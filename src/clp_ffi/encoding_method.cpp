@@ -21,6 +21,7 @@ PyObject* encode_preamble (PyObject* self, PyObject* args) {
     const std::string timezone(input_timezone);
     const std::string timestamp_pattern_syntax = "";
     std::vector<int8_t> ir_buf;
+
     if (false ==
         ffi::ir_stream::four_byte_encoding::encode_preamble(
                 timestamp_format, timestamp_pattern_syntax, timezone, ref_timestamp, ir_buf)) {
@@ -46,6 +47,7 @@ PyObject* encode_message_and_timestamp_delta (PyObject* self, PyObject* args) {
 
     std::string logtype;
     std::vector<int8_t> ir_buf;
+    ir_buf.reserve(input_buffer.len * 2);
     std::string_view msg(static_cast<char const*>(input_buffer.buf), input_buffer.len);
 
     // Encode the message
@@ -71,6 +73,7 @@ PyObject* encode_message (PyObject* self, PyObject* args) {
 
     std::string logtype;
     std::vector<int8_t> ir_buf;
+    ir_buf.reserve(input_buffer.len * 2);
 
     std::string_view msg(static_cast<char const*>(input_buffer.buf), input_buffer.len);
     if (false == ffi::ir_stream::four_byte_encoding::encode_message(msg, logtype, ir_buf)) {
