@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools >= 59.0", "setuptools_scm", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "clp_ffi_py"
+version = "0.0.0"
+license = { text = "Apache License 2.0" }
+authors = [
+    { name="zhihao lin", email="lin.zhihao@yscope.com" },
+]
+description = "Logging/encoding/decoding using CLP's IR stream format"
+readme = "README.md"
+requires-python = ">=3.6"
+dependencies = [
+    "typing-extensions >= 4.1.1",
+]
+classifiers = [
+"License :: OSI Approved :: Apache Software License",
+]
+
+[project.urls]
+
+[tool.setuptools_scm]
+
+[tool.mypy]
+strict = true
+pretty = true
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+color = true
+preview = true

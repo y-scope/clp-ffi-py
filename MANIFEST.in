@@ -1,0 +1,5 @@
+recursive-include src/clp/components/core/src *.hpp
+recursive-include src/clp/components/core/src *.tpp
+include src/clp/components/core/submodules/json/single_include/nlohmann/json.hpp
+include src/clp_ffi/*.hpp
+include src/clp_ffi/*.tpp
