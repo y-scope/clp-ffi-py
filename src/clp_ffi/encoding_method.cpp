@@ -5,10 +5,10 @@
 #include "encoding_method.hpp"
 
 namespace clp_ffi_py::encoder::four_byte_encoding {
-const char* arg_parsing_error = "Native preamble encoder failed to parse Python arguments.";
-const char* timestamp_encoding_error = "Timestamp delta > signed int32 currently unsupported";
-const char* preamble_encoding_error = "Metadata length > unsigned short currently unsupported";
-const char* message_encoding_error = "Native encoder cannot handle the given message";
+char const* arg_parsing_error = "Native preamble encoder failed to parse Python arguments.";
+char const* timestamp_encoding_error = "Timestamp delta > signed int32 currently unsupported";
+char const* preamble_encoding_error = "Metadata length > unsigned short currently unsupported";
+char const* message_encoding_error = "Native encoder cannot handle the given message";
 
 PyObject* encode_preamble (PyObject* self, PyObject* args) {
     ffi::epoch_time_ms_t ref_timestamp;

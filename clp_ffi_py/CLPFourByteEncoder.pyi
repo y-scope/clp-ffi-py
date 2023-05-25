@@ -2,7 +2,6 @@
 This file contains clp IR four-byte encoding methods.
 """
 
-
 def encode_preamble(ref_timestamp: int, timestamp_format: str, timezone: str) -> bytearray:
     """
     Create the encoded CLP preamble for a stream of encoded log messages.
@@ -18,7 +17,6 @@ def encode_preamble(ref_timestamp: int, timestamp_format: str, timezone: str) ->
     """
     ...
 
-
 def encode_message_and_timestamp_delta(timestamp_delta: int, msg: bytes) -> bytearray:
     """
     Encode the log `msg` along with the timestamp delta.
@@ -32,22 +30,20 @@ def encode_message_and_timestamp_delta(timestamp_delta: int, msg: bytes) -> byte
     """
     ...
 
-
-def encode_message(msg: bytes) -> bytearray: 
+def encode_message(msg: bytes) -> bytearray:
     """
     Encode the log `msg`.
-    
+
     :param msg: Log message to encode.
     :raises NotImplementedError: If the log message failed to encode.
     :return: The encoded message.
     """
     ...
 
-
 def encode_timestamp_delta(timestamp_delta: int) -> bytearray:
     """
     Encode the timestamp.
-    
+
     :param timestamp_delta: Timestamp difference in miliseconds between the
     current log message and the previous log message.
     :raises NotImplementedError: If the timestamp delta exceeds the supported
