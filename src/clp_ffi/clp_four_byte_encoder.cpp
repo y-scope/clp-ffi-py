@@ -9,8 +9,8 @@ static PyMethodDef EncoderMethods[] = {
          METH_VARARGS,
          "encode the preamble with a reference timestamp, a timestamp format, and a time zone."},
 
-        {"encode_message_and_timestamp",
-         clp_ffi_py::encoder::four_byte_encoding::encode_message_and_timestamp,
+        {"encode_message_and_timestamp_delta",
+         clp_ffi_py::encoder::four_byte_encoding::encode_message_and_timestamp_delta,
          METH_VARARGS,
          "encode the log message with the message content and the timestamp delta."},
 
@@ -19,8 +19,8 @@ static PyMethodDef EncoderMethods[] = {
          METH_VARARGS,
          "encode the log message content"},
 
-        {"encode_timestamp",
-         clp_ffi_py::encoder::four_byte_encoding::encode_timestamp,
+        {"encode_timestamp_delta",
+         clp_ffi_py::encoder::four_byte_encoding::encode_timestamp_delta,
          METH_VARARGS,
          "encode the timestamp delta."},
 
