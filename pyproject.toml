@@ -32,3 +32,6 @@ line-length = 100
 target-version = ["py311"]
 color = true
 preview = true
+
+[tool.cibuildwheel.macos]
+archs = ["x86_64", "universal2", "arm64"]
