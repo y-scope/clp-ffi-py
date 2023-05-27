@@ -48,10 +48,11 @@ formatting tools (found in [requirements-dev.txt](requirements-dev.txt)):
 
   * This formats the Python code according to Black's code-style rules. You should
     review and add any changes to your PR.
-* clang-format: `clang-format -i src/clp_ffi/*`
+* [clang-format][4]: `clang-format -i src/clp_ffi/*`
 
   * This formats the C++ code according to the code-style rules specified in `.clang-format`. You should review and add any changes to your PR.
 
 [1]: https://mypy.readthedocs.io/en/stable/index.html
 [2]: https://mypy.readthedocs.io/en/stable/common_issues.html#spurious-errors-and-locally-silencing-the-checker
 [3]: https://black.readthedocs.io/en/stable/index.html
+[4]: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
