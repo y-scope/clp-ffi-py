@@ -2,7 +2,7 @@
 
 /**
  * Method table
-*/
+ */
 static PyMethodDef EncoderMethods[] = {
         {"encode_preamble",
          clp_ffi_py::encoder::four_byte_encoding::encode_preamble,
@@ -28,13 +28,13 @@ static PyMethodDef EncoderMethods[] = {
 
 /**
  * Module definition
-*/
+ */
 static struct PyModuleDef clp_four_byte_encoder = {
         PyModuleDef_HEAD_INIT, "CLPFourByteEncoder", NULL, -1, EncoderMethods};
 
 /**
  * Module initialization
-*/
+ */
 PyMODINIT_FUNC PyInit_CLPFourByteEncoder (void) {
     return PyModule_Create(&clp_four_byte_encoder);
 }

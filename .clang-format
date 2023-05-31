@@ -16,7 +16,7 @@ NamespaceIndentation: Inner
 PackConstructorInitializers: CurrentLine
 PointerAlignment: Left
 QualifierAlignment: Right
-ReflowComments: false
+ReflowComments: true
 SpaceBeforeCtorInitializerColon: true
 SpaceBeforeInheritanceColon: true
 SpaceBeforeParens: Custom
