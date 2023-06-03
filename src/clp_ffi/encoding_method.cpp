@@ -2,14 +2,11 @@
 
 #include "../clp/components/core/src/ffi/encoding_methods.hpp"
 #include "../clp/components/core/src/ffi/ir_stream/encoding_methods.hpp"
+
+#include "ErrorMessage.hpp"
 #include "encoding_method.hpp"
 
 namespace clp_ffi_py::encoder::four_byte_encoding {
-char const* arg_parsing_error = "Native preamble encoder failed to parse Python arguments.";
-char const* timestamp_encoding_error = "Timestamp delta > signed int32 currently unsupported";
-char const* preamble_encoding_error = "Metadata length > unsigned short currently unsupported";
-char const* message_encoding_error = "Native encoder cannot handle the given message";
-
 PyObject* encode_preamble (PyObject* self, PyObject* args) {
     ffi::epoch_time_ms_t ref_timestamp;
     char const* input_timestamp_format;
@@ -17,7 +14,7 @@ PyObject* encode_preamble (PyObject* self, PyObject* args) {
 
     if (false ==
         PyArg_ParseTuple(args, "Lss", &ref_timestamp, &input_timestamp_format, &input_timezone)) {
-        PyErr_SetString(PyExc_RuntimeError, arg_parsing_error);
+        PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::ErrorMessage::arg_parsing_error);
         Py_RETURN_NONE;
     }
 
@@ -29,7 +26,8 @@ PyObject* encode_preamble (PyObject* self, PyObject* args) {
     if (false ==
         ffi::ir_stream::four_byte_encoding::encode_preamble(
                 timestamp_format, timestamp_pattern_syntax, timezone, ref_timestamp, ir_buf)) {
-        PyErr_SetString(PyExc_NotImplementedError, preamble_encoding_error);
+        PyErr_SetString(PyExc_NotImplementedError,
+                        clp_ffi_py::ErrorMessage::Encoding::preamble_error);
         Py_RETURN_NONE;
     }
 
@@ -44,7 +42,7 @@ PyObject* encode_message_and_timestamp_delta (PyObject* self, PyObject* args) {
     ffi::epoch_time_ms_t delta;
     Py_buffer input_buffer;
     if (false == PyArg_ParseTuple(args, "Ly*", &delta, &input_buffer)) {
-        PyErr_SetString(PyExc_RuntimeError, arg_parsing_error);
+        PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::ErrorMessage::arg_parsing_error);
         Py_RETURN_NONE;
     }
 
@@ -56,14 +54,16 @@ PyObject* encode_message_and_timestamp_delta (PyObject* self, PyObject* args) {
     // Encode the message
     if (false == ffi::ir_stream::four_byte_encoding::encode_message(msg, logtype, ir_buf)) {
         PyBuffer_Release(&input_buffer);
-        PyErr_SetString(PyExc_NotImplementedError, message_encoding_error);
+        PyErr_SetString(PyExc_NotImplementedError,
+                        clp_ffi_py::ErrorMessage::Encoding::message_error);
         Py_RETURN_NONE;
     }
 
     // Encode the timestamp
     if (false == ffi::ir_stream::four_byte_encoding::encode_timestamp(delta, ir_buf)) {
         PyBuffer_Release(&input_buffer);
-        PyErr_SetString(PyExc_NotImplementedError, timestamp_encoding_error);
+        PyErr_SetString(PyExc_NotImplementedError,
+                        clp_ffi_py::ErrorMessage::Encoding::timestamp_error);
         Py_RETURN_NONE;
     }
 
@@ -77,7 +77,7 @@ PyObject* encode_message_and_timestamp_delta (PyObject* self, PyObject* args) {
 PyObject* encode_message (PyObject* self, PyObject* args) {
     Py_buffer input_buffer;
     if (false == PyArg_ParseTuple(args, "y*", &input_buffer)) {
-        PyErr_SetString(PyExc_RuntimeError, arg_parsing_error);
+        PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::ErrorMessage::arg_parsing_error);
         Py_RETURN_NONE;
     }
 
@@ -87,7 +87,8 @@ PyObject* encode_message (PyObject* self, PyObject* args) {
 
     std::string_view msg(static_cast<char const*>(input_buffer.buf), input_buffer.len);
     if (false == ffi::ir_stream::four_byte_encoding::encode_message(msg, logtype, ir_buf)) {
-        PyErr_SetString(PyExc_NotImplementedError, message_encoding_error);
+        PyErr_SetString(PyExc_NotImplementedError,
+                        clp_ffi_py::ErrorMessage::Encoding::message_error);
         Py_RETURN_NONE;
     }
 
@@ -101,13 +102,14 @@ PyObject* encode_message (PyObject* self, PyObject* args) {
 PyObject* encode_timestamp_delta (PyObject* self, PyObject* args) {
     ffi::epoch_time_ms_t delta;
     if (false == PyArg_ParseTuple(args, "L", &delta)) {
-        PyErr_SetString(PyExc_RuntimeError, arg_parsing_error);
+        PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::ErrorMessage::arg_parsing_error);
         Py_RETURN_NONE;
     }
 
     std::vector<int8_t> ir_buf;
     if (false == ffi::ir_stream::four_byte_encoding::encode_timestamp(delta, ir_buf)) {
-        PyErr_SetString(PyExc_NotImplementedError, timestamp_encoding_error);
+        PyErr_SetString(PyExc_NotImplementedError,
+                        clp_ffi_py::ErrorMessage::Encoding::timestamp_error);
         Py_RETURN_NONE;
     }
 
