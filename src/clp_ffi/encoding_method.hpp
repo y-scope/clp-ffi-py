@@ -1,12 +1,11 @@
-#ifndef CLP_PY_ENCODING_METHOD
-#define CLP_PY_ENCODING_METHOD
+#ifndef CLP_FFI_PY_ENCODING_METHOD
+#define CLP_FFI_PY_ENCODING_METHOD
 
-#include <Python.h>
+#include "Python.hpp"
 
 namespace clp_ffi_py::encoder::four_byte_encoding {
 /**
- * Given the reference timestamp, the timestamp format, and the time zone,
- * encode the preamble
+ * Encodes the preamble
  * @param self
  * @param args, the reference timestamp, the timestamp format, and the time
  * zone are expected in sequence
@@ -15,8 +14,7 @@ namespace clp_ffi_py::encoder::four_byte_encoding {
 PyObject* encode_preamble (PyObject* self, PyObject* args);
 
 /**
- * Given the timestamp delta of the last log message and the content of the
- * current log message, encode the message using 4-byte encoding
+ * Encodes the message and timestamp delta using 4-byte encoding
  * @param self
  * @param args, timestamp delta and input byte buffer of the current log
  * message are expected in sequence
