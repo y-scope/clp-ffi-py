@@ -47,9 +47,7 @@ PyDoc_STRVAR(
         ":raises NotImplementedError: If the timestamp failed to encode.\n"
         ":return: The encoded timestamp.\n");
 
-PyDoc_STRVAR(
-        module_doc,
-        "Python interface to the CLP IR four byte encoding methods.");
+PyDoc_STRVAR(module_doc, "Python interface to the CLP IR four byte encoding methods.");
 
 /**
  * Method table

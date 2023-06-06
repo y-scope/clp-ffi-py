@@ -11,7 +11,7 @@ namespace clp_ffi_py::encoder::four_byte_encoding {
  * zone are expected in sequence
  * @return A Python bytesarray containing the encoded preamble
  */
-PyObject* encode_preamble (PyObject* self, PyObject* args);
+auto encode_preamble (PyObject* self, PyObject* args) -> PyObject*;
 
 /**
  * Encodes the message and timestamp delta using 4-byte encoding
@@ -21,7 +21,7 @@ PyObject* encode_preamble (PyObject* self, PyObject* args);
  * @return A Python bytesarray containing the encoded message and timestamp
  * delta
  */
-PyObject* encode_message_and_timestamp_delta (PyObject* self, PyObject* args);
+auto encode_message_and_timestamp_delta (PyObject* self, PyObject* args) -> PyObject*;
 
 /**
  * Encodes the message using 4-byte encoding
@@ -29,7 +29,7 @@ PyObject* encode_message_and_timestamp_delta (PyObject* self, PyObject* args);
  * @param args a log message in byte array is expected
  * @return A Python bytesarray containing the encoded message
  */
-PyObject* encode_message (PyObject* self, PyObject* args);
+auto encode_message (PyObject* self, PyObject* args) -> PyObject*;
 
 /**
  * Encodes the timestamp delta using 4-byte encoding
@@ -37,7 +37,7 @@ PyObject* encode_message (PyObject* self, PyObject* args);
  * @param args timestamp delta
  * @return A Python bytesarray containing the encoded timestamp delta
  */
-PyObject* encode_timestamp_delta (PyObject* self, PyObject* args);
+auto encode_timestamp_delta (PyObject* self, PyObject* args) -> PyObject*;
 } // namespace clp_ffi_py::encoder::four_byte_encoding
 
 #endif

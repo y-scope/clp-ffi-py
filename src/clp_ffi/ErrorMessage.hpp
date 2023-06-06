@@ -3,9 +3,10 @@
 
 namespace clp_ffi_py::error_messages {
 namespace Encoding {
-    constexpr char timestamp_error[] = "Native encoder cannot encode the given timestamp delta";
-    constexpr char preamble_error[] = "Native encoder cannot encode the given preamble";
-    constexpr char message_error[] = "Native encoder cannot encode the given message";
+    constexpr char const* cTimestampError =
+            "Native encoder cannot encode the given timestamp delta";
+    constexpr char const* cPreambleError = "Native encoder cannot encode the given preamble";
+    constexpr char const* cMessageError = "Native encoder cannot encode the given message";
 } // namespace Encoding
 } // namespace clp_ffi_py::error_messages
 #endif
