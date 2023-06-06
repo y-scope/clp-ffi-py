@@ -1,42 +1,41 @@
 #ifndef CLP_FFI_PY_ENCODING_METHOD
 #define CLP_FFI_PY_ENCODING_METHOD
 
-#include "Python.hpp"
+#include "../Python.hpp"
 
 namespace clp_ffi_py::encoder::four_byte_encoding {
 /**
  * Encodes the preamble
  * @param self
- * @param args, the reference timestamp, the timestamp format, and the time
+ * @param args the reference timestamp, the timestamp format, and the time
  * zone are expected in sequence
- * @return python bytearray that contains the encoded preamble
+ * @return A Python bytesarray containing the encoded preamble
  */
 PyObject* encode_preamble (PyObject* self, PyObject* args);
 
 /**
  * Encodes the message and timestamp delta using 4-byte encoding
  * @param self
- * @param args, timestamp delta and input byte buffer of the current log
+ * @param args timestamp delta and input byte buffer of the current log
  * message are expected in sequence
- * @return python bytearray that contains the encoded message
+ * @return A Python bytesarray containing the encoded message and timestamp
+ * delta
  */
 PyObject* encode_message_and_timestamp_delta (PyObject* self, PyObject* args);
 
 /**
- * Encode the given message into IR and write it into the buffer using
- * 4-byte encoding
+ * Encodes the message using 4-byte encoding
  * @param self
- * @param args, a log message in byte array is expected
- * @return python bytearray that contains the encoded message
+ * @param args a log message in byte array is expected
+ * @return A Python bytesarray containing the encoded message
  */
 PyObject* encode_message (PyObject* self, PyObject* args);
 
 /**
- * Encode the given timestamp delta into IR and write it into the buffer
- * using 4-byte encoding
+ * Encodes the timestamp delta using 4-byte encoding
  * @param self
- * @param args, timestamp delta
- * @return python bytearray that contains the encoded message
+ * @param args timestamp delta
+ * @return A Python bytesarray containing the encoded timestamp delta
  */
 PyObject* encode_timestamp_delta (PyObject* self, PyObject* args);
 } // namespace clp_ffi_py::encoder::four_byte_encoding

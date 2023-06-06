@@ -9,8 +9,8 @@ clp_four_byte_encoder: Extension = Extension(
         "src/clp/components/core/src/ffi/encoding_methods.cpp",
         "src/clp/components/core/src/string_utils.cpp",
         "src/clp/components/core/src/TraceableException.cpp",
-        "src/clp_ffi/clp_four_byte_encoder.cpp",
-        "src/clp_ffi/encoding_method.cpp"
+        "src/clp_ffi/modules/clp_four_byte_encoder.cpp",
+        "src/clp_ffi/encoder/encoding_methods.cpp"
     ],
     extra_compile_args=[
         '-std=c++17',
@@ -24,7 +24,6 @@ clp_four_byte_encoder: Extension = Extension(
 
 setup(
     name="clp_ffi_py",
-    version="0.0",
     description="CLP FFI Python Interface",
     ext_modules=[clp_four_byte_encoder],
     packages=["clp_ffi_py"],
