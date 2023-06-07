@@ -1,6 +1,14 @@
 #include "../Python.hpp"
 
+#include "../clang_tidy_macro.hpp"
 #include "../encoder/encoding_methods.hpp"
+
+#include <array>
+
+// NOLINTBEGIN(*-avoid-c-arrays)
+// NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
+// NOLINTBEGIN(modernize-use-trailing-return-type)
+// NOLINTBEGIN(readability-identifier-naming)
 
 PyDoc_STRVAR(
         encode_preamble_doc,
@@ -56,22 +64,22 @@ static PyMethodDef encoder_method[] = {
         {"encode_preamble",
          clp_ffi_py::encoder::four_byte_encoding::encode_preamble,
          METH_VARARGS,
-         encode_preamble_doc},
+         static_cast<char const*>(encode_preamble_doc)},
 
         {"encode_message_and_timestamp_delta",
          clp_ffi_py::encoder::four_byte_encoding::encode_message_and_timestamp_delta,
          METH_VARARGS,
-         encode_message_and_timestamp_delta_doc},
+         static_cast<char const*>(encode_message_and_timestamp_delta_doc)},
 
         {"encode_message",
          clp_ffi_py::encoder::four_byte_encoding::encode_message,
          METH_VARARGS,
-         encode_message_doc},
+         static_cast<char const*>(encode_message_doc)},
 
         {"encode_timestamp_delta",
          clp_ffi_py::encoder::four_byte_encoding::encode_timestamp_delta,
          METH_VARARGS,
-         encode_timestamp_delta_doc},
+         static_cast<char const*>(encode_timestamp_delta_doc)},
 
         {nullptr, nullptr, 0, nullptr}};
 
@@ -79,7 +87,11 @@ static PyMethodDef encoder_method[] = {
  * Module definition
  */
 static PyModuleDef clp_four_byte_encoder = {
-        PyModuleDef_HEAD_INIT, "CLPFourByteEncoder", module_doc, 0, encoder_method};
+        PyModuleDef_HEAD_INIT,
+        "CLPFourByteEncoder",
+        static_cast<char const*>(module_doc),
+        0,
+        static_cast<PyMethodDef*>(encoder_method)};
 
 /**
  * Module initialization
@@ -87,3 +99,8 @@ static PyModuleDef clp_four_byte_encoder = {
 PyMODINIT_FUNC PyInit_CLPFourByteEncoder () {
     return PyModule_Create(&clp_four_byte_encoder);
 }
+
+// NOLINTEND(readability-identifier-naming)
+// NOLINTEND(modernize-use-trailing-return-type)
+// NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
+// NOLINTEND(*-avoid-c-arrays)

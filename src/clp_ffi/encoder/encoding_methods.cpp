@@ -6,6 +6,9 @@
 #include "../ErrorMessage.hpp"
 #include "encoding_methods.hpp"
 
+// NOLINTBEGIN(cppcoreguidelines-init-variables)
+// NOLINTBEGIN(cppcoreguidelines-pro-type-vararg)
+
 namespace clp_ffi_py::encoder::four_byte_encoding {
 auto encode_preamble (PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
     ffi::epoch_time_ms_t ref_timestamp;
@@ -14,14 +17,14 @@ auto encode_preamble (PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
     Py_ssize_t input_timestamp_format_size;
     Py_ssize_t input_timezone_size;
 
-    if (false == PyArg_ParseTuple(
-                         args,
-                         "Ls#s#",
-                         &ref_timestamp,
-                         &input_timestamp_format,
-                         &input_timestamp_format_size,
-                         &input_timezone,
-                         &input_timezone_size)) {
+    if (0 == PyArg_ParseTuple(
+                     args,
+                     "Ls#s#",
+                     &ref_timestamp,
+                     &input_timestamp_format,
+                     &input_timestamp_format_size,
+                     &input_timezone,
+                     &input_timezone_size)) {
         return nullptr;
     }
 
@@ -40,14 +43,14 @@ auto encode_preamble (PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
     }
 
     return PyByteArray_FromStringAndSize(
-            size_checked_pointer_cast<char>(ir_buf.data()), ir_buf.size());
+            size_checked_pointer_cast<char>(ir_buf.data()), static_cast<Py_ssize_t>(ir_buf.size()));
 }
 
 auto encode_message_and_timestamp_delta (PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
     ffi::epoch_time_ms_t delta;
     char const* input_buffer;
     Py_ssize_t input_buffer_size;
-    if (false == PyArg_ParseTuple(args, "Ly#", &delta, &input_buffer, &input_buffer_size)) {
+    if (0 == PyArg_ParseTuple(args, "Ly#", &delta, &input_buffer, &input_buffer_size)) {
         return nullptr;
     }
 
@@ -73,13 +76,13 @@ auto encode_message_and_timestamp_delta (PyObject* Py_UNUSED(self), PyObject* ar
     }
 
     return PyByteArray_FromStringAndSize(
-            size_checked_pointer_cast<char>(ir_buf.data()), ir_buf.size());
+            size_checked_pointer_cast<char>(ir_buf.data()), static_cast<Py_ssize_t>(ir_buf.size()));
 }
 
 auto encode_message (PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
     char const* input_buffer;
     Py_ssize_t input_buffer_size;
-    if (false == PyArg_ParseTuple(args, "y#", &input_buffer, &input_buffer_size)) {
+    if (0 == PyArg_ParseTuple(args, "y#", &input_buffer, &input_buffer_size)) {
         return nullptr;
     }
 
@@ -97,12 +100,12 @@ auto encode_message (PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
     }
 
     return PyByteArray_FromStringAndSize(
-            size_checked_pointer_cast<char>(ir_buf.data()), ir_buf.size());
+            size_checked_pointer_cast<char>(ir_buf.data()), static_cast<Py_ssize_t>(ir_buf.size()));
 }
 
 auto encode_timestamp_delta (PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
     ffi::epoch_time_ms_t delta;
-    if (false == PyArg_ParseTuple(args, "L", &delta)) {
+    if (0 == PyArg_ParseTuple(args, "L", &delta)) {
         return nullptr;
     }
 
@@ -114,6 +117,9 @@ auto encode_timestamp_delta (PyObject* Py_UNUSED(self), PyObject* args) -> PyObj
     }
 
     return PyByteArray_FromStringAndSize(
-            size_checked_pointer_cast<char>(ir_buf.data()), ir_buf.size());
+            size_checked_pointer_cast<char>(ir_buf.data()), static_cast<Py_ssize_t>(ir_buf.size()));
 }
 } // namespace clp_ffi_py::encoder::four_byte_encoding
+
+// NOLINTEND(cppcoreguidelines-pro-type-vararg)
+// NOLINTEND(cppcoreguidelines-init-variables)
