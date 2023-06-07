@@ -11,14 +11,19 @@ Tested on Python 3.8 and 3.10, and it should work on any Python version >= 3.6.
 
 To manually build a package for distribution, run the following step. It should generate both .tar.gz package and .whl package under `./dist/`.
 
-1. Create and enter a virtual environment:
-   `python3 -m venv venv && . ./venv/bin/activate`
-2. Install development dependencies:
-   `pip install -r requirements-dev.txt`
-3. Pull all submodules in preparation for building:
-   `git submodule update --init --recursive`
-4. Build:
-   `python -m build`
+```bash
+# 1. Create and enter a virtual environment
+python -m venv venv && . ./venv/bin/activate
+
+# 2. Install development dependencies:
+pip install .[dev]
+
+# 3. Pull all submodules in preparation for building:
+git submodule update --init --recursive
+
+# 4. Build:
+python -m build
+```
 
 ## Testing
 
