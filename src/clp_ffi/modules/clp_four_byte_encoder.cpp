@@ -1,9 +1,5 @@
 #include "../Python.hpp"
-
-#include "../clang_tidy_macro.hpp"
 #include "../encoder/encoding_methods.hpp"
-
-#include <array>
 
 // NOLINTBEGIN(*-avoid-c-arrays)
 // NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
