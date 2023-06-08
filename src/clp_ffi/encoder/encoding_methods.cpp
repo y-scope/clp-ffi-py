@@ -43,7 +43,7 @@ auto encode_preamble (PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
                          ir_buf)) {
         PyErr_SetString(
                 PyExc_NotImplementedError,
-                clp_ffi_py::error_messages::Encoding::cPreambleError);
+                clp_ffi_py::error_messages::encoder::cPreambleError);
         return nullptr;
     }
 
@@ -71,7 +71,7 @@ auto encode_message_and_timestamp_delta (PyObject* Py_UNUSED(self), PyObject* ar
     if (false == ffi::ir_stream::four_byte_encoding::encode_message(msg, logtype, ir_buf)) {
         PyErr_SetString(
                 PyExc_NotImplementedError,
-                clp_ffi_py::error_messages::Encoding::cMessageError);
+                clp_ffi_py::error_messages::encoder::cMessageError);
         return nullptr;
     }
 
@@ -79,7 +79,7 @@ auto encode_message_and_timestamp_delta (PyObject* Py_UNUSED(self), PyObject* ar
     if (false == ffi::ir_stream::four_byte_encoding::encode_timestamp(delta, ir_buf)) {
         PyErr_SetString(
                 PyExc_NotImplementedError,
-                clp_ffi_py::error_messages::Encoding::cTimestampError);
+                clp_ffi_py::error_messages::encoder::cTimestampError);
         return nullptr;
     }
 
@@ -105,7 +105,7 @@ auto encode_message (PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
     if (false == ffi::ir_stream::four_byte_encoding::encode_message(msg, logtype, ir_buf)) {
         PyErr_SetString(
                 PyExc_NotImplementedError,
-                clp_ffi_py::error_messages::Encoding::cMessageError);
+                clp_ffi_py::error_messages::encoder::cMessageError);
         return nullptr;
     }
 
@@ -124,7 +124,7 @@ auto encode_timestamp_delta (PyObject* Py_UNUSED(self), PyObject* args) -> PyObj
     if (false == ffi::ir_stream::four_byte_encoding::encode_timestamp(delta, ir_buf)) {
         PyErr_SetString(
                 PyExc_NotImplementedError,
-                clp_ffi_py::error_messages::Encoding::cTimestampError);
+                clp_ffi_py::error_messages::encoder::cTimestampError);
         return nullptr;
     }
 
