@@ -95,14 +95,14 @@ auto encode_message (PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
         return nullptr;
     }
 
-    std::string logtype;
+    std::string log_type;
     std::vector<int8_t> ir_buf;
     std::string_view msg{input_buffer, static_cast<size_t>(input_buffer_size)};
 
     // To avoid the frequent expansion of ir_buf, allocate sufficient space in advance
     ir_buf.reserve(input_buffer_size * 2);
 
-    if (false == ffi::ir_stream::four_byte_encoding::encode_message(msg, logtype, ir_buf)) {
+    if (false == ffi::ir_stream::four_byte_encoding::encode_message(msg, log_type, ir_buf)) {
         PyErr_SetString(
                 PyExc_NotImplementedError,
                 clp_ffi_py::error_messages::encoder::cMessageError);
