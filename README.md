@@ -18,13 +18,13 @@ This process will generate both .tar.gz package and .whl package under `./dist/`
 # 1. Create and enter a virtual environment
 python -m venv venv && . ./venv/bin/activate
 
-# 2. Install development dependencies:
+# 2. Install development dependencies
 pip install -r requirements-dev.txt
 
-# 3. Pull all submodules in preparation for building:
+# 3. Pull all submodules in preparation for building
 git submodule update --init --recursive
 
-# 4. Build:
+# 4. Build
 python -m build
 ```
 
@@ -34,23 +34,23 @@ python -m build
 # 1. Create and enter a virtual environment
 python -m venv venv && . ./venv/bin/activate
 
-# 2. Install development dependencies:
+# 2. Install development dependencies
 pip install -r requirements-dev.txt
 
-# 3. Pull all submodules in preparation for building:
+# 3. Pull all submodules in preparation for building
 git submodule update --init --recursive
 
-# 4. Install:
+# 4. Install
 pip install -e .
 ```
 
 ## Build and Test with cibuildwheel
 
 This project utilizes [cibuildwheel][7] configuration.
-Whenever modifications are made and committed to Github,
+Whenever modifications are made and committed to GitHub,
 the cibuildwheel Action will automatically initiate,
 building this library for several Python environments across diverse OS and architectures.
-You can access the build outcomes (wheel files) via the Github Action page.
+You can access the build outcomes (wheel files) via the GitHub Action page.
 For instructions on customizing the build targets or running cibuildwheel locally,
 please refer to the official documentation of cibuildwheel.
 
@@ -70,6 +70,19 @@ and formatting tools (found in [pyproject.toml]):
   * This formats the C++ code according to the code-style rules specified in `.clang-format`.
     You should review and add any changes to your PR.
 
+
+Additionally, the following tools can be useful during development. However, they cannot be installed
+using `pip`, so developers need to install them using other package management tools such as `apt-get`:
+
+* [clang-tidy][8]: `clang-tidy --extra-arg=-std=c++17 PATH_TO_THE_FILE`
+  * This static analysis tool catches improper coding behaviors based on the rules specified in
+    `.clang-tidy`, and sends suggestions corresponding to each warning. Developers should manually
+    review all the warnings and try with their best effort to fix the reasonable ones.
+* [bear][9]: `bear python setup.py build`
+  * This tool generates a JSON compilation database on the project's root directory named
+    `compile_commands.json`. This file will be used by clang-tidy to execute the static analysis.
+    It also helps IDEs to configure code completion (such as VSCode).
+
 [1]: https://github.com/y-scope/clp/tree/main/components/core
 [2]: https://github.com/y-scope/clp
 [3]: https://mypy.readthedocs.io/en/stable/index.html
@@ -77,3 +90,5 @@ and formatting tools (found in [pyproject.toml]):
 [5]: https://black.readthedocs.io/en/stable/index.html
 [6]: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 [7]: https://cibuildwheel.readthedocs.io/en/stable/
+[8]: https://clang.llvm.org/extra/clang-tidy/
+[9]: https://github.com/rizsotto/Bear
