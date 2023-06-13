@@ -2,16 +2,17 @@
 
 This module provides Python packages to interface with [CLP Core Features][1]
 through CLP's FFI (foreign function interface).
-Currently, this library provides native methods to encode/decode log messages with [CLP][2].
+At present, this library supplies built-in functions for encoding/decoding log 
+messages using [CLP][2].
 
 ## Compatibility
 
-Tested on Python 3.8 and 3.10, and it should work on any Python version >= 3.6.
+Tested on Python 3.8, 3.9 and 3.10, and it should work on any Python version >= 3.6.
 
 ## Building/Packaging
 
-To manually build a package for distribution, run the following step.
-It should generate both .tar.gz package and .whl package under `./dist/`.
+To manually build a package for distribution, run the following steps.
+This process will generate both .tar.gz package and .whl package under `./dist/` directory.
 
 ```bash
 # 1. Create and enter a virtual environment
@@ -50,7 +51,8 @@ Whenever modifications are made and committed to Github,
 the cibuildwheel Action will automatically initiate,
 building this library for several Python environments across diverse OS and architectures.
 You can access the build outcomes (wheel files) via the Github Action page.
-To customize the build targets, please check cibuildwheel official documents.
+For instructions on customizing the build targets or running cibuildwheel locally,
+please refer to the official documentation of cibuildwheel.
 
 ## Contributing
 
