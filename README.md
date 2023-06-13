@@ -19,7 +19,7 @@ This process will generate both .tar.gz package and .whl package under `./dist/`
 python -m venv venv && . ./venv/bin/activate
 
 # 2. Install development dependencies:
-pip install .[dev]
+pip install -r requirements-dev.txt
 
 # 3. Pull all submodules in preparation for building:
 git submodule update --init --recursive
@@ -35,7 +35,7 @@ python -m build
 python -m venv venv && . ./venv/bin/activate
 
 # 2. Install development dependencies:
-pip install .[dev]
+pip install -r requirements-dev.txt
 
 # 3. Pull all submodules in preparation for building:
 git submodule update --init --recursive
