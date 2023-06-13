@@ -56,7 +56,7 @@ PyDoc_STRVAR(module_doc, "Python interface to the CLP IR four byte encoding meth
 /**
  * Method table
  */
-static PyMethodDef encoder_method[] = {
+static PyMethodDef encoder_method[]{
         {"encode_preamble",
          clp_ffi_py::encoder::four_byte_encoding::encode_preamble,
          METH_VARARGS,
@@ -82,7 +82,7 @@ static PyMethodDef encoder_method[] = {
 /**
  * Module definition
  */
-static PyModuleDef clp_four_byte_encoder = {
+static PyModuleDef clp_four_byte_encoder{
         PyModuleDef_HEAD_INIT,
         "CLPFourByteEncoder",
         static_cast<char const*>(module_doc),
