@@ -32,12 +32,11 @@ auto encode_preamble(PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
             input_timestamp_format,
             static_cast<size_t>(input_timestamp_format_size)};
     std::string const timezone{input_timezone, static_cast<size_t>(input_timezone_size)};
-    std::string const timestamp_pattern_syntax{};
     std::vector<int8_t> ir_buf;
 
     if (false == ffi::ir_stream::four_byte_encoding::encode_preamble(
                          timestamp_format,
-                         timestamp_pattern_syntax,
+                         {},
                          timezone,
                          ref_timestamp,
                          ir_buf)) {
