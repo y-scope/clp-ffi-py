@@ -35,8 +35,6 @@ dev = [
     "tomli==2.0.1",
 ]
 
-[project.urls]
-
 [tool.setuptools_scm]
 
 [tool.mypy]
