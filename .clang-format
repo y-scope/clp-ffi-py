@@ -26,8 +26,6 @@ SpaceBeforeInheritanceColon: true
 SpaceBeforeParens: Custom
 SpaceBeforeParensOptions:
     AfterControlStatements: true
-    AfterFunctionDeclarationName: true
-    AfterFunctionDefinitionName: true
 SpaceBeforeRangeBasedForLoopColon: true
 SpaceInEmptyBlock: false
 Standard: Latest

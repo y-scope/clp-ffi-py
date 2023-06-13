@@ -92,7 +92,7 @@ static PyModuleDef clp_four_byte_encoder = {
 /**
  * Module initialization
  */
-PyMODINIT_FUNC PyInit_CLPFourByteEncoder () {
+PyMODINIT_FUNC PyInit_CLPFourByteEncoder() {
     return PyModule_Create(&clp_four_byte_encoder);
 }
 

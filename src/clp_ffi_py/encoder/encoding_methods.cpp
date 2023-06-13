@@ -1,5 +1,5 @@
-#include <clp_ffi_py/Python.hpp>
 #include <clp_ffi_py/ErrorMessage.hpp>
+#include <clp_ffi_py/Python.hpp>
 #include <clp_ffi_py/encoder/encoding_methods.hpp>
 
 #include <clp/components/core/src/ffi/encoding_methods.hpp>
@@ -10,7 +10,7 @@
 // NOLINTBEGIN(cppcoreguidelines-pro-type-vararg)
 
 namespace clp_ffi_py::encoder::four_byte_encoding {
-auto encode_preamble (PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
+auto encode_preamble(PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
     ffi::epoch_time_ms_t ref_timestamp;
     char const* input_timestamp_format;
     char const* input_timezone;
@@ -52,7 +52,7 @@ auto encode_preamble (PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
             static_cast<Py_ssize_t>(ir_buf.size()));
 }
 
-auto encode_message_and_timestamp_delta (PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
+auto encode_message_and_timestamp_delta(PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
     ffi::epoch_time_ms_t delta;
     char const* input_buffer;
     Py_ssize_t input_buffer_size;
@@ -88,7 +88,7 @@ auto encode_message_and_timestamp_delta (PyObject* Py_UNUSED(self), PyObject* ar
             static_cast<Py_ssize_t>(ir_buf.size()));
 }
 
-auto encode_message (PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
+auto encode_message(PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
     char const* input_buffer;
     Py_ssize_t input_buffer_size;
     if (0 == PyArg_ParseTuple(args, "y#", &input_buffer, &input_buffer_size)) {
@@ -114,7 +114,7 @@ auto encode_message (PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
             static_cast<Py_ssize_t>(ir_buf.size()));
 }
 
-auto encode_timestamp_delta (PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
+auto encode_timestamp_delta(PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
     ffi::epoch_time_ms_t delta;
     if (0 == PyArg_ParseTuple(args, "L", &delta)) {
         return nullptr;
