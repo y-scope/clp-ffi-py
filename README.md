@@ -2,7 +2,7 @@
 
 This module provides Python packages to interface with [CLP Core Features][1]
 through CLP's FFI (foreign function interface).
-At present, this library supplies built-in functions for encoding/decoding log 
+At present, this library supplies built-in functions for encoding/decoding log
 messages using [CLP][2].
 
 ## Compatibility
@@ -66,7 +66,7 @@ and formatting tools (found in [pyproject.toml]):
 * [Black][5]: `black clp_ffi_py`
   * This formats the Python code according to Black's code-style rules. You should
     review and add any changes to your PR.
-* [clang-format][6]: `clang-format -i src/clp_ffi/*`
+* [clang-format][6]: `clang-format -i src/clp_ffi/* src/clp_ffi/*/*`
   * This formats the C++ code according to the code-style rules specified in `.clang-format`.
     You should review and add any changes to your PR.
 
