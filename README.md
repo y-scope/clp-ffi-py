@@ -72,7 +72,7 @@ and formatting tools (found in [pyproject.toml]):
 
 
 Additionally, the following tools can be useful during development. However, they cannot be installed
-using `pip`, so developers need to install them using other package management tools such as `apt-get`:
+using `pip`. Developers need to install them using other package management tools such as `apt-get`:
 
 * [clang-tidy][8]: `clang-tidy --extra-arg=-std=c++17 PATH_TO_THE_FILE`
   * This static analysis tool catches improper coding behaviors based on the rules specified in
