@@ -10,7 +10,8 @@ PyDoc_STRVAR(
         encode_preamble_doc,
         "encode_preamble(ref_timestamp, timestamp_format, timezone)\n"
         "--\n\n"
-        "Creates the encoded CLP preamble for a stream of encoded log messages.\n"
+        "Creates the encoded CLP preamble for a stream of encoded log messages"
+        " using 4-byte encoding.\n"
         ":param ref_timestamp: Reference timestamp used to calculate deltas emitted with each "
         "message.\n"
         ":param timestamp_format: Timestamp format to be use when generating the logs with a "
@@ -24,7 +25,7 @@ PyDoc_STRVAR(
         encode_message_and_timestamp_delta_doc,
         "encode_message_and_timestamp_delta(timestamp_delta, msg)\n"
         "--\n\n"
-        "Encodes the log `msg` along with the timestamp delta.\n"
+        "Encodes the log `msg` along with the timestamp delta using 4-byte encoding.\n"
         ":param timestamp_delta: Timestamp difference in miliseconds between the current log "
         "message and the previous log message.\n"
         ":param msg: Log message to encode.\n"
@@ -36,7 +37,7 @@ PyDoc_STRVAR(
         encode_message_doc,
         "encode_message(msg)\n"
         "--\n\n"
-        "Encodes the log `msg`.\n"
+        "Encodes the log `msg` using 4-byte encoding.\n"
         ":param msg: Log message to encode.\n"
         ":raises NotImplementedError: If the log message failed to encode.\n"
         ":return: The encoded message.\n");
@@ -45,7 +46,7 @@ PyDoc_STRVAR(
         encode_timestamp_delta_doc,
         "encode_timestamp_delta(timestamp_delta)\n"
         "--\n\n"
-        "Encodes the timestamp.\n"
+        "Encodes the timestamp using 4-byte encoding.\n"
         ":param timestamp_delta: Timestamp difference in miliseconds between the current log "
         "message and the previous log message.\n"
         ":raises NotImplementedError: If the timestamp failed to encode.\n"
