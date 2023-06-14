@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools >= 59.0", "setuptools_scm", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "clp_ffi_py"
+version = "0.0.0"
+license = { text = "Apache License 2.0" }
+authors = [
+    { name="zhihao lin", email="lin.zhihao@yscope.com" },
+]
+description = "Python interface to the CLP Core Features through CLP's FFI"
+readme = "README.md"
+requires-python = ">=3.6"
+dependencies = [
+    "typing-extensions >= 4.1.1",
+]
+classifiers = [
+"License :: OSI Approved :: Apache Software License",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/y-scope/clp-ffi-py"
+"Bug Tracker" = "https://github.com/y-scope/clp-ffi-py/issues"
+
+[tool.setuptools_scm]
+
+[tool.mypy]
+strict = true
+pretty = true
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+color = true
+preview = true
+
+[tool.cibuildwheel.macos]
+archs = ["x86_64", "universal2", "arm64"]
