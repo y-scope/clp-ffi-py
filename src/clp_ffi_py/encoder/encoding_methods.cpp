@@ -1,4 +1,4 @@
-#include <clp_ffi_py/Python.hpp>
+#include <clp_ffi_py/Python.hpp> // Must always be included before any other header files
 
 #include <clp_ffi_py/encoder/encoding_methods.hpp>
 
