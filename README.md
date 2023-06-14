@@ -66,10 +66,9 @@ and formatting tools (found in [pyproject.toml]):
 * [Black][5]: `black clp_ffi_py`
   * This formats the Python code according to Black's code-style rules. You should
     review and add any changes to your PR.
-* [clang-format][6]: `clang-format -i src/clp_ffi/**`
+* [clang-format][6]: `clang-format -i src/clp_ffi_py/**`
   * This formats the C++ code according to the code-style rules specified in `.clang-format`.
     You should review and add any changes to your PR.
-
 
 Additionally, the following tools can be useful during development. However, they cannot be installed
 using `pip`. Developers need to install them using other package management tools such as `apt-get`:
