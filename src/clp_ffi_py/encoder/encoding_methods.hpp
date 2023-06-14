@@ -1,5 +1,5 @@
-#ifndef CLP_FFI_PY_ENCODING_METHOD
-#define CLP_FFI_PY_ENCODING_METHOD
+#ifndef CLP_FFI_PY_ENCODING_METHODS
+#define CLP_FFI_PY_ENCODING_METHODS
 
 #include <clp_ffi_py/Python.hpp>
 

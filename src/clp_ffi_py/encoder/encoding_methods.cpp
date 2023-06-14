@@ -1,10 +1,12 @@
-#include <clp_ffi_py/ErrorMessage.hpp>
 #include <clp_ffi_py/Python.hpp>
+
 #include <clp_ffi_py/encoder/encoding_methods.hpp>
 
 #include <clp/components/core/src/ffi/encoding_methods.hpp>
 #include <clp/components/core/src/ffi/ir_stream/encoding_methods.hpp>
 #include <clp/components/core/src/type_utils.hpp>
+
+#include <clp_ffi_py/ErrorMessage.hpp>
 
 // NOLINTBEGIN(cppcoreguidelines-init-variables)
 // NOLINTBEGIN(cppcoreguidelines-pro-type-vararg)
@@ -28,10 +30,10 @@ auto encode_preamble(PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
         return nullptr;
     }
 
-    std::string const timestamp_format{
+    std::string_view timestamp_format{
             input_timestamp_format,
             static_cast<size_t>(input_timestamp_format_size)};
-    std::string const timezone{input_timezone, static_cast<size_t>(input_timezone_size)};
+    std::string_view timezone{input_timezone, static_cast<size_t>(input_timezone_size)};
     std::vector<int8_t> ir_buf;
 
     if (false == ffi::ir_stream::four_byte_encoding::encode_preamble(
@@ -63,10 +65,10 @@ auto encode_message_and_timestamp_delta(PyObject* Py_UNUSED(self), PyObject* arg
     std::vector<int8_t> ir_buf;
     std::string_view msg{input_buffer, static_cast<size_t>(input_buffer_size)};
 
-    // To avoid the frequent expansion of ir_buf, allocate sufficient space in advance
+    // To avoid the frequent expansion of ir_buf,
+    // allocate sufficient space in advance
     ir_buf.reserve(input_buffer_size * 2);
 
-    // Encode the message
     if (false == ffi::ir_stream::four_byte_encoding::encode_message(msg, logtype, ir_buf)) {
         PyErr_SetString(
                 PyExc_NotImplementedError,
@@ -74,7 +76,6 @@ auto encode_message_and_timestamp_delta(PyObject* Py_UNUSED(self), PyObject* arg
         return nullptr;
     }
 
-    // Encode the timestamp
     if (false == ffi::ir_stream::four_byte_encoding::encode_timestamp(delta, ir_buf)) {
         PyErr_SetString(
                 PyExc_NotImplementedError,
@@ -98,7 +99,8 @@ auto encode_message(PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
     std::vector<int8_t> ir_buf;
     std::string_view msg{input_buffer, static_cast<size_t>(input_buffer_size)};
 
-    // To avoid the frequent expansion of ir_buf, allocate sufficient space in advance
+    // To avoid the frequent expansion of ir_buf,
+    // allocate sufficient space in advance
     ir_buf.reserve(input_buffer_size * 2);
 
     if (false == ffi::ir_stream::four_byte_encoding::encode_message(msg, log_type, ir_buf)) {

@@ -7,11 +7,11 @@
 // NOLINTBEGIN(readability-identifier-naming)
 
 PyDoc_STRVAR(
-        encode_preamble_doc,
+        cEncodePreambleDoc,
         "encode_preamble(ref_timestamp, timestamp_format, timezone)\n"
         "--\n\n"
         "Creates the encoded CLP preamble for a stream of encoded log messages"
-        " using 4-byte encoding.\n"
+        " using the 4-byte encoding.\n"
         ":param ref_timestamp: Reference timestamp used to calculate deltas emitted with each "
         "message.\n"
         ":param timestamp_format: Timestamp format to be use when generating the logs with a "
@@ -22,11 +22,11 @@ PyDoc_STRVAR(
         ":return: The encoded preamble.\n");
 
 PyDoc_STRVAR(
-        encode_message_and_timestamp_delta_doc,
+        cEncodeMessageAndTimestampDeltaDoc,
         "encode_message_and_timestamp_delta(timestamp_delta, msg)\n"
         "--\n\n"
-        "Encodes the log `msg` along with the timestamp delta using 4-byte encoding.\n"
-        ":param timestamp_delta: Timestamp difference in miliseconds between the current log "
+        "Encodes the log `msg` along with the timestamp delta using the 4-byte encoding.\n"
+        ":param timestamp_delta: Timestamp difference in milliseconds between the current log "
         "message and the previous log message.\n"
         ":param msg: Log message to encode.\n"
         ":raises NotImplementedError: If the log message failed to encode, or the timestamp delta "
@@ -34,49 +34,49 @@ PyDoc_STRVAR(
         ":return: The encoded message and timestamp.\n");
 
 PyDoc_STRVAR(
-        encode_message_doc,
+        cEncodeMessageDoc,
         "encode_message(msg)\n"
         "--\n\n"
-        "Encodes the log `msg` using 4-byte encoding.\n"
+        "Encodes the log `msg` using the 4-byte encoding.\n"
         ":param msg: Log message to encode.\n"
         ":raises NotImplementedError: If the log message failed to encode.\n"
         ":return: The encoded message.\n");
 
 PyDoc_STRVAR(
-        encode_timestamp_delta_doc,
+        cEncodeTimestampDeltaDoc,
         "encode_timestamp_delta(timestamp_delta)\n"
         "--\n\n"
-        "Encodes the timestamp using 4-byte encoding.\n"
-        ":param timestamp_delta: Timestamp difference in miliseconds between the current log "
+        "Encodes the timestamp using the 4-byte encoding.\n"
+        ":param timestamp_delta: Timestamp difference in milliseconds between the current log "
         "message and the previous log message.\n"
         ":raises NotImplementedError: If the timestamp failed to encode.\n"
         ":return: The encoded timestamp.\n");
 
-PyDoc_STRVAR(module_doc, "Python interface to the CLP IR four byte encoding methods.");
+PyDoc_STRVAR(cModuleDoc, "Python interface to the CLP IR 4-byte encoding methods.");
 
 /**
  * Method table
  */
-static PyMethodDef encoder_method[]{
+static PyMethodDef encoder_method_table[]{
         {"encode_preamble",
          clp_ffi_py::encoder::four_byte_encoding::encode_preamble,
          METH_VARARGS,
-         static_cast<char const*>(encode_preamble_doc)},
+         static_cast<char const*>(cEncodePreambleDoc)},
 
         {"encode_message_and_timestamp_delta",
          clp_ffi_py::encoder::four_byte_encoding::encode_message_and_timestamp_delta,
          METH_VARARGS,
-         static_cast<char const*>(encode_message_and_timestamp_delta_doc)},
+         static_cast<char const*>(cEncodeMessageAndTimestampDeltaDoc)},
 
         {"encode_message",
          clp_ffi_py::encoder::four_byte_encoding::encode_message,
          METH_VARARGS,
-         static_cast<char const*>(encode_message_doc)},
+         static_cast<char const*>(cEncodeMessageDoc)},
 
         {"encode_timestamp_delta",
          clp_ffi_py::encoder::four_byte_encoding::encode_timestamp_delta,
          METH_VARARGS,
-         static_cast<char const*>(encode_timestamp_delta_doc)},
+         static_cast<char const*>(cEncodeTimestampDeltaDoc)},
 
         {nullptr, nullptr, 0, nullptr}};
 
@@ -86,9 +86,9 @@ static PyMethodDef encoder_method[]{
 static PyModuleDef clp_four_byte_encoder{
         PyModuleDef_HEAD_INIT,
         "CLPFourByteEncoder",
-        static_cast<char const*>(module_doc),
+        static_cast<char const*>(cModuleDoc),
         0,
-        static_cast<PyMethodDef*>(encoder_method)};
+        static_cast<PyMethodDef*>(encoder_method_table)};
 
 /**
  * Module initialization
