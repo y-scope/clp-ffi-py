@@ -1,6 +1,6 @@
 #include <clp_ffi_py/Python.hpp> // Must always be included before any other header files
 
-#include <clp_ffi_py/encoder/encoding_methods.hpp>
+#include <clp_ffi_py/ir_encoder/encoding_methods.hpp>
 
 #include <clp/components/core/src/ffi/encoding_methods.hpp>
 #include <clp/components/core/src/ffi/ir_stream/encoding_methods.hpp>
@@ -11,7 +11,7 @@
 // NOLINTBEGIN(cppcoreguidelines-init-variables)
 // NOLINTBEGIN(cppcoreguidelines-pro-type-vararg)
 
-namespace clp_ffi_py::encoder::four_byte_encoding {
+namespace clp_ffi_py::ir_encoder::four_byte_encoding {
 auto encode_preamble(PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
     ffi::epoch_time_ms_t ref_timestamp;
     char const* input_timestamp_format;

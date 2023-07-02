@@ -1,11 +1,11 @@
-#include <clp_ffi_py/decoder/Metadata.hpp>
+#include <clp_ffi_py/ir_decoder/Metadata.hpp>
 
 #include <clp/components/core/src/ffi/ir_stream/protocol_constants.hpp>
 
 #include <clp_ffi_py/ErrorMessage.hpp>
 #include <clp_ffi_py/ExceptionFFI.hpp>
 
-namespace clp_ffi_py::decoder {
+namespace clp_ffi_py::ir_decoder {
 /**
  * Validates whether the JSON object contains the given key and has a string
  * data associated to this particular key.

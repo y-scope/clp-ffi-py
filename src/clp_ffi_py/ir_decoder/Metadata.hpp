@@ -4,7 +4,7 @@
 #include <clp/components/core/src/ffi/encoding_methods.hpp>
 #include <clp/components/core/submodules/json/single_include/nlohmann/json.hpp>
 
-namespace clp_ffi_py::decoder {
+namespace clp_ffi_py::ir_decoder {
 /**
  * A class that represents a decoded IR preamble. Contains ways to access (get)
  * metadata such as timestamp format. The metadata should be readonly,

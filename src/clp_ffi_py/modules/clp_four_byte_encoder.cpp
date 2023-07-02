@@ -1,5 +1,5 @@
 #include <clp_ffi_py/Python.hpp> // Must always be included before any other header files
-#include <clp_ffi_py/encoder/encoding_methods.hpp>
+#include <clp_ffi_py/ir_encoder/encoding_methods.hpp>
 
 // NOLINTBEGIN(*-avoid-c-arrays)
 // NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
@@ -59,22 +59,22 @@ PyDoc_STRVAR(cModuleDoc, "Python interface to the CLP IR 4-byte encoding methods
  */
 static PyMethodDef encoder_method_table[]{
         {"encode_preamble",
-         clp_ffi_py::encoder::four_byte_encoding::encode_preamble,
+         clp_ffi_py::ir_encoder::four_byte_encoding::encode_preamble,
          METH_VARARGS,
          static_cast<char const*>(cEncodePreambleDoc)},
 
         {"encode_message_and_timestamp_delta",
-         clp_ffi_py::encoder::four_byte_encoding::encode_message_and_timestamp_delta,
+         clp_ffi_py::ir_encoder::four_byte_encoding::encode_message_and_timestamp_delta,
          METH_VARARGS,
          static_cast<char const*>(cEncodeMessageAndTimestampDeltaDoc)},
 
         {"encode_message",
-         clp_ffi_py::encoder::four_byte_encoding::encode_message,
+         clp_ffi_py::ir_encoder::four_byte_encoding::encode_message,
          METH_VARARGS,
          static_cast<char const*>(cEncodeMessageDoc)},
 
         {"encode_timestamp_delta",
-         clp_ffi_py::encoder::four_byte_encoding::encode_timestamp_delta,
+         clp_ffi_py::ir_encoder::four_byte_encoding::encode_timestamp_delta,
          METH_VARARGS,
          static_cast<char const*>(cEncodeTimestampDeltaDoc)},
 

@@ -3,7 +3,7 @@
 
 #include <clp/components/core/src/ffi/encoding_methods.hpp>
 
-namespace clp_ffi_py::decoder {
+namespace clp_ffi_py::ir_decoder {
 /**
  * A class that represents a decoded log event. Contains ways to access (get or
  * set) the log message, the timestamp, and the log event index.
@@ -26,11 +26,11 @@ public:
             std::string_view formatted_timestamp)
         : m_log_message{log_message},
           m_timestamp{timestamp},
-          m_formatted_timestamp{formatted_timestamp},
-          m_index{index} {};
+          m_index{index},
+          m_formatted_timestamp{formatted_timestamp} {};
 
     /**
-     * Constructs a new log event and leave the formatted timestamp empty by
+     * Constructs a new log event and leaves the formatted timestamp empty by
      * default.
      * @param log_message
      * @param timestamp
