@@ -1,5 +1,5 @@
-#ifndef CLP_FFI_PY_PYMETADATA_HPP
-#define CLP_FFI_PY_PYMETADATA_HPP
+#ifndef CLP_FFI_PY_PY_METADATA_HPP
+#define CLP_FFI_PY_PY_METADATA_HPP
 
 #include <clp_ffi_py/Python.hpp> // Must always be included before any other header files
 
@@ -20,8 +20,9 @@ struct PyMetadata {
 };
 
 /**
- * Gets the PyMetadata's Python type. This type is dynamically created
- * and initialized during the execution of `PyMetadata_module_level_init`.
+ * Gets the PyTypeObject that represents PyMetadata's Python type. This type is
+ * dynamically created and initialized during the execution of
+ * `PyMetadata_module_level_init`.
  * @return Python type object associated with PyMetadata.
  */
 auto PyMetadata_get_PyType() -> PyTypeObject*;
@@ -42,12 +43,13 @@ auto PyMetadata_module_level_init(
         std::vector<PyObject*>& new_object_append_list) -> bool;
 
 /**
- *
- * @param metadata CLP IR metadata stored in JSON format.
+ * Create and initialize a new PyMetadata object with the metadata values
+ * specified in the JSON format.
+ * @param metadata CLP IR metadata stored in the JSON format.
  * @param is_four_byte_encoding Indicates whether the CLP IR uses four-byte
  * encoding (true) or eight-byte encoding (false).
  * @return a new reference of a PyMetadata object that is initialized with the
- * given input.
+ * given inputs.
  * @return nullptr on failure with the relevant Python exception and error set.
  */
 auto PyMetadata_new_from_json(nlohmann::json const& metadata, bool is_four_byte_encoding)
