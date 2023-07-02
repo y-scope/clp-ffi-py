@@ -57,5 +57,5 @@ private:
     std::string m_timestamp_format;
     std::string m_timezone_id;
 };
-} // namespace clp_ffi_py::decoder
+} // namespace clp_ffi_py::ir_decoder
 #endif

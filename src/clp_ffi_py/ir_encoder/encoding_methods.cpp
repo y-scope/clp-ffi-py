@@ -133,7 +133,7 @@ auto encode_timestamp_delta(PyObject* Py_UNUSED(self), PyObject* args) -> PyObje
             size_checked_pointer_cast<char>(ir_buf.data()),
             static_cast<Py_ssize_t>(ir_buf.size()));
 }
-} // namespace clp_ffi_py::encoder::four_byte_encoding
+} // namespace clp_ffi_py::ir_encoder::four_byte_encoding
 
 // NOLINTEND(cppcoreguidelines-pro-type-vararg)
 // NOLINTEND(cppcoreguidelines-init-variables)

@@ -64,4 +64,4 @@ Metadata::Metadata(nlohmann::json const& metadata, bool is_four_byte_encoding) {
 
     m_timezone_id = metadata[timezone_id_key];
 }
-} // namespace clp_ffi_py::decoder
+} // namespace clp_ffi_py::ir_decoder

@@ -79,6 +79,6 @@ private:
     size_t m_index;
     std::string m_formatted_timestamp;
 };
-}; // namespace clp_ffi_py::decoder
+}; // namespace clp_ffi_py::ir_decoder
 
 #endif
