@@ -1,5 +1,5 @@
 ---
-Checks: 'cert-*,clang-analyzer-*,clang-diagnostic-*,cppcoreguidelines-*,-cppcoreguidelines-pro-type-vararg,-cppcoreguidelines-avoid-non-const-global-variables,modernize-*,performance-*,readability-*,-readability-identifier-length,-readability-simplify-boolean-expr'
+Checks: 'cert-*,clang-analyzer-*,clang-diagnostic-*,cppcoreguidelines-*,-cppcoreguidelines-pro-type-vararg,-cppcoreguidelines-pro-type-reinterpret-cast,-cppcoreguidelines-avoid-non-const-global-variables,modernize-*,performance-*,readability-*,-readability-identifier-length,-readability-simplify-boolean-expr'
 FormatStyle: file
 CheckOptions:
   readability-identifier-naming.ClassCase: 'CamelCase'

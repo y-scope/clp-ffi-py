@@ -1,5 +1,5 @@
-#ifndef PY_UTILS_HPP
-#define PY_UTILS_HPP
+#ifndef CLP_FFI_PY_PY_UTILS_HPP
+#define CLP_FFI_PY_PY_UTILS_HPP
 
 #include <clp_ffi_py/Python.hpp> // Must always be included before any other header files
 
