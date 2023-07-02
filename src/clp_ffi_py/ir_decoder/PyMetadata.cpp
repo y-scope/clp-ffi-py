@@ -62,23 +62,23 @@ static auto PyMetadata_init(PyMetadata* self, PyObject* args, PyObject* keywords
             static_cast<char*>(keyword_timezone_id),
             nullptr};
 
-    ffi::epoch_time_ms_t ref_timestamp;
-    char const* input_timestamp_format;
-    char const* input_timezone;
+    ffi::epoch_time_ms_t ref_timestamp{0};
+    char const* input_timestamp_format{nullptr};
+    char const* input_timezone{nullptr};
 
     // If the argument parsing fails, `self` will be deallocated. We must reset
     // all pointers to nullptr in advance, otherwise the deallocator might free
     // trigger segmentation faults.
     self->reset();
 
-    if (false == PyArg_ParseTupleAndKeywords(
+    if (false == static_cast<bool>(PyArg_ParseTupleAndKeywords(
                          args,
                          keywords,
                          "Lss",
-                         keyword_table,
+                         static_cast<char**>(keyword_table),
                          &ref_timestamp,
                          &input_timestamp_format,
-                         &input_timezone)) {
+                         &input_timezone))) {
         return -1;
     }
 
@@ -108,9 +108,8 @@ static auto PyMetadata_is_using_four_byte_encoding(PyMetadata* self) -> PyObject
     assert(self->metadata);
     if (self->metadata->is_using_four_byte_encoding()) {
         Py_RETURN_TRUE;
-    } else {
-        Py_RETURN_FALSE;
     }
+    Py_RETURN_FALSE;
 }
 
 PyDoc_STRVAR(
@@ -161,22 +160,22 @@ static PyMethodDef PyMetadata_method_table[]{
         {"is_using_four_byte_encoding",
          reinterpret_cast<PyCFunction>(PyMetadata_is_using_four_byte_encoding),
          METH_NOARGS,
-         cPyMetadataIsUsingFourByteEncodingDoc},
+         static_cast<char const*>(cPyMetadataIsUsingFourByteEncodingDoc)},
 
         {"get_ref_timestamp",
          reinterpret_cast<PyCFunction>(PyMetadata_get_ref_timestamp),
          METH_NOARGS,
-         cPyMetadataGetRefTimestampDoc},
+         static_cast<char const*>(cPyMetadataGetRefTimestampDoc)},
 
         {"get_timestamp_format",
          reinterpret_cast<PyCFunction>(PyMetadata_get_timestamp_format),
          METH_NOARGS,
-         cPyMetadataGetTimestampFormatDoc},
+         static_cast<char const*>(cPyMetadataGetTimestampFormatDoc)},
 
         {"get_timezone_id",
          reinterpret_cast<PyCFunction>(PyMetadata_get_timezone_id),
          METH_NOARGS,
-         cPyMetadataGetTimezoneIdDoc},
+         static_cast<char const*>(cPyMetadataGetTimezoneIdDoc)},
 
         {nullptr}};
 
@@ -197,10 +196,10 @@ static PyMemberDef PyMetadata_members[] = {
  */
 static PyType_Slot PyMetadata_slots[]{
         {Py_tp_dealloc, reinterpret_cast<void*>(PyMetadata_dealloc)},
-        {Py_tp_methods, PyMetadata_method_table},
         {Py_tp_init, reinterpret_cast<void*>(PyMetadata_init)},
         {Py_tp_new, reinterpret_cast<void*>(PyType_GenericNew)},
-        {Py_tp_members, PyMetadata_members},
+        {Py_tp_methods, static_cast<void*>(PyMetadata_method_table)},
+        {Py_tp_members, static_cast<void*>(PyMetadata_members)},
         {0, nullptr}};
 
 /**
@@ -211,7 +210,7 @@ static PyType_Spec PyMetadata_type_spec{
         sizeof(PyMetadata),
         0,
         Py_TPFLAGS_DEFAULT,
-        PyMetadata_slots};
+        static_cast<PyType_Slot*>(PyMetadata_slots)};
 
 /**
  * PyMetadata's Python type.
@@ -238,7 +237,7 @@ auto PyMetadata_init_from_json(nlohmann::json const& metadata, bool is_four_byte
 }
 
 auto PyMetadata_module_level_init(PyObject* py_module) -> bool {
-    auto type{reinterpret_cast<PyTypeObject*>(PyType_FromSpec(&PyMetadata_type_spec))};
+    auto* type{reinterpret_cast<PyTypeObject*>(PyType_FromSpec(&PyMetadata_type_spec))};
     PyMetadata_type.reset(type);
     if (nullptr == type) {
         return false;
