@@ -26,9 +26,12 @@ public:
      * Constructs a new Metadata object with values of underlying fields
      * explicitly given. Currently, `m_is_four_byte_encoding` is set to true by
      * default since it is the only format supported.
-     * @param ref_timestamp
-     * @param timestamp_format
-     * @param timezone
+     * @param ref_timestamp The reference timestamp used to calculate the
+     * timestamp of the first log message in the IR stream.
+     * @param timestamp_format Timestamp format to be use when generating the
+     * logs with a reader.
+     * @param timezone Timezone in TZID format to be use when generating the
+     * timestamp from Unix epoch time.
      */
     explicit Metadata(
             ffi::epoch_time_ms_t ref_timestamp,

@@ -16,13 +16,13 @@ namespace clp_ffi_py::ir_decoder {
 struct PyLogEvent {
     PyObject_HEAD;
     LogEvent* log_event;
-    PyMetadata* Py_metadata;
+    PyMetadata* py_metadata;
 
     /**
      * Validates whether the PyLogEvent has a PyMetadata object associated.
      * @return Whether `Py_metadata` points to nullptr.
      */
-    [[nodiscard]] bool has_metadata() { return nullptr != Py_metadata; }
+    [[nodiscard]] bool has_metadata() { return nullptr != py_metadata; }
 
     /**
      * Resets pointers to nullptr. Since the memory allocation of PyLogEvent is
@@ -34,7 +34,7 @@ struct PyLogEvent {
      */
     auto reset() -> void {
         log_event = nullptr;
-        Py_metadata = nullptr;
+        py_metadata = nullptr;
     }
 
     /**
@@ -43,10 +43,10 @@ struct PyLogEvent {
      * @param metadata
      */
     auto set_metadata(PyMetadata* metadata) -> void {
-        Py_XDECREF(Py_metadata);
-        Py_metadata = metadata;
+        Py_XDECREF(py_metadata);
+        py_metadata = metadata;
         if (nullptr != metadata) {
-            Py_INCREF(Py_metadata);
+            Py_INCREF(py_metadata);
         }
     }
 };

@@ -16,7 +16,54 @@ namespace clp_ffi_py::ir_decoder {
 struct PyMetadata {
     PyObject_HEAD;
     Metadata* metadata;
-    PyObject* Py_timezone;
+    PyObject* py_timezone;
+
+    /**
+     * Initializes the underlying data with the given inputs.
+     * Since the memory allocation of PyMetadata is handled by CPython
+     * allocator, cpp constructors will not be explicitly called. This function
+     * serves as the default constructor to initialize the underlying metadata.
+     * It has to be manually called whenever creating a new PyMetadata object
+     * through CPython APIs.
+     * @param ref_timestamp
+     * @param input_timestamp_format
+     * @param input_timezone
+     * @return true on success.
+     * @return false on failure with the relevant Python exception and error
+     * set.
+     */
+    auto
+    init(ffi::epoch_time_ms_t ref_timestamp,
+         char const* input_timestamp_format,
+         char const* input_timezone) -> bool;
+
+    /**
+     * Same as above, but takes inputs stored in the JSON format instead.
+     * @param metadata
+     * @param is_four_byte_encoding
+     * @return true on success.
+     * @return false on failure with the relevant Python exception and error
+     * set.
+     */
+    auto init(nlohmann::json const& metadata, bool is_four_byte_encoding = true) -> bool;
+
+    /**
+     * Resets pointers to nullptr.
+     */
+    auto reset() -> void {
+        metadata = nullptr;
+        py_timezone = nullptr;
+    }
+
+private:
+    /**
+     * Initializes py_timezone by setting the corresponded tzinfo object from
+     * the timezone id. Should be called by `init` methods.
+     * @return true on success.
+     * @return false on failure with the relevant Python exception and error
+     * set.
+     */
+    auto init_py_timezone() -> bool;
 };
 
 /**
@@ -32,15 +79,10 @@ auto PyMetadata_get_PyType() -> PyTypeObject*;
  * this type as a Python object into the py_module module.
  * @param py_module This is the Python module where the initialized PyMetadata
  * will be incorporated.
- * @param new_object_append_list This vector is responsible for appending all
- * successfully created PyObjects during initialization for reference tracking
- * purposes.
  * @return true on success.
  * @return false on failure with the relevant Python exception and error set.
  */
-auto PyMetadata_module_level_init(
-        PyObject* py_module,
-        std::vector<PyObject*>& new_object_append_list) -> bool;
+auto PyMetadata_module_level_init(PyObject* py_module) -> bool;
 
 /**
  * Creates and initializes a new PyMetadata object with the metadata values

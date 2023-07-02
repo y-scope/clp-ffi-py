@@ -9,27 +9,17 @@
 
 namespace clp_ffi_py {
 /**
- * Decrements the reference count for every Python object stored in the list.
- * @param object_append_list
- */
-auto clean_object_append_list(std::vector<PyObject*> const& object_append_list) -> void;
-
-/**
  * Adds the given Python type to the given Python module.
  * @param new_type Type object to add.
  * @param type_name Type name identifier.
  * @param module Python module to hold the new type.
- * @param new_object_append_list This vector is responsible for appending all
- * successfully created PyObjects during initialization for reference tracking
- * purposes.
  * @return true on success.
  * @return false on failure with the relevant Python exception and error set.
  */
 auto add_type(
         PyTypeObject* new_type,
         char const* type_name,
-        PyObject* module,
-        std::vector<PyObject*>& new_object_append_list) -> bool;
+        PyObject* module) -> bool;
 
 /**
  * Parses a Python string into std::string.

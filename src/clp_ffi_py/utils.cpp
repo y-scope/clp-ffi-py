@@ -23,21 +23,12 @@ static inline auto get_Py_string_data(PyObject* py_string) -> char const* {
     return PyUnicode_AsUTF8(py_string);
 }
 
-auto clean_object_append_list(std::vector<PyObject*> const& object_append_list) -> void {
-    for (auto* object : object_append_list) {
-        Py_DECREF(object);
-    }
-}
-
 auto add_type(
         PyTypeObject* new_type,
         char const* type_name,
-        PyObject* module,
-        std::vector<PyObject*>& new_object_append_list) -> bool {
+        PyObject* module) -> bool {
     assert(new_type);
     auto* type_object{reinterpret_cast<PyObject*>(new_type)};
-    new_object_append_list.push_back(type_object);
-    Py_INCREF(type_object);
     if (PyModule_AddObject(module, type_name, type_object) < 0) {
         return false;
     }
