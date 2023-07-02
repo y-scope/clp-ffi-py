@@ -63,15 +63,15 @@ public:
         return (false == m_formatted_timestamp.empty());
     }
 
-    void set_log_message(std::string_view log_message) { m_log_message = log_message; }
+    auto set_log_message(std::string_view log_message) -> void { m_log_message = log_message; }
 
-    void set_timestamp(ffi::epoch_time_ms_t timestamp) { m_timestamp = timestamp; }
+    auto set_timestamp(ffi::epoch_time_ms_t timestamp) -> void { m_timestamp = timestamp; }
 
-    void set_formatted_timestamp(std::string const& formatted_timestamp) {
+    auto set_formatted_timestamp(std::string const& formatted_timestamp) -> void {
         m_formatted_timestamp = formatted_timestamp;
     }
 
-    void set_index(size_t index) { m_index = index; }
+    auto set_index(size_t index) -> void { m_index = index; }
 
 private:
     std::string m_log_message;
