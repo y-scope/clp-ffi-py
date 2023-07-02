@@ -38,6 +38,7 @@ clp_ir_decoder: Extension = Extension(
         "src/clp_ffi_py/modules/clp_ir_decoder.cpp",
         "src/clp_ffi_py/ir_decoder/LogEvent.cpp",
         "src/clp_ffi_py/ir_decoder/Metadata.cpp",
+        "src/clp_ffi_py/Py_utils.cpp",
     ],
     extra_compile_args=[
         '-std=c++17',

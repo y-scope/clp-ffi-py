@@ -75,7 +75,7 @@ auto PyLogEvent_module_level_init(
         std::vector<PyObject*>& new_object_append_list) -> bool;
 
 /**
- * Create and initialize a new PyLogEvent using the given inputs.
+ * Creates and initializes a new PyLogEvent using the given inputs.
  * @param log_message
  * @param timestamp
  * @param index

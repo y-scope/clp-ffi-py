@@ -3,6 +3,7 @@ venv*/
 __pycache__
 
 # Packaging
+compile_commands.json
 build/
 clp_ffi_py.egg-info
 dist/

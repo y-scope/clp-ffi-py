@@ -43,7 +43,7 @@ auto PyMetadata_module_level_init(
         std::vector<PyObject*>& new_object_append_list) -> bool;
 
 /**
- * Create and initialize a new PyMetadata object with the metadata values
+ * Creates and initializes a new PyMetadata object with the metadata values
  * specified in the JSON format.
  * @param metadata CLP IR metadata stored in the JSON format.
  * @param is_four_byte_encoding Indicates whether the CLP IR uses four-byte
