@@ -11,7 +11,7 @@
 namespace clp_ffi_py::ir_decoder {
 /**
  * A PyObject structure functioning as a Python-compatible interface to retrieve
- * an long event. The underlying data is pointed by `log_event`. The object may
+ * a log event. The underlying data is pointed by `log_event`. The object may
  * bind with a PyMetadata object pointed by `Py_metadata` that specifies event
  * metadata such as timestamp format.
  */
@@ -22,15 +22,16 @@ struct PyLogEvent {
 
     /**
      * Initializes the underlying data with the given inputs.
-     * Since the memory allocation of PyMetadata is handled by CPython
+     * Since the memory allocation of PyLogEvent is handled by CPython
      * allocator, cpp constructors will not be explicitly called. This function
      * serves as the default constructor to initialize the underlying metadata.
-     * It has to be manually called whenever creating a new PyMetadata object
+     * It has to be manually called whenever creating a new PyLogEvent object
      * through CPython APIs.
      * @param log_message
      * @param timestamp
      * @param index
-     * @param metadata PyMetadata to bind. Can be nullptr.
+     * @param metadata A PyMetadata instance to bind with the log event (can be 
+     * nullptr).
      * @param formatted_timestamp Formatted timestamp. This argument is not
      * given by default. It should be given when deserializing the object from
      * a saved state.
@@ -52,12 +53,7 @@ struct PyLogEvent {
     [[nodiscard]] bool has_metadata() { return nullptr != py_metadata; }
 
     /**
-     * Resets pointers to nullptr. Since the memory allocation of PyLogEvent is
-     * handled by CPython allocator, cpp constructors cannot be used to assign
-     * initial values to the underlying pointers. This function serves as the
-     * default constructor to reset the memory region. It has to be manually
-     * called whenever receiving a newly created PyLogEvent object from CPython
-     * APIs.
+     * Resets pointers to nullptr.
      */
     auto reset() -> void {
         log_event = nullptr;
@@ -116,7 +112,8 @@ auto PyLogEvent_module_level_init(PyObject* py_module) -> bool;
  * @param log_message
  * @param timestamp
  * @param index
- * @param metadata A PyMetadata to bind with the log event (can be nullptr).
+ * @param metadata A PyMetadata instance to bind with the log event (can be 
+ * nullptr).
  * @return a new reference of a PyLogEvent object that is initialized with the
  * given inputs.
  * @return nullptr on failure with the relevant Python exception and error set.
