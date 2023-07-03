@@ -42,6 +42,9 @@ git submodule update --init --recursive
 
 # 4. Install
 pip install -e .
+
+# 5. Run unit tests
+python -m unittest -bv
 ```
 
 ## Build and Test with cibuildwheel
