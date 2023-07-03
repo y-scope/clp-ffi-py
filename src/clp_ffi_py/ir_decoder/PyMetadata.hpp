@@ -32,7 +32,7 @@ struct PyMetadata {
      * @return false on failure with the relevant Python exception and error
      * set.
      */
-    auto
+    [[nodiscard]] auto
     init(ffi::epoch_time_ms_t ref_timestamp,
          char const* input_timestamp_format,
          char const* input_timezone) -> bool;
@@ -45,7 +45,8 @@ struct PyMetadata {
      * @return false on failure with the relevant Python exception and error
      * set.
      */
-    auto init(nlohmann::json const& metadata, bool is_four_byte_encoding = true) -> bool;
+    [[nodiscard]] auto init(nlohmann::json const& metadata, bool is_four_byte_encoding = true)
+            -> bool;
 
     /**
      * Resets pointers to nullptr.
@@ -63,7 +64,7 @@ private:
      * @return false on failure with the relevant Python exception and error
      * set.
      */
-    auto init_py_timezone() -> bool;
+    [[nodiscard]] auto init_py_timezone() -> bool;
 };
 
 /**
@@ -88,8 +89,8 @@ auto PyMetadata_module_level_init(PyObject* py_module) -> bool;
  * Creates and initializes a new PyMetadata object with the metadata values
  * specified in the JSON format.
  * @param metadata CLP IR metadata stored in the JSON format.
- * @param is_four_byte_encoding Indicates whether the CLP IR uses four-byte
- * encoding (true) or eight-byte encoding (false).
+ * @param is_four_byte_encoding Indicates whether the CLP IR uses 4-byte
+ * encoding (true) or 8-byte encoding (false).
  * @return a new reference of a PyMetadata object that is initialized with the
  * given inputs.
  * @return nullptr on failure with the relevant Python exception and error set.

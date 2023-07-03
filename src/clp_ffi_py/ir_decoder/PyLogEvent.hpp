@@ -3,6 +3,8 @@
 
 #include <clp_ffi_py/Python.hpp> // Must always be included before any other header files
 
+#include <optional>
+
 #include <clp_ffi_py/ir_decoder/LogEvent.hpp>
 #include <clp_ffi_py/ir_decoder/PyMetadata.hpp>
 
@@ -17,6 +19,31 @@ struct PyLogEvent {
     PyObject_HEAD;
     LogEvent* log_event;
     PyMetadata* py_metadata;
+
+    /**
+     * Initializes the underlying data with the given inputs.
+     * Since the memory allocation of PyMetadata is handled by CPython
+     * allocator, cpp constructors will not be explicitly called. This function
+     * serves as the default constructor to initialize the underlying metadata.
+     * It has to be manually called whenever creating a new PyMetadata object
+     * through CPython APIs.
+     * @param log_message
+     * @param timestamp
+     * @param index
+     * @param metadata PyMetadata to bind. Can be nullptr.
+     * @param formatted_timestamp Formatted timestamp. This argument is not
+     * given by default. It should be given when deserializing the object from
+     * a saved state.
+     * @return true on success.
+     * @return false on failure with the relevant Python exception and error
+     * set.
+     */
+    [[nodiscard]] auto
+    init(std::string_view log_message,
+         ffi::epoch_time_ms_t timestamp,
+         size_t index,
+         PyMetadata* metadata,
+         std::optional<std::string_view> formatted_timestamp = std::nullopt) -> bool;
 
     /**
      * Validates whether the PyLogEvent has a PyMetadata object associated.
@@ -49,6 +76,21 @@ struct PyLogEvent {
             Py_INCREF(py_metadata);
         }
     }
+
+    /**
+     * Gets the formatted log message represented by the underlying log event.
+     * If a specific timezone is provided, this timezone is used to format the
+     * timestamp. If the timezone is not provided (Py_None), the default
+     * formatted timestamp from the log event is used. In the case where
+     * the log event does not have a cached formatted timestamp, it obtains one
+     * using the default timezone from the metadata (if metadata is present),
+     * or defaults to UTC.
+     * @param timezone Python tzinfo object that specifies a timezone.
+     * @return Python string of the formatted log message.
+     * @return nullptr on failure with the relevant Python exception and error
+     * set.
+     */
+    [[nodiscard]] auto get_formatted_message(PyObject* timezone = Py_None) -> PyObject*;
 };
 
 /**
@@ -64,15 +106,10 @@ auto PyLogEvent_get_PyType() -> PyTypeObject*;
  * this type as a Python object into the py_module module.
  * @param py_module This is the Python module where the initialized PyLogEvent
  * will be incorporated.
- * @param new_object_append_list This vector is responsible for appending all
- * successfully created PyObjects during initialization for reference tracking
- * purposes.
  * @return true on success.
  * @return false on failure with the relevant Python exception and error set.
  */
-auto PyLogEvent_module_level_init(
-        PyObject* py_module,
-        std::vector<PyObject*>& new_object_append_list) -> bool;
+auto PyLogEvent_module_level_init(PyObject* py_module) -> bool;
 
 /**
  * Creates and initializes a new PyLogEvent using the given inputs.
@@ -89,14 +126,5 @@ auto PyLogEvent_create_new(
         ffi::epoch_time_ms_t timestamp,
         size_t index,
         PyMetadata* metadata) -> PyLogEvent*;
-
-/**
- * Constant keys used to serialize/deserialize PyLogEvent objects through
- * __getstate__ and __setstate__ methods.
- */
-constexpr char cStateLogMessage[] = "log_message";
-constexpr char cStateTimestamp[] = "timestamp";
-constexpr char cStateFormattedTimestamp[] = "formatted_timestamp";
-constexpr char cStateIndex[] = "index";
 } // namespace clp_ffi_py::ir_decoder
 #endif

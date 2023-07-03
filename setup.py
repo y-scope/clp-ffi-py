@@ -38,6 +38,7 @@ clp_ir_decoder: Extension = Extension(
         "src/clp_ffi_py/modules/clp_ir_decoder.cpp",
         "src/clp_ffi_py/ir_decoder/LogEvent.cpp",
         "src/clp_ffi_py/ir_decoder/Metadata.cpp",
+        "src/clp_ffi_py/ir_decoder/PyLogEvent.cpp",
         "src/clp_ffi_py/ir_decoder/PyMetadata.cpp",
         "src/clp_ffi_py/Py_utils.cpp",
         "src/clp_ffi_py/utils.cpp",

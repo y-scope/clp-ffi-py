@@ -43,14 +43,14 @@ auto PyMetadata::init_py_timezone() -> bool {
 
 extern "C" {
 /**
- * PyMetadata `__init__` method:
+ * Callback of PyMetadata `__init__` method:
  * __init__(ref_timestamp, timestamp_format, timezone_id)
  * Keyword argument parsing is supported.
  * @param self
  * @param args
  * @param keywords
  * @return 0 on success.
- * @return -1 on failure  with the relevant Python exception and error set.
+ * @return -1 on failure with the relevant Python exception and error set.
  */
 static auto PyMetadata_init(PyMetadata* self, PyObject* args, PyObject* keywords) -> int {
     static char keyword_ref_timestamp[]{"ref_timestamp"};
@@ -67,8 +67,8 @@ static auto PyMetadata_init(PyMetadata* self, PyObject* args, PyObject* keywords
     char const* input_timezone{nullptr};
 
     // If the argument parsing fails, `self` will be deallocated. We must reset
-    // all pointers to nullptr in advance, otherwise the deallocator might free
-    // trigger segmentation faults.
+    // all pointers to nullptr in advance, otherwise the deallocator might
+    // trigger segmentation fault
     self->reset();
 
     if (false == static_cast<bool>(PyArg_ParseTupleAndKeywords(
@@ -87,7 +87,7 @@ static auto PyMetadata_init(PyMetadata* self, PyObject* args, PyObject* keywords
 }
 
 /**
- * PyMetadata deallocator.
+ * Callback of PyMetadata deallocator.
  * @param self
  */
 static auto PyMetadata_dealloc(PyMetadata* self) -> void {
@@ -100,9 +100,9 @@ PyDoc_STRVAR(
         cPyMetadataIsUsingFourByteEncodingDoc,
         "is_using_four_byte_encoding(self)\n"
         "--\n\n"
-        "Checks whether the CLP IR is encoded using four-byte or eight-byte encoding methods.\n"
+        "Checks whether the CLP IR is encoded using 4-byte or 8-byte encoding methods.\n"
         ":param self\n"
-        ":return: True for four-byte encoding, and False for eight-byte encoding.\n");
+        ":return: True for 4-byte encoding, and False for 8-byte encoding.\n");
 
 static auto PyMetadata_is_using_four_byte_encoding(PyMetadata* self) -> PyObject* {
     assert(self->metadata);
@@ -116,7 +116,8 @@ PyDoc_STRVAR(
         cPyMetadataGetRefTimestampDoc,
         "get_ref_timestamp(self)\n"
         "--\n\n"
-        "Gets the reference timestamp used to calculate the timestamp of the first log message in "
+        "Gets the reference Unix epoch timestamp in milliseconds used to calculate the timestamp "
+        "of the first log message in "
         "the IR stream.\n"
         ":param self\n"
         ":return: The reference timestamp.\n");
@@ -221,6 +222,15 @@ auto PyMetadata_get_PyType() -> PyTypeObject* {
     return PyMetadata_type.get();
 }
 
+auto PyMetadata_module_level_init(PyObject* py_module) -> bool {
+    auto* type{reinterpret_cast<PyTypeObject*>(PyType_FromSpec(&PyMetadata_type_spec))};
+    PyMetadata_type.reset(type);
+    if (nullptr == type) {
+        return false;
+    }
+    return add_type(PyMetadata_get_PyType(), "Metadata", py_module);
+}
+
 auto PyMetadata_init_from_json(nlohmann::json const& metadata, bool is_four_byte_encoding)
         -> PyMetadata* {
     PyMetadata* self{
@@ -234,14 +244,5 @@ auto PyMetadata_init_from_json(nlohmann::json const& metadata, bool is_four_byte
         return nullptr;
     }
     return self;
-}
-
-auto PyMetadata_module_level_init(PyObject* py_module) -> bool {
-    auto* type{reinterpret_cast<PyTypeObject*>(PyType_FromSpec(&PyMetadata_type_spec))};
-    PyMetadata_type.reset(type);
-    if (nullptr == type) {
-        return false;
-    }
-    return add_type(PyMetadata_get_PyType(), "Metadata", py_module);
 }
 }; // namespace clp_ffi_py::ir_decoder
