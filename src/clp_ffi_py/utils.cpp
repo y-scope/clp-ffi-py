@@ -26,6 +26,9 @@ static inline auto get_Py_string_data(PyObject* py_string) -> char const* {
 auto add_type(PyTypeObject* new_type, char const* type_name, PyObject* module) -> bool {
     assert(new_type);
     auto* type_object{reinterpret_cast<PyObject*>(new_type)};
+    if (PyType_Ready(new_type) < 0) {
+        return false;
+    }
     if (PyModule_AddObject(module, type_name, type_object) < 0) {
         return false;
     }

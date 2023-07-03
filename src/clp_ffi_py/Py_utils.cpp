@@ -30,13 +30,13 @@ auto Py_utils_init() -> bool {
     }
 
     Py_func_get_timezone_from_timezone_id.reset(
-            PyObject_GetAttrString(py_utils, cPyFuncNameGetFormattedTimestamp));
+            PyObject_GetAttrString(py_utils, cPyFuncNameGetTimezoneFromTimezoneId));
     if (nullptr == Py_func_get_timezone_from_timezone_id.get()) {
         return false;
     }
 
     Py_func_get_formatted_timestamp.reset(
-            PyObject_GetAttrString(py_utils, cPyFuncNameGetTimezoneFromTimezoneId));
+            PyObject_GetAttrString(py_utils, cPyFuncNameGetFormattedTimestamp));
     if (nullptr == Py_func_get_formatted_timestamp.get()) {
         return false;
     }

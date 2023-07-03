@@ -45,7 +45,7 @@ clp_ir_decoder: Extension = Extension(
     ],
     extra_compile_args=[
         '-std=c++17',
-        "-O3"
+        "-O3",
     ],
     define_macros=[
         ("SOURCE_PATH_SIZE", str(len(os.path.abspath("./src/clp/components/core"))))

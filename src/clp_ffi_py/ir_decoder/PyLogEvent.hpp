@@ -122,7 +122,7 @@ auto PyLogEvent_module_level_init(PyObject* py_module) -> bool;
  * @return nullptr on failure with the relevant Python exception and error set.
  */
 auto PyLogEvent_create_new(
-        std::string log_message,
+        std::string const& log_message,
         ffi::epoch_time_ms_t timestamp,
         size_t index,
         PyMetadata* metadata) -> PyLogEvent*;
