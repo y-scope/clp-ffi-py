@@ -30,7 +30,7 @@ struct PyLogEvent {
      * @param log_message
      * @param timestamp
      * @param index
-     * @param metadata A PyMetadata instance to bind with the log event (can be 
+     * @param metadata A PyMetadata instance to bind with the log event (can be
      * nullptr).
      * @param formatted_timestamp Formatted timestamp. This argument is not
      * given by default. It should be given when deserializing the object from
@@ -112,7 +112,7 @@ auto PyLogEvent_module_level_init(PyObject* py_module) -> bool;
  * @param log_message
  * @param timestamp
  * @param index
- * @param metadata A PyMetadata instance to bind with the log event (can be 
+ * @param metadata A PyMetadata instance to bind with the log event (can be
  * nullptr).
  * @return a new reference of a PyLogEvent object that is initialized with the
  * given inputs.

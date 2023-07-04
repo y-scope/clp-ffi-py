@@ -23,7 +23,17 @@ auto PyMetadata::init(
 }
 
 auto PyMetadata::init(nlohmann::json const& metadata, bool is_four_byte_encoding) -> bool {
-    this->metadata = new Metadata(metadata, is_four_byte_encoding);
+    try {
+        this->metadata = new Metadata(metadata, is_four_byte_encoding);
+    } catch (ExceptionFFI const& ex) {
+        PyErr_Format(
+                PyExc_RuntimeError,
+                "Failed to initialize metadata from decoded JSON format preamble. "
+                "Error message: %s",
+                ex.what());
+        this->metadata = nullptr;
+        return false;
+    }
     if (nullptr == this->metadata) {
         PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::error_messages::out_of_memory_error);
         return false;
