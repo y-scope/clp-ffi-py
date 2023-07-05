@@ -4,16 +4,18 @@
 #include <clp_ffi_py/ir_decoder/PyLogEvent.hpp>
 #include <clp_ffi_py/ir_decoder/PyMetadata.hpp>
 
-static PyMethodDef decoder_methods[] = {{nullptr, nullptr, 0, nullptr}};
+namespace {
+PyMethodDef decoder_methods[] = {{nullptr, nullptr, 0, nullptr}};
 
 PyDoc_STRVAR(cModuleDoc, "Python interface to the CLP IR Decoder.");
 
-static struct PyModuleDef clp_ir_decoder = {
+struct PyModuleDef clp_ir_decoder = {
         PyModuleDef_HEAD_INIT,
         "CLPIRDecoder",
         static_cast<char const*>(cModuleDoc),
         -1,
         decoder_methods};
+} // namespace
 
 extern "C" {
 PyMODINIT_FUNC PyInit_CLPIRDecoder() {

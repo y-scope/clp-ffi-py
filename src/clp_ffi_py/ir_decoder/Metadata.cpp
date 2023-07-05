@@ -5,7 +5,7 @@
 #include <clp_ffi_py/ErrorMessage.hpp>
 #include <clp_ffi_py/ExceptionFFI.hpp>
 
-namespace clp_ffi_py::ir_decoder {
+namespace {
 /**
  * Validates whether the JSON object contains the given key and has a string
  * data associated to this particular key.
@@ -13,11 +13,12 @@ namespace clp_ffi_py::ir_decoder {
  * @param key The key to access the data field.
  * @return Return true if the data is valid.
  */
-static inline auto is_valid_json_string_data(nlohmann::json const& json_data, char const* key)
-        -> bool {
+inline auto is_valid_json_string_data(nlohmann::json const& json_data, char const* key) -> bool {
     return json_data.contains(key) && json_data[key].is_string();
 };
+} // namespace
 
+namespace clp_ffi_py::ir_decoder {
 Metadata::Metadata(nlohmann::json const& metadata, bool is_four_byte_encoding) {
     if (false == is_four_byte_encoding) {
         throw ExceptionFFI(

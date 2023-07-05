@@ -6,7 +6,7 @@
 
 #include <clp_ffi_py/ErrorMessage.hpp>
 
-namespace clp_ffi_py {
+namespace {
 /**
  * Gets the underlying py_string byte data.
  * @param py_string PyObject that represents a Python level string. Only Python
@@ -15,14 +15,16 @@ namespace clp_ffi_py {
  * @return pointer to the byte data on success.
  * @return nullptr on failure with the relevant Python exception and error set.
  */
-static inline auto get_Py_string_data(PyObject* py_string) -> char const* {
+inline auto get_Py_string_data(PyObject* py_string) -> char const* {
     if (false == static_cast<bool>(PyUnicode_Check(py_string))) {
         PyErr_SetString(PyExc_TypeError, "parse_PyString receives none-string argument.");
         return nullptr;
     }
     return PyUnicode_AsUTF8(py_string);
 }
+} // namespace
 
+namespace clp_ffi_py {
 auto add_type(PyTypeObject* new_type, char const* type_name, PyObject* module) -> bool {
     assert(new_type);
     auto* type_object{reinterpret_cast<PyObject*>(new_type)};

@@ -6,6 +6,7 @@
 // NOLINTBEGIN(modernize-use-trailing-return-type)
 // NOLINTBEGIN(readability-identifier-naming)
 
+namespace {
 PyDoc_STRVAR(
         cEncodePreambleDoc,
         "encode_preamble(ref_timestamp, timestamp_format, timezone)\n"
@@ -57,7 +58,7 @@ PyDoc_STRVAR(cModuleDoc, "Python interface to the CLP IR 4-byte encoding methods
 /**
  * Method table
  */
-static PyMethodDef encoder_method_table[]{
+PyMethodDef encoder_method_table[]{
         {"encode_preamble",
          clp_ffi_py::ir_encoder::four_byte_encoding::encode_preamble,
          METH_VARARGS,
@@ -83,12 +84,13 @@ static PyMethodDef encoder_method_table[]{
 /**
  * Module definition
  */
-static PyModuleDef clp_four_byte_encoder{
+PyModuleDef clp_four_byte_encoder{
         PyModuleDef_HEAD_INIT,
         "CLPFourByteEncoder",
         static_cast<char const*>(cModuleDoc),
         0,
         static_cast<PyMethodDef*>(encoder_method_table)};
+} // namespace
 
 /**
  * Module initialization
