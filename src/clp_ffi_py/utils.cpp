@@ -6,6 +6,7 @@
 
 #include <clp_ffi_py/ErrorMessage.hpp>
 
+namespace clp_ffi_py {
 namespace {
 /**
  * Gets the underlying py_string byte data.
@@ -24,7 +25,6 @@ inline auto get_Py_string_data(PyObject* py_string) -> char const* {
 }
 } // namespace
 
-namespace clp_ffi_py {
 auto add_type(PyTypeObject* new_type, char const* type_name, PyObject* module) -> bool {
     assert(new_type);
     auto* type_object{reinterpret_cast<PyObject*>(new_type)};

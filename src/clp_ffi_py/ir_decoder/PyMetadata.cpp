@@ -9,10 +9,8 @@
 #include <clp_ffi_py/ir_decoder/Metadata.hpp>
 #include <clp_ffi_py/utils.hpp>
 
+namespace clp_ffi_py::ir_decoder {
 namespace {
-using namespace clp_ffi_py::ir_decoder;
-using clp_ffi_py::PyObjectPtr;
-
 extern "C" {
 /**
  * Callback of PyMetadata `__init__` method:
@@ -191,7 +189,6 @@ PyType_Spec PyMetadata_type_spec{
 PyObjectPtr<PyTypeObject> PyMetadata_type;
 } // namespace
 
-namespace clp_ffi_py::ir_decoder {
 auto PyMetadata::init(
         ffi::epoch_time_ms_t ref_timestamp,
         char const* input_timestamp_format,

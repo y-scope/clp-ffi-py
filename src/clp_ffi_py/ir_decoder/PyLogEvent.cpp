@@ -8,10 +8,8 @@
 #include <clp_ffi_py/ir_decoder/LogEvent.hpp>
 #include <clp_ffi_py/utils.hpp>
 
+namespace clp_ffi_py::ir_decoder {
 namespace {
-using namespace clp_ffi_py::ir_decoder;
-using clp_ffi_py::PyObjectPtr;
-
 extern "C" {
 /**
  * Callback of PyLogEvent `__init__` method:
@@ -283,8 +281,9 @@ PyDoc_STRVAR(
         "get_formatted_message(self, timezone=None)\n"
         "--\n\n"
         "Gets the formatted log message of the log event.\n"
-        "If a specific timezone is provided, it will be used to format the timestamp. Otherwise, "
-        "the timestamp will be formatted using the timezone from the originating CLP IR stream.\n"
+        "If a specific timezone is provided, it will be used to format the timestamp. "
+        "Otherwise, the timestamp will be formatted using the timezone from the originating CLP IR "
+        "stream.\n"
         ":param self\n"
         ":param timezone: Python tzinfo object that specifies a timezone."
         ":return: The formatted message.\n");
@@ -372,7 +371,6 @@ PyType_Spec PyLogEvent_type_spec{
 PyObjectPtr<PyTypeObject> PyLogEvent_type;
 } // namespace
 
-namespace clp_ffi_py::ir_decoder {
 auto PyLogEvent::get_formatted_message(PyObject* timezone) -> PyObject* {
     auto cache_formatted_timestamp{false};
     if (Py_None == timezone) {

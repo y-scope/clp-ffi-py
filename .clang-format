@@ -16,7 +16,7 @@ BinPackArguments: false
 BinPackParameters: false
 ContinuationIndentWidth: 8
 InsertNewlineAtEOF: true
-NamespaceIndentation: Inner
+NamespaceIndentation: None
 PackConstructorInitializers: CurrentLine
 PointerAlignment: Left
 QualifierAlignment: Right

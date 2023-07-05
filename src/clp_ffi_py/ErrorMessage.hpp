@@ -11,10 +11,9 @@ constexpr char const* cSetstateInputError =
 constexpr char const* cSetstateKeyErrorTemplate = "\"%s\" not found in the state dictionary.";
 
 namespace encoder {
-    constexpr char const* cTimestampError =
-            "Native encoder cannot encode the given timestamp delta";
-    constexpr char const* cPreambleError = "Native encoder cannot encode the given preamble";
-    constexpr char const* cMessageError = "Native encoder cannot encode the given message";
+constexpr char const* cTimestampError = "Native encoder cannot encode the given timestamp delta";
+constexpr char const* cPreambleError = "Native encoder cannot encode the given preamble";
+constexpr char const* cMessageError = "Native encoder cannot encode the given message";
 } // namespace encoder
 } // namespace clp_ffi_py::error_messages
 #endif

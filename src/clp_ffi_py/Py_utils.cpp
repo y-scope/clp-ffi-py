@@ -4,9 +4,8 @@
 
 #include <clp_ffi_py/PyObjectPtr.hpp>
 
+namespace clp_ffi_py {
 namespace {
-using namespace clp_ffi_py;
-
 constexpr char const* cPyFuncNameGetFormattedTimestamp{"get_formatted_timestamp"};
 PyObjectPtr<PyObject> Py_func_get_formatted_timestamp;
 
@@ -24,7 +23,6 @@ inline auto Py_utils_function_call_wrapper(PyObject* func, PyObject* args) -> Py
 }
 } // namespace
 
-namespace clp_ffi_py {
 auto Py_utils_init() -> bool {
     PyObjectPtr<PyObject> utils_module(PyImport_ImportModule("clp_ffi_py.utils"));
     auto* py_utils{utils_module.get()};
