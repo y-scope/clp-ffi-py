@@ -371,6 +371,7 @@ PyType_Spec PyLogEvent_type_spec{
  */
 PyObjectPtr<PyTypeObject> PyLogEvent_type;
 } // namespace
+
 namespace clp_ffi_py::ir_decoder {
 auto PyLogEvent::get_formatted_message(PyObject* timezone) -> PyObject* {
     auto cache_formatted_timestamp{false};
