@@ -265,4 +265,4 @@ auto PyMetadata_init_from_json(nlohmann::json const& metadata, bool is_four_byte
     }
     return self;
 }
-};  // namespace clp_ffi_py::ir
+}  // namespace clp_ffi_py::ir

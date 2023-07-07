@@ -15,7 +15,7 @@ namespace {
  * @return pointer to the byte data on success.
  * @return nullptr on failure with the relevant Python exception and error set.
  */
-inline auto get_Py_string_data(PyObject* py_string) -> char const* {
+auto get_Py_string_data(PyObject* py_string) -> char const* {
     if (false == static_cast<bool>(PyUnicode_Check(py_string))) {
         PyErr_SetString(PyExc_TypeError, "parse_PyString receives none-string argument.");
         return nullptr;

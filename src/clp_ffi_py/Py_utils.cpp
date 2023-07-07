@@ -17,7 +17,7 @@ PyObjectPtr<PyObject> Py_func_get_timezone_from_timezone_id;
  * @param args Function arguments.
  * @return PyObject* returned from PyObject_CallObject.
  */
-inline auto Py_utils_function_call_wrapper(PyObject* func, PyObject* args) -> PyObject* {
+auto Py_utils_function_call_wrapper(PyObject* func, PyObject* args) -> PyObject* {
     return PyObject_CallObject(func, args);
 }
 }  // namespace
@@ -63,4 +63,4 @@ auto Py_utils_get_timezone_from_timezone_id(std::string const& timezone_id) -> P
     }
     return Py_utils_function_call_wrapper(Py_func_get_timezone_from_timezone_id.get(), func_args);
 }
-};  // namespace clp_ffi_py
+}  // namespace clp_ffi_py

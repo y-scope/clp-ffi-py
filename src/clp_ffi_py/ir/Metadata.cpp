@@ -12,7 +12,7 @@ namespace {
  * @param key The key to access the data field.
  * @return Return true if the data is valid.
  */
-inline auto is_valid_json_string_data(nlohmann::json const& json_data, char const* key) -> bool {
+auto is_valid_json_string_data(nlohmann::json const& json_data, char const* key) -> bool {
     return json_data.contains(key) && json_data[key].is_string();
 }
 }  // namespace
