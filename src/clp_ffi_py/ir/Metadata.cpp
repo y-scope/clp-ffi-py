@@ -4,6 +4,7 @@
 #include <clp_ffi_py/ExceptionFFI.hpp>
 #include <clp_ffi_py/ir/Metadata.hpp>
 
+namespace clp_ffi_py::ir {
 namespace {
 /**
  * Validates whether the JSON object contains the given key and has a string
@@ -17,7 +18,6 @@ auto is_valid_json_string_data(nlohmann::json const& json_data, char const* key)
 }
 }  // namespace
 
-namespace clp_ffi_py::ir {
 Metadata::Metadata(nlohmann::json const& metadata, bool is_four_byte_encoding) {
     if (false == is_four_byte_encoding) {
         throw ExceptionFFI(
