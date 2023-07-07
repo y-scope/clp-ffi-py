@@ -1,10 +1,9 @@
-#include <clp_ffi_py/Python.hpp> // Must always be included before any other header files
-
-#include <clp_ffi_py/utils.hpp>
+#include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
 #include <iostream>
 
 #include <clp_ffi_py/ErrorMessage.hpp>
+#include <clp_ffi_py/utils.hpp>
 
 namespace clp_ffi_py {
 namespace {
@@ -23,7 +22,7 @@ inline auto get_Py_string_data(PyObject* py_string) -> char const* {
     }
     return PyUnicode_AsUTF8(py_string);
 }
-} // namespace
+}  // namespace
 
 auto add_type(PyTypeObject* new_type, char const* type_name, PyObject* module) -> bool {
     assert(new_type);
@@ -54,4 +53,4 @@ auto parse_PyString_as_string_view(PyObject* py_string, std::string_view& view) 
     view = std::string_view(str);
     return true;
 }
-} // namespace clp_ffi_py
+}  // namespace clp_ffi_py

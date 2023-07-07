@@ -1,7 +1,7 @@
 #ifndef CLP_FFI_PY_UTILS_HPP
 #define CLP_FFI_PY_UTILS_HPP
 
-#include <clp_ffi_py/Python.hpp> // Must always be included before any other header files
+#include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
 #include <iostream>
 #include <string>
@@ -62,7 +62,7 @@ auto parse_PyString_as_string_view(PyObject* py_string, std::string_view& view) 
  */
 template <typename int_type>
 auto parse_PyInt(PyObject* py_int, int_type& val) -> bool;
-}; // namespace clp_ffi_py
+};  // namespace clp_ffi_py
 
 #include <clp_ffi_py/utils.tpp>
 #endif

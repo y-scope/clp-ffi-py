@@ -1,7 +1,7 @@
 #ifndef CLP_FFI_PY_UTILS_TPP
 #define CLP_FFI_PY_UTILS_TPP
 
-#include <clp_ffi_py/Python.hpp> // Must always be included before any other header files
+#include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
 #include <clp/components/core/src/ffi/encoding_methods.hpp>
 #include <type_traits>
@@ -26,5 +26,5 @@ auto parse_PyInt(PyObject* py_int, int_type& val) -> bool {
 
     return (nullptr == PyErr_Occurred());
 }
-} // namespace clp_ffi_py
+}  // namespace clp_ffi_py
 #endif

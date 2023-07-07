@@ -1,14 +1,14 @@
 #ifndef CLP_FFI_PY_PY_LOG_EVENT_HPP
 #define CLP_FFI_PY_PY_LOG_EVENT_HPP
 
-#include <clp_ffi_py/Python.hpp> // Must always be included before any other header files
+#include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
 #include <optional>
 
-#include <clp_ffi_py/ir_decoder/LogEvent.hpp>
-#include <clp_ffi_py/ir_decoder/PyMetadata.hpp>
+#include <clp_ffi_py/ir/LogEvent.hpp>
+#include <clp_ffi_py/ir/PyMetadata.hpp>
 
-namespace clp_ffi_py::ir_decoder {
+namespace clp_ffi_py::ir {
 /**
  * A PyObject structure functioning as a Python-compatible interface to retrieve
  * a log event. The underlying data is pointed by `log_event`. The object may
@@ -39,12 +39,13 @@ struct PyLogEvent {
      * @return false on failure with the relevant Python exception and error
      * set.
      */
-    [[nodiscard]] auto
-    init(std::string_view log_message,
-         ffi::epoch_time_ms_t timestamp,
-         size_t index,
-         PyMetadata* metadata,
-         std::optional<std::string_view> formatted_timestamp = std::nullopt) -> bool;
+    [[nodiscard]] auto init(
+            std::string_view log_message,
+            ffi::epoch_time_ms_t timestamp,
+            size_t index,
+            PyMetadata* metadata,
+            std::optional<std::string_view> formatted_timestamp = std::nullopt
+    ) -> bool;
 
     /**
      * Validates whether the PyLogEvent has a PyMetadata object associated.
@@ -122,6 +123,7 @@ auto PyLogEvent_create_new(
         std::string const& log_message,
         ffi::epoch_time_ms_t timestamp,
         size_t index,
-        PyMetadata* metadata) -> PyLogEvent*;
-} // namespace clp_ffi_py::ir_decoder
+        PyMetadata* metadata
+) -> PyLogEvent*;
+}  // namespace clp_ffi_py::ir
 #endif

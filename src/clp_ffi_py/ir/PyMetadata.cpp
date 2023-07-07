@@ -1,15 +1,14 @@
-#include <clp_ffi_py/Python.hpp> // Must always be included before any other header files
-
-#include <clp_ffi_py/ir_decoder/PyMetadata.hpp>
+#include <clp_ffi_py/Python.hpp>
 
 #include <clp_ffi_py/ErrorMessage.hpp>
 #include <clp_ffi_py/ExceptionFFI.hpp>
-#include <clp_ffi_py/PyObjectPtr.hpp>
+#include <clp_ffi_py/ir/Metadata.hpp>
+#include <clp_ffi_py/ir/PyMetadata.hpp>
 #include <clp_ffi_py/Py_utils.hpp>
-#include <clp_ffi_py/ir_decoder/Metadata.hpp>
+#include <clp_ffi_py/PyObjectPtr.hpp>
 #include <clp_ffi_py/utils.hpp>
 
-namespace clp_ffi_py::ir_decoder {
+namespace clp_ffi_py::ir {
 namespace {
 extern "C" {
 /**
@@ -26,11 +25,11 @@ auto PyMetadata_init(PyMetadata* self, PyObject* args, PyObject* keywords) -> in
     static char keyword_ref_timestamp[]{"ref_timestamp"};
     static char keyword_timestamp_format[]{"timestamp_format"};
     static char keyword_timezone_id[]{"timezone_id"};
-    static char* keyword_table[] = {
-            static_cast<char*>(keyword_ref_timestamp),
-            static_cast<char*>(keyword_timestamp_format),
-            static_cast<char*>(keyword_timezone_id),
-            nullptr};
+    static char* keyword_table[]
+            = {static_cast<char*>(keyword_ref_timestamp),
+               static_cast<char*>(keyword_timestamp_format),
+               static_cast<char*>(keyword_timezone_id),
+               nullptr};
 
     ffi::epoch_time_ms_t ref_timestamp{0};
     char const* input_timestamp_format{nullptr};
@@ -41,14 +40,17 @@ auto PyMetadata_init(PyMetadata* self, PyObject* args, PyObject* keywords) -> in
     // trigger segmentation fault
     self->reset();
 
-    if (false == static_cast<bool>(PyArg_ParseTupleAndKeywords(
-                         args,
-                         keywords,
-                         "Lss",
-                         static_cast<char**>(keyword_table),
-                         &ref_timestamp,
-                         &input_timestamp_format,
-                         &input_timezone))) {
+    if (false
+        == static_cast<bool>(PyArg_ParseTupleAndKeywords(
+                args,
+                keywords,
+                "Lss",
+                static_cast<char**>(keyword_table),
+                &ref_timestamp,
+                &input_timestamp_format,
+                &input_timezone
+        )))
+    {
         return -1;
     }
 
@@ -72,7 +74,8 @@ PyDoc_STRVAR(
         "--\n\n"
         "Checks whether the CLP IR is encoded using 4-byte or 8-byte encoding methods.\n"
         ":param self\n"
-        ":return: True for 4-byte encoding, and False for 8-byte encoding.\n");
+        ":return: True for 4-byte encoding, and False for 8-byte encoding.\n"
+);
 
 auto PyMetadata_is_using_four_byte_encoding(PyMetadata* self) -> PyObject* {
     assert(self->metadata);
@@ -90,7 +93,8 @@ PyDoc_STRVAR(
         "of the first log message in "
         "the IR stream.\n"
         ":param self\n"
-        ":return: The reference timestamp.\n");
+        ":return: The reference timestamp.\n"
+);
 
 auto PyMetadata_get_ref_timestamp(PyMetadata* self) -> PyObject* {
     assert(self->metadata);
@@ -103,7 +107,8 @@ PyDoc_STRVAR(
         "--\n\n"
         "Gets the timestamp format to be use when generating the logs with a reader.\n"
         ":param self\n"
-        ":return: The timestamp format.\n");
+        ":return: The timestamp format.\n"
+);
 
 auto PyMetadata_get_timestamp_format(PyMetadata* self) -> PyObject* {
     assert(self->metadata);
@@ -116,7 +121,8 @@ PyDoc_STRVAR(
         "--\n\n"
         "Gets the timezone id to be use when generating the timestamp from Unix epoch time.\n"
         ":param self\n"
-        ":return: The timezone in TZID format.\n");
+        ":return: The timezone in TZID format.\n"
+);
 
 auto PyMetadata_get_timezone_id(PyMetadata* self) -> PyObject* {
     assert(self->metadata);
@@ -153,14 +159,14 @@ PyMethodDef PyMetadata_method_table[]{
 /**
  * PyMetadata member table.
  */
-PyMemberDef PyMetadata_members[] = {
-        {"timezone",
-         T_OBJECT,
-         offsetof(PyMetadata, py_timezone),
-         READONLY,
-         "Read only timezone stored as tzinfo"},
+PyMemberDef PyMetadata_members[]
+        = {{"timezone",
+            T_OBJECT,
+            offsetof(PyMetadata, py_timezone),
+            READONLY,
+            "Read only timezone stored as tzinfo"},
 
-        {nullptr}};
+           {nullptr}};
 
 /**
  * PyMetadata Python type slots.
@@ -177,7 +183,7 @@ PyType_Slot PyMetadata_slots[]{
  * PyMetadata Python type specifications.
  */
 PyType_Spec PyMetadata_type_spec{
-        "clp_ffi_py.CLPIRDecoder.Metadata",
+        "clp_ffi_py.CLPIR.Metadata",
         sizeof(PyMetadata),
         0,
         Py_TPFLAGS_DEFAULT,
@@ -187,12 +193,13 @@ PyType_Spec PyMetadata_type_spec{
  * PyMetadata's Python type.
  */
 PyObjectPtr<PyTypeObject> PyMetadata_type;
-} // namespace
+}  // namespace
 
 auto PyMetadata::init(
         ffi::epoch_time_ms_t ref_timestamp,
         char const* input_timestamp_format,
-        char const* input_timezone) -> bool {
+        char const* input_timezone
+) -> bool {
     this->metadata = new Metadata(ref_timestamp, input_timestamp_format, input_timezone);
     if (nullptr == this->metadata) {
         PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::error_messages::cOutofMemoryError);
@@ -209,7 +216,8 @@ auto PyMetadata::init(nlohmann::json const& metadata, bool is_four_byte_encoding
                 PyExc_RuntimeError,
                 "Failed to initialize metadata from decoded JSON format preamble. "
                 "Error message: %s",
-                ex.what());
+                ex.what()
+        );
         this->metadata = nullptr;
         return false;
     }
@@ -257,4 +265,4 @@ auto PyMetadata_init_from_json(nlohmann::json const& metadata, bool is_four_byte
     }
     return self;
 }
-}; // namespace clp_ffi_py::ir_decoder
+};  // namespace clp_ffi_py::ir

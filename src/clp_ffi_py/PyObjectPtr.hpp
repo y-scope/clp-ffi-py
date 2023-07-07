@@ -1,7 +1,7 @@
 #ifndef CLP_FFI_PY_PY_OBJECT_PTR_HPP
 #define CLP_FFI_PY_PY_OBJECT_PTR_HPP
 
-#include <clp_ffi_py/Python.hpp> // Must always be included before any other header files
+#include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
 #include <memory>
 
@@ -24,5 +24,5 @@ public:
  */
 template <typename PyObjectType>
 using PyObjectPtr = std::unique_ptr<PyObjectType, PyObjectDeleter<PyObjectType>>;
-} // namespace clp_ffi_py
+}  // namespace clp_ffi_py
 #endif

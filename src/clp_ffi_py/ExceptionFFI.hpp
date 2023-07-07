@@ -2,7 +2,6 @@
 #define CLP_FFI_PY_EXCEPTION_FFI
 
 #include <clp/components/core/src/TraceableException.hpp>
-
 #include <string>
 
 namespace clp_ffi_py {
@@ -17,15 +16,16 @@ public:
             ErrorCode error_code,
             char const* const filename,
             int line_number,
-            std::string message)
-        : TraceableException{error_code, filename, line_number},
-          m_message{std::move(message)} {};
+            std::string message
+    )
+            : TraceableException{error_code, filename, line_number},
+              m_message{std::move(message)} {};
 
     [[nodiscard]] auto what() const noexcept -> char const* override { return m_message.c_str(); }
 
 private:
     std::string m_message;
 };
-} // namespace clp_ffi_py
+}  // namespace clp_ffi_py
 
 #endif

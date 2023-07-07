@@ -2,7 +2,7 @@ import dateutil.tz
 import pickle
 import unittest
 
-from clp_ffi_py.CLPIRDecoder import LogEvent, Metadata
+from clp_ffi_py.CLPIR import LogEvent, Metadata
 from datetime import tzinfo
 from typing import Optional
 

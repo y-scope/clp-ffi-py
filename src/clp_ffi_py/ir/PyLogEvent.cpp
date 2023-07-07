@@ -1,14 +1,14 @@
-#include <clp_ffi_py/Python.hpp> // Must always be included before any other header files
+#include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
-#include <clp_ffi_py/ir_decoder/PyLogEvent.hpp>
+#include "PyLogEvent.hpp"
 
 #include <clp_ffi_py/ErrorMessage.hpp>
-#include <clp_ffi_py/PyObjectPtr.hpp>
+#include <clp_ffi_py/ir/LogEvent.hpp>
 #include <clp_ffi_py/Py_utils.hpp>
-#include <clp_ffi_py/ir_decoder/LogEvent.hpp>
+#include <clp_ffi_py/PyObjectPtr.hpp>
 #include <clp_ffi_py/utils.hpp>
 
-namespace clp_ffi_py::ir_decoder {
+namespace clp_ffi_py::ir {
 namespace {
 extern "C" {
 /**
@@ -42,30 +42,37 @@ auto PyLogEvent_init(PyLogEvent* self, PyObject* args, PyObject* keywords) -> in
     ffi::epoch_time_ms_t timestamp{0};
     size_t index{0};
     PyObject* metadata{Py_None};
-    if (false == static_cast<bool>(PyArg_ParseTupleAndKeywords(
-                         args,
-                         keywords,
-                         "sL|KO",
-                         static_cast<char**>(keyword_table),
-                         &log_message,
-                         &timestamp,
-                         &index,
-                         &metadata))) {
+    if (false
+        == static_cast<bool>(PyArg_ParseTupleAndKeywords(
+                args,
+                keywords,
+                "sL|KO",
+                static_cast<char**>(keyword_table),
+                &log_message,
+                &timestamp,
+                &index,
+                &metadata
+        )))
+    {
         return -1;
     }
 
     auto const has_metadata{Py_None != metadata};
-    if (has_metadata &&
-        false == static_cast<bool>(PyObject_TypeCheck(metadata, PyMetadata_get_PyType()))) {
+    if (has_metadata
+        && false == static_cast<bool>(PyObject_TypeCheck(metadata, PyMetadata_get_PyType())))
+    {
         PyErr_SetString(PyExc_TypeError, clp_ffi_py::error_messages::cPyTypeError);
         return -1;
     }
 
-    if (false == self->init(
-                         log_message,
-                         timestamp,
-                         index,
-                         has_metadata ? reinterpret_cast<PyMetadata*>(metadata) : nullptr)) {
+    if (false
+        == self->init(
+                log_message,
+                timestamp,
+                index,
+                has_metadata ? reinterpret_cast<PyMetadata*>(metadata) : nullptr
+        ))
+    {
         return -1;
     }
     return 0;
@@ -96,7 +103,8 @@ PyDoc_STRVAR(
         "--\n\n"
         "Serializes the log event.\n"
         ":param self\n"
-        ":return: Serialized log event in a Python dictionary.\n");
+        ":return: Serialized log event in a Python dictionary.\n"
+);
 
 /**
  * Callback of PyLogEvent `__getstate__` method.
@@ -110,7 +118,8 @@ auto PyLogEvent_getstate(PyLogEvent* self) -> PyObject* {
         PyObjectPtr<PyObject> formatted_timestamp_object{
                 clp_ffi_py::Py_utils_get_formatted_timestamp(
                         self->log_event->get_timestamp(),
-                        self->has_metadata() ? self->py_metadata->py_timezone : Py_None)};
+                        self->has_metadata() ? self->py_metadata->py_timezone : Py_None
+                )};
         auto* formatted_timestamp_ptr{formatted_timestamp_object.get()};
         if (nullptr == formatted_timestamp_ptr) {
             return nullptr;
@@ -131,7 +140,8 @@ auto PyLogEvent_getstate(PyLogEvent* self) -> PyObject* {
             static_cast<char const*>(cStateTimestamp),
             self->log_event->get_timestamp(),
             static_cast<char const*>(cStateIndex),
-            self->log_event->get_index());
+            self->log_event->get_index()
+    );
 }
 
 PyDoc_STRVAR(
@@ -141,7 +151,8 @@ PyDoc_STRVAR(
         "Deserializes the log event from a state dictionary.\n"
         ":param self\n"
         ":param state: Serialized log event represented by a Python dictionary.\n"
-        ":return: None\n");
+        ":return: None\n"
+);
 
 /**
  * Callback of PyLogEvent `__setstate__` method.
@@ -163,7 +174,8 @@ auto PyLogEvent_setstate(PyLogEvent* self, PyObject* state) -> PyObject* {
         PyErr_Format(
                 PyExc_KeyError,
                 clp_ffi_py::error_messages::cSetstateKeyErrorTemplate,
-                static_cast<char const*>(cStateLogMessage));
+                static_cast<char const*>(cStateLogMessage)
+        );
         return nullptr;
     }
     std::string log_message;
@@ -177,7 +189,8 @@ auto PyLogEvent_setstate(PyLogEvent* self, PyObject* state) -> PyObject* {
         PyErr_Format(
                 PyExc_KeyError,
                 clp_ffi_py::error_messages::cSetstateKeyErrorTemplate,
-                static_cast<char const*>(cStateFormattedTimestamp));
+                static_cast<char const*>(cStateFormattedTimestamp)
+        );
         return nullptr;
     }
     std::string formatted_timestamp;
@@ -190,7 +203,8 @@ auto PyLogEvent_setstate(PyLogEvent* self, PyObject* state) -> PyObject* {
         PyErr_Format(
                 PyExc_KeyError,
                 clp_ffi_py::error_messages::cSetstateKeyErrorTemplate,
-                static_cast<char const*>(cStateTimestamp));
+                static_cast<char const*>(cStateTimestamp)
+        );
         return nullptr;
     }
     ffi::epoch_time_ms_t timestamp{0};
@@ -203,7 +217,8 @@ auto PyLogEvent_setstate(PyLogEvent* self, PyObject* state) -> PyObject* {
         PyErr_Format(
                 PyExc_KeyError,
                 clp_ffi_py::error_messages::cSetstateKeyErrorTemplate,
-                static_cast<char const*>(cStateIndex));
+                static_cast<char const*>(cStateIndex)
+        );
         return nullptr;
     }
     size_t index{0};
@@ -242,7 +257,8 @@ PyDoc_STRVAR(
         "--\n\n"
         "Gets the log message of the log event.\n"
         ":param self\n"
-        ":return: The log message.\n");
+        ":return: The log message.\n"
+);
 
 auto PyLogEvent_get_log_message(PyLogEvent* self) -> PyObject* {
     assert(self->log_event);
@@ -255,7 +271,8 @@ PyDoc_STRVAR(
         "--\n\n"
         "Gets the Unix epoch timestamp in milliseconds of the log event.\n"
         ":param self\n"
-        ":return: The timestamp in milliseconds.\n");
+        ":return: The timestamp in milliseconds.\n"
+);
 
 auto PyLogEvent_get_timestamp(PyLogEvent* self) -> PyObject* {
     assert(self->log_event);
@@ -269,7 +286,8 @@ PyDoc_STRVAR(
         "Gets the message index (relative to the source CLP IR stream) of the log event. This "
         "message is set to 0 by default.\n"
         ":param self\n"
-        ":return: The log event index.\n");
+        ":return: The log event index.\n"
+);
 
 auto PyLogEvent_get_index(PyLogEvent* self) -> PyObject* {
     assert(self->log_event);
@@ -286,7 +304,8 @@ PyDoc_STRVAR(
         "stream.\n"
         ":param self\n"
         ":param timezone: Python tzinfo object that specifies a timezone."
-        ":return: The formatted message.\n");
+        ":return: The formatted message.\n"
+);
 
 auto PyLogEvent_get_formatted_message(PyLogEvent* self, PyObject* args, PyObject* keywords)
         -> PyObject* {
@@ -294,12 +313,15 @@ auto PyLogEvent_get_formatted_message(PyLogEvent* self, PyObject* args, PyObject
     static char* key_table[] = {static_cast<char*>(keyword_timezone), nullptr};
 
     PyObject* timezone{Py_None};
-    if (false == static_cast<bool>(PyArg_ParseTupleAndKeywords(
-                         args,
-                         keywords,
-                         "|O",
-                         static_cast<char**>(key_table),
-                         &timezone))) {
+    if (false
+        == static_cast<bool>(PyArg_ParseTupleAndKeywords(
+                args,
+                keywords,
+                "|O",
+                static_cast<char**>(key_table),
+                &timezone
+        )))
+    {
         return nullptr;
     }
 
@@ -359,7 +381,7 @@ PyType_Slot PyLogEvent_slots[]{
  * PyLogEvent Python type specifications.
  */
 PyType_Spec PyLogEvent_type_spec{
-        "clp_ffi_py.CLPIRDecoder.LogEvent",
+        "clp_ffi_py.CLPIR.LogEvent",
         sizeof(PyLogEvent),
         0,
         Py_TPFLAGS_DEFAULT,
@@ -369,7 +391,7 @@ PyType_Spec PyLogEvent_type_spec{
  * PyLogEvent's Python type.
  */
 PyObjectPtr<PyTypeObject> PyLogEvent_type;
-} // namespace
+}  // namespace
 
 auto PyLogEvent::get_formatted_message(PyObject* timezone) -> PyObject* {
     auto cache_formatted_timestamp{false};
@@ -380,7 +402,8 @@ auto PyLogEvent::get_formatted_message(PyObject* timezone) -> PyObject* {
             return PyUnicode_FromFormat(
                     "%s%s",
                     this->log_event->get_formatted_timestamp().c_str(),
-                    this->log_event->get_log_message().c_str());
+                    this->log_event->get_log_message().c_str()
+            );
         }
         if (this->has_metadata()) {
             timezone = this->py_metadata->py_timezone;
@@ -405,7 +428,8 @@ auto PyLogEvent::get_formatted_message(PyObject* timezone) -> PyObject* {
     return PyUnicode_FromFormat(
             "%s%s",
             formatted_timestamp.c_str(),
-            this->log_event->get_log_message().c_str());
+            this->log_event->get_log_message().c_str()
+    );
 }
 
 auto PyLogEvent::init(
@@ -413,7 +437,8 @@ auto PyLogEvent::init(
         ffi::epoch_time_ms_t timestamp,
         size_t index,
         PyMetadata* metadata,
-        std::optional<std::string_view> formatted_timestamp) -> bool {
+        std::optional<std::string_view> formatted_timestamp
+) -> bool {
     this->log_event = new LogEvent(log_message, timestamp, index, formatted_timestamp);
     if (nullptr == this->log_event) {
         PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::error_messages::cOutofMemoryError);
@@ -440,7 +465,8 @@ auto PyLogEvent_create_new(
         std::string const& log_message,
         ffi::epoch_time_ms_t timestamp,
         size_t index,
-        PyMetadata* metadata) -> PyLogEvent* {
+        PyMetadata* metadata
+) -> PyLogEvent* {
     PyLogEvent* self{
             reinterpret_cast<PyLogEvent*>(PyObject_New(PyLogEvent, PyLogEvent_get_PyType()))};
     if (nullptr == self) {
@@ -453,4 +479,4 @@ auto PyLogEvent_create_new(
     }
     return self;
 }
-} // namespace clp_ffi_py::ir_decoder
+}  // namespace clp_ffi_py::ir

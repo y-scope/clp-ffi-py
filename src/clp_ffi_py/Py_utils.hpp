@@ -1,7 +1,7 @@
 #ifndef CLP_FFI_PY_PY_UTILS_HPP
 #define CLP_FFI_PY_PY_UTILS_HPP
 
-#include <clp_ffi_py/Python.hpp> // Must always be included before any other header files
+#include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
 #include <clp/components/core/src/ffi/encoding_methods.hpp>
 
@@ -33,5 +33,5 @@ auto Py_utils_get_formatted_timestamp(ffi::epoch_time_ms_t timestamp, PyObject* 
  * @return nullptr on failure with the relevant Python exception and error set.
  */
 auto Py_utils_get_timezone_from_timezone_id(std::string const& timezone_id) -> PyObject*;
-} // namespace clp_ffi_py
+}  // namespace clp_ffi_py
 #endif

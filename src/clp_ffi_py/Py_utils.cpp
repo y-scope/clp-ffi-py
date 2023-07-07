@@ -1,7 +1,6 @@
-#include <clp_ffi_py/Python.hpp> // Must always be included before any other header file
+#include <clp_ffi_py/Python.hpp>  // Must always be included before any other header file
 
 #include <clp_ffi_py/Py_utils.hpp>
-
 #include <clp_ffi_py/PyObjectPtr.hpp>
 
 namespace clp_ffi_py {
@@ -21,7 +20,7 @@ PyObjectPtr<PyObject> Py_func_get_timezone_from_timezone_id;
 inline auto Py_utils_function_call_wrapper(PyObject* func, PyObject* args) -> PyObject* {
     return PyObject_CallObject(func, args);
 }
-} // namespace
+}  // namespace
 
 auto Py_utils_init() -> bool {
     PyObjectPtr<PyObject> utils_module(PyImport_ImportModule("clp_ffi_py.utils"));
@@ -31,13 +30,15 @@ auto Py_utils_init() -> bool {
     }
 
     Py_func_get_timezone_from_timezone_id.reset(
-            PyObject_GetAttrString(py_utils, cPyFuncNameGetTimezoneFromTimezoneId));
+            PyObject_GetAttrString(py_utils, cPyFuncNameGetTimezoneFromTimezoneId)
+    );
     if (nullptr == Py_func_get_timezone_from_timezone_id.get()) {
         return false;
     }
 
     Py_func_get_formatted_timestamp.reset(
-            PyObject_GetAttrString(py_utils, cPyFuncNameGetFormattedTimestamp));
+            PyObject_GetAttrString(py_utils, cPyFuncNameGetFormattedTimestamp)
+    );
     if (nullptr == Py_func_get_formatted_timestamp.get()) {
         return false;
     }
@@ -62,4 +63,4 @@ auto Py_utils_get_timezone_from_timezone_id(std::string const& timezone_id) -> P
     }
     return Py_utils_function_call_wrapper(Py_func_get_timezone_from_timezone_id.get(), func_args);
 }
-}; // namespace clp_ffi_py
+};  // namespace clp_ffi_py

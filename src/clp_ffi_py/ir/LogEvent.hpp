@@ -2,10 +2,9 @@
 #define CLP_FFI_PY_LOG_EVENT_HPP
 
 #include <clp/components/core/src/ffi/encoding_methods.hpp>
-
 #include <optional>
 
-namespace clp_ffi_py::ir_decoder {
+namespace clp_ffi_py::ir {
 /**
  * A class that represents a decoded log event. Contains ways to access (get or
  * set) the log message, the timestamp, and the log event index.
@@ -26,14 +25,15 @@ public:
             std::string_view log_message,
             ffi::epoch_time_ms_t timestamp,
             size_t index,
-            std::optional<std::string_view> formatted_timestamp = std::nullopt)
-        : m_log_message{log_message},
-          m_timestamp{timestamp},
-          m_index{index} {
+            std::optional<std::string_view> formatted_timestamp = std::nullopt
+    )
+            : m_log_message{log_message},
+              m_timestamp{timestamp},
+              m_index{index} {
         if (formatted_timestamp.has_value()) {
             m_formatted_timestamp = std::string(formatted_timestamp.value());
         }
-    };
+    }
 
     [[nodiscard]] auto get_log_message() const -> std::string { return m_log_message; }
 
@@ -73,6 +73,6 @@ private:
     size_t m_index;
     std::string m_formatted_timestamp;
 };
-}; // namespace clp_ffi_py::ir_decoder
+};  // namespace clp_ffi_py::ir
 
 #endif

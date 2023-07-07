@@ -1,9 +1,8 @@
-#include <clp_ffi_py/ir_decoder/Metadata.hpp>
-
 #include <clp/components/core/src/ffi/ir_stream/protocol_constants.hpp>
 
 #include <clp_ffi_py/ErrorMessage.hpp>
 #include <clp_ffi_py/ExceptionFFI.hpp>
+#include <clp_ffi_py/ir/Metadata.hpp>
 
 namespace {
 /**
@@ -15,17 +14,18 @@ namespace {
  */
 inline auto is_valid_json_string_data(nlohmann::json const& json_data, char const* key) -> bool {
     return json_data.contains(key) && json_data[key].is_string();
-};
-} // namespace
+}
+}  // namespace
 
-namespace clp_ffi_py::ir_decoder {
+namespace clp_ffi_py::ir {
 Metadata::Metadata(nlohmann::json const& metadata, bool is_four_byte_encoding) {
     if (false == is_four_byte_encoding) {
         throw ExceptionFFI(
                 ErrorCode_Unsupported,
                 __FILE__,
                 __LINE__,
-                "Eight Byte Preamble is not yet supported.");
+                "Eight Byte Preamble is not yet supported."
+        );
     }
     m_is_four_byte_encoding = is_four_byte_encoding;
 
@@ -36,7 +36,8 @@ Metadata::Metadata(nlohmann::json const& metadata, bool is_four_byte_encoding) {
                 ErrorCode_MetadataCorrupted,
                 __FILE__,
                 __LINE__,
-                "Valid Reference Timestamp cannot be found in the metadata.");
+                "Valid Reference Timestamp cannot be found in the metadata."
+        );
     }
     try {
         std::string const ref_timestamp_str{metadata[ref_timestamp_key]};
@@ -52,7 +53,8 @@ Metadata::Metadata(nlohmann::json const& metadata, bool is_four_byte_encoding) {
                 ErrorCode_MetadataCorrupted,
                 __FILE__,
                 __LINE__,
-                "Valid Timestamp Format cannot be found in the metadata.");
+                "Valid Timestamp Format cannot be found in the metadata."
+        );
     }
     m_timestamp_format = metadata[timestamp_format_key];
 
@@ -63,9 +65,10 @@ Metadata::Metadata(nlohmann::json const& metadata, bool is_four_byte_encoding) {
                 ErrorCode_MetadataCorrupted,
                 __FILE__,
                 __LINE__,
-                "Valid Timezone ID cannot be found in the metadata.");
+                "Valid Timezone ID cannot be found in the metadata."
+        );
     }
 
     m_timezone_id = metadata[timezone_id_key];
 }
-} // namespace clp_ffi_py::ir_decoder
+}  // namespace clp_ffi_py::ir
