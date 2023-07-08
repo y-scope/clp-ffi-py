@@ -25,11 +25,11 @@ auto PyMetadata_init(PyMetadata* self, PyObject* args, PyObject* keywords) -> in
     static char keyword_ref_timestamp[]{"ref_timestamp"};
     static char keyword_timestamp_format[]{"timestamp_format"};
     static char keyword_timezone_id[]{"timezone_id"};
-    static char* keyword_table[]
-            = {static_cast<char*>(keyword_ref_timestamp),
-               static_cast<char*>(keyword_timestamp_format),
-               static_cast<char*>(keyword_timezone_id),
-               nullptr};
+    static char* keyword_table[]{
+            static_cast<char*>(keyword_ref_timestamp),
+            static_cast<char*>(keyword_timestamp_format),
+            static_cast<char*>(keyword_timezone_id),
+            nullptr};
 
     ffi::epoch_time_ms_t ref_timestamp{0};
     char const* input_timestamp_format{nullptr};
@@ -159,14 +159,14 @@ PyMethodDef PyMetadata_method_table[]{
 /**
  * PyMetadata member table.
  */
-PyMemberDef PyMetadata_members[]
-        = {{"timezone",
-            T_OBJECT,
-            offsetof(PyMetadata, py_timezone),
-            READONLY,
-            "Read only timezone stored as tzinfo"},
+PyMemberDef PyMetadata_members[]{
+        {"timezone",
+         T_OBJECT,
+         offsetof(PyMetadata, py_timezone),
+         READONLY,
+         "Read only timezone stored as tzinfo"},
 
-           {nullptr}};
+        {nullptr}};
 
 /**
  * PyMetadata Python type slots.

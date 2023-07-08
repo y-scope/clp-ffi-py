@@ -22,10 +22,10 @@ extern "C" {
  * @return -1 on failure with the relevant Python exception and error set.
  */
 auto PyLogEvent_init(PyLogEvent* self, PyObject* args, PyObject* keywords) -> int {
-    static char keyword_message[] = "log_message";
-    static char keyword_timestamp[] = "timestamp";
-    static char keyword_message_idx[] = "index";
-    static char keyword_metadata[] = "metadata";
+    static char keyword_message[]{"log_message"};
+    static char keyword_timestamp[]{"timestamp"};
+    static char keyword_message_idx[]{"index"};
+    static char keyword_metadata[]{"metadata"};
     static char* keyword_table[]{
             static_cast<char*>(keyword_message),
             static_cast<char*>(keyword_timestamp),
@@ -92,10 +92,10 @@ auto PyLogEvent_dealloc(PyLogEvent* self) -> void {
  * Constant keys used to serialize/deserialize PyLogEvent objects through
  * __getstate__ and __setstate__ methods.
  */
-constexpr char cStateLogMessage[] = "log_message";
-constexpr char cStateTimestamp[] = "timestamp";
-constexpr char cStateFormattedTimestamp[] = "formatted_timestamp";
-constexpr char cStateIndex[] = "index";
+constexpr char cStateLogMessage[]{"log_message"};
+constexpr char cStateTimestamp[]{"timestamp"};
+constexpr char cStateFormattedTimestamp[]{"formatted_timestamp"};
+constexpr char cStateIndex[]{"index"};
 
 PyDoc_STRVAR(
         cPyLogEventGetStateDoc,
@@ -309,8 +309,8 @@ PyDoc_STRVAR(
 
 auto PyLogEvent_get_formatted_message(PyLogEvent* self, PyObject* args, PyObject* keywords)
         -> PyObject* {
-    static char keyword_timezone[] = "timezone";
-    static char* key_table[] = {static_cast<char*>(keyword_timezone), nullptr};
+    static char keyword_timezone[]{"timezone"};
+    static char* key_table[]{static_cast<char*>(keyword_timezone), nullptr};
 
     PyObject* timezone{Py_None};
     if (false
