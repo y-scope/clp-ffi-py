@@ -4,6 +4,7 @@
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
 #include <clp/components/core/submodules/json/single_include/nlohmann/json.hpp>
+#include <GSL/include/gsl/pointers>
 
 #include <clp_ffi_py/ir/Metadata.hpp>
 
@@ -17,7 +18,7 @@ namespace clp_ffi_py::ir {
 class PyMetadata {
 public:
     PyObject_HEAD;
-    Metadata* metadata;
+    gsl::owner<Metadata*> metadata;
     PyObject* py_timezone;
 
     /**

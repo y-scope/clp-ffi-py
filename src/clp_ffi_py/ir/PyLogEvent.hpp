@@ -3,6 +3,7 @@
 
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
+#include <GSL/include/gsl/pointers>
 #include <optional>
 
 #include <clp_ffi_py/ir/LogEvent.hpp>
@@ -17,7 +18,7 @@ namespace clp_ffi_py::ir {
  */
 struct PyLogEvent {
     PyObject_HEAD;
-    LogEvent* log_event;
+    gsl::owner<LogEvent*> log_event;
     PyMetadata* py_metadata;
 
     /**
