@@ -40,6 +40,8 @@ class TestCaseMetadata(TestCaseBase):
         ref_timestamp: int = metadata.get_ref_timestamp()
         timestamp_format: str = metadata.get_timestamp_format()
         timezone_id: str = metadata.get_timezone_id()
+        timezone: tzinfo = metadata.get_timezone()
+
         self.assertEqual(
             ref_timestamp,
             expected_ref_timestamp,
@@ -58,12 +60,12 @@ class TestCaseMetadata(TestCaseBase):
 
         expected_tzinfo: Optional[tzinfo] = dateutil.tz.gettz(expected_timezone_id)
         assert expected_tzinfo is not None
-        is_the_same_tz: bool = expected_tzinfo is metadata.timezone
+        is_the_same_tz: bool = expected_tzinfo is timezone
         self.assertEqual(
             is_the_same_tz,
             True,
             f"Timezone does not match timezone id. Timezone ID: {timezone_id}, Timezone:"
-            f' {str(metadata.timezone)}"',
+            f' {str(timezone)}"',
         )
 
     def test_init(self) -> None:
@@ -95,10 +97,9 @@ class TestCaseMetadata(TestCaseBase):
         )
         self.check_metadata(metadata, ref_timestamp, timestamp_format, timezone_id)
 
-    def test_timezone_readonly(self) -> None:
+    def test_timezone_new_reference(self) -> None:
         """
-        Test the timezone is properly set as readonly and will trigger exception
-        for any modification
+        Test the timezone is a new reference returned.
         """
         ref_timestamp: int = 2005689603190
         timestamp_format: str = "yy/MM/dd HH:mm:ss"
@@ -106,35 +107,9 @@ class TestCaseMetadata(TestCaseBase):
         metadata: Metadata = Metadata(ref_timestamp, timestamp_format, timezone_id)
         self.check_metadata(metadata, ref_timestamp, timestamp_format, timezone_id)
 
-        exception_captured: bool
-        wrong_tz: Optional[tzinfo]
-
-        exception_captured = False
+        wrong_tz: Optional[tzinfo] = metadata.get_timezone()
         wrong_tz = dateutil.tz.gettz("America/New_York")
-        try:
-            assert wrong_tz is not None
-            metadata.timezone = wrong_tz
-        except AttributeError:
-            exception_captured = True
-        self.assertEqual(
-            exception_captured, True, "Timezone is overwritten by another valid tzinfo object"
-        )
-
-        exception_captured = False
-        wrong_tz = metadata.timezone
-        try:
-            assert wrong_tz is not None
-            metadata.timezone = wrong_tz
-        except AttributeError:
-            exception_captured = True
-        self.assertEqual(exception_captured, True, "Timezone is overwritten by itself")
-
-        exception_captured = False
-        try:
-            metadata.timezone = None  # type: ignore
-        except AttributeError:
-            exception_captured = True
-        self.assertEqual(exception_captured, True, "Timezone is overwritten by None")
+        self.check_metadata(metadata, ref_timestamp, timestamp_format, timezone_id)
 
 
 class TestCaseLogEvent(TestCaseBase):
@@ -301,6 +276,7 @@ class TestCaseLogEvent(TestCaseBase):
             expected_formatted_message,
             f"Raw message: {formatted_message}; Expected: {expected_formatted_message}",
         )
+
 
 if __name__ == "__main__":
     unittest.main()

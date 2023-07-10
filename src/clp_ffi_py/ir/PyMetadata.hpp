@@ -17,10 +17,6 @@ namespace clp_ffi_py::ir {
  */
 class PyMetadata {
 public:
-    PyObject_HEAD;
-    gsl::owner<Metadata*> metadata;
-    PyObject* py_timezone;
-
     /**
      * Initializes the underlying data with the given inputs.
      * Since the memory allocation of PyMetadata is handled by CPython
@@ -53,12 +49,25 @@ public:
             -> bool;
 
     /**
+     * Releases the memory allocated for underlying metadata field and the
+     * reference hold for the Python tzinfo object.
+     */
+    auto clean() -> void {
+        delete m_metadata;
+        Py_XDECREF(m_py_timezone);
+    }
+
+    /**
      * Resets pointers to nullptr.
      */
     auto reset() -> void {
-        metadata = nullptr;
-        py_timezone = nullptr;
+        m_metadata = nullptr;
+        m_py_timezone = nullptr;
     }
+
+    [[nodiscard]] auto get_metadata() -> Metadata* { return m_metadata; }
+
+    [[nodiscard]] auto get_py_timezone() -> PyObject* { return m_py_timezone; }
 
 private:
     /**
@@ -69,6 +78,10 @@ private:
      * set.
      */
     [[nodiscard]] auto init_py_timezone() -> bool;
+
+    PyObject_HEAD;
+    gsl::owner<Metadata*> m_metadata;
+    PyObject* m_py_timezone;
 };
 
 /**

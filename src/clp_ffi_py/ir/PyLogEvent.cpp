@@ -118,7 +118,7 @@ auto PyLogEvent_getstate(PyLogEvent* self) -> PyObject* {
         PyObjectPtr<PyObject> formatted_timestamp_object{
                 clp_ffi_py::Py_utils_get_formatted_timestamp(
                         self->log_event->get_timestamp(),
-                        self->has_metadata() ? self->py_metadata->py_timezone : Py_None
+                        self->has_metadata() ? self->py_metadata->get_py_timezone() : Py_None
                 )};
         auto* formatted_timestamp_ptr{formatted_timestamp_object.get()};
         if (nullptr == formatted_timestamp_ptr) {
@@ -303,7 +303,7 @@ PyDoc_STRVAR(
         "Otherwise, the timestamp will be formatted using the timezone from the originating CLP IR "
         "stream.\n"
         ":param self\n"
-        ":param timezone: Python tzinfo object that specifies a timezone."
+        ":param timezone: Python tzinfo object that specifies a timezone.\n"
         ":return: The formatted message.\n"
 );
 
@@ -369,6 +369,7 @@ PyMethodDef PyLogEvent_method_table[]{
  * PyLogEvent Python type slots.
  */
 PyType_Slot PyLogEvent_slots[]{
+        {Py_tp_alloc, reinterpret_cast<void*>(PyType_GenericAlloc)},
         {Py_tp_dealloc, reinterpret_cast<void*>(PyLogEvent_dealloc)},
         {Py_tp_new, reinterpret_cast<void*>(PyType_GenericNew)},
         {Py_tp_init, reinterpret_cast<void*>(PyLogEvent_init)},
@@ -406,7 +407,7 @@ auto PyLogEvent::get_formatted_message(PyObject* timezone) -> PyObject* {
             );
         }
         if (this->has_metadata()) {
-            timezone = this->py_metadata->py_timezone;
+            timezone = this->py_metadata->get_py_timezone();
             cache_formatted_timestamp = true;
         }
     }

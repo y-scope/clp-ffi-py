@@ -9,6 +9,8 @@ constexpr char const* cPyTypeError = "Wrong Python Type received.";
 constexpr char const* cSetstateInputError
         = "Python dictionary is expected to be the input of __setstate__ method.";
 constexpr char const* cSetstateKeyErrorTemplate = "\"%s\" not found in the state dictionary.";
+constexpr char const* cTimezoneObjectNotInitialzed
+        = "Timezone (tzinfo) object is not yet initialized.";
 
 namespace ir {
 constexpr char const* cEncodeTimestampError

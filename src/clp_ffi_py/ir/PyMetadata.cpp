@@ -13,8 +13,9 @@ namespace {
 extern "C" {
 /**
  * Callback of PyMetadata `__init__` method:
- * __init__(ref_timestamp, timestamp_format, timezone_id)
+ * __init__(self, ref_timestamp, timestamp_format, timezone_id)
  * Keyword argument parsing is supported.
+ * Note: double initialization will result in memory leaks.
  * @param self
  * @param args
  * @param keywords
@@ -63,8 +64,7 @@ auto PyMetadata_init(PyMetadata* self, PyObject* args, PyObject* keywords) -> in
  * @param self
  */
 auto PyMetadata_dealloc(PyMetadata* self) -> void {
-    delete self->metadata;
-    Py_XDECREF(self->py_timezone);
+    self->clean();
     PyObject_Del(self);
 }
 
@@ -78,8 +78,7 @@ PyDoc_STRVAR(
 );
 
 auto PyMetadata_is_using_four_byte_encoding(PyMetadata* self) -> PyObject* {
-    assert(self->metadata);
-    if (self->metadata->is_using_four_byte_encoding()) {
+    if (self->get_metadata()->is_using_four_byte_encoding()) {
         Py_RETURN_TRUE;
     }
     Py_RETURN_FALSE;
@@ -90,15 +89,13 @@ PyDoc_STRVAR(
         "get_ref_timestamp(self)\n"
         "--\n\n"
         "Gets the reference Unix epoch timestamp in milliseconds used to calculate the timestamp "
-        "of the first log message in "
-        "the IR stream.\n"
+        "of the first log message in the IR stream.\n"
         ":param self\n"
         ":return: The reference timestamp.\n"
 );
 
 auto PyMetadata_get_ref_timestamp(PyMetadata* self) -> PyObject* {
-    assert(self->metadata);
-    return PyLong_FromLongLong(self->metadata->get_ref_timestamp());
+    return PyLong_FromLongLong(self->get_metadata()->get_ref_timestamp());
 }
 
 PyDoc_STRVAR(
@@ -111,8 +108,7 @@ PyDoc_STRVAR(
 );
 
 auto PyMetadata_get_timestamp_format(PyMetadata* self) -> PyObject* {
-    assert(self->metadata);
-    return PyUnicode_FromString(self->metadata->get_timestamp_format().c_str());
+    return PyUnicode_FromString(self->get_metadata()->get_timestamp_format().c_str());
 }
 
 PyDoc_STRVAR(
@@ -121,12 +117,34 @@ PyDoc_STRVAR(
         "--\n\n"
         "Gets the timezone id to be use when generating the timestamp from Unix epoch time.\n"
         ":param self\n"
-        ":return: The timezone in TZID format.\n"
+        ":return: The timezone ID in TZID format.\n"
 );
 
 auto PyMetadata_get_timezone_id(PyMetadata* self) -> PyObject* {
-    assert(self->metadata);
-    return PyUnicode_FromString(self->metadata->get_timezone_id().c_str());
+    return PyUnicode_FromString(self->get_metadata()->get_timezone_id().c_str());
+}
+
+PyDoc_STRVAR(
+        cPyMetadataGetTimezoneDoc,
+        "get_timezone(self)\n"
+        "--\n\n"
+        "Gets the timezone represented as tzinfo to be use when generating the timestamp from Unix "
+        "epoch time.\n"
+        ":param self\n"
+        ":return: A new reference to the timezone as tzinfo.\n"
+);
+
+auto PyMetadata_get_timezone(PyMetadata* self) -> PyObject* {
+    auto* timezone{self->get_py_timezone()};
+    if (nullptr == timezone) {
+        PyErr_SetString(
+                PyExc_RuntimeError,
+                clp_ffi_py::error_messages::cTimezoneObjectNotInitialzed
+        );
+        return nullptr;
+    }
+    Py_INCREF(timezone);
+    return timezone;
 }
 }
 
@@ -154,29 +172,44 @@ PyMethodDef PyMetadata_method_table[]{
          METH_NOARGS,
          static_cast<char const*>(cPyMetadataGetTimezoneIdDoc)},
 
+        {"get_timezone",
+         reinterpret_cast<PyCFunction>(PyMetadata_get_timezone),
+         METH_NOARGS,
+         static_cast<char const*>(cPyMetadataGetTimezoneDoc)},
+
         {nullptr}};
 
 /**
- * PyMetadata member table.
+ * PyMetadata class doc string.
  */
-PyMemberDef PyMetadata_members[]{
-        {"timezone",
-         T_OBJECT,
-         offsetof(PyMetadata, py_timezone),
-         READONLY,
-         "Read only timezone stored as tzinfo"},
-
-        {nullptr}};
+PyDoc_STRVAR(
+        cPyMetadataDoc,
+        "This class represents the IR stream preamble and provides ways to access the underlying "
+        "metadata. Normally, this class will be instantiated by the FFI IR decoding methods.\n"
+        "However, with `__init__` method provided below, direct instantiation is also possible.\n\n"
+        "__init__(self, ref_timestamp, timestamp_format, timezone_id)\n"
+        "Initialize an object that represents CLP IR metadata. Notice that each object should be "
+        "strictly initialized only once. Double initialization will result in memory leaks.\n"
+        ":param self\n"
+        ":param ref_timestamp: the reference Unix epoch timestamp in milliseconds used to "
+        "calculate the timestamp of the first log message in the IR stream.\n"
+        ":param timestamp_format: the timestamp format to be use when generating the logs with a "
+        "reader.\n"
+        ":param timezone_id: the timezone id to be use when generating the timestamp from Unix "
+        "epoch time.\n"
+        ":return: 0 on success, -1 on failure with relevant Python exceptions and error set.\n"
+);
 
 /**
  * PyMetadata Python type slots.
  */
 PyType_Slot PyMetadata_slots[]{
+        {Py_tp_alloc, reinterpret_cast<void*>(PyType_GenericAlloc)},
         {Py_tp_dealloc, reinterpret_cast<void*>(PyMetadata_dealloc)},
         {Py_tp_init, reinterpret_cast<void*>(PyMetadata_init)},
         {Py_tp_new, reinterpret_cast<void*>(PyType_GenericNew)},
         {Py_tp_methods, static_cast<void*>(PyMetadata_method_table)},
-        {Py_tp_members, static_cast<void*>(PyMetadata_members)},
+        {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyMetadataDoc))},
         {0, nullptr}};
 
 /**
@@ -200,8 +233,8 @@ auto PyMetadata::init(
         char const* input_timestamp_format,
         char const* input_timezone
 ) -> bool {
-    this->metadata = new Metadata(ref_timestamp, input_timestamp_format, input_timezone);
-    if (nullptr == this->metadata) {
+    this->m_metadata = new Metadata(ref_timestamp, input_timestamp_format, input_timezone);
+    if (nullptr == this->m_metadata) {
         PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::error_messages::cOutofMemoryError);
         return false;
     }
@@ -210,7 +243,7 @@ auto PyMetadata::init(
 
 auto PyMetadata::init(nlohmann::json const& metadata, bool is_four_byte_encoding) -> bool {
     try {
-        this->metadata = new Metadata(metadata, is_four_byte_encoding);
+        this->m_metadata = new Metadata(metadata, is_four_byte_encoding);
     } catch (ExceptionFFI const& ex) {
         PyErr_Format(
                 PyExc_RuntimeError,
@@ -218,10 +251,10 @@ auto PyMetadata::init(nlohmann::json const& metadata, bool is_four_byte_encoding
                 "Error message: %s",
                 ex.what()
         );
-        this->metadata = nullptr;
+        this->m_metadata = nullptr;
         return false;
     }
-    if (nullptr == this->metadata) {
+    if (nullptr == this->m_metadata) {
         PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::error_messages::cOutofMemoryError);
         return false;
     }
@@ -229,12 +262,13 @@ auto PyMetadata::init(nlohmann::json const& metadata, bool is_four_byte_encoding
 }
 
 auto PyMetadata::init_py_timezone() -> bool {
-    assert(this->metadata);
-    this->py_timezone = Py_utils_get_timezone_from_timezone_id(this->metadata->get_timezone_id());
-    if (nullptr == this->py_timezone) {
+    assert(this->m_metadata);
+    this->m_py_timezone
+            = Py_utils_get_timezone_from_timezone_id(this->m_metadata->get_timezone_id());
+    if (nullptr == this->m_py_timezone) {
         return false;
     }
-    Py_INCREF(this->py_timezone);
+    Py_INCREF(this->m_py_timezone);
     return true;
 }
 
