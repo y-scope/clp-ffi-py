@@ -233,17 +233,17 @@ auto PyMetadata::init(
         char const* input_timestamp_format,
         char const* input_timezone
 ) -> bool {
-    this->m_metadata = new Metadata(ref_timestamp, input_timestamp_format, input_timezone);
-    if (nullptr == this->m_metadata) {
+    m_metadata = new Metadata(ref_timestamp, input_timestamp_format, input_timezone);
+    if (nullptr == m_metadata) {
         PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::error_messages::cOutofMemoryError);
         return false;
     }
-    return this->init_py_timezone();
+    return init_py_timezone();
 }
 
 auto PyMetadata::init(nlohmann::json const& metadata, bool is_four_byte_encoding) -> bool {
     try {
-        this->m_metadata = new Metadata(metadata, is_four_byte_encoding);
+        m_metadata = new Metadata(metadata, is_four_byte_encoding);
     } catch (ExceptionFFI const& ex) {
         PyErr_Format(
                 PyExc_RuntimeError,
@@ -251,24 +251,22 @@ auto PyMetadata::init(nlohmann::json const& metadata, bool is_four_byte_encoding
                 "Error message: %s",
                 ex.what()
         );
-        this->m_metadata = nullptr;
+        m_metadata = nullptr;
         return false;
     }
-    if (nullptr == this->m_metadata) {
+    if (nullptr == m_metadata) {
         PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::error_messages::cOutofMemoryError);
         return false;
     }
-    return this->init_py_timezone();
+    return init_py_timezone();
 }
 
 auto PyMetadata::init_py_timezone() -> bool {
-    assert(this->m_metadata);
-    this->m_py_timezone
-            = Py_utils_get_timezone_from_timezone_id(this->m_metadata->get_timezone_id());
-    if (nullptr == this->m_py_timezone) {
+    m_py_timezone = Py_utils_get_timezone_from_timezone_id(m_metadata->get_timezone_id());
+    if (nullptr == m_py_timezone) {
         return false;
     }
-    Py_INCREF(this->m_py_timezone);
+    Py_INCREF(m_py_timezone);
     return true;
 }
 
