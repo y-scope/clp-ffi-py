@@ -71,19 +71,6 @@ private:
     [[nodiscard]] auto init_py_timezone() -> bool;
 };
 
-class PyWhatever {
-public:
-    PyObject_HEAD;
-
-private:
-    int cpp_layer_data_1;
-    int cpp_layer_data_2;
-
-public:
-    int expose_to_python_1;
-    int expose_to_python_2;
-};
-
 /**
  * Gets the PyTypeObject that represents PyMetadata's Python type. This type is
  * dynamically created and initialized during the execution of
