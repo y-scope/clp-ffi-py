@@ -286,8 +286,7 @@ auto PyMetadata_module_level_init(PyObject* py_module) -> bool {
 
 auto PyMetadata_init_from_json(nlohmann::json const& metadata, bool is_four_byte_encoding)
         -> PyMetadata* {
-    PyMetadata* self{
-            reinterpret_cast<PyMetadata*>(PyObject_New(PyMetadata, PyMetadata_get_PyType()))};
+    PyMetadata* self{PyObject_New(PyMetadata, PyMetadata_get_PyType())};
     if (nullptr == self) {
         return nullptr;
     }

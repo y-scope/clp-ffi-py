@@ -493,8 +493,7 @@ auto PyLogEvent_create_new(
         size_t index,
         PyMetadata* metadata
 ) -> PyLogEvent* {
-    PyLogEvent* self{
-            reinterpret_cast<PyLogEvent*>(PyObject_New(PyLogEvent, PyLogEvent_get_PyType()))};
+    PyLogEvent* self{PyObject_New(PyLogEvent, PyLogEvent_get_PyType())};
     if (nullptr == self) {
         PyErr_SetString(PyExc_MemoryError, clp_ffi_py::error_messages::cOutofMemoryError);
         return nullptr;
