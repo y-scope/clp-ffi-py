@@ -188,7 +188,7 @@ PyDoc_STRVAR(
         "metadata. Normally, this class will be instantiated by the FFI IR decoding methods.\n"
         "However, with `__init__` method provided below, direct instantiation is also possible.\n\n"
         "__init__(self, ref_timestamp, timestamp_format, timezone_id)\n"
-        "Initialize an object that represents CLP IR metadata. Notice that each object should be "
+        "Initializes an object that represents CLP IR metadata. Notice that each object should be "
         "strictly initialized only once. Double initialization will result in memory leaks.\n"
         ":param self\n"
         ":param ref_timestamp: the reference Unix epoch timestamp in milliseconds used to "
@@ -275,6 +275,7 @@ auto PyMetadata_get_PyType() -> PyTypeObject* {
 }
 
 auto PyMetadata_module_level_init(PyObject* py_module) -> bool {
+    static_assert(std::is_trivially_destructible<PyMetadata>());
     auto* type{reinterpret_cast<PyTypeObject*>(PyType_FromSpec(&PyMetadata_type_spec))};
     PyMetadata_type.reset(type);
     if (nullptr == type) {

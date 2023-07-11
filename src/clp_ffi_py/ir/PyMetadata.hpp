@@ -50,7 +50,7 @@ public:
 
     /**
      * Releases the memory allocated for underlying metadata field and the
-     * reference hold for the Python tzinfo object.
+     * reference hold for the Python object(s).
      */
     auto clean() -> void {
         delete m_metadata;

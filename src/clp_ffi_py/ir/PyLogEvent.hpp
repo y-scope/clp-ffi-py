@@ -16,11 +16,8 @@ namespace clp_ffi_py::ir {
  * bind with a PyMetadata object pointed by `Py_metadata` that specifies event
  * metadata such as timestamp format.
  */
-struct PyLogEvent {
-    PyObject_HEAD;
-    gsl::owner<LogEvent*> log_event;
-    PyMetadata* py_metadata;
-
+class PyLogEvent {
+public:
     /**
      * Initializes the underlying data with the given inputs.
      * Since the memory allocation of PyLogEvent is handled by CPython
@@ -52,14 +49,23 @@ struct PyLogEvent {
      * Validates whether the PyLogEvent has a PyMetadata object associated.
      * @return Whether `Py_metadata` points to nullptr.
      */
-    [[nodiscard]] bool has_metadata() { return nullptr != py_metadata; }
+    [[nodiscard]] bool has_metadata() { return nullptr != m_py_metadata; }
 
     /**
      * Resets pointers to nullptr.
      */
     auto reset() -> void {
-        log_event = nullptr;
-        py_metadata = nullptr;
+        m_log_event = nullptr;
+        m_py_metadata = nullptr;
+    }
+
+    /**
+     * Releases the memory allocated for underlying metadata field and the
+     * reference hold for the Python object(s).
+     */
+    auto clean() -> void {
+        Py_XDECREF(m_py_metadata);
+        delete m_log_event;
     }
 
     /**
@@ -68,10 +74,10 @@ struct PyLogEvent {
      * @param metadata
      */
     auto set_metadata(PyMetadata* metadata) -> void {
-        Py_XDECREF(py_metadata);
-        py_metadata = metadata;
+        Py_XDECREF(m_py_metadata);
+        m_py_metadata = metadata;
         if (nullptr != metadata) {
-            Py_INCREF(py_metadata);
+            Py_INCREF(m_py_metadata);
         }
     }
 
@@ -89,6 +95,15 @@ struct PyLogEvent {
      * set.
      */
     [[nodiscard]] auto get_formatted_message(PyObject* timezone = Py_None) -> PyObject*;
+
+    [[nodiscard]] auto get_log_event() -> LogEvent* { return m_log_event; }
+
+    [[nodiscard]] auto get_py_metadata() -> PyMetadata* { return m_py_metadata; }
+
+private:
+    PyObject_HEAD;
+    gsl::owner<LogEvent*> m_log_event;
+    PyMetadata* m_py_metadata;
 };
 
 /**

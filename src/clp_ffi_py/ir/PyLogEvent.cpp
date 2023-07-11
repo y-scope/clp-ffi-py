@@ -15,6 +15,7 @@ extern "C" {
  * Callback of PyLogEvent `__init__` method:
  * __init__(log_message, timestamp, index=0, metadata=None)
  * Keyword argument parsing is supported.
+ * Note: double initialization will result in memory leaks.
  * @param self
  * @param args
  * @param keywords
@@ -83,8 +84,7 @@ auto PyLogEvent_init(PyLogEvent* self, PyObject* args, PyObject* keywords) -> in
  * @param self
  */
 auto PyLogEvent_dealloc(PyLogEvent* self) -> void {
-    self->set_metadata(nullptr);
-    delete self->log_event;
+    self->clean();
     PyObject_Del(self);
 }
 
@@ -101,7 +101,7 @@ PyDoc_STRVAR(
         cPyLogEventGetStateDoc,
         "__getstate__(self)\n"
         "--\n\n"
-        "Serializes the log event.\n"
+        "Serializes the log event (should be called by the Python pickle module).\n"
         ":param self\n"
         ":return: Serialized log event in a Python dictionary.\n"
 );
@@ -113,12 +113,12 @@ PyDoc_STRVAR(
  * @return nullptr on failure with the relevant Python exception and error set.
  */
 auto PyLogEvent_getstate(PyLogEvent* self) -> PyObject* {
-    assert(self->log_event);
-    if (false == self->log_event->has_formatted_timestamp()) {
+    auto* log_event{self->get_log_event()};
+    if (false == log_event->has_formatted_timestamp()) {
         PyObjectPtr<PyObject> formatted_timestamp_object{
                 clp_ffi_py::Py_utils_get_formatted_timestamp(
-                        self->log_event->get_timestamp(),
-                        self->has_metadata() ? self->py_metadata->get_py_timezone() : Py_None
+                        log_event->get_timestamp(),
+                        self->has_metadata() ? self->get_py_metadata()->get_py_timezone() : Py_None
                 )};
         auto* formatted_timestamp_ptr{formatted_timestamp_object.get()};
         if (nullptr == formatted_timestamp_ptr) {
@@ -128,19 +128,19 @@ auto PyLogEvent_getstate(PyLogEvent* self) -> PyObject* {
         if (false == clp_ffi_py::parse_PyString(formatted_timestamp_ptr, formatted_timestamp)) {
             return nullptr;
         }
-        self->log_event->set_formatted_timestamp(formatted_timestamp);
+        log_event->set_formatted_timestamp(formatted_timestamp);
     }
 
     return Py_BuildValue(
             "{sssssLsK}",
             static_cast<char const*>(cStateLogMessage),
-            self->log_event->get_log_message().c_str(),
+            log_event->get_log_message().c_str(),
             static_cast<char const*>(cStateFormattedTimestamp),
-            self->log_event->get_formatted_timestamp().c_str(),
+            log_event->get_formatted_timestamp().c_str(),
             static_cast<char const*>(cStateTimestamp),
-            self->log_event->get_timestamp(),
+            log_event->get_timestamp(),
             static_cast<char const*>(cStateIndex),
-            self->log_event->get_index()
+            log_event->get_index()
     );
 }
 
@@ -149,13 +149,18 @@ PyDoc_STRVAR(
         "__setstate__(self, state)\n"
         "--\n\n"
         "Deserializes the log event from a state dictionary.\n"
+        "Note: this function is exclusively designed for invocation by the Python pickle module. "
+        "If this method is called by an instance that has already been initialized, it could lead "
+        "to memory leaks.\n"
         ":param self\n"
-        ":param state: Serialized log event represented by a Python dictionary.\n"
+        ":param state: Serialized log event represented by a Python dictionary. It is anticipated "
+        "to be the valid output of the `__getstate__` method.\n"
         ":return: None\n"
 );
 
 /**
  * Callback of PyLogEvent `__setstate__` method.
+ * Note: double initialization will result in memory leaks.
  * @param self
  * @param state Python dictionary that contains the serialized object info.
  * @return Py_None on success
@@ -261,8 +266,7 @@ PyDoc_STRVAR(
 );
 
 auto PyLogEvent_get_log_message(PyLogEvent* self) -> PyObject* {
-    assert(self->log_event);
-    return PyUnicode_FromString(self->log_event->get_log_message().c_str());
+    return PyUnicode_FromString(self->get_log_event()->get_log_message().c_str());
 }
 
 PyDoc_STRVAR(
@@ -275,8 +279,7 @@ PyDoc_STRVAR(
 );
 
 auto PyLogEvent_get_timestamp(PyLogEvent* self) -> PyObject* {
-    assert(self->log_event);
-    return PyLong_FromLongLong(self->log_event->get_timestamp());
+    return PyLong_FromLongLong(self->get_log_event()->get_timestamp());
 }
 
 PyDoc_STRVAR(
@@ -290,8 +293,7 @@ PyDoc_STRVAR(
 );
 
 auto PyLogEvent_get_index(PyLogEvent* self) -> PyObject* {
-    assert(self->log_event);
-    return PyLong_FromLongLong(static_cast<int64_t>(self->log_event->get_index()));
+    return PyLong_FromLongLong(static_cast<int64_t>(self->get_log_event()->get_index()));
 }
 
 PyDoc_STRVAR(
@@ -366,6 +368,27 @@ PyMethodDef PyLogEvent_method_table[]{
         {nullptr}};
 
 /**
+ * PyLogEvent class doc string.
+ */
+PyDoc_STRVAR(
+        cPyLogEventDoc,
+        "This class represents a decoded log event and provides ways to access the underlying "
+        "log data, including the log message, the timestamp, and the log event index. "
+        "Normally, this class will be instantiated by the FFI IR decoding methods.\n"
+        "However, with `__init__` method provided below, direct instantiation is also possible.\n\n"
+        "__init__(self, log_message, timestamp, index=0, metadata=None)\n"
+        "Initializes an object that represents a log event. Notice that each object should be "
+        "strictly initialized only once. Double initialization will result in memory leaks.\n"
+        ":param self\n"
+        ":param log_message: The message content of the log event.\n"
+        ":param timestamp: The timestamp of the log event.\n"
+        ":param index: The message index (relative to the source CLP IR stream) of the log event.\n"
+        ":param metadata: The PyMetadata instance that represents the source CLP IR stream. "
+        "It is set to None by default.\n"
+        ":return: 0 on success, -1 on failure with relevant Python exceptions and error set.\n"
+);
+
+/**
  * PyLogEvent Python type slots.
  */
 PyType_Slot PyLogEvent_slots[]{
@@ -376,6 +399,7 @@ PyType_Slot PyLogEvent_slots[]{
         {Py_tp_str, reinterpret_cast<void*>(PyLogEvent_str)},
         {Py_tp_repr, reinterpret_cast<void*>(PyLogEvent_repr)},
         {Py_tp_methods, static_cast<void*>(PyLogEvent_method_table)},
+        {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyLogEventDoc))},
         {0, nullptr}};
 
 /**
@@ -397,23 +421,23 @@ PyObjectPtr<PyTypeObject> PyLogEvent_type;
 auto PyLogEvent::get_formatted_message(PyObject* timezone) -> PyObject* {
     auto cache_formatted_timestamp{false};
     if (Py_None == timezone) {
-        if (this->log_event->has_formatted_timestamp()) {
+        if (m_log_event->has_formatted_timestamp()) {
             // If the formatted timestamp exists, it constructs the raw message
             // without calling python level format function
             return PyUnicode_FromFormat(
                     "%s%s",
-                    this->log_event->get_formatted_timestamp().c_str(),
-                    this->log_event->get_log_message().c_str()
+                    m_log_event->get_formatted_timestamp().c_str(),
+                    m_log_event->get_log_message().c_str()
             );
         }
-        if (this->has_metadata()) {
-            timezone = this->py_metadata->get_py_timezone();
+        if (has_metadata()) {
+            timezone = m_py_metadata->get_py_timezone();
             cache_formatted_timestamp = true;
         }
     }
 
     PyObjectPtr<PyObject> formatted_timestamp_object{
-            Py_utils_get_formatted_timestamp(this->log_event->get_timestamp(), timezone)};
+            Py_utils_get_formatted_timestamp(m_log_event->get_timestamp(), timezone)};
     auto* formatted_timestamp_ptr{formatted_timestamp_object.get()};
     if (nullptr == formatted_timestamp_ptr) {
         return nullptr;
@@ -424,12 +448,12 @@ auto PyLogEvent::get_formatted_message(PyObject* timezone) -> PyObject* {
     }
 
     if (cache_formatted_timestamp) {
-        this->log_event->set_formatted_timestamp(formatted_timestamp);
+        m_log_event->set_formatted_timestamp(formatted_timestamp);
     }
     return PyUnicode_FromFormat(
             "%s%s",
             formatted_timestamp.c_str(),
-            this->log_event->get_log_message().c_str()
+            m_log_event->get_log_message().c_str()
     );
 }
 
@@ -440,12 +464,12 @@ auto PyLogEvent::init(
         PyMetadata* metadata,
         std::optional<std::string_view> formatted_timestamp
 ) -> bool {
-    this->log_event = new LogEvent(log_message, timestamp, index, formatted_timestamp);
-    if (nullptr == this->log_event) {
+    m_log_event = new LogEvent(log_message, timestamp, index, formatted_timestamp);
+    if (nullptr == m_log_event) {
         PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::error_messages::cOutofMemoryError);
         return false;
     }
-    this->set_metadata(metadata);
+    set_metadata(metadata);
     return true;
 }
 
@@ -454,6 +478,7 @@ auto PyLogEvent_get_PyType() -> PyTypeObject* {
 }
 
 auto PyLogEvent_module_level_init(PyObject* py_module) -> bool {
+    static_assert(std::is_trivially_destructible<PyLogEvent>());
     auto* type{reinterpret_cast<PyTypeObject*>(PyType_FromSpec(&PyLogEvent_type_spec))};
     PyLogEvent_type.reset(type);
     if (nullptr == type) {
