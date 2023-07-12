@@ -12,6 +12,8 @@ CheckOptions:
   readability-identifier-naming.EnumConstantCase: 'CamelCase'
   readability-identifier-naming.GlobalConstantCase: 'CamelCase'
   readability-identifier-naming.GlobalConstantPrefix: 'c'
+  readability-identifier-naming.GlobalFunctionCase: 'Camel_Snake_Case'
+  readability-identifier-naming.GlobalVariableCase: 'Camel_Snake_Case'
   readability-identifier-naming.LocalVariableCase: 'lower_case'
   readability-identifier-naming.MemberCase: 'lower_case'
   readability-identifier-naming.MemberPrefix: 'm_'
