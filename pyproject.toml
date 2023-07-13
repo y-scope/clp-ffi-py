@@ -39,3 +39,6 @@ preview = true
 
 [tool.cibuildwheel.macos]
 archs = ["x86_64", "universal2", "arm64"]
+
+[tool.ruff]
+line-length = 100

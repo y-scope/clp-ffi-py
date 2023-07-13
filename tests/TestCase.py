@@ -108,7 +108,11 @@ class TestCaseMetadata(TestCaseBase):
         self.check_metadata(metadata, ref_timestamp, timestamp_format, timezone_id)
 
         wrong_tz: Optional[tzinfo] = metadata.get_timezone()
+        self.assertEqual(wrong_tz is metadata.get_timezone(), True)
+
         wrong_tz = dateutil.tz.gettz("America/New_York")
+        self.assertEqual(wrong_tz is not metadata.get_timezone(), True)
+
         self.check_metadata(metadata, ref_timestamp, timestamp_format, timezone_id)
 
 

@@ -72,6 +72,9 @@ and formatting tools (found in [pyproject.toml]):
 * [clang-format][6]: `clang-format -i src/clp_ffi_py/**`
   * This formats the C++ code according to the code-style rules specified in `.clang-format`.
     You should review and add any changes to your PR.
+* [ruff][10]: `ruff check --fix clp_ffi_py tests`
+  * This performs linting according to PEPs. You should review and add any
+    changes to your PR.
 
 Additionally, the following tools can be useful during development. However, they cannot be installed
 using `pip`. Developers need to install them using other package management tools such as `apt-get`:
@@ -94,3 +97,4 @@ using `pip`. Developers need to install them using other package management tool
 [7]: https://cibuildwheel.readthedocs.io/en/stable/
 [8]: https://clang.llvm.org/extra/clang-tidy/
 [9]: https://github.com/rizsotto/Bear
+[10]: https://beta.ruff.rs/docs/
