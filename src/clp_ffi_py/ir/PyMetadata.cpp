@@ -154,27 +154,27 @@ auto PyMetadata_get_timezone(PyMetadata* self) -> PyObject* {
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyMethodDef PyMetadata_method_table[]{
         {"is_using_four_byte_encoding",
-         py_reinterpret_cast<PyCFunction>(PyMetadata_is_using_four_byte_encoding),
+         py_c_function_cast(PyMetadata_is_using_four_byte_encoding),
          METH_NOARGS,
          static_cast<char const*>(cPyMetadataIsUsingFourByteEncodingDoc)},
 
         {"get_ref_timestamp",
-         py_reinterpret_cast<PyCFunction>(PyMetadata_get_ref_timestamp),
+         py_c_function_cast(PyMetadata_get_ref_timestamp),
          METH_NOARGS,
          static_cast<char const*>(cPyMetadataGetRefTimestampDoc)},
 
         {"get_timestamp_format",
-         py_reinterpret_cast<PyCFunction>(PyMetadata_get_timestamp_format),
+         py_c_function_cast(PyMetadata_get_timestamp_format),
          METH_NOARGS,
          static_cast<char const*>(cPyMetadataGetTimestampFormatDoc)},
 
         {"get_timezone_id",
-         py_reinterpret_cast<PyCFunction>(PyMetadata_get_timezone_id),
+         py_c_function_cast(PyMetadata_get_timezone_id),
          METH_NOARGS,
          static_cast<char const*>(cPyMetadataGetTimezoneIdDoc)},
 
         {"get_timezone",
-         py_reinterpret_cast<PyCFunction>(PyMetadata_get_timezone),
+         py_c_function_cast(PyMetadata_get_timezone),
          METH_NOARGS,
          static_cast<char const*>(cPyMetadataGetTimezoneDoc)},
 
@@ -270,7 +270,7 @@ auto PyMetadata_get_PyType() -> PyTypeObject* {
 
 auto PyMetadata_module_level_init(PyObject* py_module) -> bool {
     static_assert(std::is_trivially_destructible<PyMetadata>());
-    auto* type{py_reinterpret_cast<PyTypeObject*>(PyType_FromSpec(&PyMetadata_type_spec))};
+    auto* type{py_reinterpret_cast<PyTypeObject>(PyType_FromSpec(&PyMetadata_type_spec))};
     PyMetadata_type.reset(type);
     if (nullptr == type) {
         return false;

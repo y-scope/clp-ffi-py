@@ -59,7 +59,7 @@ PyDoc_STRVAR(
         ":return: The encoded timestamp.\n"
 );
 
-PyMethodDef CLPIR_method_table[]{
+PyMethodDef PyCLPIR_method_table[]{
         {"encode_preamble",
          clp_ffi_py::ir::encode_four_byte_preamble,
          METH_VARARGS,
@@ -84,15 +84,15 @@ PyMethodDef CLPIR_method_table[]{
 
 PyDoc_STRVAR(cModuleDoc, "Python interface to the CLP IR encoding and decoding methods.");
 
-struct PyModuleDef CLPIR {
+struct PyModuleDef PyCLPIR {
     PyModuleDef_HEAD_INIT, "CLPIR", static_cast<char const*>(cModuleDoc), -1,
-            static_cast<PyMethodDef*>(CLPIR_method_table)
+            static_cast<PyMethodDef*>(PyCLPIR_method_table)
 };
 }  // namespace
 
 // NOLINTNEXTLINE(modernize-use-trailing-return-type)
 PyMODINIT_FUNC PyInit_CLPIR() {
-    PyObject* new_module{PyModule_Create(&CLPIR)};
+    PyObject* new_module{PyModule_Create(&PyCLPIR)};
     if (nullptr == new_module) {
         return nullptr;
     }

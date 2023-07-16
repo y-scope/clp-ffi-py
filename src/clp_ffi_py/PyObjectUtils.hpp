@@ -1,9 +1,11 @@
-#ifndef CLP_FFI_PY_PY_OBJECT_PTR_HPP
-#define CLP_FFI_PY_PY_OBJECT_PTR_HPP
+#ifndef CLP_FFI_PY_PY_OBJECT_UTILS_HPP
+#define CLP_FFI_PY_PY_OBJECT_UTILS_HPP
 
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
 #include <memory>
+
+#include <clp_ffi_py/PyObjectCast.hpp>
 
 namespace clp_ffi_py {
 /**
@@ -25,27 +27,5 @@ public:
  */
 template <typename PyObjectType>
 using PyObjectPtr = std::unique_ptr<PyObjectType, PyObjectDeleter<PyObjectType>>;
-
-namespace ir {
-class PyMetadata;
-class PyLogEvent;
-}  // namespace ir
-
-template <typename Dst, typename Src, typename PyT>
-constexpr bool is_valid_py_object_cast{
-        (std::is_same_v<Src, PyObject*> && std::is_same_v<Dst, PyT>)
-        || (std::is_same_v<Src, PyT> && std::is_same_v<Dst, PyObject*>)};
-
-template <typename Dst, typename Src>
-auto py_reinterpret_cast(Src src) noexcept -> Dst {
-    constexpr bool is_valid_cast{
-            std::is_same_v<Dst, PyCFunction> || is_valid_py_object_cast<Src, Dst, ir::PyMetadata*>
-            || is_valid_py_object_cast<Src, Dst, ir::PyLogEvent*>
-            || is_valid_py_object_cast<Src, Dst, PyTypeObject*>};
-    static_assert(is_valid_cast, "Invalid Cast");
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-    return reinterpret_cast<Dst>(src);
-}
-
 }  // namespace clp_ffi_py
 #endif  // CLP_FFI_PY_PY_OBJECT_PTR_HPP

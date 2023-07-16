@@ -71,7 +71,7 @@ auto PyLogEvent_init(PyLogEvent* self, PyObject* args, PyObject* keywords) -> in
                 log_message,
                 timestamp,
                 index,
-                has_metadata ? py_reinterpret_cast<PyMetadata*>(metadata) : nullptr
+                has_metadata ? py_reinterpret_cast<PyMetadata>(metadata) : nullptr
         ))
     {
         return -1;
@@ -327,32 +327,32 @@ auto PyLogEvent_get_formatted_message(PyLogEvent* self, PyObject* args, PyObject
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyMethodDef PyLogEvent_method_table[]{
         {"get_log_message",
-         py_reinterpret_cast<PyCFunction>(PyLogEvent_get_log_message),
+         py_c_function_cast(PyLogEvent_get_log_message),
          METH_NOARGS,
          static_cast<char const*>(cPyLogEventGetLogMessageDoc)},
 
         {"get_timestamp",
-         py_reinterpret_cast<PyCFunction>(PyLogEvent_get_timestamp),
+         py_c_function_cast(PyLogEvent_get_timestamp),
          METH_NOARGS,
          static_cast<char const*>(cPyLogEventGetTimestampDoc)},
 
         {"get_index",
-         py_reinterpret_cast<PyCFunction>(PyLogEvent_get_index),
+         py_c_function_cast(PyLogEvent_get_index),
          METH_NOARGS,
          static_cast<char const*>(cPyLogEventGetIndexDoc)},
 
         {"get_formatted_message",
-         py_reinterpret_cast<PyCFunction>(PyLogEvent_get_formatted_message),
+         py_c_function_cast(PyLogEvent_get_formatted_message),
          METH_KEYWORDS | METH_VARARGS,
          static_cast<char const*>(cPyLogEventGetFormattedMessageDoc)},
 
         {"__getstate__",
-         py_reinterpret_cast<PyCFunction>(PyLogEvent_getstate),
+         py_c_function_cast(PyLogEvent_getstate),
          METH_NOARGS,
          static_cast<char const*>(cPyLogEventGetStateDoc)},
 
         {"__setstate__",
-         py_reinterpret_cast<PyCFunction>(PyLogEvent_setstate),
+         py_c_function_cast(PyLogEvent_setstate),
          METH_O,
          static_cast<char const*>(cPyLogEventSetStateDoc)},
 
@@ -468,7 +468,7 @@ auto PyLogEvent_get_PyType() -> PyTypeObject* {
 
 auto PyLogEvent_module_level_init(PyObject* py_module) -> bool {
     static_assert(std::is_trivially_destructible<PyLogEvent>());
-    auto* type{py_reinterpret_cast<PyTypeObject*>(PyType_FromSpec(&PyLogEvent_type_spec))};
+    auto* type{py_reinterpret_cast<PyTypeObject>(PyType_FromSpec(&PyLogEvent_type_spec))};
     PyLogEvent_type.reset(type);
     if (nullptr == type) {
         return false;

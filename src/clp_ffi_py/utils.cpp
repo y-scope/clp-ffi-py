@@ -31,7 +31,7 @@ auto add_type(PyTypeObject* new_type, char const* type_name, PyObject* module) -
     if (PyType_Ready(new_type) < 0) {
         return false;
     }
-    if (PyModule_AddObject(module, type_name, py_reinterpret_cast<PyObject*>(new_type)) < 0) {
+    if (PyModule_AddObject(module, type_name, py_reinterpret_cast<PyObject>(new_type)) < 0) {
         return false;
     }
     return true;
