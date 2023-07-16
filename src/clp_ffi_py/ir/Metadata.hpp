@@ -1,16 +1,16 @@
 #ifndef CLP_FFI_PY_METADATA_HPP
 #define CLP_FFI_PY_METADATA_HPP
 
+#include <utility>
+
 #include <clp/components/core/src/ffi/encoding_methods.hpp>
 #include <clp/components/core/submodules/json/single_include/nlohmann/json.hpp>
 
 namespace clp_ffi_py::ir {
 /**
  * A class that represents a decoded IR preamble. Contains ways to access (get)
- * metadata such as timestamp format. The metadata should be readonly,
- * meaning that there is no way to change the underlying values after
- * initialization.
- */
+ * metadata such as the timestamp format. After construction, the metadata is
+ * readonly. */
 class Metadata {
 public:
     /**
@@ -23,9 +23,9 @@ public:
     explicit Metadata(nlohmann::json const& metadata, bool is_four_byte_encoding);
 
     /**
-     * Constructs a new Metadata object with values of underlying fields
-     * explicitly given. Currently, `m_is_four_byte_encoding` is set to true by
-     * default since it is the only format supported.
+     * Constructs a new Metadata object from the provided fields. Currently,
+     * `m_is_four_byte_encoding` is set to true by default since it is the only
+     * format supported.
      * @param ref_timestamp The reference timestamp used to calculate the
      * timestamp of the first log message in the IR stream.
      * @param timestamp_format Timestamp format to be use when generating the
@@ -35,13 +35,13 @@ public:
      */
     explicit Metadata(
             ffi::epoch_time_ms_t ref_timestamp,
-            std::string const& timestamp_format,
-            std::string const& timezone
+            std::string timestamp_format,
+            std::string timezone
     )
             : m_is_four_byte_encoding{true},
               m_ref_timestamp{ref_timestamp},
-              m_timestamp_format{timestamp_format},
-              m_timezone_id{timezone} {};
+              m_timestamp_format{std::move(timestamp_format)},
+              m_timezone_id{std::move(timezone)} {};
 
     [[nodiscard]] auto is_using_four_byte_encoding() const -> bool {
         return m_is_four_byte_encoding;
@@ -62,4 +62,4 @@ private:
     std::string m_timezone_id;
 };
 }  // namespace clp_ffi_py::ir
-#endif
+#endif  // CLP_FFI_PY_METADATA_HPP

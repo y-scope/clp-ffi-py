@@ -1,13 +1,14 @@
 #ifndef CLP_FFI_PY_LOG_EVENT_HPP
 #define CLP_FFI_PY_LOG_EVENT_HPP
 
-#include <clp/components/core/src/ffi/encoding_methods.hpp>
 #include <optional>
+
+#include <clp/components/core/src/ffi/encoding_methods.hpp>
 
 namespace clp_ffi_py::ir {
 /**
- * A class that represents a decoded log event. Contains ways to access (get or
- * set) the log message, the timestamp, and the log event index.
+ * A class that represents a decoded IR log event. Contains ways to access (get
+ * or set) the log message, the timestamp, and the log event index.
  */
 class LogEvent {
 public:
@@ -75,4 +76,4 @@ private:
 };
 }  // namespace clp_ffi_py::ir
 
-#endif
+#endif  // CLP_FFI_PY_LOG_EVENT_HPP

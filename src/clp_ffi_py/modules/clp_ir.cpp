@@ -5,6 +5,9 @@
 #include <clp_ffi_py/ir/PyMetadata.hpp>
 #include <clp_ffi_py/Py_utils.hpp>
 
+// CPython macors use C-arrays
+// NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays)
+
 namespace {
 PyDoc_STRVAR(
         cEncodePreambleDoc,
@@ -56,27 +59,24 @@ PyDoc_STRVAR(
         ":return: The encoded timestamp.\n"
 );
 
-/**
- * Method table
- */
-PyMethodDef method_table[]{
+PyMethodDef CLPIR_method_table[]{
         {"encode_preamble",
-         clp_ffi_py::ir::four_byte_encoding::encode_preamble,
+         clp_ffi_py::ir::encode_four_byte_preamble,
          METH_VARARGS,
          static_cast<char const*>(cEncodePreambleDoc)},
 
         {"encode_message_and_timestamp_delta",
-         clp_ffi_py::ir::four_byte_encoding::encode_message_and_timestamp_delta,
+         clp_ffi_py::ir::encode_four_byte_message_and_timestamp_delta,
          METH_VARARGS,
          static_cast<char const*>(cEncodeMessageAndTimestampDeltaDoc)},
 
         {"encode_message",
-         clp_ffi_py::ir::four_byte_encoding::encode_message,
+         clp_ffi_py::ir::encode_four_byte_message,
          METH_VARARGS,
          static_cast<char const*>(cEncodeMessageDoc)},
 
         {"encode_timestamp_delta",
-         clp_ffi_py::ir::four_byte_encoding::encode_timestamp_delta,
+         clp_ffi_py::ir::encode_four_byte_timestamp_delta,
          METH_VARARGS,
          static_cast<char const*>(cEncodeTimestampDeltaDoc)},
 
@@ -84,19 +84,20 @@ PyMethodDef method_table[]{
 
 PyDoc_STRVAR(cModuleDoc, "Python interface to the CLP IR encoding and decoding methods.");
 
-struct PyModuleDef clp_ir {
-    PyModuleDef_HEAD_INIT, "CLPIR", static_cast<char const*>(cModuleDoc), -1, method_table
+struct PyModuleDef CLPIR {
+    PyModuleDef_HEAD_INIT, "CLPIR", static_cast<char const*>(cModuleDoc), -1,
+            static_cast<PyMethodDef*>(CLPIR_method_table)
 };
 }  // namespace
 
-extern "C" {
+// NOLINTNEXTLINE(modernize-use-trailing-return-type)
 PyMODINIT_FUNC PyInit_CLPIR() {
-    PyObject* new_module{PyModule_Create(&clp_ir)};
+    PyObject* new_module{PyModule_Create(&CLPIR)};
     if (nullptr == new_module) {
         return nullptr;
     }
 
-    if (false == clp_ffi_py::Py_utils_init()) {
+    if (false == clp_ffi_py::py_utils_init()) {
         Py_DECREF(new_module);
         return nullptr;
     }
@@ -113,4 +114,5 @@ PyMODINIT_FUNC PyInit_CLPIR() {
 
     return new_module;
 }
-}
+
+// NOLINTEND(cppcoreguidelines-avoid-c-arrays)

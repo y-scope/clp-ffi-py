@@ -4,7 +4,6 @@
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
 #include <clp/components/core/submodules/json/single_include/nlohmann/json.hpp>
-#include <GSL/include/gsl/pointers>
 
 #include <clp_ffi_py/ir/Metadata.hpp>
 
@@ -80,7 +79,7 @@ private:
     [[nodiscard]] auto init_py_timezone() -> bool;
 
     PyObject_HEAD;
-    gsl::owner<Metadata*> m_metadata;
+    Metadata* m_metadata;
     PyObject* m_py_timezone;
 };
 
@@ -115,4 +114,4 @@ auto PyMetadata_module_level_init(PyObject* py_module) -> bool;
 auto PyMetadata_new_from_json(nlohmann::json const& metadata, bool is_four_byte_encoding)
         -> PyMetadata*;
 }  // namespace clp_ffi_py::ir
-#endif
+#endif  // CLP_FFI_PY_PY_METADATA_HPP

@@ -1,11 +1,12 @@
 #include <clp_ffi_py/Python.hpp>
 
-#include <clp_ffi_py/ErrorMessage.hpp>
+#include "PyMetadata.hpp"
+
+#include <clp_ffi_py/ErrorMessages.hpp>
 #include <clp_ffi_py/ExceptionFFI.hpp>
 #include <clp_ffi_py/ir/Metadata.hpp>
-#include <clp_ffi_py/ir/PyMetadata.hpp>
 #include <clp_ffi_py/Py_utils.hpp>
-#include <clp_ffi_py/PyObjectPtr.hpp>
+#include <clp_ffi_py/PyObjectUtils.hpp>
 #include <clp_ffi_py/utils.hpp>
 
 namespace clp_ffi_py::ir {
@@ -68,6 +69,7 @@ auto PyMetadata_dealloc(PyMetadata* self) -> void {
     PyObject_Del(self);
 }
 
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cPyMetadataIsUsingFourByteEncodingDoc,
         "is_using_four_byte_encoding(self)\n"
@@ -84,6 +86,7 @@ auto PyMetadata_is_using_four_byte_encoding(PyMetadata* self) -> PyObject* {
     Py_RETURN_FALSE;
 }
 
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cPyMetadataGetRefTimestampDoc,
         "get_ref_timestamp(self)\n"
@@ -98,6 +101,7 @@ auto PyMetadata_get_ref_timestamp(PyMetadata* self) -> PyObject* {
     return PyLong_FromLongLong(self->get_metadata()->get_ref_timestamp());
 }
 
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cPyMetadataGetTimestampFormatDoc,
         "get_timestamp_format(self)\n"
@@ -111,6 +115,7 @@ auto PyMetadata_get_timestamp_format(PyMetadata* self) -> PyObject* {
     return PyUnicode_FromString(self->get_metadata()->get_timestamp_format().c_str());
 }
 
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cPyMetadataGetTimezoneIdDoc,
         "get_timezone_id(self)\n"
@@ -124,6 +129,7 @@ auto PyMetadata_get_timezone_id(PyMetadata* self) -> PyObject* {
     return PyUnicode_FromString(self->get_metadata()->get_timezone_id().c_str());
 }
 
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cPyMetadataGetTimezoneDoc,
         "get_timezone(self)\n"
@@ -137,10 +143,7 @@ PyDoc_STRVAR(
 auto PyMetadata_get_timezone(PyMetadata* self) -> PyObject* {
     auto* timezone{self->get_py_timezone()};
     if (nullptr == timezone) {
-        PyErr_SetString(
-                PyExc_RuntimeError,
-                clp_ffi_py::error_messages::cTimezoneObjectNotInitialzed
-        );
+        PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::cTimezoneObjectNotInitialzed);
         return nullptr;
     }
     Py_INCREF(timezone);
@@ -148,40 +151,36 @@ auto PyMetadata_get_timezone(PyMetadata* self) -> PyObject* {
 }
 }
 
-/**
- * PyMetadata method table.
- */
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyMethodDef PyMetadata_method_table[]{
         {"is_using_four_byte_encoding",
-         reinterpret_cast<PyCFunction>(PyMetadata_is_using_four_byte_encoding),
+         py_reinterpret_cast<PyCFunction>(PyMetadata_is_using_four_byte_encoding),
          METH_NOARGS,
          static_cast<char const*>(cPyMetadataIsUsingFourByteEncodingDoc)},
 
         {"get_ref_timestamp",
-         reinterpret_cast<PyCFunction>(PyMetadata_get_ref_timestamp),
+         py_reinterpret_cast<PyCFunction>(PyMetadata_get_ref_timestamp),
          METH_NOARGS,
          static_cast<char const*>(cPyMetadataGetRefTimestampDoc)},
 
         {"get_timestamp_format",
-         reinterpret_cast<PyCFunction>(PyMetadata_get_timestamp_format),
+         py_reinterpret_cast<PyCFunction>(PyMetadata_get_timestamp_format),
          METH_NOARGS,
          static_cast<char const*>(cPyMetadataGetTimestampFormatDoc)},
 
         {"get_timezone_id",
-         reinterpret_cast<PyCFunction>(PyMetadata_get_timezone_id),
+         py_reinterpret_cast<PyCFunction>(PyMetadata_get_timezone_id),
          METH_NOARGS,
          static_cast<char const*>(cPyMetadataGetTimezoneIdDoc)},
 
         {"get_timezone",
-         reinterpret_cast<PyCFunction>(PyMetadata_get_timezone),
+         py_reinterpret_cast<PyCFunction>(PyMetadata_get_timezone),
          METH_NOARGS,
          static_cast<char const*>(cPyMetadataGetTimezoneDoc)},
 
         {nullptr}};
 
-/**
- * PyMetadata class doc string.
- */
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cPyMetadataDoc,
         "This class represents the IR stream preamble and provides ways to access the underlying "
@@ -200,9 +199,7 @@ PyDoc_STRVAR(
         ":return: 0 on success, -1 on failure with relevant Python exceptions and error set.\n"
 );
 
-/**
- * PyMetadata Python type slots.
- */
+// NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
 PyType_Slot PyMetadata_slots[]{
         {Py_tp_alloc, reinterpret_cast<void*>(PyType_GenericAlloc)},
         {Py_tp_dealloc, reinterpret_cast<void*>(PyMetadata_dealloc)},
@@ -211,10 +208,8 @@ PyType_Slot PyMetadata_slots[]{
         {Py_tp_methods, static_cast<void*>(PyMetadata_method_table)},
         {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyMetadataDoc))},
         {0, nullptr}};
+// NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
 
-/**
- * PyMetadata Python type specifications.
- */
 PyType_Spec PyMetadata_type_spec{
         "clp_ffi_py.CLPIR.Metadata",
         sizeof(PyMetadata),
@@ -222,9 +217,6 @@ PyType_Spec PyMetadata_type_spec{
         Py_TPFLAGS_DEFAULT,
         static_cast<PyType_Slot*>(PyMetadata_slots)};
 
-/**
- * PyMetadata's Python type.
- */
 PyObjectPtr<PyTypeObject> PyMetadata_type;
 }  // namespace
 
@@ -233,9 +225,10 @@ auto PyMetadata::init(
         char const* input_timestamp_format,
         char const* input_timezone
 ) -> bool {
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     m_metadata = new Metadata(ref_timestamp, input_timestamp_format, input_timezone);
     if (nullptr == m_metadata) {
-        PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::error_messages::cOutofMemoryError);
+        PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::cOutofMemoryError);
         return false;
     }
     return init_py_timezone();
@@ -243,6 +236,7 @@ auto PyMetadata::init(
 
 auto PyMetadata::init(nlohmann::json const& metadata, bool is_four_byte_encoding) -> bool {
     try {
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         m_metadata = new Metadata(metadata, is_four_byte_encoding);
     } catch (ExceptionFFI const& ex) {
         PyErr_Format(
@@ -255,14 +249,14 @@ auto PyMetadata::init(nlohmann::json const& metadata, bool is_four_byte_encoding
         return false;
     }
     if (nullptr == m_metadata) {
-        PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::error_messages::cOutofMemoryError);
+        PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::cOutofMemoryError);
         return false;
     }
     return init_py_timezone();
 }
 
 auto PyMetadata::init_py_timezone() -> bool {
-    m_py_timezone = Py_utils_get_timezone_from_timezone_id(m_metadata->get_timezone_id());
+    m_py_timezone = py_utils_get_timezone_from_timezone_id(m_metadata->get_timezone_id());
     if (nullptr == m_py_timezone) {
         return false;
     }
@@ -276,7 +270,7 @@ auto PyMetadata_get_PyType() -> PyTypeObject* {
 
 auto PyMetadata_module_level_init(PyObject* py_module) -> bool {
     static_assert(std::is_trivially_destructible<PyMetadata>());
-    auto* type{reinterpret_cast<PyTypeObject*>(PyType_FromSpec(&PyMetadata_type_spec))};
+    auto* type{py_reinterpret_cast<PyTypeObject*>(PyType_FromSpec(&PyMetadata_type_spec))};
     PyMetadata_type.reset(type);
     if (nullptr == type) {
         return false;

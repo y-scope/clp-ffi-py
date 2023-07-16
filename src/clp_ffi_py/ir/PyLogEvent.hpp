@@ -3,7 +3,6 @@
 
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
-#include <GSL/include/gsl/pointers>
 #include <optional>
 
 #include <clp_ffi_py/ir/LogEvent.hpp>
@@ -49,7 +48,7 @@ public:
      * Validates whether the PyLogEvent has a PyMetadata object associated.
      * @return Whether `Py_metadata` points to nullptr.
      */
-    [[nodiscard]] bool has_metadata() { return nullptr != m_py_metadata; }
+    [[nodiscard]] auto has_metadata() -> bool { return nullptr != m_py_metadata; }
 
     /**
      * Resets pointers to nullptr.
@@ -102,7 +101,7 @@ public:
 
 private:
     PyObject_HEAD;
-    gsl::owner<LogEvent*> m_log_event;
+    LogEvent* m_log_event;
     PyMetadata* m_py_metadata;
 };
 
@@ -142,4 +141,4 @@ auto PyLogEvent_create_new(
         PyMetadata* metadata
 ) -> PyLogEvent*;
 }  // namespace clp_ffi_py::ir
-#endif
+#endif  // CLP_FFI_PY_PY_LOG_EVENT_HPP

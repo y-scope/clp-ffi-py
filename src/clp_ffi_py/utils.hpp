@@ -27,7 +27,7 @@ auto add_type(PyTypeObject* new_type, char const* type_name, PyObject* module) -
  * @return true on success.
  * @return false on failure with the relevant Python exception and error set.
  */
-auto parse_PyString(PyObject* py_string, std::string& out) -> bool;
+auto parse_py_string(PyObject* py_string, std::string& out) -> bool;
 
 /**
  * Parses a Python string into std::string_view.
@@ -38,17 +38,7 @@ auto parse_PyString(PyObject* py_string, std::string& out) -> bool;
  * @return true on success.
  * @return false on failure with the relevant Python exception and error set.
  */
-auto parse_PyString_as_string_view(PyObject* py_string, std::string_view& view) -> bool;
-
-/**
- * Parses a Python integer into an int_type variable.
- * @param py_int PyObject that represents a Python level integer. Only
- * PyLongObject or an instance of a subtype of PyLongObject will be considered
- * as valid input.
- * @param int_type The string_view of the underlying byte data of py_string.
- * @return true on success.
- * @return false on failure with the relevant Python exception and error set.
- */
+auto parse_py_string_as_string_view(PyObject* py_string, std::string_view& view) -> bool;
 
 /**
  * Parses a Python integer into an int_type variable.
@@ -61,8 +51,8 @@ auto parse_PyString_as_string_view(PyObject* py_string, std::string_view& view) 
  * @return false on failure with the relevant Python exception and error set.
  */
 template <typename int_type>
-auto parse_PyInt(PyObject* py_int, int_type& val) -> bool;
+auto parse_py_int(PyObject* py_int, int_type& val) -> bool;
 }  // namespace clp_ffi_py
 
 #include <clp_ffi_py/utils.tpp>
-#endif
+#endif  // CLP_FFI_PY_UTILS_HPP
