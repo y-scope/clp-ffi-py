@@ -5,6 +5,7 @@
 #include <clp_ffi_py/ErrorMessages.hpp>
 #include <clp_ffi_py/ir/LogEvent.hpp>
 #include <clp_ffi_py/Py_utils.hpp>
+#include <clp_ffi_py/PyObjectCast.hpp>
 #include <clp_ffi_py/PyObjectUtils.hpp>
 #include <clp_ffi_py/utils.hpp>
 
@@ -15,7 +16,8 @@ extern "C" {
  * Callback of PyLogEvent `__init__` method:
  * __init__(log_message, timestamp, index=0, metadata=None)
  * Keyword argument parsing is supported.
- * Note: double initialization will result in memory leaks.
+ * Assumes `self` is uninitialized and will allocate the underlying memory. If
+ * `self` is already initialized this will result in memory leaks.
  * @param self
  * @param args
  * @param keywords
@@ -92,10 +94,10 @@ auto PyLogEvent_dealloc(PyLogEvent* self) -> void {
  * Constant keys used to serialize/deserialize PyLogEvent objects through
  * __getstate__ and __setstate__ methods.
  */
-constexpr char const* cStateLogMessage = "log_message";
-constexpr char const* cStateTimestamp = "timestamp";
-constexpr char const* cStateFormattedTimestamp = "formatted_timestamp";
-constexpr char const* cStateIndex = "index";
+constexpr char const* const cStateLogMessage = "log_message";
+constexpr char const* const cStateTimestamp = "timestamp";
+constexpr char const* const cStateFormattedTimestamp = "formatted_timestamp";
+constexpr char const* const cStateIndex = "index";
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
@@ -152,8 +154,8 @@ PyDoc_STRVAR(
         "--\n\n"
         "Deserializes the log event from a state dictionary.\n"
         "Note: this function is exclusively designed for invocation by the Python pickle module. "
-        "If this method is called by an instance that has already been initialized, it could lead "
-        "to memory leaks.\n"
+        "Assumes `self` is uninitialized and will allocate the underlying memory. If"
+        "`self` is already initialized this will result in memory leaks.\n"
         ":param self\n"
         ":param state: Serialized log event represented by a Python dictionary. It is anticipated "
         "to be the valid output of the `__getstate__` method.\n"
@@ -162,7 +164,9 @@ PyDoc_STRVAR(
 
 /**
  * Callback of PyLogEvent `__setstate__` method.
- * Note: double initialization will result in memory leaks.
+ * Note: should only be used by the Python pickle module.
+ * Assumes `self` is uninitialized and will allocate the underlying memory. If
+ * `self` is already initialized this will result in memory leaks.
  * @param self
  * @param state Python dictionary that contains the serialized object info.
  * @return Py_None on success
@@ -279,7 +283,7 @@ PyDoc_STRVAR(
         "get_index(self)\n"
         "--\n\n"
         "Gets the message index (relative to the source CLP IR stream) of the log event. This "
-        "message is set to 0 by default.\n"
+        "index is set to 0 by default.\n"
         ":param self\n"
         ":return: The log event index.\n"
 );
@@ -295,7 +299,7 @@ PyDoc_STRVAR(
         "--\n\n"
         "Gets the formatted log message of the log event.\n"
         "If a specific timezone is provided, it will be used to format the timestamp. "
-        "Otherwise, the timestamp will be formatted using the timezone from the originating CLP IR "
+        "Otherwise, the timestamp will be formatted using the timezone from the source CLP IR "
         "stream.\n"
         ":param self\n"
         ":param timezone: Python tzinfo object that specifies a timezone.\n"
@@ -364,7 +368,8 @@ PyDoc_STRVAR(
         "This class represents a decoded log event and provides ways to access the underlying "
         "log data, including the log message, the timestamp, and the log event index. "
         "Normally, this class will be instantiated by the FFI IR decoding methods.\n"
-        "However, with `__init__` method provided below, direct instantiation is also possible.\n\n"
+        "However, with the `__init__` method provided below, direct instantiation is also "
+        "possible.\n\n"
         "__init__(self, log_message, timestamp, index=0, metadata=None)\n"
         "Initializes an object that represents a log event. Notice that each object should be "
         "strictly initialized only once. Double initialization will result in memory leaks.\n"

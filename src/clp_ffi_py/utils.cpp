@@ -5,7 +5,7 @@
 #include <iostream>
 
 #include <clp_ffi_py/ErrorMessages.hpp>
-#include <clp_ffi_py/PyObjectUtils.hpp>
+#include <clp_ffi_py/PyObjectCast.hpp>
 
 namespace clp_ffi_py {
 namespace {

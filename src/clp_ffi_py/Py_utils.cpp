@@ -6,10 +6,10 @@
 
 namespace clp_ffi_py {
 namespace {
-constexpr char const* cPyFuncNameGetFormattedTimestamp{"get_formatted_timestamp"};
+constexpr char const* const cPyFuncNameGetFormattedTimestamp{"get_formatted_timestamp"};
 PyObjectPtr<PyObject> Py_func_get_formatted_timestamp;
 
-constexpr char const* cPyFuncNameGetTimezoneFromTimezoneId{"get_timezone_from_timezone_id"};
+constexpr char const* const cPyFuncNameGetTimezoneFromTimezoneId{"get_timezone_from_timezone_id"};
 PyObjectPtr<PyObject> Py_func_get_timezone_from_timezone_id;
 
 /**

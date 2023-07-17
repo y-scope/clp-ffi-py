@@ -42,3 +42,10 @@ archs = ["x86_64", "universal2", "arm64"]
 
 [tool.ruff]
 line-length = 100
+
+[tool.docformatter]
+make-summary-multi-line = true
+pre-summary-newline = true
+recursive = true
+wrap-summaries = 80
+wrap-descriptions = 80

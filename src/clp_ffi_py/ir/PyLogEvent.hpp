@@ -12,14 +12,14 @@ namespace clp_ffi_py::ir {
 /**
  * A PyObject structure functioning as a Python-compatible interface to retrieve
  * a log event. The underlying data is pointed by `log_event`. The object may
- * bind with a PyMetadata object pointed by `Py_metadata` that specifies event
- * metadata such as timestamp format.
+ * reference a PyMetadata object pointed to by `Py_metadata` that specifies the
+ * event's metadata, such as timestamp format, from the preamble.
  */
 class PyLogEvent {
 public:
     /**
      * Initializes the underlying data with the given inputs.
-     * Since the memory allocation of PyLogEvent is handled by CPython
+     * Since the memory allocation of PyLogEvent is handled by CPython's
      * allocator, cpp constructors will not be explicitly called. This function
      * serves as the default constructor to initialize the underlying metadata.
      * It has to be manually called whenever creating a new PyLogEvent object

@@ -6,10 +6,6 @@
 #include <type_traits>
 
 namespace clp_ffi_py {
-namespace ir {
-class PyMetadata;
-class PyLogEvent;
-}  // namespace ir
 
 /**
  * Casts a given function pointer to a PyCFunction.
@@ -45,19 +41,17 @@ struct is_python_object {
 template <typename T>  // NOLINTNEXTLINE(readability-identifier-naming)
 constexpr bool is_python_object_v{is_python_object<T>::cValue};
 
-// NOLINTBEGIN(cppcoreguidelines-macro-usage)
 /**
  * The macro to create a specialization of is_python_object for a given type T.
  * Only types that are marked with this macro will be considered as a valid
  * Python object type.
  */
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define CLP_FFI_PY_MARK_AS_PYOBJECT(T) \
     template <> \
     struct is_python_object<T> { \
         static constexpr bool cValue = true; \
     }
-
-// NOLINTEND(cppcoreguidelines-macro-usage)
 
 /**
  * Casts a given Src pointer to a Dst pointer. It should behave as followed:
@@ -89,6 +83,11 @@ auto py_reinterpret_cast(Src* src) noexcept -> Dst* {
         return reinterpret_cast<Dst*>(src);
     }
 }
+
+namespace ir {
+class PyMetadata;
+class PyLogEvent;
+}  // namespace ir
 
 CLP_FFI_PY_MARK_AS_PYOBJECT(ir::PyLogEvent);
 CLP_FFI_PY_MARK_AS_PYOBJECT(ir::PyMetadata);

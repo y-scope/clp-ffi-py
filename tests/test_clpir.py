@@ -7,20 +7,9 @@ from datetime import tzinfo
 from typing import Optional
 
 
-class TestCaseBase(unittest.TestCase):
+class TestCaseMetadata(unittest.TestCase):
     """
-    Functionally abstract base class for testing handlers, etc.
-
-    Functionally abstract as we use `load_tests` to avoid adding `TestBase`
-    itself to the test suite. However, we cannot mark it as abstract as
-    `unittest` will still `__init__` an instance before `load_tests` is run (and
-    will error out if any method is marked abstract).
-    """
-
-
-class TestCaseMetadata(TestCaseBase):
-    """
-    Class for testing clp_ffi_py.CLPIRDecoder.Metadata
+    Class for testing clp_ffi_py.CLPIRDecoder.Metadata.
     """
 
     def check_metadata(
@@ -32,10 +21,11 @@ class TestCaseMetadata(TestCaseBase):
     ) -> None:
         """
         Given a Metadata object, check if the content matches the reference
-        :param metadata: Metadata object to be checked
-        :param expected_ref_timestamp
-        :param expected_timestamp_format
-        :param expected_timezone_id
+        :param metadata: Metadata object to be checked.
+
+        :param expected_ref_timestamp: Expected reference timestamp.
+        :param expected_timestamp_format: Expected timestamp format.
+        :param expected_timezone_id: Expected timezone ID.
         """
         ref_timestamp: int = metadata.get_ref_timestamp()
         timestamp_format: str = metadata.get_timestamp_format()
@@ -70,7 +60,7 @@ class TestCaseMetadata(TestCaseBase):
 
     def test_init(self) -> None:
         """
-        Test the initialization of Metadata object without using keyword
+        Test the initialization of Metadata object without using keyword.
         """
         ref_timestamp: int = 2005689603190
         timestamp_format: str = "yy/MM/dd HH:mm:ss"
@@ -80,7 +70,7 @@ class TestCaseMetadata(TestCaseBase):
 
     def test_keyword_init(self) -> None:
         """
-        Test the initialization of Metadata object using keyword
+        Test the initialization of Metadata object using keyword.
         """
         ref_timestamp: int = 2005689603270
         timestamp_format: str = "MM/dd/yy HH:mm:ss"
@@ -116,9 +106,9 @@ class TestCaseMetadata(TestCaseBase):
         self.check_metadata(metadata, ref_timestamp, timestamp_format, timezone_id)
 
 
-class TestCaseLogEvent(TestCaseBase):
+class TestCaseLogEvent(unittest.TestCase):
     """
-    Class for testing clp_ffi_py.CLPIRDecoder.LogEvent
+    Class for testing clp_ffi_py.CLPIRDecoder.LogEvent.
     """
 
     def check_log_event(
@@ -129,11 +119,12 @@ class TestCaseLogEvent(TestCaseBase):
         expected_idx: int,
     ) -> None:
         """
-        Given a LogEvent object, check if the content matches the reference
-        :param log_event: LogEvent object to be checked
-        :param expected_log_message
-        :param expected_timestamp
-        :param expected_idx
+        Given a LogEvent object, check if the content matches the reference.
+
+        :param log_event: LogEvent object to be checked.
+        :param expected_log_message: Expected log message.
+        :param expected_timestamp: Expected timestamp.
+        :param expected_idx: Expected log event index.
         """
         log_message: str = log_event.get_log_message()
         timestamp: int = log_event.get_timestamp()
@@ -152,7 +143,7 @@ class TestCaseLogEvent(TestCaseBase):
 
     def test_init(self) -> None:
         """
-        Test the initialization of LogEvent object without using keyword
+        Test the initialization of LogEvent object without using keyword.
         """
         log_message: str = " This is a test log message"
         timestamp: int = 2005689603190
@@ -169,7 +160,7 @@ class TestCaseLogEvent(TestCaseBase):
 
     def test_keyword_init(self) -> None:
         """
-        Test the initialization of LogEvent object using keyword
+        Test the initialization of LogEvent object using keyword.
         """
         log_message: str = " This is a test log message"
         timestamp: int = 932724000000
@@ -194,8 +185,10 @@ class TestCaseLogEvent(TestCaseBase):
 
     def test_formatted_message(self) -> None:
         """
-        Test the reconstruction of the raw message. In particular, it checks if
-        the timestamp is properly formatted with the expected tzinfo
+        Test the reconstruction of the raw message.
+
+        In particular, it checks if the timestamp is properly formatted with the
+        expected tzinfo
         """
         log_message: str = " This is a test log message"
         timestamp: int = 932724000000
@@ -246,6 +239,7 @@ class TestCaseLogEvent(TestCaseBase):
     def test_pickle(self) -> None:
         """
         Test the reconstruction of LogEvent object from pickling data.
+
         For unpickled LogEvent object, even though the metadata is set to None,
         it should still format the timestamp with the original tz before
         pickling

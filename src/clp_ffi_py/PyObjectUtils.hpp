@@ -5,8 +5,6 @@
 
 #include <memory>
 
-#include <clp_ffi_py/PyObjectCast.hpp>
-
 namespace clp_ffi_py {
 /**
  * A specialized deleter for PyObjectPtr which decrements the pointed PyObject

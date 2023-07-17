@@ -6,6 +6,7 @@
 #include <clp_ffi_py/ExceptionFFI.hpp>
 #include <clp_ffi_py/ir/Metadata.hpp>
 #include <clp_ffi_py/Py_utils.hpp>
+#include <clp_ffi_py/PyObjectCast.hpp>
 #include <clp_ffi_py/PyObjectUtils.hpp>
 #include <clp_ffi_py/utils.hpp>
 
@@ -16,7 +17,8 @@ extern "C" {
  * Callback of PyMetadata `__init__` method:
  * __init__(self, ref_timestamp, timestamp_format, timezone_id)
  * Keyword argument parsing is supported.
- * Note: double initialization will result in memory leaks.
+ * Assumes `self` is uninitialized and will allocate the underlying memory. If
+ * `self` is already initialized this will result in memory leaks.
  * @param self
  * @param args
  * @param keywords
@@ -185,10 +187,12 @@ PyDoc_STRVAR(
         cPyMetadataDoc,
         "This class represents the IR stream preamble and provides ways to access the underlying "
         "metadata. Normally, this class will be instantiated by the FFI IR decoding methods.\n"
-        "However, with `__init__` method provided below, direct instantiation is also possible.\n\n"
+        "However, with the `__init__` method provided below, direct instantiation is also "
+        "possible.\n\n"
         "__init__(self, ref_timestamp, timestamp_format, timezone_id)\n"
-        "Initializes an object that represents CLP IR metadata. Notice that each object should be "
-        "strictly initialized only once. Double initialization will result in memory leaks.\n"
+        "Initializes an object that represents CLP IR metadata. "
+        "Assumes `self` is uninitialized and will allocate the underlying memory. If "
+        "`self` is already initialized this will result in memory leaks.\n"
         ":param self\n"
         ":param ref_timestamp: the reference Unix epoch timestamp in milliseconds used to "
         "calculate the timestamp of the first log message in the IR stream.\n"

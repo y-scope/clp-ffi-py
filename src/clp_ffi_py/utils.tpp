@@ -8,10 +8,16 @@
 #include <clp/components/core/src/ffi/encoding_methods.hpp>
 
 namespace clp_ffi_py {
+namespace {
+template <typename T>
+[[maybe_unused]] constexpr bool cAlwaysFalse{false};
+}  // namespace
+
 template <typename int_type>
 auto parse_py_int(PyObject* py_int, int_type& val) -> bool {
     if (false == static_cast<bool>(PyLong_Check(py_int))) {
         PyErr_SetString(PyExc_TypeError, "parse_py_int receives none-integer argument.");
+        return false;
     }
 
     if constexpr (std::is_same_v<int_type, size_t>) {
@@ -21,8 +27,7 @@ auto parse_py_int(PyObject* py_int, int_type& val) -> bool {
     } else if constexpr (std::is_same_v<int_type, Py_ssize_t>) {
         val = PyLong_AsSsize_t(py_int);
     } else {
-        PyErr_SetString(PyExc_NotImplementedError, "parse_py_int receives unsupported int type.");
-        return false;
+        static_assert(cAlwaysFalse<int_type>, "Given integer type not supported.");
     }
 
     return (nullptr == PyErr_Occurred());
