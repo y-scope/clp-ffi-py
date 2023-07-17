@@ -20,9 +20,9 @@ class TestCaseMetadata(unittest.TestCase):
         expected_timezone_id: str,
     ) -> None:
         """
-        Given a Metadata object, check if the content matches the reference
-        :param metadata: Metadata object to be checked.
+        Given a Metadata object, check if the content matches the reference.
 
+        :param metadata: Metadata object to be checked.
         :param expected_ref_timestamp: Expected reference timestamp.
         :param expected_timestamp_format: Expected timestamp format.
         :param expected_timezone_id: Expected timezone ID.
