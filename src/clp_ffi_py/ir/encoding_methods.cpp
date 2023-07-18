@@ -6,7 +6,7 @@
 #include <clp/components/core/src/ffi/ir_stream/encoding_methods.hpp>
 #include <clp/components/core/src/type_utils.hpp>
 
-#include <clp_ffi_py/ir/ErrorMessages.hpp>
+#include <clp_ffi_py/ir/error_messages.hpp>
 
 namespace clp_ffi_py::ir {
 auto encode_four_byte_preamble(PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {

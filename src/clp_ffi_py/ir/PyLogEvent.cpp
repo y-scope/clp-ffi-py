@@ -2,7 +2,7 @@
 
 #include "PyLogEvent.hpp"
 
-#include <clp_ffi_py/ErrorMessages.hpp>
+#include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ir/LogEvent.hpp>
 #include <clp_ffi_py/Py_utils.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
@@ -478,7 +478,7 @@ auto PyLogEvent_module_level_init(PyObject* py_module) -> bool {
     if (nullptr == type) {
         return false;
     }
-    return add_type(PyLogEvent_get_PyType(), "LogEvent", py_module);
+    return add_python_type(PyLogEvent_get_PyType(), "LogEvent", py_module);
 }
 
 auto PyLogEvent_create_new(

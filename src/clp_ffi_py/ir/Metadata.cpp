@@ -3,7 +3,7 @@
 #include <clp/components/core/src/ffi/ir_stream/protocol_constants.hpp>
 
 #include <clp_ffi_py/ExceptionFFI.hpp>
-#include <clp_ffi_py/ir/ErrorMessages.hpp>
+#include <clp_ffi_py/ir/error_messages.hpp>
 
 namespace clp_ffi_py::ir {
 namespace {

@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include <clp_ffi_py/ErrorMessages.hpp>
+#include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
 
 namespace clp_ffi_py {
@@ -26,7 +26,7 @@ auto get_py_string_data(PyObject* py_string) -> char const* {
 }
 }  // namespace
 
-auto add_type(PyTypeObject* new_type, char const* type_name, PyObject* module) -> bool {
+auto add_python_type(PyTypeObject* new_type, char const* type_name, PyObject* module) -> bool {
     assert(new_type);
     if (PyType_Ready(new_type) < 0) {
         return false;

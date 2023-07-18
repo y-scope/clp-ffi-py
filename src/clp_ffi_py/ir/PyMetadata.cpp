@@ -2,7 +2,7 @@
 
 #include "PyMetadata.hpp"
 
-#include <clp_ffi_py/ErrorMessages.hpp>
+#include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ExceptionFFI.hpp>
 #include <clp_ffi_py/ir/Metadata.hpp>
 #include <clp_ffi_py/Py_utils.hpp>
@@ -279,7 +279,7 @@ auto PyMetadata_module_level_init(PyObject* py_module) -> bool {
     if (nullptr == type) {
         return false;
     }
-    return add_type(PyMetadata_get_PyType(), "Metadata", py_module);
+    return add_python_type(PyMetadata_get_PyType(), "Metadata", py_module);
 }
 
 auto PyMetadata_init_from_json(nlohmann::json const& metadata, bool is_four_byte_encoding)

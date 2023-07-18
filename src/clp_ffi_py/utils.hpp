@@ -16,7 +16,7 @@ namespace clp_ffi_py {
  * @return true on success.
  * @return false on failure with the relevant Python exception and error set.
  */
-auto add_type(PyTypeObject* new_type, char const* type_name, PyObject* module) -> bool;
+auto add_python_type(PyTypeObject* new_type, char const* type_name, PyObject* module) -> bool;
 
 /**
  * Parses a Python string into std::string.
