@@ -57,9 +57,10 @@ public:
     }
 
     /**
-     * Resets pointers to nullptr.
+     * Initializes the pointers to nullptr by default. Should be called once
+     * the object is allocated.
      */
-    auto reset() -> void {
+    auto default_init() -> void {
         m_metadata = nullptr;
         m_py_timezone = nullptr;
     }

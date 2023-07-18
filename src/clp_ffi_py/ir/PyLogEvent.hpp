@@ -51,9 +51,10 @@ public:
     [[nodiscard]] auto has_metadata() -> bool { return nullptr != m_py_metadata; }
 
     /**
-     * Resets pointers to nullptr.
+     * Initializes the pointers to nullptr by default. Should be called once
+     * the object is allocated.
      */
-    auto reset() -> void {
+    auto default_init() -> void {
         m_log_event = nullptr;
         m_py_metadata = nullptr;
     }

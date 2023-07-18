@@ -39,7 +39,7 @@ auto PyLogEvent_init(PyLogEvent* self, PyObject* args, PyObject* keywords) -> in
     // If the argument parsing fails, `self` will be deallocated. We must reset
     // all pointers to nullptr in advance, otherwise the deallocator might
     // trigger segmentation fault
-    self->reset();
+    self->default_init();
 
     char const* log_message{nullptr};
     ffi::epoch_time_ms_t timestamp{0};
@@ -173,7 +173,7 @@ PyDoc_STRVAR(
  * @return nullptr on failure with the relevant Python exception and error set.
  */
 auto PyLogEvent_setstate(PyLogEvent* self, PyObject* state) -> PyObject* {
-    self->reset();
+    self->default_init();
 
     if (false == static_cast<bool>(PyDict_CheckExact(state))) {
         PyErr_SetString(PyExc_ValueError, clp_ffi_py::cSetstateInputError);
@@ -493,7 +493,7 @@ auto PyLogEvent_create_new(
         PyErr_SetString(PyExc_MemoryError, clp_ffi_py::cOutofMemoryError);
         return nullptr;
     }
-    self->reset();
+    self->default_init();
     if (false == self->init(log_message, timestamp, index, metadata)) {
         return nullptr;
     }

@@ -42,7 +42,7 @@ auto PyMetadata_init(PyMetadata* self, PyObject* args, PyObject* keywords) -> in
     // If the argument parsing fails, `self` will be deallocated. We must reset
     // all pointers to nullptr in advance, otherwise the deallocator might
     // trigger segmentation fault
-    self->reset();
+    self->default_init();
 
     if (false
         == static_cast<bool>(PyArg_ParseTupleAndKeywords(
@@ -288,7 +288,7 @@ auto PyMetadata_init_from_json(nlohmann::json const& metadata, bool is_four_byte
     if (nullptr == self) {
         return nullptr;
     }
-    self->reset();
+    self->default_init();
     if (false == self->init(metadata, is_four_byte_encoding)) {
         Py_DECREF(self);
         return nullptr;
