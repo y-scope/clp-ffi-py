@@ -25,12 +25,6 @@ classifiers = [
 "Homepage" = "https://github.com/y-scope/clp-ffi-py"
 "Bug Tracker" = "https://github.com/y-scope/clp-ffi-py/issues"
 
-[tool.setuptools_scm]
-
-[tool.mypy]
-strict = true
-pretty = true
-
 [tool.black]
 line-length = 100
 target-version = ["py311"]
@@ -40,12 +34,17 @@ preview = true
 [tool.cibuildwheel.macos]
 archs = ["x86_64", "universal2", "arm64"]
 
-[tool.ruff]
-line-length = 100
-
 [tool.docformatter]
 make-summary-multi-line = true
 pre-summary-newline = true
 recursive = true
 wrap-summaries = 80
 wrap-descriptions = 80
+
+[tool.mypy]
+strict = true
+pretty = true
+
+[tool.ruff]
+line-length = 100
+

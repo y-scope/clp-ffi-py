@@ -8,11 +8,11 @@ clp_ir: Extension = Extension(
         "src"
     ],
     sources=[
-        "src/clp/components/core/src/TraceableException.cpp",
         "src/clp/components/core/src/ffi/ir_stream/encoding_methods.cpp",
-        "src/clp/components/core/src/ffi/encoding_methods.cpp",
-        "src/clp/components/core/src/string_utils.cpp",
         "src/clp/components/core/src/ffi/ir_stream/decoding_methods.cpp",
+        "src/clp/components/core/src/ffi/encoding_methods.cpp",
+        "src/clp/components/core/src/TraceableException.cpp",
+        "src/clp/components/core/src/string_utils.cpp",
 
         "src/clp_ffi_py/ir/encoding_methods.cpp",
         "src/clp_ffi_py/ir/Metadata.cpp",

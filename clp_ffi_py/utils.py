@@ -23,8 +23,7 @@ def get_timezone_from_timezone_id(timezone_id: str) -> tzinfo:
     """
     Gets the Python timezone object of the provided timezone id.
 
-    :param timezone_id: Timezone Id. :raise RuntimeError: If the given
-        timezone_id is invalid.
+    :param timezone_id: Timezone Id.
     :return: Timezone object.
     """
     timezone: Optional[tzinfo] = dateutil.tz.gettz(timezone_id)
