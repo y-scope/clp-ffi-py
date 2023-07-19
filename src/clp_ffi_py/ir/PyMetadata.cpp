@@ -268,22 +268,22 @@ auto PyMetadata::init_py_timezone() -> bool {
 PyObjectPtr<PyTypeObject> PyMetadata::m_py_type{nullptr};
 
 auto PyMetadata::get_py_type() -> PyTypeObject* {
-    return PyMetadata::m_py_type.get();
+    return m_py_type.get();
 }
 
-auto PyMetadata_module_level_init(PyObject* py_module) -> bool {
+auto PyMetadata::module_level_init(PyObject* py_module) -> bool {
     static_assert(std::is_trivially_destructible<PyMetadata>());
     auto* type{py_reinterpret_cast<PyTypeObject>(PyType_FromSpec(&PyMetadata_type_spec))};
-    PyMetadata::m_py_type.reset(type);
+    m_py_type.reset(type);
     if (nullptr == type) {
         return false;
     }
-    return add_python_type(PyMetadata::get_py_type(), "Metadata", py_module);
+    return add_python_type(get_py_type(), "Metadata", py_module);
 }
 
-auto PyMetadata_init_from_json(nlohmann::json const& metadata, bool is_four_byte_encoding)
+auto PyMetadata::create_new_from_json(nlohmann::json const& metadata, bool is_four_byte_encoding)
         -> PyMetadata* {
-    PyMetadata* self{PyObject_New(PyMetadata, PyMetadata::get_py_type())};
+    PyMetadata* self{PyObject_New(PyMetadata, get_py_type())};
     if (nullptr == self) {
         return nullptr;
     }

@@ -78,7 +78,30 @@ public:
      */
     [[nodiscard]] static auto get_py_type() -> PyTypeObject*;
 
-    friend auto PyMetadata_module_level_init(PyObject* py_module) -> bool;
+    /**
+     * Creates and initializes PyMetadata as a Python type, and then
+     * incorporates this type as a Python object into the py_module module.
+     * @param py_module This is the Python module where the initialized
+     * PyMetadata will be incorporated.
+     * @return true on success.
+     * @return false on failure with the relevant Python exception and error
+     * set.
+     */
+    [[nodiscard]] static auto module_level_init(PyObject* py_module) -> bool;
+
+    /**
+     * Creates and initializes a new PyMetadata object with the metadata values
+     * specified in the JSON format.
+     * @param metadata CLP IR metadata stored in the JSON format.
+     * @param is_four_byte_encoding Indicates whether the CLP IR uses 4-byte
+     * encoding (true) or 8-byte encoding (false).
+     * @return a new reference of a PyMetadata object that is initialized with
+     * the given inputs.
+     * @return nullptr on failure with the relevant Python exception and error
+     * set.
+     */
+    [[nodiscard]] static auto
+    create_new_from_json(nlohmann::json const& metadata, bool is_four_byte_encoding) -> PyMetadata*;
 
 private:
     /**
@@ -90,34 +113,11 @@ private:
      */
     [[nodiscard]] auto init_py_timezone() -> bool;
 
-    static PyObjectPtr<PyTypeObject> m_py_type;
-
     PyObject_HEAD;
     Metadata* m_metadata;
     PyObject* m_py_timezone;
+
+    static PyObjectPtr<PyTypeObject> m_py_type;
 };
-
-/**
- * Creates and initializes PyMetadata as a Python type, and then incorporates
- * this type as a Python object into the py_module module.
- * @param py_module This is the Python module where the initialized PyMetadata
- * will be incorporated.
- * @return true on success.
- * @return false on failure with the relevant Python exception and error set.
- */
-auto PyMetadata_module_level_init(PyObject* py_module) -> bool;
-
-/**
- * Creates and initializes a new PyMetadata object with the metadata values
- * specified in the JSON format.
- * @param metadata CLP IR metadata stored in the JSON format.
- * @param is_four_byte_encoding Indicates whether the CLP IR uses 4-byte
- * encoding (true) or 8-byte encoding (false).
- * @return a new reference of a PyMetadata object that is initialized with the
- * given inputs.
- * @return nullptr on failure with the relevant Python exception and error set.
- */
-auto PyMetadata_new_from_json(nlohmann::json const& metadata, bool is_four_byte_encoding)
-        -> PyMetadata*;
 }  // namespace clp_ffi_py::ir
 #endif  // CLP_FFI_PY_PY_METADATA_HPP

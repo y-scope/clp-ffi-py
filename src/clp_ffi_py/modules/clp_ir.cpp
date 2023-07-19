@@ -102,12 +102,12 @@ PyMODINIT_FUNC PyInit_CLPIR() {
         return nullptr;
     }
 
-    if (false == clp_ffi_py::ir::PyLogEvent_module_level_init(new_module)) {
+    if (false == clp_ffi_py::ir::PyMetadata::module_level_init(new_module)) {
         Py_DECREF(new_module);
         return nullptr;
     }
 
-    if (false == clp_ffi_py::ir::PyMetadata_module_level_init(new_module)) {
+    if (false == clp_ffi_py::ir::PyLogEvent::module_level_init(new_module)) {
         Py_DECREF(new_module);
         return nullptr;
     }

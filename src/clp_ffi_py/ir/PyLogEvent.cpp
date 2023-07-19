@@ -6,7 +6,6 @@
 #include <clp_ffi_py/ir/LogEvent.hpp>
 #include <clp_ffi_py/Py_utils.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
-#include <clp_ffi_py/PyObjectUtils.hpp>
 #include <clp_ffi_py/utils.hpp>
 
 namespace clp_ffi_py::ir {
@@ -404,11 +403,6 @@ PyType_Spec PyLogEvent_type_spec{
         0,
         Py_TPFLAGS_DEFAULT,
         static_cast<PyType_Slot*>(PyLogEvent_slots)};
-
-/**
- * PyLogEvent's Python type.
- */
-PyObjectPtr<PyTypeObject> PyLogEvent_type;
 }  // namespace
 
 auto PyLogEvent::get_formatted_message(PyObject* timezone) -> PyObject* {
@@ -467,28 +461,30 @@ auto PyLogEvent::init(
     return true;
 }
 
-auto PyLogEvent_get_PyType() -> PyTypeObject* {
-    return PyLogEvent_type.get();
+PyObjectPtr<PyTypeObject> PyLogEvent::m_py_type{nullptr};
+
+auto PyLogEvent::get_py_type() -> PyTypeObject* {
+    return m_py_type.get();
 }
 
-auto PyLogEvent_module_level_init(PyObject* py_module) -> bool {
+auto PyLogEvent::module_level_init(PyObject* py_module) -> bool {
     static_assert(std::is_trivially_destructible<PyLogEvent>());
     auto* type{py_reinterpret_cast<PyTypeObject>(PyType_FromSpec(&PyLogEvent_type_spec))};
-    PyLogEvent_type.reset(type);
+    m_py_type.reset(type);
     if (nullptr == type) {
         return false;
     }
-    return add_python_type(PyLogEvent_get_PyType(), "LogEvent", py_module);
+    return add_python_type(get_py_type(), "LogEvent", py_module);
 }
 
-auto PyLogEvent_create_new(
+auto PyLogEvent::create_new_log_event(
         std::string const& log_message,
         ffi::epoch_time_ms_t timestamp,
         size_t index,
         PyMetadata* metadata
 ) -> PyLogEvent* {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
-    PyLogEvent* self{PyObject_New(PyLogEvent, PyLogEvent_get_PyType())};
+    PyLogEvent* self{PyObject_New(PyLogEvent, get_py_type())};
     if (nullptr == self) {
         PyErr_SetString(PyExc_MemoryError, clp_ffi_py::cOutofMemoryError);
         return nullptr;

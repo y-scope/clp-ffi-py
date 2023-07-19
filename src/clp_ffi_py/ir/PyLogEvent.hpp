@@ -7,6 +7,7 @@
 
 #include <clp_ffi_py/ir/LogEvent.hpp>
 #include <clp_ffi_py/ir/PyMetadata.hpp>
+#include <clp_ffi_py/PyObjectUtils.hpp>
 
 namespace clp_ffi_py::ir {
 /**
@@ -100,46 +101,50 @@ public:
 
     [[nodiscard]] auto get_py_metadata() -> PyMetadata* { return m_py_metadata; }
 
+    /**
+     * Gets the PyTypeObject that represents PyLogEvent's Python type. This type
+     * is dynamically created and initialized during the execution of
+     * `PyLogEvent_module_level_init`.
+     * @return Python type object associated with PyLogEvent.
+     */
+    [[nodiscard]] static auto get_py_type() -> PyTypeObject*;
+
+    /**
+     * Creates and initializes PyLogEvent as a Python type, and then
+     * incorporates this type as a Python object into the py_module module.
+     * @param py_module This is the Python module where the initialized
+     * PyLogEvent will be incorporated.
+     * @return true on success.
+     * @return false on failure with the relevant Python exception and error
+     * set.
+     */
+    [[nodiscard]] static auto module_level_init(PyObject* py_module) -> bool;
+
+    /**
+     * Creates and initializes a new PyLogEvent using the given inputs.
+     * @param log_message
+     * @param timestamp
+     * @param index
+     * @param metadata A PyMetadata instance to bind with the log event (can be
+     * nullptr).
+     * @return a new reference of a PyLogEvent object that is initialized with
+     * the given inputs.
+     * @return nullptr on failure with the relevant Python exception and error
+     * set.
+     */
+    [[nodiscard]] static auto create_new_log_event(
+            std::string const& log_message,
+            ffi::epoch_time_ms_t timestamp,
+            size_t index,
+            PyMetadata* metadata
+    ) -> PyLogEvent*;
+
 private:
     PyObject_HEAD;
     LogEvent* m_log_event;
     PyMetadata* m_py_metadata;
+
+    static PyObjectPtr<PyTypeObject> m_py_type;
 };
-
-/**
- * Gets the PyTypeObject that represents PyLogEvent's Python type. This type is
- * dynamically created and initialized during the execution of
- * `PyLogEvent_module_level_init`.
- * @return Python type object associated with PyLogEvent.
- */
-auto PyLogEvent_get_PyType() -> PyTypeObject*;
-
-/**
- * Creates and initializes PyLogEvent as a Python type, and then incorporates
- * this type as a Python object into the py_module module.
- * @param py_module This is the Python module where the initialized PyLogEvent
- * will be incorporated.
- * @return true on success.
- * @return false on failure with the relevant Python exception and error set.
- */
-auto PyLogEvent_module_level_init(PyObject* py_module) -> bool;
-
-/**
- * Creates and initializes a new PyLogEvent using the given inputs.
- * @param log_message
- * @param timestamp
- * @param index
- * @param metadata A PyMetadata instance to bind with the log event (can be
- * nullptr).
- * @return a new reference of a PyLogEvent object that is initialized with the
- * given inputs.
- * @return nullptr on failure with the relevant Python exception and error set.
- */
-auto PyLogEvent_create_new(
-        std::string const& log_message,
-        ffi::epoch_time_ms_t timestamp,
-        size_t index,
-        PyMetadata* metadata
-) -> PyLogEvent*;
 }  // namespace clp_ffi_py::ir
 #endif  // CLP_FFI_PY_PY_LOG_EVENT_HPP
