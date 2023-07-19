@@ -28,9 +28,9 @@ public:
      * format supported.
      * @param ref_timestamp The reference timestamp used to calculate the
      * timestamp of the first log message in the IR stream.
-     * @param timestamp_format Timestamp format to be use when generating the
-     * logs with a reader.
-     * @param timezone Timezone in TZID format to be use when generating the
+     * @param timestamp_format Timestamp format to use when generating the logs
+     * with a reader.
+     * @param timezone Timezone in TZID format to use when generating the
      * timestamp from Unix epoch time.
      */
     explicit Metadata(

@@ -51,8 +51,7 @@ public:
     [[nodiscard]] auto get_index() const -> size_t { return m_index; }
 
     /**
-     * Checks if the log event has the formatted timestamp buffered.
-     * @return Whether the m_formatted_timestamp is empty.
+     * @return Whether the log event has the formatted timestamp buffered.
      */
     [[nodiscard]] auto has_formatted_timestamp() const -> bool {
         return (false == m_formatted_timestamp.empty());

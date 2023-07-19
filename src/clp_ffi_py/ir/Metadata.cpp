@@ -12,7 +12,7 @@ namespace {
  * data associated to this particular key.
  * @param json_data JSON object to be validated.
  * @param key The key to access the data field.
- * @return Return true if the data is valid.
+ * @return true if the data is valid.
  */
 auto is_valid_json_string_data(nlohmann::json const& json_data, char const* key) -> bool {
     return json_data.contains(key) && json_data[key].is_string();
@@ -59,7 +59,7 @@ Metadata::Metadata(nlohmann::json const& metadata, bool is_four_byte_encoding) {
     }
     m_timestamp_format = metadata[timestamp_format_key];
 
-    auto const* const timezone_id_key{
+    auto const* timezone_id_key{
             static_cast<char const*>(ffi::ir_stream::cProtocol::Metadata::TimeZoneIdKey)};
     if (false == is_valid_json_string_data(metadata, timezone_id_key)) {
         throw ExceptionFFI(
