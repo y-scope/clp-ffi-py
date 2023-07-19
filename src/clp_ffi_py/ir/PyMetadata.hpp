@@ -6,6 +6,7 @@
 #include <clp/components/core/submodules/json/single_include/nlohmann/json.hpp>
 
 #include <clp_ffi_py/ir/Metadata.hpp>
+#include <clp_ffi_py/PyObjectUtils.hpp>
 
 namespace clp_ffi_py::ir {
 /**
@@ -69,6 +70,16 @@ public:
 
     [[nodiscard]] auto get_py_timezone() -> PyObject* { return m_py_timezone; }
 
+    /**
+     * Gets the PyTypeObject that represents PyMetadata's Python type. This type
+     * is dynamically created and initialized during the execution of
+     * `PyMetadata_module_level_init`.
+     * @return Python type object associated with PyMetadata.
+     */
+    [[nodiscard]] static auto get_py_type() -> PyTypeObject*;
+
+    friend auto PyMetadata_module_level_init(PyObject* py_module) -> bool;
+
 private:
     /**
      * Initializes py_timezone by setting the corresponded tzinfo object from
@@ -79,18 +90,12 @@ private:
      */
     [[nodiscard]] auto init_py_timezone() -> bool;
 
+    static PyObjectPtr<PyTypeObject> m_py_type;
+
     PyObject_HEAD;
     Metadata* m_metadata;
     PyObject* m_py_timezone;
 };
-
-/**
- * Gets the PyTypeObject that represents PyMetadata's Python type. This type is
- * dynamically created and initialized during the execution of
- * `PyMetadata_module_level_init`.
- * @return Python type object associated with PyMetadata.
- */
-auto PyMetadata_get_PyType() -> PyTypeObject*;
 
 /**
  * Creates and initializes PyMetadata as a Python type, and then incorporates

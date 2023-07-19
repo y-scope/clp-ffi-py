@@ -7,7 +7,6 @@
 #include <clp_ffi_py/ir/Metadata.hpp>
 #include <clp_ffi_py/Py_utils.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
-#include <clp_ffi_py/PyObjectUtils.hpp>
 #include <clp_ffi_py/utils.hpp>
 
 namespace clp_ffi_py::ir {
@@ -220,8 +219,6 @@ PyType_Spec PyMetadata_type_spec{
         0,
         Py_TPFLAGS_DEFAULT,
         static_cast<PyType_Slot*>(PyMetadata_slots)};
-
-PyObjectPtr<PyTypeObject> PyMetadata_type;
 }  // namespace
 
 auto PyMetadata::init(
@@ -268,23 +265,25 @@ auto PyMetadata::init_py_timezone() -> bool {
     return true;
 }
 
-auto PyMetadata_get_PyType() -> PyTypeObject* {
-    return PyMetadata_type.get();
+PyObjectPtr<PyTypeObject> PyMetadata::m_py_type{nullptr};
+
+auto PyMetadata::get_py_type() -> PyTypeObject* {
+    return PyMetadata::m_py_type.get();
 }
 
 auto PyMetadata_module_level_init(PyObject* py_module) -> bool {
     static_assert(std::is_trivially_destructible<PyMetadata>());
     auto* type{py_reinterpret_cast<PyTypeObject>(PyType_FromSpec(&PyMetadata_type_spec))};
-    PyMetadata_type.reset(type);
+    PyMetadata::m_py_type.reset(type);
     if (nullptr == type) {
         return false;
     }
-    return add_python_type(PyMetadata_get_PyType(), "Metadata", py_module);
+    return add_python_type(PyMetadata::get_py_type(), "Metadata", py_module);
 }
 
 auto PyMetadata_init_from_json(nlohmann::json const& metadata, bool is_four_byte_encoding)
         -> PyMetadata* {
-    PyMetadata* self{PyObject_New(PyMetadata, PyMetadata_get_PyType())};
+    PyMetadata* self{PyObject_New(PyMetadata, PyMetadata::get_py_type())};
     if (nullptr == self) {
         return nullptr;
     }

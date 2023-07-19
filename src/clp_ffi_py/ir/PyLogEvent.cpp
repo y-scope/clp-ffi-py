@@ -62,7 +62,7 @@ auto PyLogEvent_init(PyLogEvent* self, PyObject* args, PyObject* keywords) -> in
 
     auto const has_metadata{Py_None != metadata};
     if (has_metadata
-        && false == static_cast<bool>(PyObject_TypeCheck(metadata, PyMetadata_get_PyType())))
+        && false == static_cast<bool>(PyObject_TypeCheck(metadata, PyMetadata::get_py_type())))
     {
         PyErr_SetString(PyExc_TypeError, clp_ffi_py::cPyTypeError);
         return -1;
