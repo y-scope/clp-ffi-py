@@ -11,3 +11,7 @@ wheelhouse/
 
 # Testing
 unittest-logs/
+
+# Dev
+compile_commands.json
+.mypy_cache

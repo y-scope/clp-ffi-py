@@ -42,6 +42,9 @@ git submodule update --init --recursive
 
 # 4. Install
 pip install -e .
+
+# 5. Run unit tests
+python -m unittest -bv
 ```
 
 ## Build and Test with cibuildwheel
@@ -63,12 +66,19 @@ and formatting tools (found in [pyproject.toml]):
   * mypy checks for typing errors. You should resolve all typing errors or if an
     error cannot be resolved (e.g., it's due to a third-party library), you
     should add a comment `# type: ignore` to [silence][4] the error.
+* [docformatter][11]: `docformatter -i clp_ffi_py tests`
+  * This formats docstrings. You should review and add any changes to your PR.
 * [Black][5]: `black clp_ffi_py`
   * This formats the Python code according to Black's code-style rules. You should
     review and add any changes to your PR.
 * [clang-format][6]: `clang-format -i src/clp_ffi_py/**`
   * This formats the C++ code according to the code-style rules specified in `.clang-format`.
     You should review and add any changes to your PR.
+* [ruff][10]: `ruff check --fix clp_ffi_py tests`
+  * This performs linting according to PEPs. You should review and add any
+    changes to your PR.
+
+Note that `docformatter` should be run before `black` to give Black the [last][12].
 
 Additionally, the following tools can be useful during development. However, they cannot be installed
 using `pip`. Developers need to install them using other package management tools such as `apt-get`:
@@ -91,3 +101,6 @@ using `pip`. Developers need to install them using other package management tool
 [7]: https://cibuildwheel.readthedocs.io/en/stable/
 [8]: https://clang.llvm.org/extra/clang-tidy/
 [9]: https://github.com/rizsotto/Bear
+[10]: https://beta.ruff.rs/docs/
+[11]: https://docformatter.readthedocs.io/en/latest/
+[12]: https://docformatter.readthedocs.io/en/latest/faq.html#interaction-with-black

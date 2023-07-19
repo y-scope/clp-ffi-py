@@ -1,5 +1,27 @@
 ---
-Checks: 'cert-*,clang-analyzer-*,clang-diagnostic-*,cppcoreguidelines-*,modernize-*,performance-*,readability-*,-readability-identifier-length,-readability-simplify-boolean-expr'
+Checks: >- 
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  cert-*,
+  clang-analyzer-*,
+  clang-diagnostic-*,
+  concurrency-*,
+  cppcoreguidelines-*,
+  -cppcoreguidelines-avoid-non-const-global-variables,
+  -cppcoreguidelines-pro-type-cstyle-cast,
+  -cppcoreguidelines-pro-type-vararg,
+  misc-*,
+  modernize-*,
+  -modernize-avoid-c-arrays,
+  performance-*,
+  portability-*,
+  readability-*,
+  -readability-identifier-length,
+  -readability-simplify-boolean-expr
+
+WarningsAsErrors: >-
+  *
+
 FormatStyle: file
 CheckOptions:
   readability-identifier-naming.ClassCase: 'CamelCase'
@@ -12,8 +34,6 @@ CheckOptions:
   readability-identifier-naming.EnumConstantCase: 'CamelCase'
   readability-identifier-naming.GlobalConstantCase: 'CamelCase'
   readability-identifier-naming.GlobalConstantPrefix: 'c'
-  readability-identifier-naming.GlobalFunctionCase: 'lower_case'
-  readability-identifier-naming.GlobalVariableCase: 'lower_case'
   readability-identifier-naming.LocalVariableCase: 'lower_case'
   readability-identifier-naming.MemberCase: 'lower_case'
   readability-identifier-naming.MemberPrefix: 'm_'
