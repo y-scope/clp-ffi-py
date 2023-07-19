@@ -25,6 +25,7 @@ def get_timezone_from_timezone_id(timezone_id: str) -> tzinfo:
 
     :param timezone_id: Timezone Id.
     :return: Timezone object.
+    :raises: RuntimeError The given timestamp ID is invalid.
     """
     timezone: Optional[tzinfo] = dateutil.tz.gettz(timezone_id)
     if timezone is None:
