@@ -2,7 +2,6 @@
 #define CLP_FFI_PY_QUERY_HPP
 
 #include <limits>
-#include <optional>
 #include <vector>
 
 #include <clp/components/core/src/ffi/encoding_methods.hpp>
