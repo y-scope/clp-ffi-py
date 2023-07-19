@@ -39,7 +39,7 @@ public:
     [[nodiscard]] auto get_log_message() const -> std::string { return m_log_message; }
 
     [[nodiscard]] auto get_log_message_view() const -> std::string_view {
-        return std::string_view(m_log_message);
+        return std::string_view{m_log_message};
     }
 
     [[nodiscard]] auto get_timestamp() const -> ffi::epoch_time_ms_t { return m_timestamp; }
