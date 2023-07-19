@@ -5,7 +5,7 @@
 #include <clp_ffi_py/ir/PyMetadata.hpp>
 #include <clp_ffi_py/Py_utils.hpp>
 
-// CPython macors use C-arrays
+// CPython macros use C-arrays
 // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays)
 
 namespace {
