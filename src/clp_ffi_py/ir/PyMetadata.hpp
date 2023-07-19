@@ -1,5 +1,5 @@
-#ifndef CLP_FFI_PY_PY_METADATA_HPP
-#define CLP_FFI_PY_PY_METADATA_HPP
+#ifndef CLP_FFI_PY_PYMETADATA_HPP
+#define CLP_FFI_PY_PYMETADATA_HPP
 
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 

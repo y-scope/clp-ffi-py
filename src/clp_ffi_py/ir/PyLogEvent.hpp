@@ -1,5 +1,5 @@
-#ifndef CLP_FFI_PY_PY_LOG_EVENT_HPP
-#define CLP_FFI_PY_PY_LOG_EVENT_HPP
+#ifndef CLP_FFI_PY_PYLOGEVENT_HPP
+#define CLP_FFI_PY_PYLOGEVENT_HPP
 
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
