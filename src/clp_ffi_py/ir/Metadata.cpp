@@ -30,7 +30,7 @@ Metadata::Metadata(nlohmann::json const& metadata, bool is_four_byte_encoding) {
     }
     m_is_four_byte_encoding = is_four_byte_encoding;
 
-    auto const* const ref_timestamp_key{
+    auto const* ref_timestamp_key{
             static_cast<char const*>(ffi::ir_stream::cProtocol::Metadata::ReferenceTimestampKey)};
     if (false == is_valid_json_string_data(metadata, ref_timestamp_key)) {
         throw ExceptionFFI(
@@ -47,7 +47,7 @@ Metadata::Metadata(nlohmann::json const& metadata, bool is_four_byte_encoding) {
         throw ExceptionFFI(ErrorCode_Unsupported, __FILE__, __LINE__, ex.what());
     }
 
-    auto const* const timestamp_format_key{
+    auto const* timestamp_format_key{
             static_cast<char const*>(ffi::ir_stream::cProtocol::Metadata::TimestampPatternKey)};
     if (false == is_valid_json_string_data(metadata, timestamp_format_key)) {
         throw ExceptionFFI(
