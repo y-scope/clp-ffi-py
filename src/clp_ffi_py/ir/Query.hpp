@@ -11,19 +11,29 @@
 namespace clp_ffi_py::ir {
 /**
  * This class represents a search query, utilized for eliminating unmatched log
- * events when decoding an encoded IR stream. The query could include a list of
+ * events when decoding a CLP IR stream. The query could include a list of
  * wildcard searches aimed at identifying certain log messages, and a preset
- * timestamp interval specified by a lower bound and an upper bound timestamp,
- * which are defined as query conditions. This class provides an interface to
- * set up a query with customized conditions, as well as methods to validate
- * whether a log event matches the query conditions.
+ * timestamp interval specified by a lower bound and an upper bound timestamp.
+ * This class provides an interface to set up a search query, as well as methods 
+ * to validate whether the query can be matched by a log event.
  */
 class Query {
 public:
     static constexpr ffi::epoch_time_ms_t const cTimestampMin{0};
     static constexpr ffi::epoch_time_ms_t const cTimestampMax{
             std::numeric_limits<ffi::epoch_time_ms_t>::max()};
-    static constexpr ffi::epoch_time_ms_t const cTimestampUpperBoundSafeRange{
+    
+    /**
+    * Ideally, when decoding an IR stream with a query, the decoding terminates 
+    * once the timestamp exceeds the search upper bound. However, the
+    * timestamp might not be monotonically increasing in a CLP IR stream. It can
+    * be locally disordered due to the thread contention. To safely exit, we 
+    * need to ensure that the timestamp has exceeded the upper bound by a 
+    * reasonable margin. This margin is defined by the following constant. 
+    * During the query initialization, it will be applied to the upper bound
+    * timestamp to generate a timestamp which indicates the safe termination.
+    */
+    static constexpr ffi::epoch_time_ms_t const cTimestampTerminationMargin{
             static_cast<ffi::epoch_time_ms_t>(60 * 1000)};
 
     /**
@@ -33,38 +43,38 @@ public:
      */
     explicit Query(bool case_sensitive)
             : m_case_sensitive{case_sensitive},
-              m_ts_lower_bound{cTimestampMin},
-              m_ts_upper_bound{cTimestampMax},
-              m_ts_safe_upper_bound{cTimestampMax} {};
+              m_lower_bound_ts{cTimestampMin},
+              m_upper_bound_ts{cTimestampMax},
+              m_termination_ts{cTimestampMax} {};
 
     /**
      * Constructs a new query object with the given timestamp range. By default,
      * the wildcard list is empty.
      * @param case_sensitive Whether the wildcard match is case-sensitive.
-     * @param ts_lower_bound Start of search time range (inclusive).
-     * @param ts_upper_bound End of search time range (inclusive).
+     * @param search_time_lower_bound Start of search time range (inclusive).
+     * @param search_time_upper_bound End of search time range (inclusive).
      */
     explicit Query(
             bool case_sensitive,
-            ffi::epoch_time_ms_t ts_lower_bound,
-            ffi::epoch_time_ms_t ts_upper_bound
+            ffi::epoch_time_ms_t search_time_lower_bound,
+            ffi::epoch_time_ms_t search_time_upper_bound
     )
             : m_case_sensitive{case_sensitive},
-              m_ts_lower_bound{ts_lower_bound},
-              m_ts_upper_bound{ts_upper_bound},
-              m_ts_safe_upper_bound{
-                      (cTimestampMax - cTimestampUpperBoundSafeRange > ts_upper_bound)
-                              ? ts_upper_bound + cTimestampUpperBoundSafeRange
+              m_lower_bound_ts{search_time_lower_bound},
+              m_upper_bound_ts{search_time_upper_bound},
+              m_termination_ts{
+                      (cTimestampMax - cTimestampTerminationMargin > search_time_upper_bound)
+                              ? search_time_upper_bound + cTimestampTerminationMargin
                               : cTimestampMax} {};
 
     [[nodiscard]] auto is_case_sensitive() const -> bool { return m_case_sensitive; }
 
-    [[nodiscard]] auto get_ts_lower_bound() const -> ffi::epoch_time_ms_t {
-        return m_ts_lower_bound;
+    [[nodiscard]] auto get_lower_bound_ts() const -> ffi::epoch_time_ms_t {
+        return m_lower_bound_ts;
     }
 
-    [[nodiscard]] auto get_ts_upper_bound() const -> ffi::epoch_time_ms_t {
-        return m_ts_upper_bound;
+    [[nodiscard]] auto get_ts_upper_bound_ts() const -> ffi::epoch_time_ms_t {
+        return m_upper_bound_ts;
     }
 
     /**
@@ -74,68 +84,60 @@ public:
     auto add_wildcard(std::string_view wildcard) -> void { m_wildcard_list.emplace_back(wildcard); }
 
     /**
-     * Checks the given timestamp against the timestamp search lower bound.
-     * @param ts Given timestamp.
-     * @return whether the given timestamp is equal to or larger than the
-     * timestamp search lower bound.
+     * @param ts Input timestamp.
+     * @return true if the given timestamp is equal to or greater than the 
+     * search lower bound.
+     * @return false otherwise.
      */
     [[nodiscard]] auto ts_lower_bound_check(ffi::epoch_time_ms_t ts) const -> bool {
-        return m_ts_lower_bound <= ts;
+        return m_lower_bound_ts <= ts;
     }
 
     /**
-     * Checks the given timestamp against the timestamp search upper bound.
-     * @param ts Given timestamp.
-     * @return whether the given timestamp is equal to or smaller than the
-     * timestamp search lower bound.
+     * @param ts Input timestamp.
+     * @return true if the given timestamp is equal to or smaller than the 
+     * search lower bound.
+     * @return false otherwise.
      */
     [[nodiscard]] auto ts_upper_bound_check(ffi::epoch_time_ms_t ts) const -> bool {
-        return ts <= m_ts_upper_bound;
+        return ts <= m_upper_bound_ts;
     }
 
     /**
-     * Checks whether the given timestamp is in the search range: it should pass
-     * both the lower bound check and the upper bound check.
-     * @param ts Given timestamp.
-     * @return Whether the given timestamp is in range.
+     * @param ts Input timestamp.
+     * @return Whether the given timestamp is in the search time rage bounded by
+     * the lower bound and the upper bound timestamp (inclusive).
      */
     [[nodiscard]] auto ts_in_range(ffi::epoch_time_ms_t ts) const -> bool {
         return ts_lower_bound_check(ts) && ts_upper_bound_check(ts);
     }
 
     /**
-     * Checks whether the given timestamp exceeds the timestamp safe upper
-     * bound. When decoding an IR stream with a query, the decoding can
-     * terminate once the timestamp exceeds the upper bound. However, the
-     * timestamp might not be monotonically increasing. It can be locally
-     * disordered due to the thread contention. To safely exit, we need to
-     * ensure that the timestamp has exceeds the upper bound with a reasonable
-     * range.
-     * @param ts Given timestamp.
-     * @return Whether the given timestamp strictly exceeds the safe upper
-     * bound timestamp.
+     * Determines whether the decoding can terminate by evaluating the input
+     * timestamp.
+     * @param ts Input timestamp.
+     * @return true if the given timestamp is equal to or greater than the 
+     * termination timestamp.
+     * @return false otherwise.
      */
-    [[nodiscard]] auto ts_exceed_safe_upper_bound(ffi::epoch_time_ms_t ts) const -> bool {
-        return m_ts_safe_upper_bound < ts;
+    [[nodiscard]] auto is_safe_to_terminate_decoding(ffi::epoch_time_ms_t ts) const -> bool {
+        return m_termination_ts <= ts;
     }
 
     /**
-     * Validates whether the given log message matches the underlying wildcard
-     * query list. If the wildcard list is empty, this function will always
-     * return true.
+     * Validates whether the input log message matches the query.
      * @param log_message Input log message.
-     * @return true if the wildcard query list is empty, or there is at least
-     * one wildcard query matches the given message.
-     * @return false if there is no matches found.
+     * @return true if the wildcard list is empty or has at least one match.
+     * @return false otherwise.
      */
     [[nodiscard]] auto wildcard_matches(std::string_view log_message) -> bool;
 
     /**
-     * Validates whether the given log event matches the given query.
+     * Validates whether the input log event matches the query.
      * @param log_event Input log event.
-     * @return Whether the timestamp is in range, and the message represented by
-     * the log event matches at least one of the wildcard query if the wildcard
-     * query list is not empty.
+     * @return true if the timestamp is in range, and the wildcard list is empty
+     * or has at least one match.
+     * @return false otherwise.
      */
     [[nodiscard]] auto matches(LogEvent const& log_event) -> bool {
         if (false == ts_in_range(log_event.get_timestamp())) {
@@ -147,9 +149,9 @@ public:
 private:
     std::vector<std::string> m_wildcard_list;
     bool m_case_sensitive;
-    ffi::epoch_time_ms_t m_ts_lower_bound;
-    ffi::epoch_time_ms_t m_ts_upper_bound;
-    ffi::epoch_time_ms_t m_ts_safe_upper_bound;
+    ffi::epoch_time_ms_t m_lower_bound_ts;
+    ffi::epoch_time_ms_t m_upper_bound_ts;
+    ffi::epoch_time_ms_t m_termination_ts;
 };
 }  // namespace clp_ffi_py::ir
 #endif
