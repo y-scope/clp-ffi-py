@@ -2,7 +2,7 @@ import dateutil.tz
 import pickle
 import unittest
 
-from clp_ffi_py.CLPIR import LogEvent, Metadata
+from clp_ffi_py.CLPIR import FourByteEncoder, LogEvent, Metadata
 from datetime import tzinfo
 from typing import Optional
 
@@ -274,6 +274,47 @@ class TestCaseLogEvent(unittest.TestCase):
             f'Timestamp: "{timestamp}", Expected: "{expected_log_message}"',
         )
         self.assertEqual(idx, expected_idx, f"Message idx: {idx}, Expected: {expected_idx}")
+
+
+class TestCaseFourByteEncoder(unittest.TestCase):
+    """
+    Class for testing clp_ffi_py.CLPIR.FourByteEncoder.
+    """
+
+    def test_init(self) -> None:
+        type_error_exception_captured: bool = False
+        four_byte_encoder: FourByteEncoder
+        try:
+            four_byte_encoder = FourByteEncoder() # noqa
+        except TypeError:
+            type_error_exception_captured = True
+        self.assertEqual(
+            type_error_exception_captured, True, "FourByteEncoder should be non-instantiable."
+        )
+
+    def test_encode(self) -> None:
+        """
+        For simplicity, this function is not testing the functionality of the
+        encoder.
+
+        It only checks if the result of
+        encode_message_and_timestamp_delta is consistent with the combine of
+        encode_message and encode_timestamp_delta. The actual functionality
+        should be covered by the unittest of CLP Python logging library.
+        TODO: When the decoder is implemented, add some more tests to ensure
+        the encoded bytes can be successfully decoded to recover the original
+        log event.
+        """
+        timestamp_delta: int = -3190
+        log_message: str = "This is a test message: Do NOT Reply!"
+        encoded_message_and_ts_delta: bytearray = (
+            FourByteEncoder.encode_message_and_timestamp_delta(
+                timestamp_delta, log_message.encode()
+            )
+        )
+        encoded_message: bytearray = FourByteEncoder.encode_message(log_message.encode())
+        encoded_ts_delta: bytearray = FourByteEncoder.encode_timestamp_delta(timestamp_delta)
+        self.assertEqual(encoded_message_and_ts_delta, encoded_message + encoded_ts_delta)
 
 
 if __name__ == "__main__":

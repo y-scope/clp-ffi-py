@@ -16,6 +16,7 @@ clp_ir: Extension = Extension(
 
         "src/clp_ffi_py/ir/encoding_methods.cpp",
         "src/clp_ffi_py/ir/Metadata.cpp",
+        "src/clp_ffi_py/ir/PyFourByteEncoder.cpp",
         "src/clp_ffi_py/ir/PyLogEvent.cpp",
         "src/clp_ffi_py/ir/PyMetadata.cpp",
         "src/clp_ffi_py/modules/clp_ir.cpp",
