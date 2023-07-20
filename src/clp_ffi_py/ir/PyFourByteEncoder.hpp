@@ -15,7 +15,7 @@ public:
      * Creates and initializes PyFourByteEncoder as a Python type, and then
      * incorporates this type as a Python object into the py_module module.
      * @param py_module This is the Python module where the initialized
-     * PyLogEvent will be incorporated.
+     * PyFourByteEncoder will be incorporated.
      * @return true on success.
      * @return false on failure with the relevant Python exception and error
      * set.

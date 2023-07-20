@@ -104,7 +104,7 @@ PyType_Slot PyFourByteEncoder_slots[]{
 // NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
 
 /**
- * PyLogEvent Python type specifications.
+ * PyFourByteEncoder Python type specifications.
  */
 PyType_Spec PyFourByteEncoder_type_spec{
         "clp_ffi_py.CLPIR.FourByteEncoder",
