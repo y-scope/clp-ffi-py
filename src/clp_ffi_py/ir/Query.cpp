@@ -1,6 +1,7 @@
 #include "Query.hpp"
 
 #include <algorithm>
+#include <string_view>
 
 #include <clp/components/core/src/string_utils.hpp>
 
