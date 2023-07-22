@@ -38,12 +38,11 @@ private:
 };
 
 /**
- * This class represents a search query, utilized for eliminating unmatched log
- * events when decoding a CLP IR stream. The query could include a list of
- * wildcard searches aimed at identifying certain log messages, and a preset
- * timestamp interval specified by a lower bound and an upper bound timestamp.
- * This class provides an interface to set up a search query, as well as methods
- * to validate whether the query can be matched by a log event.
+ * This class represents a search query, utilized for filtering log events in a
+ * CLP IR stream. The query could include a list of wildcard searches aimed at
+ * identifying certain log messages, and a timestamp interval with a lower and
+ * upper bound.  This class provides an interface to set up a search query, as
+ * well as methods to validate whether the query can be matched by a log event.
  */
 class Query {
 public:
@@ -52,15 +51,15 @@ public:
             std::numeric_limits<ffi::epoch_time_ms_t>::max()};
 
     /**
-     * Ideally, when decoding an IR stream with a query, the decoding terminates
-     * once the timestamp exceeds the search upper bound. However, the
-     * timestamp might not be monotonically increasing in a CLP IR stream. It can
-     * be locally disordered due to the thread contention. To safely exit, we
-     * need to ensure that the timestamp has exceeded the upper bound by a
-     * reasonable margin. During the query initialization, it will be applied to
-     * the upper bound timestamp to generate a timestamp which indicates the safe
-     * termination. The default search termination margin is defined with the
-     * following constant.
+     * Ideally, when searching an IR stream with a query, the search terminates
+     * once the timestamp exceeds the search upper bound. However, the timestamp
+     * might not be monotonically increasing in a CLP IR stream. It can be
+     * locally disordered due to thread contention. To safely stop searching, we
+     * need to ensure that the current timestamp has exceeded the search's upper
+     * bound by a reasonable margin. This margin defaults to the following
+     * constant. During the query initialization, it will be applied to the
+     * upper bound timestamp to generate a timestamp which indicates the safe
+     * termination.
      */
     static constexpr ffi::epoch_time_ms_t const cDefaultSearchTerminationMargin{
             static_cast<ffi::epoch_time_ms_t>(60 * 1000)};
@@ -133,7 +132,7 @@ public:
 
     /**
      * @param ts Input timestamp.
-     * @return Whether the given timestamp is in the search time rage bounded by
+     * @return true if the given timestamp is in the search time rage bounded by
      * the lower bound and the upper bound timestamp (inclusive).
      */
     [[nodiscard]] auto ts_in_range(ffi::epoch_time_ms_t ts) const -> bool {
@@ -153,7 +152,8 @@ public:
     }
 
     /**
-     * Validates whether the input log message matches the query.
+     * Validates whether the input log message matches any of the wildcard
+     * conditions for the query.
      * @param log_message Input log message.
      * @return true if the wildcard list is empty or has at least one match.
      * @return false otherwise.
