@@ -398,7 +398,7 @@ PyType_Slot PyLogEvent_slots[]{
  * PyLogEvent Python type specifications.
  */
 PyType_Spec PyLogEvent_type_spec{
-        "clp_ffi_py.CLPIR.LogEvent",
+        "clp_ffi_py.ir.LogEvent",
         sizeof(PyLogEvent),
         0,
         Py_TPFLAGS_DEFAULT,

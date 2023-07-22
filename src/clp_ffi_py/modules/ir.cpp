@@ -11,18 +11,20 @@ namespace {
 PyDoc_STRVAR(cModuleDoc, "Python interface to the CLP IR encoding and decoding methods.");
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
-PyMethodDef PyCLPIR_method_table[]{{nullptr, nullptr, 0, nullptr}};
+PyMethodDef Py_ir_method_table[]{{nullptr, nullptr, 0, nullptr}};
 
-struct PyModuleDef PyCLPIR {
-    PyModuleDef_HEAD_INIT, "CLPIR", static_cast<char const*>(cModuleDoc), -1,
-            static_cast<PyMethodDef*>(PyCLPIR_method_table)
-};
+PyModuleDef Py_ir{
+        PyModuleDef_HEAD_INIT,
+        "ir",
+        static_cast<char const*>(cModuleDoc),
+        -1,
+        static_cast<PyMethodDef*>(Py_ir_method_table)};
 }  // namespace
 
 extern "C" {
 // NOLINTNEXTLINE(modernize-use-trailing-return-type)
-PyMODINIT_FUNC PyInit_CLPIR() {
-    PyObject* new_module{PyModule_Create(&PyCLPIR)};
+PyMODINIT_FUNC PyInit_ir() {
+    PyObject* new_module{PyModule_Create(&Py_ir)};
     if (nullptr == new_module) {
         return nullptr;
     }

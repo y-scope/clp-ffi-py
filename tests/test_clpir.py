@@ -2,7 +2,7 @@ import dateutil.tz
 import pickle
 import unittest
 
-from clp_ffi_py.CLPIR import FourByteEncoder, LogEvent, Metadata
+from clp_ffi_py.ir import FourByteEncoder, LogEvent, Metadata
 from datetime import tzinfo
 from typing import Optional
 
@@ -285,7 +285,7 @@ class TestCaseFourByteEncoder(unittest.TestCase):
         type_error_exception_captured: bool = False
         four_byte_encoder: FourByteEncoder
         try:
-            four_byte_encoder = FourByteEncoder() # noqa
+            four_byte_encoder = FourByteEncoder()  # noqa
         except TypeError:
             type_error_exception_captured = True
         self.assertEqual(

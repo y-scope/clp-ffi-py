@@ -107,7 +107,7 @@ PyType_Slot PyFourByteEncoder_slots[]{
  * PyFourByteEncoder Python type specifications.
  */
 PyType_Spec PyFourByteEncoder_type_spec{
-        "clp_ffi_py.CLPIR.FourByteEncoder",
+        "clp_ffi_py.ir.FourByteEncoder",
         sizeof(PyFourByteEncoder),
         0,
         Py_TPFLAGS_DEFAULT,
