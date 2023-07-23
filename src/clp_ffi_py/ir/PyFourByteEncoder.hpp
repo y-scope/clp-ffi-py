@@ -8,12 +8,13 @@
 namespace clp_ffi_py::ir {
 class PyFourByteEncoder {
     /**
-     * This class provides a Python level namespace for CLP 4-byte encoding methods.
+     * This class provides a Python level namespace for CLP 4-byte encoding
+     * methods.
      */
 public:
     /**
      * Creates and initializes PyFourByteEncoder as a Python type, and then
-     * incorporates this type as a Python object into the py_module module.
+     * incorporates this type as a Python object into the py_module.
      * @param py_module This is the Python module where the initialized
      * PyFourByteEncoder will be incorporated.
      * @return true on success.

@@ -1,12 +1,10 @@
-
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
 #include "PyFourByteEncoder.hpp"
 
+#include <clp_ffi_py/ir/encoding_methods.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
 #include <clp_ffi_py/utils.hpp>
-
-#include "encoding_methods.hpp"
 
 namespace clp_ffi_py::ir {
 namespace {
@@ -91,17 +89,17 @@ PyMethodDef PyFourByteEncoder_method_table[]{
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cPyFourByteEncoderDoc,
-        "Namespace for all CLP encoding methods.\n\n"
+        "Namespace for all CLP four byte IR encoding methods.\n\n"
         "Methods encode bytes from the log record to create a CLP log message. This class should "
         "never be instantiated since it only contains static methods.\n"
 );
 
-// NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
+// NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-const-cast)
 PyType_Slot PyFourByteEncoder_slots[]{
         {Py_tp_methods, static_cast<void*>(PyFourByteEncoder_method_table)},
         {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyFourByteEncoderDoc))},
         {0, nullptr}};
-// NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
+// NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-const-cast)
 
 /**
  * PyFourByteEncoder Python type specifications.

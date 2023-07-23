@@ -21,7 +21,6 @@ PyModuleDef Py_ir{
         static_cast<PyMethodDef*>(Py_ir_method_table)};
 }  // namespace
 
-extern "C" {
 // NOLINTNEXTLINE(modernize-use-trailing-return-type)
 PyMODINIT_FUNC PyInit_ir() {
     PyObject* new_module{PyModule_Create(&Py_ir)};
@@ -50,5 +49,4 @@ PyMODINIT_FUNC PyInit_ir() {
     }
 
     return new_module;
-}
 }
