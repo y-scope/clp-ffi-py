@@ -1,16 +1,15 @@
-#ifndef CLP_FFI_PY_PyFourByteEncoder_HPP
-#define CLP_FFI_PY_PyFourByteEncoder_HPP
+#ifndef CLP_FFI_PY_PYFOURBYTEENCODER_HPP
+#define CLP_FFI_PY_PYFOURBYTEENCODER_HPP
 
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
 #include <clp_ffi_py/PyObjectUtils.hpp>
 
 namespace clp_ffi_py::ir {
+/**
+ * This class provides a Python level namespace for CLP 4-byte encoding methods.
+ */
 class PyFourByteEncoder {
-    /**
-     * This class provides a Python level namespace for CLP 4-byte encoding
-     * methods.
-     */
 public:
     /**
      * Creates and initializes PyFourByteEncoder as a Python type, and then
