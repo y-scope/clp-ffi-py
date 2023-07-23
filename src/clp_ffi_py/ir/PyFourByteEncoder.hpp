@@ -7,7 +7,8 @@
 
 namespace clp_ffi_py::ir {
 /**
- * This class provides a Python level namespace for CLP 4-byte encoding methods.
+ * This class provides a Python-level namespace for CLP 4-byte IR encoding
+ * methods.
  */
 class PyFourByteEncoder {
 public:
