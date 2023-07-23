@@ -44,24 +44,21 @@ private:
  * upper bound. This class provides an interface to set up a search query, as
  * well as methods to validate whether the query can be matched by a log event.
  * Note that an empty wildcard query list will match any log within the range.
+ * Ideally, when searching an IR stream with a query, the search terminates
+ * once the timestamp exceeds the search upper bound. However, the timestamp
+ * might not be monotonically increasing in a CLP IR stream. It can be
+ * locally disordered due to thread contention. To safely stop searching, we
+ * need to ensure that the current timestamp has exceeded the search's upper
+ * bound by a reasonable margin. This margin defaults to the following
+ * constant. During the query initialization, it will be applied to the
+ * upper bound timestamp to generate a timestamp which indicates it is safe
+ * to terminate the search.
  */
 class Query {
 public:
     static constexpr ffi::epoch_time_ms_t const cTimestampMin{0};
     static constexpr ffi::epoch_time_ms_t const cTimestampMax{
             std::numeric_limits<ffi::epoch_time_ms_t>::max()};
-
-    /**
-     * Ideally, when searching an IR stream with a query, the search terminates
-     * once the timestamp exceeds the search upper bound. However, the timestamp
-     * might not be monotonically increasing in a CLP IR stream. It can be
-     * locally disordered due to thread contention. To safely stop searching, we
-     * need to ensure that the current timestamp has exceeded the search's upper
-     * bound by a reasonable margin. This margin defaults to the following
-     * constant. During the query initialization, it will be applied to the
-     * upper bound timestamp to generate a timestamp which indicates it is safe
-     * to terminate the search.
-     */
     static constexpr ffi::epoch_time_ms_t const cDefaultSearchTerminationMargin{
             static_cast<ffi::epoch_time_ms_t>(60 * 1000)};
 
@@ -104,7 +101,8 @@ public:
      * @param search_time_upper_bound End of search time range (inclusive).
      * @param wildcard_list A reference to the wildcard queries vector, whose
      * data will be transferred using std::move to initialize
-     * m_wildcard_queries.
+     * m_wildcard_queries. The given wildcard query must be valid (see
+     * wildcard_match_unsafe).
      * @param search_time_termination_margin The margin used to determine the
      * search termination timestamp.
      */
