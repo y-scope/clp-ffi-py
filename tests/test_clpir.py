@@ -9,7 +9,7 @@ from typing import Optional
 
 class TestCaseMetadata(unittest.TestCase):
     """
-    Class for testing clp_ffi_py.CLPIRDecoder.Metadata.
+    Class for testing clp_ffi_py.ir.Metadata.
     """
 
     def test_init(self) -> None:
@@ -108,7 +108,7 @@ class TestCaseMetadata(unittest.TestCase):
 
 class TestCaseLogEvent(unittest.TestCase):
     """
-    Class for testing clp_ffi_py.CLPIRDecoder.LogEvent.
+    Class for testing clp_ffi_py.ir.LogEvent.
     """
 
     def test_init(self) -> None:
