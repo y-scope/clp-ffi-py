@@ -17,7 +17,7 @@ auto Query::wildcard_matches(std::string_view log_message) const -> bool {
                 return wildcard_match_unsafe(
                         log_message,
                         wildcard_query.get_wildcard(),
-                        wildcard_query.get_case_sensitive()
+                        wildcard_query.is_case_sensitive()
                 );
             }
     );

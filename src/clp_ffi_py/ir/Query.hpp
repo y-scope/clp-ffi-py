@@ -30,7 +30,7 @@ public:
 
     [[nodiscard]] auto get_wildcard() const -> std::string_view { return m_wildcard; }
 
-    [[nodiscard]] auto get_case_sensitive() const -> bool { return m_case_sensitive; }
+    [[nodiscard]] auto is_case_sensitive() const -> bool { return m_case_sensitive; }
 
 private:
     std::string m_wildcard;
@@ -40,9 +40,10 @@ private:
 /**
  * This class represents a search query, utilized for filtering log events in a
  * CLP IR stream. The query could include a list of wildcard searches aimed at
- * identifying certain log messages, and a timestamp interval with a lower and
- * upper bound.  This class provides an interface to set up a search query, as
+ * identifying certain log messages, and a timestamp range with a lower and
+ * upper bound. This class provides an interface to set up a search query, as
  * well as methods to validate whether the query can be matched by a log event.
+ * Note that an empty wildcard query list will match any log within the range.
  */
 class Query {
 public:
@@ -58,15 +59,16 @@ public:
      * need to ensure that the current timestamp has exceeded the search's upper
      * bound by a reasonable margin. This margin defaults to the following
      * constant. During the query initialization, it will be applied to the
-     * upper bound timestamp to generate a timestamp which indicates the safe
-     * termination.
+     * upper bound timestamp to generate a timestamp which indicates it is safe
+     * to terminate the search.
      */
     static constexpr ffi::epoch_time_ms_t const cDefaultSearchTerminationMargin{
             static_cast<ffi::epoch_time_ms_t>(60 * 1000)};
 
     /**
-     * Constructs an empty query object: the wildcard list is empty and the
-     * timestamp range is set to include all the valid Unix epoch time.
+     * Constructs an empty query object that will match all logs. The wildcard
+     * list is empty and the timestamp range is set to include all the valid
+     * Unix epoch timestamps.
      */
     explicit Query()
             : m_lower_bound_ts{cTimestampMin},
@@ -132,8 +134,8 @@ public:
 
     /**
      * @param ts Input timestamp.
-     * @return true if the given timestamp is in the search time rage bounded by
-     * the lower bound and the upper bound timestamp (inclusive).
+     * @return true if the given timestamp is in the search time range bounded
+     * by the lower bound and the upper bound timestamp (inclusive).
      */
     [[nodiscard]] auto ts_in_range(ffi::epoch_time_ms_t ts) const -> bool {
         return m_lower_bound_ts <= ts && ts <= m_upper_bound_ts;
