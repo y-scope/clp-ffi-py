@@ -14,7 +14,7 @@ class PyFourByteEncoder {
 public:
     /**
      * Creates and initializes PyFourByteEncoder as a Python type, and then
-     * incorporates this type as a Python object into the py_module.
+     * incorporates this type as a Python object into py_module.
      * @param py_module This is the Python module where the initialized
      * PyFourByteEncoder will be incorporated.
      * @return true on success.

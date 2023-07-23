@@ -300,7 +300,7 @@ class TestCaseFourByteEncoder(unittest.TestCase):
     def test_encoding_methods_consistency(self) -> None:
         """
         This test checks if the result of encode_message_and_timestamp_delta is
-        consistent with the combine of encode_message and
+        consistent with the combination of encode_message and
         encode_timestamp_delta.
         """
         timestamp_delta: int = -3190
