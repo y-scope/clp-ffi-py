@@ -3,7 +3,7 @@
 
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
-// Documentation for these methods is found in clp_ffi_py/modules/clp_ir.cpp,
+// Documentation for these methods is in clp_ffi_py/ir/PyFourByteEncoder.cpp,
 // as it also serves as the documentation for python.
 namespace clp_ffi_py::ir {
 auto encode_four_byte_preamble(PyObject* self, PyObject* args) -> PyObject*;

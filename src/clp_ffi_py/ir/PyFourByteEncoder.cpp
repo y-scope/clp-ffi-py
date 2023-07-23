@@ -1,14 +1,14 @@
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
+#include "PyFourByteEncoder.hpp"
+
 #include <clp_ffi_py/ir/encoding_methods.hpp>
-#include <clp_ffi_py/ir/PyLogEvent.hpp>
-#include <clp_ffi_py/ir/PyMetadata.hpp>
-#include <clp_ffi_py/Py_utils.hpp>
+#include <clp_ffi_py/PyObjectCast.hpp>
+#include <clp_ffi_py/utils.hpp>
 
-// CPython macros use C-arrays
-// NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays)
-
+namespace clp_ffi_py::ir {
 namespace {
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cEncodePreambleDoc,
         "encode_preamble(ref_timestamp, timestamp_format, timezone)\n"
@@ -25,6 +25,7 @@ PyDoc_STRVAR(
         ":return: The encoded preamble.\n"
 );
 
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cEncodeMessageAndTimestampDeltaDoc,
         "encode_message_and_timestamp_delta(timestamp_delta, msg)\n"
@@ -38,6 +39,7 @@ PyDoc_STRVAR(
         ":return: The encoded message and timestamp.\n"
 );
 
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cEncodeMessageDoc,
         "encode_message(msg)\n"
@@ -48,6 +50,7 @@ PyDoc_STRVAR(
         ":return: The encoded message.\n"
 );
 
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cEncodeTimestampDeltaDoc,
         "encode_timestamp_delta(timestamp_delta)\n"
@@ -59,60 +62,67 @@ PyDoc_STRVAR(
         ":return: The encoded timestamp.\n"
 );
 
-PyMethodDef PyCLPIR_method_table[]{
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
+PyMethodDef PyFourByteEncoder_method_table[]{
         {"encode_preamble",
          clp_ffi_py::ir::encode_four_byte_preamble,
-         METH_VARARGS,
+         METH_VARARGS | METH_STATIC,
          static_cast<char const*>(cEncodePreambleDoc)},
 
         {"encode_message_and_timestamp_delta",
          clp_ffi_py::ir::encode_four_byte_message_and_timestamp_delta,
-         METH_VARARGS,
+         METH_VARARGS | METH_STATIC,
          static_cast<char const*>(cEncodeMessageAndTimestampDeltaDoc)},
 
         {"encode_message",
          clp_ffi_py::ir::encode_four_byte_message,
-         METH_VARARGS,
+         METH_VARARGS | METH_STATIC,
          static_cast<char const*>(cEncodeMessageDoc)},
 
         {"encode_timestamp_delta",
          clp_ffi_py::ir::encode_four_byte_timestamp_delta,
-         METH_VARARGS,
+         METH_VARARGS | METH_STATIC,
          static_cast<char const*>(cEncodeTimestampDeltaDoc)},
 
         {nullptr, nullptr, 0, nullptr}};
 
-PyDoc_STRVAR(cModuleDoc, "Python interface to the CLP IR encoding and decoding methods.");
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
+PyDoc_STRVAR(
+        cPyFourByteEncoderDoc,
+        "Namespace for all CLP four byte IR encoding methods.\n\n"
+        "Methods encode bytes from the log record to create a CLP log message. This class should "
+        "never be instantiated since it only contains static methods.\n"
+);
 
-struct PyModuleDef PyCLPIR {
-    PyModuleDef_HEAD_INIT, "CLPIR", static_cast<char const*>(cModuleDoc), -1,
-            static_cast<PyMethodDef*>(PyCLPIR_method_table)
-};
+// NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-const-cast)
+PyType_Slot PyFourByteEncoder_slots[]{
+        {Py_tp_methods, static_cast<void*>(PyFourByteEncoder_method_table)},
+        {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyFourByteEncoderDoc))},
+        {0, nullptr}};
+// NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-const-cast)
+
+/**
+ * PyFourByteEncoder Python type specifications.
+ */
+PyType_Spec PyFourByteEncoder_type_spec{
+        "clp_ffi_py.ir.FourByteEncoder",
+        sizeof(PyFourByteEncoder),
+        0,
+        Py_TPFLAGS_DEFAULT,
+        static_cast<PyType_Slot*>(PyFourByteEncoder_slots)};
 }  // namespace
 
-// NOLINTNEXTLINE(modernize-use-trailing-return-type)
-PyMODINIT_FUNC PyInit_CLPIR() {
-    PyObject* new_module{PyModule_Create(&PyCLPIR)};
-    if (nullptr == new_module) {
-        return nullptr;
-    }
+PyObjectPtr<PyTypeObject> PyFourByteEncoder::m_py_type{nullptr};
 
-    if (false == clp_ffi_py::py_utils_init()) {
-        Py_DECREF(new_module);
-        return nullptr;
+auto PyFourByteEncoder::module_level_init(PyObject* py_module) -> bool {
+    static_assert(std::is_trivially_destructible<PyFourByteEncoder>());
+    auto* type{py_reinterpret_cast<PyTypeObject>(PyType_FromSpec(&PyFourByteEncoder_type_spec))};
+    m_py_type.reset(type);
+    if (nullptr == type) {
+        return false;
     }
-
-    if (false == clp_ffi_py::ir::PyMetadata::module_level_init(new_module)) {
-        Py_DECREF(new_module);
-        return nullptr;
-    }
-
-    if (false == clp_ffi_py::ir::PyLogEvent::module_level_init(new_module)) {
-        Py_DECREF(new_module);
-        return nullptr;
-    }
-
-    return new_module;
+    // Explicitly set the tp_new to nullptr to mark this type non-instantiable.
+    type->tp_new = nullptr;
+    return add_python_type(type, "FourByteEncoder", py_module);
 }
-
-// NOLINTEND(cppcoreguidelines-avoid-c-arrays)
+}  // namespace clp_ffi_py::ir
