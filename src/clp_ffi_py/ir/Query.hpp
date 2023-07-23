@@ -25,15 +25,15 @@ public:
      * @param case_sensitive Case sensitive indicator.
      */
     WildcardQuery(std::string wildcard, bool case_sensitive)
-            : m_wildcard(std::move(wildcard)),
+            : m_wildcard_query(std::move(wildcard)),
               m_case_sensitive(case_sensitive){};
 
-    [[nodiscard]] auto get_wildcard() const -> std::string_view { return m_wildcard; }
+    [[nodiscard]] auto get_wildcard_query() const -> std::string_view { return m_wildcard_query; }
 
     [[nodiscard]] auto is_case_sensitive() const -> bool { return m_case_sensitive; }
 
 private:
-    std::string m_wildcard;
+    std::string m_wildcard_query;
     bool m_case_sensitive;
 };
 
@@ -80,19 +80,19 @@ public:
      * empty wildcard list.
      * @param search_time_lower_bound Start of search time range (inclusive).
      * @param search_time_upper_bound End of search time range (inclusive).
-     * @param search_termination_margin The margin used to determine the search
-     * termination timestamp.
+     * @param search_time_termination_margin The margin used to determine the
+     * search termination timestamp.
      */
     explicit Query(
             ffi::epoch_time_ms_t search_time_lower_bound,
             ffi::epoch_time_ms_t search_time_upper_bound,
-            ffi::epoch_time_ms_t search_termination_margin = cDefaultSearchTerminationMargin
+            ffi::epoch_time_ms_t search_time_termination_margin = cDefaultSearchTerminationMargin
     )
             : m_lower_bound_ts{search_time_lower_bound},
               m_upper_bound_ts{search_time_upper_bound},
               m_search_termination_ts{
-                      (cTimestampMax - search_termination_margin > search_time_upper_bound)
-                              ? search_time_upper_bound + search_termination_margin
+                      (cTimestampMax - search_time_termination_margin > search_time_upper_bound)
+                              ? search_time_upper_bound + search_time_termination_margin
                               : cTimestampMax} {
         throw_if_ts_range_invalid();
     }
@@ -103,24 +103,22 @@ public:
      * @param search_time_lower_bound Start of search time range (inclusive).
      * @param search_time_upper_bound End of search time range (inclusive).
      * @param wildcard_list A reference to the wildcard queries vector, whose
-     * data will be transferred using std::move to initialize m_wildcard_list.
-     * @param search_termination_margin The margin used to determine the search
-     * termination timestamp. By default, this value is set to
-     * cDefaultSearchTerminationMargin.
+     * data will be transferred using std::move to initialize
+     * m_wildcard_queries.
+     * @param search_time_termination_margin The margin used to determine the
+     * search termination timestamp.
      */
-    explicit Query(
-            ffi::epoch_time_ms_t search_time_lower_bound,
-            ffi::epoch_time_ms_t search_time_upper_bound,
-            std::vector<WildcardQuery> wildcard_list,
-            ffi::epoch_time_ms_t search_termination_margin = cDefaultSearchTerminationMargin
-    )
+    Query(ffi::epoch_time_ms_t search_time_lower_bound,
+          ffi::epoch_time_ms_t search_time_upper_bound,
+          std::vector<WildcardQuery> wildcard_list,
+          ffi::epoch_time_ms_t search_time_termination_margin = cDefaultSearchTerminationMargin)
             : m_lower_bound_ts{search_time_lower_bound},
               m_upper_bound_ts{search_time_upper_bound},
               m_search_termination_ts{
-                      (cTimestampMax - search_termination_margin > search_time_upper_bound)
-                              ? search_time_upper_bound + search_termination_margin
+                      (cTimestampMax - search_time_termination_margin > search_time_upper_bound)
+                              ? search_time_upper_bound + search_time_termination_margin
                               : cTimestampMax},
-              m_wildcard_list{std::move(wildcard_list)} {
+              m_wildcard_queries{std::move(wildcard_list)} {
         throw_if_ts_range_invalid();
     }
 
@@ -128,7 +126,7 @@ public:
         return m_lower_bound_ts;
     }
 
-    [[nodiscard]] auto get_ts_upper_bound_ts() const -> ffi::epoch_time_ms_t {
+    [[nodiscard]] auto get_upper_bound_ts() const -> ffi::epoch_time_ms_t {
         return m_upper_bound_ts;
     }
 
@@ -137,30 +135,28 @@ public:
      * @return true if the given timestamp is in the search time range bounded
      * by the lower bound and the upper bound timestamp (inclusive).
      */
-    [[nodiscard]] auto ts_in_range(ffi::epoch_time_ms_t ts) const -> bool {
+    [[nodiscard]] auto matches_time_range(ffi::epoch_time_ms_t ts) const -> bool {
         return m_lower_bound_ts <= ts && ts <= m_upper_bound_ts;
     }
 
     /**
-     * Determines whether the search can terminate by evaluating the input
-     * timestamp.
      * @param ts Input timestamp.
-     * @return true if the given timestamp is equal to or greater than the
-     * termination timestamp.
-     * @return false otherwise.
+     * @return Whether the given timestamp is safely outside this query's time
+     * range.
      */
-    [[nodiscard]] auto terminate_search(ffi::epoch_time_ms_t ts) const -> bool {
+    [[nodiscard]] auto ts_safely_outside_time_range(ffi::epoch_time_ms_t ts) const -> bool {
         return m_search_termination_ts <= ts;
     }
 
     /**
      * Validates whether the input log message matches any of the wildcard
-     * conditions for the query.
+     * queries in the query.
      * @param log_message Input log message.
-     * @return true if the wildcard list is empty or has at least one match.
+     * @return true if the wildcard query list is empty or has at least one
+     * wildcard query matches.
      * @return false otherwise.
      */
-    [[nodiscard]] auto wildcard_matches(std::string_view log_message) const -> bool;
+    [[nodiscard]] auto matches_wildcard_queries(std::string_view log_message) const -> bool;
 
     /**
      * Validates whether the input log event matches the query.
@@ -170,10 +166,8 @@ public:
      * @return false otherwise.
      */
     [[nodiscard]] auto matches(LogEvent const& log_event) const -> bool {
-        if (false == ts_in_range(log_event.get_timestamp())) {
-            return false;
-        }
-        return wildcard_matches(log_event.get_log_message_view());
+        return matches_time_range(log_event.get_timestamp())
+               && matches_wildcard_queries(log_event.get_log_message_view());
     }
 
 private:
@@ -194,7 +188,7 @@ private:
     ffi::epoch_time_ms_t m_lower_bound_ts;
     ffi::epoch_time_ms_t m_upper_bound_ts;
     ffi::epoch_time_ms_t m_search_termination_ts;
-    std::vector<WildcardQuery> m_wildcard_list;
+    std::vector<WildcardQuery> m_wildcard_queries;
 };
 }  // namespace clp_ffi_py::ir
 #endif
