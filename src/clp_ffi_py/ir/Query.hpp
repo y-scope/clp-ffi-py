@@ -39,20 +39,20 @@ private:
 
 /**
  * This class represents a search query, utilized for filtering log events in a
- * CLP IR stream. The query could include a list of wildcard searches aimed at
+ * CLP IR stream. The query could include a list of wildcard queries aimed at
  * identifying certain log messages, and a timestamp range with a lower and
  * upper bound. This class provides an interface to set up a search query, as
  * well as methods to validate whether the query can be matched by a log event.
  * Note that an empty wildcard query list will match any log within the range.
- * Ideally, when searching an IR stream with a query, the search terminates
- * once the timestamp exceeds the search upper bound. However, the timestamp
- * might not be monotonically increasing in a CLP IR stream. It can be
- * locally disordered due to thread contention. To safely stop searching, we
- * need to ensure that the current timestamp has exceeded the search's upper
- * bound by a reasonable margin. This margin defaults to the following
- * constant. During the query initialization, it will be applied to the
- * upper bound timestamp to generate a timestamp which indicates it is safe
- * to terminate the search.
+ * <p>
+ * NOTE: When searching an IR stream with a query, ideally, the search
+ * would terminate once the current log event's timestamp exceeds the upper
+ * bound of the query's time range. However, the timestamps in the IR stream
+ * might not be monotonically increasing; they can be locally disordered due to
+ * thread contention. So to safely stop searching, we need to ensure that the
+ * current timestamp in the IR stream exceeds the query's upper bound timestamp
+ * by a reasonable margin. This margin can be specified by the user or it
+ * will default to `cDefaultSearchTerminationMargin`.
  */
 class Query {
 public:
@@ -64,8 +64,8 @@ public:
 
     /**
      * Constructs an empty query object that will match all logs. The wildcard
-     * list is empty and the timestamp range is set to include all the valid
-     * Unix epoch timestamps.
+     * query list is empty and the timestamp range is set to include all the
+     * valid Unix epoch timestamps.
      */
     explicit Query()
             : m_lower_bound_ts{cTimestampMin},
@@ -78,7 +78,7 @@ public:
      * @param search_time_lower_bound Start of search time range (inclusive).
      * @param search_time_upper_bound End of search time range (inclusive).
      * @param search_time_termination_margin The margin used to determine the
-     * search termination timestamp.
+     * search termination timestamp (see note in the class' docstring).
      */
     explicit Query(
             ffi::epoch_time_ms_t search_time_lower_bound,
@@ -96,19 +96,19 @@ public:
 
     /**
      * Constructs a new query object with the given timestamp range and a
-     * wildcard list.
+     * wildcard query list.
      * @param search_time_lower_bound Start of search time range (inclusive).
      * @param search_time_upper_bound End of search time range (inclusive).
-     * @param wildcard_list A reference to the wildcard queries vector, whose
-     * data will be transferred using std::move to initialize
+     * @param wildcard_queries A list of wildcard queries. Each wildcard query must
+     * be valid (see `wildcard_match_unsafe`).
      * m_wildcard_queries. The given wildcard query must be valid (see
      * wildcard_match_unsafe).
      * @param search_time_termination_margin The margin used to determine the
-     * search termination timestamp.
+     * search termination timestamp (see note in the class' docstring).
      */
     Query(ffi::epoch_time_ms_t search_time_lower_bound,
           ffi::epoch_time_ms_t search_time_upper_bound,
-          std::vector<WildcardQuery> wildcard_list,
+          std::vector<WildcardQuery> wildcard_queries,
           ffi::epoch_time_ms_t search_time_termination_margin = cDefaultSearchTerminationMargin)
             : m_lower_bound_ts{search_time_lower_bound},
               m_upper_bound_ts{search_time_upper_bound},
@@ -116,7 +116,7 @@ public:
                       (cTimestampMax - search_time_termination_margin > search_time_upper_bound)
                               ? search_time_upper_bound + search_time_termination_margin
                               : cTimestampMax},
-              m_wildcard_queries{std::move(wildcard_list)} {
+              m_wildcard_queries{std::move(wildcard_queries)} {
         throw_if_ts_range_invalid();
     }
 
@@ -140,7 +140,7 @@ public:
     /**
      * @param ts Input timestamp.
      * @return Whether the given timestamp is safely outside this query's time
-     * range.
+     * range (see note in the class' docstring).
      */
     [[nodiscard]] auto ts_safely_outside_time_range(ffi::epoch_time_ms_t ts) const -> bool {
         return m_search_termination_ts <= ts;
@@ -150,8 +150,8 @@ public:
      * Validates whether the input log message matches any of the wildcard
      * queries in the query.
      * @param log_message Input log message.
-     * @return true if the wildcard query list is empty or has at least one
-     * wildcard query matches.
+     * @return true if the wildcard query list is empty or at least one wildcard
+     * query matches.
      * @return false otherwise.
      */
     [[nodiscard]] auto matches_wildcard_queries(std::string_view log_message) const -> bool;
