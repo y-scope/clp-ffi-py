@@ -19,6 +19,7 @@ ir: Extension = Extension(
         "src/clp_ffi_py/ir/PyFourByteEncoder.cpp",
         "src/clp_ffi_py/ir/PyLogEvent.cpp",
         "src/clp_ffi_py/ir/PyMetadata.cpp",
+        "src/clp_ffi_py/ir/Query.cpp",
         "src/clp_ffi_py/modules/ir.cpp",
         "src/clp_ffi_py/Py_utils.cpp",
         "src/clp_ffi_py/utils.cpp",
