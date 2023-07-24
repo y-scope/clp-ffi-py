@@ -37,4 +37,5 @@ setup(
     description="CLP FFI Python Interface",
     ext_modules=[ir],
     packages=["clp_ffi_py"],
+    version="0.0.1"
 )
