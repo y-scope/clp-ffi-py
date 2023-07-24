@@ -214,7 +214,7 @@ PyType_Slot PyMetadata_slots[]{
 // NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
 
 PyType_Spec PyMetadata_type_spec{
-        "clp_ffi_py.CLPIR.Metadata",
+        "clp_ffi_py.ir.Metadata",
         sizeof(PyMetadata),
         0,
         Py_TPFLAGS_DEFAULT,

@@ -1,8 +1,8 @@
 import os
 from setuptools import setup, Extension
 
-clp_ir: Extension = Extension(
-    name="clp_ffi_py.CLPIR",
+ir: Extension = Extension(
+    name="clp_ffi_py.ir",
     language="c++",
     include_dirs=[
         "src"
@@ -16,10 +16,11 @@ clp_ir: Extension = Extension(
 
         "src/clp_ffi_py/ir/encoding_methods.cpp",
         "src/clp_ffi_py/ir/Metadata.cpp",
+        "src/clp_ffi_py/ir/PyFourByteEncoder.cpp",
         "src/clp_ffi_py/ir/PyLogEvent.cpp",
         "src/clp_ffi_py/ir/PyMetadata.cpp",
         "src/clp_ffi_py/ir/Query.cpp",
-        "src/clp_ffi_py/modules/clp_ir.cpp",
+        "src/clp_ffi_py/modules/ir.cpp",
         "src/clp_ffi_py/Py_utils.cpp",
         "src/clp_ffi_py/utils.cpp",
     ],
@@ -35,6 +36,6 @@ clp_ir: Extension = Extension(
 setup(
     name="clp_ffi_py",
     description="CLP FFI Python Interface",
-    ext_modules=[clp_ir],
+    ext_modules=[ir],
     packages=["clp_ffi_py"],
 )
