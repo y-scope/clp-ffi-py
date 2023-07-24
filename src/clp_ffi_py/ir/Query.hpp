@@ -21,11 +21,11 @@ class WildcardQuery {
 public:
     /**
      * Initializes the wildcard query.
-     * @param wildcard Wildcard string.
+     * @param wildcard_query Wildcard query.
      * @param case_sensitive Case sensitive indicator.
      */
-    WildcardQuery(std::string wildcard, bool case_sensitive)
-            : m_wildcard_query(std::move(wildcard)),
+    WildcardQuery(std::string wildcard_query, bool case_sensitive)
+            : m_wildcard_query(std::move(wildcard_query)),
               m_case_sensitive(case_sensitive){};
 
     [[nodiscard]] auto get_wildcard_query() const -> std::string_view { return m_wildcard_query; }
