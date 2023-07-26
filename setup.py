@@ -41,7 +41,7 @@ if "__main__" == __name__:
         config: Dict[str, Any] = toml.load("pyproject.toml")
         version: Optional[str] = config.get("project", {}).get("version", None)
         if None is version:
-            sys.exit("Error: The version number is not found in pyproject.toml")
+            sys.exit("Error: The version number was not found in pyproject.toml")
 
         setup(
             name="clp_ffi_py",
