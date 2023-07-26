@@ -1,4 +1,5 @@
 import os
+import platform
 import sys
 import toml
 from setuptools import setup, Extension
@@ -32,7 +33,7 @@ ir: Extension = Extension(
 
 if "__main__" == __name__:
     try:
-        if hasattr(os, "sys") and "darwin" == os.sys.platform:
+        if "Darwin" == platform.system():
             target: Optional[str] = os.environ.get("MACOSX_DEPLOYMENT_TARGET")
             if None is target or float(target) < 10.15:
                 os.environ["MACOSX_DEPLOYMENT_TARGET"] = "10.15"
