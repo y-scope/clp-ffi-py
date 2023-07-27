@@ -20,6 +20,21 @@ class WildcardQuery:
         self._wildcard_query: str = wildcard_query
         self._case_sensitive: bool = case_sensitive
 
+    def __str__(self) -> str:
+        """
+        :return: The string representation of the WildcardQuery object.
+        """
+        return (
+            f'WildcardQuery(wildcard_query="{self._wildcard_query}",'
+            f" case_sensitive={self._case_sensitive})"
+        )
+
+    def __repr__(self) -> str:
+        """
+        :return: Same as `__str__` method.
+        """
+        return self.__str__()
+
     @property
     def wildcard_query(self) -> str:
         return self._wildcard_query

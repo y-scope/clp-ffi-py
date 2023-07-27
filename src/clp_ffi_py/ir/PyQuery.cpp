@@ -50,11 +50,11 @@ auto deserialize_wildcard_queries(
             PyErr_SetString(PyExc_TypeError, clp_ffi_py::cPyTypeError);
             return false;
         }
-        auto* wildcard_query_py_str{PyObject_GetAttrString(py_wildcard_queries, "wildcard_query")};
+        auto* wildcard_query_py_str{PyObject_GetAttrString(wildcard_query, "wildcard_query")};
         if (nullptr == wildcard_query_py_str) {
             return false;
         }
-        auto* case_sensitive_py_bool{PyObject_GetAttrString(py_wildcard_queries, "case_sensitive")};
+        auto* case_sensitive_py_bool{PyObject_GetAttrString(wildcard_query, "case_sensitive")};
         if (nullptr == case_sensitive_py_bool) {
             return false;
         }
@@ -62,8 +62,8 @@ auto deserialize_wildcard_queries(
         if (false == parse_py_string_as_string_view(wildcard_query_py_str, wildcard_query_view)) {
             return false;
         }
-        int is_case_sensitive{PyObject_IsTrue(case_sensitive_py_bool)};
-        if (-1 == is_case_sensitive && PyErr_Occurred()) {
+        int const is_case_sensitive{PyObject_IsTrue(case_sensitive_py_bool)};
+        if (-1 == is_case_sensitive && nullptr != PyErr_Occurred()) {
             return false;
         }
         wildcard_queries.emplace_back(
@@ -82,7 +82,7 @@ auto deserialize_wildcard_queries(
  * @return Py_None if the wildcard_queries are empty.
  */
 auto serialize_wildcard_queries(std::vector<WildcardQuery> const& wildcard_queries) -> PyObject* {
-    auto const wildcard_queries_size{wildcard_queries.size()};
+    Py_ssize_t const wildcard_queries_size{static_cast<Py_ssize_t>(wildcard_queries.size())};
     if (0 == wildcard_queries_size) {
         Py_RETURN_NONE;
     }
@@ -97,14 +97,15 @@ auto serialize_wildcard_queries(std::vector<WildcardQuery> const& wildcard_queri
     // objects it contains.
     Py_ssize_t idx{0};
     for (auto const& wildcard_query : wildcard_queries) {
-        PyObjectPtr<PyObject> wildcard_py_str_ptr{
+        PyObjectPtr<PyObject> const wildcard_py_str_ptr{
                 PyUnicode_FromString(wildcard_query.get_wildcard_query().c_str())};
         auto* wildcard_py_str{wildcard_py_str_ptr.get()};
         if (nullptr == wildcard_py_str) {
             Py_DECREF(py_wildcard_queries);
             return nullptr;
         }
-        PyObjectPtr<PyObject> is_case_sensitive{get_py_bool(wildcard_query.is_case_sensitive())};
+        PyObjectPtr<PyObject> const is_case_sensitive{
+                get_py_bool(wildcard_query.is_case_sensitive())};
         PyObject* py_wildcard_query{PyObject_CallFunction(
                 PyQuery::get_py_wildcard_query_type(),
                 "OO",
@@ -115,6 +116,7 @@ auto serialize_wildcard_queries(std::vector<WildcardQuery> const& wildcard_queri
             Py_DECREF(py_wildcard_queries);
             return nullptr;
         }
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         PyList_SET_ITEM(py_wildcard_queries, idx, py_wildcard_query);
         ++idx;
     }
@@ -164,16 +166,16 @@ auto PyQuery_init(PyQuery* self, PyObject* args, PyObject* keywords) -> int {
     auto search_time_termination_margin{Query::cDefaultSearchTimeTerminationMargin};
 
     if (false
-        == PyArg_ParseTupleAndKeywords(
+        == static_cast<bool>(PyArg_ParseTupleAndKeywords(
                 args,
                 keywords,
                 "|LLOL",
-                keyword_table,
+                static_cast<char**>(keyword_table),
                 &search_time_lower_bound,
                 &search_time_upper_bound,
                 &py_wildcard_queries,
                 &search_time_termination_margin
-        ))
+        )))
     {
         return -1;
     }
@@ -277,7 +279,7 @@ PyDoc_STRVAR(
 auto PyQuery_setstate(PyQuery* self, PyObject* state) -> PyObject* {
     self->default_init();
 
-    if (false == PyDict_CheckExact(state)) {
+    if (false == static_cast<bool>(PyDict_CheckExact(state))) {
         PyErr_SetString(PyExc_ValueError, clp_ffi_py::cSetstateInputError);
         return nullptr;
     }
@@ -380,8 +382,59 @@ auto PyQuery_match_log_event(PyQuery* self, PyObject* log_event) -> PyObject* {
     return get_py_bool(self->get_query()->matches(*py_log_event->get_log_event()));
 }
 
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
-        cDefaultSearchTimeLowerBoundDoc,
+        cPyQueryGetSearchTimeLowerBoundDoc,
+        "get_search_time_lower_bound(self)\n"
+        "--\n\n"
+        ":return: The search time lower bound.\n"
+);
+
+auto PyQuery_get_search_time_lower_bound(PyQuery* self) -> PyObject* {
+    return PyLong_FromLongLong(self->get_query()->get_lower_bound_ts());
+}
+
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
+PyDoc_STRVAR(
+        cPyQueryGetSearchTimeUpperBoundDoc,
+        "get_search_time_upper_bound(self)\n"
+        "--\n\n"
+        ":return: The search time upper bound.\n"
+);
+
+auto PyQuery_get_search_time_upper_bound(PyQuery* self) -> PyObject* {
+    return PyLong_FromLongLong(self->get_query()->get_upper_bound_ts());
+}
+
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
+PyDoc_STRVAR(
+        cPyQueryGetWildcardQueriesDoc,
+        "get_wildcard_queries(self)\n"
+        "--\n\n"
+        ":return: A new Python list of stored wildcard queries, presented as Wildcard Query "
+        "objects.\n"
+        ":return: None if the wildcard queries are empty.\n"
+);
+
+auto PyQuery_get_wildcard_queries(PyQuery* self) -> PyObject* {
+    return serialize_wildcard_queries(self->get_query()->get_wildcard_queries());
+}
+
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
+PyDoc_STRVAR(
+        cPyQueryGetSearchTimeTerminationMarginDoc,
+        "get_search_time_termination_margin(self)\n"
+        "--\n\n"
+        ":return: The search time termination margin.\n"
+);
+
+auto PyQuery_get_search_time_termination_margin(PyQuery* self) -> PyObject* {
+    return PyLong_FromLongLong(self->get_query()->get_search_time_termination_margin());
+}
+
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
+PyDoc_STRVAR(
+        cPyQueryDefaultSearchTimeLowerBoundDoc,
         "default_search_time_lower_bound()\n"
         "--\n\n"
         ":return: The minimum valid timestamp from Unix epoch time.\n"
@@ -391,8 +444,9 @@ auto PyQuery_default_search_time_lower_bound(PyObject* Py_UNUSED(self)) -> PyObj
     return PyLong_FromLongLong(Query::cTimestampMin);
 }
 
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
-        cDefaultSearchTimeUpperBoundDoc,
+        cPyQueryDefaultSearchTimeUpperBoundDoc,
         "default_search_time_upper_bound()\n"
         "--\n\n"
         ":return: The maximum valid timestamp from Unix epoch time.\n"
@@ -402,8 +456,9 @@ auto PyQuery_default_search_time_upper_bound(PyObject* Py_UNUSED(self)) -> PyObj
     return PyLong_FromLongLong(Query::cTimestampMax);
 }
 
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
-        cDefaultSearchTimeTerminationMargin,
+        cPyQueryDefaultSearchTimeTerminationMargin,
         "default_search_time_termination_margin()\n"
         "--\n\n"
         ":return: The default search termination margin as Unix epoch time.\n"
@@ -431,20 +486,40 @@ PyMethodDef PyQuery_method_table[]{
          METH_O,
          static_cast<char const*>(cPyQuerySetStateDoc)},
 
+        {"get_search_time_lower_bound",
+         py_c_function_cast(PyQuery_get_search_time_lower_bound),
+         METH_NOARGS,
+         static_cast<char const*>(cPyQueryGetSearchTimeLowerBoundDoc)},
+
+        {"get_search_time_upper_bound",
+         py_c_function_cast(PyQuery_get_search_time_upper_bound),
+         METH_NOARGS,
+         static_cast<char const*>(cPyQueryGetSearchTimeUpperBoundDoc)},
+
+        {"get_wildcard_queries",
+         py_c_function_cast(PyQuery_get_wildcard_queries),
+         METH_NOARGS,
+         static_cast<char const*>(cPyQueryGetWildcardQueriesDoc)},
+
+        {"get_search_time_termination_margin",
+         py_c_function_cast(PyQuery_get_search_time_termination_margin),
+         METH_NOARGS,
+         static_cast<char const*>(cPyQueryGetSearchTimeTerminationMarginDoc)},
+
         {"default_search_time_lower_bound",
          py_c_function_cast(PyQuery_default_search_time_lower_bound),
          METH_NOARGS | METH_STATIC,
-         static_cast<char const*>(cDefaultSearchTimeLowerBoundDoc)},
+         static_cast<char const*>(cPyQueryDefaultSearchTimeLowerBoundDoc)},
 
         {"default_search_time_upper_bound",
          py_c_function_cast(PyQuery_default_search_time_upper_bound),
          METH_NOARGS | METH_STATIC,
-         static_cast<char const*>(cDefaultSearchTimeUpperBoundDoc)},
+         static_cast<char const*>(cPyQueryDefaultSearchTimeUpperBoundDoc)},
 
         {"default_search_time_termination_margin",
          py_c_function_cast(PyQuery_default_search_time_termination_margin),
          METH_NOARGS | METH_STATIC,
-         static_cast<char const*>(cDefaultSearchTimeTerminationMargin)},
+         static_cast<char const*>(cPyQueryDefaultSearchTimeTerminationMargin)},
 
         {nullptr}};
 
