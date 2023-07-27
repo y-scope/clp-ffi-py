@@ -54,4 +54,11 @@ auto parse_py_string_as_string_view(PyObject* py_string, std::string_view& view)
     view = std::string_view(str);
     return true;
 }
+
+auto get_py_bool(bool boolean) -> PyObject* {
+    if (boolean) {
+        Py_RETURN_TRUE;
+    }
+    Py_RETURN_FALSE;
+}
 }  // namespace clp_ffi_py

@@ -28,7 +28,7 @@ public:
             : m_wildcard_query(std::move(wildcard_query)),
               m_case_sensitive(case_sensitive){};
 
-    [[nodiscard]] auto get_wildcard_query() const -> std::string_view { return m_wildcard_query; }
+    [[nodiscard]] auto get_wildcard_query() const -> std::string const& { return m_wildcard_query; }
 
     [[nodiscard]] auto is_case_sensitive() const -> bool { return m_case_sensitive; }
 
@@ -52,14 +52,14 @@ private:
  * thread contention. So to safely stop searching, we need to ensure that the
  * current timestamp in the IR stream exceeds the query's upper bound timestamp
  * by a reasonable margin. This margin can be specified by the user or it
- * will default to `cDefaultSearchTerminationMargin`.
+ * will default to `cDefaultSearchTimeTerminationMargin`.
  */
 class Query {
 public:
     static constexpr ffi::epoch_time_ms_t const cTimestampMin{0};
     static constexpr ffi::epoch_time_ms_t const cTimestampMax{
             std::numeric_limits<ffi::epoch_time_ms_t>::max()};
-    static constexpr ffi::epoch_time_ms_t const cDefaultSearchTerminationMargin{
+    static constexpr ffi::epoch_time_ms_t const cDefaultSearchTimeTerminationMargin{
             static_cast<ffi::epoch_time_ms_t>(60 * 1000)};
 
     /**
@@ -83,7 +83,8 @@ public:
     explicit Query(
             ffi::epoch_time_ms_t search_time_lower_bound,
             ffi::epoch_time_ms_t search_time_upper_bound,
-            ffi::epoch_time_ms_t search_time_termination_margin = cDefaultSearchTerminationMargin
+            ffi::epoch_time_ms_t search_time_termination_margin
+            = cDefaultSearchTimeTerminationMargin
     )
             : m_lower_bound_ts{search_time_lower_bound},
               m_upper_bound_ts{search_time_upper_bound},
@@ -99,17 +100,15 @@ public:
      * wildcard query list.
      * @param search_time_lower_bound Start of search time range (inclusive).
      * @param search_time_upper_bound End of search time range (inclusive).
-     * @param wildcard_queries A list of wildcard queries. Each wildcard query must
-     * be valid (see `wildcard_match_unsafe`).
-     * m_wildcard_queries. The given wildcard query must be valid (see
-     * wildcard_match_unsafe).
+     * @param wildcard_queries A list of wildcard queries. Each wildcard query
+     * must be valid (see `wildcard_match_unsafe`).
      * @param search_time_termination_margin The margin used to determine the
      * search termination timestamp (see note in the class' docstring).
      */
     Query(ffi::epoch_time_ms_t search_time_lower_bound,
           ffi::epoch_time_ms_t search_time_upper_bound,
           std::vector<WildcardQuery> wildcard_queries,
-          ffi::epoch_time_ms_t search_time_termination_margin = cDefaultSearchTerminationMargin)
+          ffi::epoch_time_ms_t search_time_termination_margin = cDefaultSearchTimeTerminationMargin)
             : m_lower_bound_ts{search_time_lower_bound},
               m_upper_bound_ts{search_time_upper_bound},
               m_search_termination_ts{
@@ -126,6 +125,18 @@ public:
 
     [[nodiscard]] auto get_upper_bound_ts() const -> ffi::epoch_time_ms_t {
         return m_upper_bound_ts;
+    }
+
+    [[nodiscard]] auto get_wildcard_queries() const -> std::vector<WildcardQuery> const& {
+        return m_wildcard_queries;
+    }
+
+    /**
+     * @return The search time termination margin by calculating the difference
+     * between m_search_termination_ts and m_upper_bound_ts.
+     */
+    [[nodiscard]] auto get_search_time_termination_margin() const -> ffi::epoch_time_ms_t {
+        return m_search_termination_ts - m_upper_bound_ts;
     }
 
     /**

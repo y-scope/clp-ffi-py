@@ -87,10 +87,12 @@ auto py_reinterpret_cast(Src* src) noexcept -> Dst* {
 namespace ir {
 class PyMetadata;
 class PyLogEvent;
+class PyQuery;
 }  // namespace ir
 
 CLP_FFI_PY_MARK_AS_PYOBJECT(ir::PyLogEvent);
 CLP_FFI_PY_MARK_AS_PYOBJECT(ir::PyMetadata);
+CLP_FFI_PY_MARK_AS_PYOBJECT(ir::PyQuery);
 CLP_FFI_PY_MARK_AS_PYOBJECT(PyTypeObject);
 }  // namespace clp_ffi_py
 #endif

@@ -41,6 +41,13 @@ auto parse_py_string(PyObject* py_string, std::string& out) -> bool;
 auto parse_py_string_as_string_view(PyObject* py_string, std::string_view& view) -> bool;
 
 /**
+ * Gets the Python True/False from a given `bool` value.
+ * @param boolean A C/C++ `bool` value.
+ * @return PyObject that is either Python True or Python False.
+ */
+auto get_py_bool(bool boolean) -> PyObject*;
+
+/**
  * Parses a Python integer into an int_type variable.
  * @tparam int_type Output integer type (size and signed/unsigned).
  * @param py_int PyObject that represents a Python level integer. Only
