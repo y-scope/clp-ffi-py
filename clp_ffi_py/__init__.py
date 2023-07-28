@@ -1,2 +1,2 @@
-from clp_ffi_py.ir import *
-from clp_ffi_py.query import *
+from clp_ffi_py.ir import *  # noqa
+from clp_ffi_py.query import *  # noqa
