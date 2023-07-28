@@ -12,9 +12,9 @@
 namespace clp_ffi_py::ir {
 /**
  * A PyObject structure functioning as a Python-compatible interface to retrieve
- * a log event. The underlying data is pointed by `m_log_event`. The object may
- * reference a PyMetadata object pointed to by `m_py_metadata` that specifies
- * the event's metadata, such as timestamp format, from the preamble.
+ * a log event. The underlying data is pointed to by `m_log_event`. The object
+ * may reference a PyMetadata object pointed to by `m_py_metadata` that
+ * specifies the event's metadata, such as timestamp format, from the preamble.
  */
 class PyLogEvent {
 public:

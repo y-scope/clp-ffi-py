@@ -297,8 +297,8 @@ PyDoc_STRVAR(
         cPyLogEventMatchQueryDoc,
         "match_query(self, query)\n"
         "--\n\n"
-        "Matches the underlying log event against the given query. Check the document of the Query "
-        "object for more details.\n"
+        "Matches the underlying log event against the given query. Refer to the documentation of "
+        "clp_ffi_py.Query for more details.\n"
         ":param self\n"
         ":param query: Input Query object.\n"
         ":return: True if the log event matches the query, False otherwise.\n"

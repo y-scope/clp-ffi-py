@@ -158,7 +158,7 @@ auto PyQuery_init(PyQuery* self, PyObject* args, PyObject* keywords) -> int {
 
     // If the argument parsing fails, `self` will be deallocated. We must reset
     // all pointers to nullptr in advance, otherwise the deallocator might
-    // trigger segmentation fault
+    // trigger a segmentation fault.
     self->default_init();
 
     auto search_time_lower_bound{Query::cTimestampMin};
@@ -534,7 +534,7 @@ PyDoc_STRVAR(
         "be matched by a log event. Note that an empty wildcard query list will match any log "
         "within the range.\n"
         "By default, the wildcard query list is empty and the timestamp range is set to include "
-        "all the valid Unix epoch timestamps. To filtering certain log messages, use customized "
+        "all the valid Unix epoch timestamps. To filter certain log messages, use customized "
         "wildcard queries to initialize the wildcard query list. For more details, check the "
         "documentation of the class `WildcardQuery`.\n"
         "NOTE: When searching an IR stream with a query, ideally, the search would terminate once "

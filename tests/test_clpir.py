@@ -315,12 +315,12 @@ class TestCaseFourByteEncoder(unittest.TestCase):
         self.assertEqual(encoded_message_and_ts_delta, encoded_message + encoded_ts_delta)
 
 
+@unittest.skip("Base class should not be used during testing.")
 class TestCaseQueryBase(unittest.TestCase):
     """
     Base class for Query related testing.
 
-    Helper functions should be defined in this class. This base class shouldn't
-    be launched during the testing.
+    Helper functions should be defined in this class. 
     """
 
     def _check_wildcard_query(
@@ -454,7 +454,7 @@ class TestCaseQuery(TestCaseQueryBase):
         exception_captured: bool
 
         # Note: for the default initialization, the actual search time
-        # termination margin should be set to 0, otherwise it will overflow
+        # termination margin should have be set to 0, otherwise it will overflow
         # the underlying integer that stores the search termination timestamp.
         query = Query()
         self._check_query(

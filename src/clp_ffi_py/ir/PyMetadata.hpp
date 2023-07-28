@@ -11,7 +11,7 @@
 namespace clp_ffi_py::ir {
 /**
  * A PyObject structure functioning as a Python-compatible interface to retrieve
- * CLP IR metadata. The underlying data is pointed by `m_metadata`.
+ * CLP IR metadata. The underlying data is pointed to by `m_metadata`.
  * Additionally, it retains a tzinfo object at the Python level that signifies
  * the corresponding timezone.
  */

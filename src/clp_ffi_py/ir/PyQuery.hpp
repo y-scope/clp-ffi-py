@@ -7,21 +7,21 @@
 #include <clp_ffi_py/PyObjectUtils.hpp>
 
 namespace clp_ffi_py::ir {
+/**
+ * A PyObject structure functioning as a Python-compatible interface to retrieve
+ * a search query that is used to filter log events in a CLP IR stream. The
+ * underlying data is pointed to by `m_query`. A detailed description can be
+ * found in the PyQuery Python doc strings.
+ */
 class PyQuery {
-    /**
-     * A PyObject structure functioning as a Python-compatible interface to retrieve
-     * a search query that is used to filtering log events in a CLP IR stream. The
-     * underlying data is pointed by `m_query`. The detailed description can be
-     * found in the PyQuery Python doc string.
-     */
 public:
     /**
      * Initializes the underlying data with the given input.
      * Since the memory allocation of PyQuery is handled by CPython's
-     * allocator, cpp constructor will ot be explicitly called. This function
-     * serves as the default constructor to initialize the underlying query.
-     * It has to be manually called whenever creating a new PyQuery object
-     * through CPython AIPs.
+     * allocator, any cpp constructor will not be explicitly called. This
+     * function serves as the default constructor to initialize the underlying
+     * query. It has to be manually called whenever creating a new PyQuery
+     * object through CPython AIPs.
      * @param search_time_lower_bound Start of search time range (inclusive).
      * @param search_time_upper_bound End of search time range (inclusive).
      * @param wildcard_queries A list of wildcard queries. Each wildcard query

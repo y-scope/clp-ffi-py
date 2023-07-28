@@ -41,7 +41,7 @@ auto parse_py_string(PyObject* py_string, std::string& out) -> bool;
 auto parse_py_string_as_string_view(PyObject* py_string, std::string_view& view) -> bool;
 
 /**
- * Gets the Python True/False from a given `bool` value/expression.
+ * Gets the Python True/False object from a given `bool` value/expression.
  * @param is_true A boolean value/expression.
  * @return PyObject that is either Python True or Python False.
  */
