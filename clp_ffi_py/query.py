@@ -10,7 +10,7 @@ class WildcardQuery:
     are escaped are treated as normal characters.
     """
 
-    def __init__(self, wildcard_query: str, case_sensitive: bool = True):
+    def __init__(self, wildcard_query: str, case_sensitive: bool = False):
         """
         Initializes a wildcard query using the given parameters.
 
