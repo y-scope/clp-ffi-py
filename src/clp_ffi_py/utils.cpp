@@ -55,8 +55,8 @@ auto parse_py_string_as_string_view(PyObject* py_string, std::string_view& view)
     return true;
 }
 
-auto get_py_bool(bool boolean) -> PyObject* {
-    if (boolean) {
+auto get_py_bool(bool is_true) -> PyObject* {
+    if (is_true) {
         Py_RETURN_TRUE;
     }
     Py_RETURN_FALSE;
