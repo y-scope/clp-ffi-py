@@ -635,7 +635,7 @@ auto PyQuery::module_level_init(PyObject* py_module) -> bool {
         return false;
     }
 
-    PyObjectPtr<PyObject> const query_module(PyImport_ImportModule("clp_ffi_py.query"));
+    PyObjectPtr<PyObject> const query_module(PyImport_ImportModule("clp_ffi_py.wildcard_query"));
     auto* py_query{query_module.get()};
     if (nullptr == py_query) {
         return false;
