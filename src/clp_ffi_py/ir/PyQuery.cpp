@@ -76,7 +76,8 @@ auto deserialize_wildcard_queries(
 
 /**
  * Serializes the std::vector of WildcardQuery into a Python list. Serves as a
- * helper function to serialize PyQuery object.
+ * helper function to serialize the underlying wildcard queries of the PyQuery
+ * object.
  * @param wildcard_queries A std::vector of WildcardQuery.
  * @return The Python list that consists of Python wildcard query objects.
  * @return Py_None if the wildcard_queries are empty.
@@ -524,7 +525,41 @@ PyMethodDef PyQuery_method_table[]{
         {nullptr}};
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
-PyDoc_STRVAR(cPyQueryDoc, "\n");
+PyDoc_STRVAR(
+        cPyQueryDoc,
+        "This class represents a search query, utilized for filtering log events in a CLP IR "
+        "stream. The query could include a list of wildcard queries aimed at identifying certain "
+        "log messages, and a timestamp range with a lower and upper bound. This class provides an "
+        "interface to set up a search query, as well as methods to validate whether the query can "
+        "be matched by a log event. Note that an empty wildcard query list will match any log "
+        "within the range.\n"
+        "By default, the wildcard query list is empty and the timestamp range is set to include "
+        "all the valid Unix epoch timestamps. To filtering certain log messages, use customized "
+        "wildcard queries to initialize the wildcard query list. For more details, check the "
+        "documentation of the class `WildcardQuery`.\n"
+        "NOTE: When searching an IR stream with a query, ideally, the search would terminate once "
+        "the current log event's timestamp exceeds the upper bound of the query's time range. "
+        "However, the timestamps in the IR stream might not be monotonically increasing; they can "
+        "be locally disordered due to thread contention. To safely stop searching, the decoder "
+        "needs to ensure that the current timestamp in the IR stream exceeds the query's upper "
+        "bound timestamp by a reasonable margin. This margin can be specified during the "
+        "initialization. This margin is set to a default value specified by the static method "
+        "`default_search_time_termination_margin()`. Users can customized this margin accordingly, "
+        "for example, the margin can be set to 0 if the CLP IR stream is generated from a "
+        "single-threaded program execution.\n"
+        "The signature of `__init__` method is shown as following:\n\n"
+        "__init__(self, search_time_lower_bound=Query.default_search_time_lower_bound(), "
+        "search_time_upper_bound=Query.default_search_time_upper_bound(), "
+        "wildcard_queries=None,search_time_termination_margin=Query.default_search_time_"
+        "termination_margin()):\n"
+        "Initializes a Query object using the given inputs.\n"
+        ":param self\n"
+        ":param search_time_lower_bound: Start of search time range (inclusive).\n"
+        ":param search_time_upper_bound: End of search time range (inclusive).\n"
+        ":param wildcard_queries: A list of wildcard queries.\n"
+        ":param search_time_termination_margin: The margin used to determine the search "
+        "termination timestamp.\n"
+);
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
 PyType_Slot PyQuery_slots[]{
@@ -585,6 +620,10 @@ auto PyQuery::get_py_type() -> PyTypeObject* {
     return m_py_type.get();
 }
 
+auto PyQuery::get_py_wildcard_query_type() -> PyObject* {
+    return m_py_wildcard_query_type.get();
+}
+
 auto PyQuery::module_level_init(PyObject* py_module) -> bool {
     static_assert(std::is_trivially_destructible<PyQuery>());
     auto* type{py_reinterpret_cast<PyTypeObject>(PyType_FromSpec(&PyQuery_type_spec))};
@@ -607,9 +646,5 @@ auto PyQuery::module_level_init(PyObject* py_module) -> bool {
     }
     m_py_wildcard_query_type.reset(py_wildcard_query_type);
     return true;
-}
-
-auto PyQuery::get_py_wildcard_query_type() -> PyObject* {
-    return m_py_wildcard_query_type.get();
 }
 }  // namespace clp_ffi_py::ir
