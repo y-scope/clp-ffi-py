@@ -47,10 +47,11 @@ pip install -e .
 python -m unittest -bv
 ```
 
-Note: the testing procedure showing above only works when installing the package using
-`pip install -e .`. If the package is installed from a whl file into the site package, the tester cannot be launched from
-the project's root directory because the `clp_ffi_py` module import conflicts with the directory
-`clp_ffi_py`.
+Note: If the package is installed from a `whl` file into the site packages,
+rather than installed locally (`pip install -e .`),
+the tester cannot be launched from the project's root directory.
+If `unittest` is ran from the root directory,
+the local `clp_ffi_py` directory will shadow the `clp_ffi_py` module installed.
 
 ## Build and Test with cibuildwheel
 
