@@ -4,6 +4,7 @@
 
 #include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ir/LogEvent.hpp>
+#include <clp_ffi_py/ir/PyQuery.hpp>
 #include <clp_ffi_py/Py_utils.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
 #include <clp_ffi_py/utils.hpp>
@@ -293,6 +294,27 @@ auto PyLogEvent_get_index(PyLogEvent* self) -> PyObject* {
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
+        cPyLogEventMatchQueryDoc,
+        "match_query(self, query)\n"
+        "--\n\n"
+        "Matches the underlying log event against the given query. Refer to the documentation of "
+        "clp_ffi_py.Query for more details.\n"
+        ":param self\n"
+        ":param query: Input Query object.\n"
+        ":return: True if the log event matches the query, False otherwise.\n"
+);
+
+auto PyLogEvent_match_query(PyLogEvent* self, PyObject* query) -> PyObject* {
+    if (false == static_cast<bool>(PyObject_TypeCheck(query, PyQuery::get_py_type()))) {
+        PyErr_SetString(PyExc_TypeError, cPyTypeError);
+        return nullptr;
+    }
+    auto* py_query{py_reinterpret_cast<PyQuery>(query)};
+    return get_py_bool(py_query->get_query()->matches(*self->get_log_event()));
+}
+
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
+PyDoc_STRVAR(
         cPyLogEventGetFormattedMessageDoc,
         "get_formatted_message(self, timezone=None)\n"
         "--\n\n"
@@ -348,6 +370,11 @@ PyMethodDef PyLogEvent_method_table[]{
          py_c_function_cast(PyLogEvent_get_formatted_message),
          METH_KEYWORDS | METH_VARARGS,
          static_cast<char const*>(cPyLogEventGetFormattedMessageDoc)},
+
+        {"match_query",
+         py_c_function_cast(PyLogEvent_match_query),
+         METH_O,
+         static_cast<char const*>(cPyLogEventMatchQueryDoc)},
 
         {"__getstate__",
          py_c_function_cast(PyLogEvent_getstate),

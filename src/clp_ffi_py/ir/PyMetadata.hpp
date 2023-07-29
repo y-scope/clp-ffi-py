@@ -11,9 +11,9 @@
 namespace clp_ffi_py::ir {
 /**
  * A PyObject structure functioning as a Python-compatible interface to retrieve
- * CLP IR metadata. The underlying data is pointed by `metadata`. Additionally,
- * it retains a tzinfo object at the Python level that signifies the
- * corresponding timezone.
+ * CLP IR metadata. The underlying data is pointed to by `m_metadata`.
+ * Additionally, it retains a tzinfo object at the Python level that signifies
+ * the corresponding timezone.
  */
 class PyMetadata {
 public:
@@ -73,7 +73,7 @@ public:
     /**
      * Gets the PyTypeObject that represents PyMetadata's Python type. This type
      * is dynamically created and initialized during the execution of
-     * `PyMetadata_module_level_init`.
+     * `PyMetadata::module_level_init`.
      * @return Python type object associated with PyMetadata.
      */
     [[nodiscard]] static auto get_py_type() -> PyTypeObject*;

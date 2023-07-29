@@ -4,6 +4,7 @@
 #include <clp_ffi_py/ir/PyFourByteEncoder.hpp>
 #include <clp_ffi_py/ir/PyLogEvent.hpp>
 #include <clp_ffi_py/ir/PyMetadata.hpp>
+#include <clp_ffi_py/ir/PyQuery.hpp>
 #include <clp_ffi_py/Py_utils.hpp>
 
 namespace {
@@ -39,6 +40,11 @@ PyMODINIT_FUNC PyInit_ir() {
     }
 
     if (false == clp_ffi_py::ir::PyLogEvent::module_level_init(new_module)) {
+        Py_DECREF(new_module);
+        return nullptr;
+    }
+
+    if (false == clp_ffi_py::ir::PyQuery::module_level_init(new_module)) {
         Py_DECREF(new_module);
         return nullptr;
     }
