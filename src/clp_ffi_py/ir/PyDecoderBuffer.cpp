@@ -55,14 +55,14 @@ auto PyDecoderBuffer_getbuffer(PyDecoderBuffer* self, Py_buffer* view, int flags
  * @param self (unused).
  * @param view (unused).
  */
-auto PyDecoderBuffer_releasebuffer(PyDecoderBuffer* Py_UNUSED(self), Py_buffer* Py_UNUSED(view)) -> void {
+auto PyDecoderBuffer_releasebuffer(PyDecoderBuffer* Py_UNUSED(self), Py_buffer* Py_UNUSED(view))
+        -> void {
     return;
 }
 }
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
-PyMethodDef PyDecoderBuffer_method_table[]{
-        {nullptr}};
+PyMethodDef PyDecoderBuffer_method_table[]{{nullptr}};
 
 /**
  * Declaration of Python buffer protocol.
@@ -74,10 +74,7 @@ static PyBufferProcs PyDecoderBuffer_as_buffer{
 };
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
-PyDoc_STRVAR(
-        cPyDecoderBufferDoc,
-        "TODO\n"
-);
+PyDoc_STRVAR(cPyDecoderBufferDoc, "TODO\n");
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
 PyType_Slot PyDecoderBuffer_slots[]{
@@ -99,7 +96,7 @@ PyType_Spec PyDecoderBuffer_type_spec{
         0,
         Py_TPFLAGS_DEFAULT,
         static_cast<PyType_Slot*>(PyDecoderBuffer_slots)};
-}
+}  // namespace
 
 auto PyDecoderBuffer::init(PyObject* input_stream, Py_ssize_t buf_capacity) -> bool {
     m_buffer_capacity = buf_capacity;
@@ -137,11 +134,11 @@ auto PyDecoderBuffer::populate_read_buffer(Py_ssize_t& num_bytes_read) -> bool {
     m_buffer_size = num_unconsumed_bytes;
 
     PyObjectPtr<PyObject> num_read_byte_obj{PyObject_CallMethod(
-        m_input_ir_stream, 
-        "readinto", 
-        "O", 
-        py_reinterpret_cast<PyObject>(this))
-    };
+            m_input_ir_stream,
+            "readinto",
+            "O",
+            py_reinterpret_cast<PyObject>(this)
+    )};
     if (nullptr == num_read_byte_obj.get()) {
         return false;
     }
@@ -161,12 +158,12 @@ auto PyDecoderBuffer::py_getbuffer(Py_buffer* view, int flags) -> int {
     }
     auto* buffer{m_read_buffer + m_buffer_size};
     return PyBuffer_FillInfo(
-        view,
-        py_reinterpret_cast<PyObject>(this),
-        buffer,
-        buffer_size,
-        0,
-        flags
+            view,
+            py_reinterpret_cast<PyObject>(this),
+            buffer,
+            buffer_size,
+            0,
+            flags
     );
 }
 
@@ -193,4 +190,4 @@ auto PyDecoderBuffer::module_level_init(PyObject* py_module) -> bool {
     type->tp_as_buffer = &PyDecoderBuffer_as_buffer;
     return add_python_type(get_py_type(), "DecoderBuffer", py_module);
 }
-}
+}  // namespace clp_ffi_py::ir

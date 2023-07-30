@@ -9,9 +9,9 @@
 
 namespace clp_ffi_py::ir {
 class PyDecoderBuffer {
-/**
- * TODO: add class description to this class.
- */
+    /**
+     * TODO: add class description to this class.
+     */
 public:
     static constexpr Py_ssize_t cDefaultInitialCapacity{4096};
 
@@ -26,10 +26,9 @@ public:
      * @return false on failure with the relevant Python exception and error
      * set.
      */
-    [[nodiscard]] auto init(
-        PyObject* input_stream,
-        Py_ssize_t buf_capacity = PyDecoderBuffer::cDefaultInitialCapacity
-    ) -> bool;
+    [[nodiscard]] auto
+    init(PyObject* input_stream, Py_ssize_t buf_capacity = PyDecoderBuffer::cDefaultInitialCapacity)
+            -> bool;
 
     /**
      * Initializes the pointers to nullptr by default. Should be called once
@@ -72,7 +71,7 @@ public:
     }
 
     /**
-     * Commits the bytes consumed in the read buffer by incrementing the 
+     * Commits the bytes consumed in the read buffer by incrementing the
      * underlying cursor position.
      * @param num_bytes_consumed Total number of bytes consumed.
      * @return true on success.
@@ -82,7 +81,7 @@ public:
     auto commit_read_buffer_consumption(Py_ssize_t num_bytes_consumed) -> bool;
 
     [[nodiscard]] auto get_num_decoded_message() const -> size_t { return m_num_decoded_message; }
-    
+
     auto increment_num_decoded_message() -> void { ++m_num_decoded_message; }
 
     /**
@@ -93,7 +92,7 @@ public:
     }
 
     /**
-     * @return The pointer to the first unconsumed byte stored in the current 
+     * @return The pointer to the first unconsumed byte stored in the current
      * read buffer.
      */
     [[nodiscard]] auto get_unconsumed_bytes() const -> int8_t* {
@@ -139,5 +138,5 @@ private:
 
     static PyObjectPtr<PyTypeObject> m_py_type;
 };
-}
+}  // namespace clp_ffi_py::ir
 #endif
