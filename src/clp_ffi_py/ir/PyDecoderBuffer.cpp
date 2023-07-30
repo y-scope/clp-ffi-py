@@ -24,7 +24,62 @@ extern "C" {
  * @return -1 on failure with the relevant Python exception and error set.
  */
 auto PyDecoderBuffer_init(PyDecoderBuffer* self, PyObject* args, PyObject* keywords) -> int {
-    return -1;
+    static char keyword_input_stream[]{"input_stream"};
+    static char keyword_initial_buffer_capacity[]{"initial_buffer_capacity"};
+    static char* keyword_table[]{
+            static_cast<char*>(keyword_input_stream),
+            static_cast<char*>(keyword_initial_buffer_capacity),
+            nullptr};
+
+    // If the argument parsing fails, `self` will be deallocated. We must reset
+    // all pointers to nullptr in advance, otherwise the deallocator might
+    // trigger segmentation fault
+    self->default_init();
+
+    PyObject* input_stream{nullptr};
+    Py_ssize_t initial_buffer_capacity{PyDecoderBuffer::cDefaultInitialCapacity};
+    if (false
+        == static_cast<bool>(PyArg_ParseTupleAndKeywords(
+                args,
+                keywords,
+                "O|L",
+                static_cast<char**>(keyword_table),
+                &input_stream,
+                &initial_buffer_capacity
+        )))
+    {
+        return -1;
+    }
+
+    if (nullptr == input_stream || false == static_cast<bool>(PyObject_CheckBuffer(input_stream))) {
+        PyErr_SetString(
+                PyExc_TypeError,
+                "The given input stream object does not support Python buffer protocol. "
+                "IO[bytes] object is expected."
+        );
+        return -1;
+    }
+
+    PyObjectPtr<PyObject> const readinto_method_obj{
+            PyObject_GetAttrString(input_stream, "readinto")};
+    auto* readinto_method{readinto_method_obj.get()};
+    if (nullptr == readinto_method) {
+        return -1;
+    }
+
+    if (false == static_cast<bool>(PyCallable_Check(readinto_method))) {
+        PyErr_SetString(
+                PyExc_TypeError,
+                "The attribute `readinto` of the given input stream object is not callable."
+        );
+        return -1;
+    }
+
+    if (false == self->init(input_stream, initial_buffer_capacity)) {
+        return -1;
+    }
+
+    return 0;
 }
 
 /**
@@ -104,9 +159,6 @@ auto PyDecoderBuffer::init(PyObject* input_stream, Py_ssize_t buf_capacity) -> b
     if (nullptr == m_read_buffer) {
         return false;
     }
-    m_buffer_size = 0;
-    m_current_num_bytes_consumed = 0;
-    m_num_decoded_message = 0;
     m_input_ir_stream = input_stream;
     Py_INCREF(m_input_ir_stream);
     return true;
@@ -130,15 +182,18 @@ auto PyDecoderBuffer::populate_read_buffer(Py_ssize_t& num_bytes_read) -> bool {
     } else if (0 < num_unconsumed_bytes) {
         memcpy(m_read_buffer, unconsumed_bytes, static_cast<size_t>(num_unconsumed_bytes));
     }
-    m_current_num_bytes_consumed = 0;
+    m_num_current_bytes_consumed = 0;
     m_buffer_size = num_unconsumed_bytes;
 
-    PyObjectPtr<PyObject> num_read_byte_obj{PyObject_CallMethod(
+    enable_py_buffer_protocol();
+    PyObjectPtr<PyObject> const num_read_byte_obj{PyObject_CallMethod(
             m_input_ir_stream,
             "readinto",
             "O",
             py_reinterpret_cast<PyObject>(this)
     )};
+    disable_py_buffer_protocol();
+
     if (nullptr == num_read_byte_obj.get()) {
         return false;
     }
@@ -151,6 +206,10 @@ auto PyDecoderBuffer::populate_read_buffer(Py_ssize_t& num_bytes_read) -> bool {
 }
 
 auto PyDecoderBuffer::py_getbuffer(Py_buffer* view, int flags) -> int {
+    if (false == is_py_buffer_protocol_enabled()) {
+        PyErr_SetString(PyExc_RuntimeError, cDecoderBufferPyBufferProtocolNotEnabledError);
+        return -1;
+    }
     auto const buffer_size{m_buffer_capacity - m_buffer_size};
     if (0 >= buffer_size) {
         PyErr_SetString(PyExc_RuntimeError, cDecoderBufferFullError);
@@ -169,10 +228,10 @@ auto PyDecoderBuffer::py_getbuffer(Py_buffer* view, int flags) -> int {
 
 auto PyDecoderBuffer::commit_read_buffer_consumption(Py_ssize_t num_bytes_consumed) -> bool {
     if (get_num_unconsumed_bytes() < num_bytes_consumed) {
-        PyErr_SetString(PyExc_OverflowError, cDecoderBufferCursorOverflowError);
+        PyErr_SetString(PyExc_OverflowError, cDecoderBufferOverflowError);
         return false;
     }
-    m_current_num_bytes_consumed += num_bytes_consumed;
+    m_num_current_bytes_consumed += num_bytes_consumed;
     return true;
 }
 

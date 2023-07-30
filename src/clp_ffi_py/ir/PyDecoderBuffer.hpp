@@ -19,9 +19,9 @@ public:
      * Since the memory allocation of PyDecoderBuffer is handled by CPython's
      * allocator, cpp constructors will not be explicitly called. This function
      * serves as the default constructor to initialize the underlying input IR
-     * stream, read buffer, and variables used to track reading states. It has
-     * to be manually called whenever creating a new PyDecoderBuffer object
-     * through CPython APIs.
+     * stream and read buffer. Other data members are assumed to be
+     * zero-initialized by `default-init` method. It has to be manually called
+     * whenever creating a new PyDecoderBuffer object through CPython APIs.
      * @return true on success.
      * @return false on failure with the relevant Python exception and error
      * set.
@@ -31,10 +31,15 @@ public:
             -> bool;
 
     /**
-     * Initializes the pointers to nullptr by default. Should be called once
-     * the object is allocated.
+     * Zero-initializes all the data members in PyDecoderBuffer. Should be
+     * called once the object is allocated.
      */
     auto default_init() -> void {
+        m_buffer_size = 0;
+        m_buffer_capacity = 0;
+        m_num_current_bytes_consumed = 0;
+        m_num_decoded_message = 0;
+        m_py_buffer_protocol_enabled = false;
         m_read_buffer = nullptr;
         m_input_ir_stream = nullptr;
     }
@@ -49,7 +54,7 @@ public:
     }
 
     /**
-     * Cleans the consumed bytes by shifting the unconsumed bytes to the 
+     * Cleans the consumed bytes by shifting the unconsumed bytes to the
      * beginning of the buffer, and fills the read buffer by reading from the
      * input IR stream. If more than half of the bytes are unconsumed in the
      * read buffer, the buffer capacity will be doubled before reading.
@@ -88,7 +93,7 @@ public:
      * @return Number of unconsumed bytes stored in the current read buffer.
      */
     [[nodiscard]] auto get_num_unconsumed_bytes() const -> Py_ssize_t {
-        return m_buffer_size - m_current_num_bytes_consumed;
+        return m_buffer_size - m_num_current_bytes_consumed;
     }
 
     /**
@@ -96,17 +101,25 @@ public:
      * read buffer.
      */
     [[nodiscard]] auto get_unconsumed_bytes() const -> int8_t* {
-        return m_read_buffer + m_current_num_bytes_consumed;
+        return m_read_buffer + m_num_current_bytes_consumed;
     }
 
     /**
      * Handles the Python buffer protocol's `getbuffer` operation.
+     * This function should fail unless the buffer protocol is enabled.
      * @param view Python Buffer view.
      * @param flags Python Buffer flags.
      * @return 0 on success.
      * @return -1 on failure with the relevant Python exception and error set.
      */
     [[nodiscard]] auto py_getbuffer(Py_buffer* view, int flags) -> int;
+
+    /**
+     * @return Whether the buffer protocol is enabled.
+     */
+    [[nodiscard]] auto is_py_buffer_protocol_enabled() -> bool {
+        return m_py_buffer_protocol_enabled;
+    }
 
     /**
      * Gets the PyTypeObject that represents PyDecoderBuffer's Python type. This
@@ -132,9 +145,20 @@ private:
     int8_t* m_read_buffer;
     Py_ssize_t m_buffer_size;
     Py_ssize_t m_buffer_capacity;
-    Py_ssize_t m_current_num_bytes_consumed;
+    Py_ssize_t m_num_current_bytes_consumed;
     size_t m_num_decoded_message;
+    bool m_py_buffer_protocol_enabled;
     PyObject* m_input_ir_stream;
+
+    /**
+     * Enable the buffer protocol.
+     */
+    auto enable_py_buffer_protocol() -> void { m_py_buffer_protocol_enabled = true; }
+
+    /**
+     * Disable the buffer protocol.
+     */
+    auto disable_py_buffer_protocol() -> void { m_py_buffer_protocol_enabled = false; }
 
     static PyObjectPtr<PyTypeObject> m_py_type;
 };
