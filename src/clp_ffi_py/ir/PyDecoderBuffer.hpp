@@ -49,10 +49,10 @@ public:
     }
 
     /**
-     * Moves the unconsumed bytes to the beginning of the buffer, and fills the
-     * read buffer by reading from the input IR stream. If more than half of the
-     * bytes are unconsumed in the read buffer, doubles the buffer capacity
-     * before reading.
+     * Cleans the consumed bytes by moving the unconsumed bytes to the beginning
+     * of the buffer, and fills the read buffer by reading from the input IR
+     * stream. If more than half of the bytes are unconsumed in the read buffer,
+     * the buffer capacity will be doubled before reading.
      * @param num_bytes_read Number of bytes read from the input IR stream to
      * populate the read buffer.
      * @return true on success.
@@ -88,15 +88,15 @@ public:
      * @return Number of unconsumed bytes stored in the current read buffer.
      */
     [[nodiscard]] auto get_num_unconsumed_bytes() const -> Py_ssize_t {
-        return m_buffer_size - m_cursor_pos;
+        return m_buffer_size - m_current_num_bytes_consumed;
     }
 
     /**
-     * @return The pointer to the first unconsumed byte stored in the current
+     * @return The pointer to the first unconsumed bytes stored in the current
      * read buffer.
      */
     [[nodiscard]] auto get_unconsumed_bytes() const -> int8_t* {
-        return m_read_buffer + m_cursor_pos;
+        return m_read_buffer + m_current_num_bytes_consumed;
     }
 
     /**
@@ -130,9 +130,9 @@ public:
 private:
     PyObject_HEAD;
     int8_t* m_read_buffer;
-    Py_ssize_t m_cursor_pos;
     Py_ssize_t m_buffer_size;
     Py_ssize_t m_buffer_capacity;
+    Py_ssize_t m_current_num_bytes_consumed;
     size_t m_num_decoded_message;
     PyObject* m_input_ir_stream;
 

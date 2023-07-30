@@ -105,7 +105,7 @@ auto PyDecoderBuffer::init(PyObject* input_stream, Py_ssize_t buf_capacity) -> b
         return false;
     }
     m_buffer_size = 0;
-    m_cursor_pos = 0;
+    m_current_num_bytes_consumed = 0;
     m_num_decoded_message = 0;
     m_input_ir_stream = input_stream;
     Py_INCREF(m_input_ir_stream);
@@ -130,7 +130,7 @@ auto PyDecoderBuffer::populate_read_buffer(Py_ssize_t& num_bytes_read) -> bool {
     } else if (0 < num_unconsumed_bytes) {
         memcpy(m_read_buffer, unconsumed_bytes, static_cast<size_t>(num_unconsumed_bytes));
     }
-    m_cursor_pos = 0;
+    m_current_num_bytes_consumed = 0;
     m_buffer_size = num_unconsumed_bytes;
 
     PyObjectPtr<PyObject> num_read_byte_obj{PyObject_CallMethod(
@@ -172,7 +172,7 @@ auto PyDecoderBuffer::commit_read_buffer_consumption(Py_ssize_t num_bytes_consum
         PyErr_SetString(PyExc_OverflowError, cDecoderBufferCursorOverflowError);
         return false;
     }
-    m_cursor_pos += num_bytes_consumed;
+    m_current_num_bytes_consumed += num_bytes_consumed;
     return true;
 }
 
