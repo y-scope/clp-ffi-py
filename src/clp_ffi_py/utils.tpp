@@ -26,6 +26,20 @@ auto parse_py_int(PyObject* py_int, int_type& val) -> bool {
         val = PyLong_AsLongLong(py_int);
     } else if constexpr (std::is_same_v<int_type, Py_ssize_t>) {
         val = PyLong_AsSsize_t(py_int);
+    } else if constexpr (std::is_same_v<int_type, unsigned>) {
+        unsigned long const val_as_unsigned_long{PyLong_AsUnsignedLong(py_int)};
+        if (nullptr != PyErr_Occurred()) {
+            return false;
+        }
+        if (std::numeric_limits<unsigned>::max() < val_as_unsigned_long) {
+            PyErr_Format(
+                    PyExc_OverflowError,
+                    "The input integer %lu overflows tha range of `unsigned`",
+                    val_as_unsigned_long
+            );
+            return false;
+        }
+        val = static_cast<unsigned>(val_as_unsigned_long);
     } else {
         static_assert(cAlwaysFalse<int_type>, "Given integer type not supported.");
     }

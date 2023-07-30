@@ -122,6 +122,20 @@ public:
     }
 
     /**
+     * Tests the functionality of the DecoderBuffer by stepping through the
+     * input stream and stream it as random sized byte sequences. It will
+     * attempt to read a random number of bytes from the read buffer and grow
+     * the buffer when necessary until the the entire input stream is consumed.
+     * All the read bytes will be returned as a Python bytearray.
+     * @param seed Random seed passing from the tester.
+     * @return Python bytearray that contains all the read bytes read from the
+     * input stream in sequence.
+     * @return nullptr on failure with the relevant Python exception and error
+     * set.
+     */
+    [[nodiscard]] auto test_streaming(unsigned seed) -> PyObject*;
+
+    /**
      * Gets the PyTypeObject that represents PyDecoderBuffer's Python type. This
      * type is dynamically created and initialized during the execution of
      * `PyDecoderBuffer::module_level_init`.

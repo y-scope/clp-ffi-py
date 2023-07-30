@@ -2,6 +2,9 @@
 
 #include "PyDecoderBuffer.hpp"
 
+#include <algorithm>
+#include <random>
+
 #include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ir/error_messages.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
@@ -48,15 +51,6 @@ auto PyDecoderBuffer_init(PyDecoderBuffer* self, PyObject* args, PyObject* keywo
                 &initial_buffer_capacity
         )))
     {
-        return -1;
-    }
-
-    if (nullptr == input_stream || false == static_cast<bool>(PyObject_CheckBuffer(input_stream))) {
-        PyErr_SetString(
-                PyExc_TypeError,
-                "The given input stream object does not support Python buffer protocol. "
-                "IO[bytes] object is expected."
-        );
         return -1;
     }
 
@@ -114,10 +108,38 @@ auto PyDecoderBuffer_releasebuffer(PyDecoderBuffer* Py_UNUSED(self), Py_buffer* 
         -> void {
     return;
 }
+
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
+PyDoc_STRVAR(
+        cPyDecoderBufferTestStreamingDoc,
+        "__test_streaming(self, seed)\n"
+        "--\n\n"
+        "Tests the functionality of the DecoderBuffer by streaming the entire input stream into "
+        "a Python bytearray. The stepping size from the read buffer is randomly generated, "
+        "initialized by the given seed.\n"
+        "Note: this function should only for testing purpose.\n"
+        ":param self\n"
+        ":param seed_obj: Random seed.\n"
+        ":return: The entire input stream stored in a Python bytearray.\n"
+);
+
+auto PyDecoderBuffer_test_streaming(PyDecoderBuffer* self, PyObject* seed_obj) -> PyObject* {
+    unsigned seed{0};
+    if (false == parse_py_int<unsigned>(seed_obj, seed)) {
+        return nullptr;
+    }
+    return self->test_streaming(seed);
+}
 }
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
-PyMethodDef PyDecoderBuffer_method_table[]{{nullptr}};
+PyMethodDef PyDecoderBuffer_method_table[]{
+        {"__test_streaming",
+         py_c_function_cast(PyDecoderBuffer_test_streaming),
+         METH_O,
+         static_cast<char const*>(cPyDecoderBufferTestStreamingDoc)},
+
+        {nullptr}};
 
 /**
  * Declaration of Python buffer protocol.
@@ -234,6 +256,35 @@ auto PyDecoderBuffer::commit_read_buffer_consumption(Py_ssize_t num_bytes_consum
     m_num_current_bytes_consumed += num_bytes_consumed;
     return true;
 }
+
+auto PyDecoderBuffer::test_streaming(unsigned seed) -> PyObject* {
+    std::default_random_engine rand_generator(seed);
+    std::vector<uint8_t> read_bytes;
+    bool reach_istream_end{false};
+    while (false == reach_istream_end) {
+        std::uniform_int_distribution<Py_ssize_t> distribution(1, m_buffer_size);
+        auto num_bytes_to_read{distribution(rand_generator)};
+        if (get_num_unconsumed_bytes() < num_bytes_to_read) {
+            Py_ssize_t num_bytes_read_from_istream{0};
+            if (false == populate_read_buffer(num_bytes_read_from_istream)) {
+                return nullptr;
+            }
+            if (0 == num_bytes_read_from_istream) {
+                reach_istream_end = true;
+            }
+            num_bytes_to_read = std::min<Py_ssize_t>(num_bytes_to_read, m_buffer_size);
+        }
+        auto* unconsumed_bytes{get_unconsumed_bytes()};
+        read_bytes.insert(read_bytes.end(), unconsumed_bytes, unconsumed_bytes + num_bytes_to_read);
+        commit_read_buffer_consumption(num_bytes_to_read);
+    }
+    return PyByteArray_FromStringAndSize(
+            size_checked_pointer_cast<char>(read_bytes.data()),
+            static_cast<Py_ssize_t>(read_bytes.size())
+    );
+}
+
+PyObjectPtr<PyTypeObject> PyDecoderBuffer::m_py_type{nullptr};
 
 auto PyDecoderBuffer::get_py_type() -> PyTypeObject* {
     return m_py_type.get();
