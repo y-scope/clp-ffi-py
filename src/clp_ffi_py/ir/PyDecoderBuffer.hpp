@@ -49,10 +49,10 @@ public:
     }
 
     /**
-     * Cleans the consumed bytes by moving the unconsumed bytes to the beginning
-     * of the buffer, and fills the read buffer by reading from the input IR
-     * stream. If more than half of the bytes are unconsumed in the read buffer,
-     * the buffer capacity will be doubled before reading.
+     * Cleans the consumed bytes by shifting the unconsumed bytes to the 
+     * beginning of the buffer, and fills the read buffer by reading from the
+     * input IR stream. If more than half of the bytes are unconsumed in the
+     * read buffer, the buffer capacity will be doubled before reading.
      * @param num_bytes_read Number of bytes read from the input IR stream to
      * populate the read buffer.
      * @return true on success.
