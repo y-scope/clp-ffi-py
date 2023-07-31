@@ -112,7 +112,7 @@ auto PyDecoderBuffer_releasebuffer(PyDecoderBuffer* Py_UNUSED(self), Py_buffer* 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cPyDecoderBufferTestStreamingDoc,
-        "__test_streaming(self, seed)\n"
+        "_test_streaming(self, seed)\n"
         "--\n\n"
         "Tests the functionality of the DecoderBuffer by streaming the entire input stream into "
         "a Python bytearray. The stepping size from the read buffer is randomly generated, "
@@ -134,7 +134,7 @@ auto PyDecoderBuffer_test_streaming(PyDecoderBuffer* self, PyObject* seed_obj) -
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyMethodDef PyDecoderBuffer_method_table[]{
-        {"__test_streaming",
+        {"_test_streaming",
          py_c_function_cast(PyDecoderBuffer_test_streaming),
          METH_O,
          static_cast<char const*>(cPyDecoderBufferTestStreamingDoc)},

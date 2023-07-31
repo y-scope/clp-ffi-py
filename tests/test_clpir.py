@@ -1,10 +1,27 @@
 import dateutil.tz
 import pickle
+import time
 import unittest
 
-from clp_ffi_py import FourByteEncoder, LogEvent, Metadata, Query, WildcardQuery
+from clp_ffi_py import DecoderBuffer, FourByteEncoder, LogEvent, Metadata, Query, WildcardQuery
 from datetime import tzinfo
-from typing import Optional, List
+from math import floor
+from pathlib import Path
+from smart_open import register_compressor  # type: ignore
+from typing import IO, Optional, List
+from zstandard import ZstdDecompressionReader, ZstdDecompressor
+
+
+def _zstd_comppressions_handler(file_obj: IO[bytes], mode: str) -> ZstdDecompressionReader:
+    if "rb" == mode:
+        dctx = ZstdDecompressor()
+        return dctx.stream_reader(file_obj)
+    else:
+        raise RuntimeError(f"Zstd handler: Unexpected Mode {mode}")
+
+
+# Register .zst with zstandard library compressor
+register_compressor(".zst", _zstd_comppressions_handler)
 
 
 class TestCaseMetadata(unittest.TestCase):
@@ -742,6 +759,67 @@ class TestCaseQuery(TestCaseQueryBase):
         log_event = LogEvent("I'm finally matching something... QAQ", 3213)
         self.assertEqual(query.match_log_event(log_event), True, description)
         self.assertEqual(log_event.match_query(query), True, description)
+
+
+class TestCaseDecoderBuffer(unittest.TestCase):
+    """
+    Class for testing clp_ffi_py.ir.DecoderBuffer.
+    """
+
+    input_src_dir = "DecoderBufferTestSrc"
+
+    def test_streaming_small_buffer(self) -> None:
+        """
+        Tests DecoderBuffer's functionality using the small buffer capacity.
+        """
+        buffer_capacity: int = 1024
+        self.__launch_test(buffer_capacity)
+
+    def test_streaming_default_buffer(self) -> None:
+        """
+        Tests DecoderBuffer's functionality using the default buffer capacity.
+        """
+        self.__launch_test(None)
+
+    def test_streaming_large_buffer(self) -> None:
+        """
+        Tests DecoderBuffer's functionality using the large buffer capacity.
+        """
+        buffer_capacity: int = 16384
+        self.__launch_test(buffer_capacity)
+
+    def __launch_test(self, buffer_capacity: Optional[int]) -> None:
+        current_dir: Path = Path(__file__).resolve().parent
+        test_src_dir: Path = current_dir / TestCaseDecoderBuffer.input_src_dir
+        for file_path in test_src_dir.rglob("*"):
+            if not file_path.is_file():
+                continue
+            streaming_result: bytearray
+            decoder_buffer: DecoderBuffer
+            random_seed: int = floor(time.time() * 1000) % 1000
+            with open(str(file_path), "rb") as istream:
+                try:
+                    if None is buffer_capacity:
+                        decoder_buffer = DecoderBuffer(istream)
+                    else:
+                        decoder_buffer = DecoderBuffer(
+                            initial_buffer_capacity=buffer_capacity, input_stream=istream
+                        )
+                    streaming_result = decoder_buffer._test_streaming(random_seed)
+                except Exception as e:
+                    self.assertFalse(
+                        True, f"Error on file {file_path} using seed {random_seed}: {e}"
+                    )
+            self.__assert_streaming_result(file_path, streaming_result)
+
+    def __assert_streaming_result(self, file_path: Path, streaming_result: bytearray) -> None:
+        with open(str(file_path), "rb") as istream:
+            ref_result: bytearray = bytearray(istream.read())
+            self.assertEqual(
+                ref_result,
+                streaming_result,
+                f"Streaming result is different from the src: {file_path}.",
+            )
 
 
 if __name__ == "__main__":
