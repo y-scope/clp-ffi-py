@@ -789,6 +789,13 @@ class TestCaseDecoderBuffer(unittest.TestCase):
         self.__launch_test(buffer_capacity)
 
     def __launch_test(self, buffer_capacity: Optional[int]) -> None:
+        """
+        Tests the DecoderBuffer by streaming the files inside `test_src_dir`.
+
+        :param self
+        :param buffer_capacity: The buffer capacity used to initialize the
+            decoder buffer.
+        """
         current_dir: Path = Path(__file__).resolve().parent
         test_src_dir: Path = current_dir / TestCaseDecoderBuffer.input_src_dir
         for file_path in test_src_dir.rglob("*"):
@@ -797,22 +804,31 @@ class TestCaseDecoderBuffer(unittest.TestCase):
             streaming_result: bytearray
             decoder_buffer: DecoderBuffer
             random_seed: int = floor(time.time() * 1000) % 1000
-            with open(str(file_path), "rb") as istream:
-                try:
-                    if None is buffer_capacity:
-                        decoder_buffer = DecoderBuffer(istream)
-                    else:
-                        decoder_buffer = DecoderBuffer(
-                            initial_buffer_capacity=buffer_capacity, input_stream=istream
+            # Run against 10 different seeds:
+            for _ in range(10):
+                with open(str(file_path), "rb") as istream:
+                    try:
+                        if None is buffer_capacity:
+                            decoder_buffer = DecoderBuffer(istream)
+                        else:
+                            decoder_buffer = DecoderBuffer(
+                                initial_buffer_capacity=buffer_capacity, input_stream=istream
+                            )
+                        streaming_result = decoder_buffer._test_streaming(random_seed)
+                    except Exception as e:
+                        self.assertFalse(
+                            True, f"Error on file {file_path} using seed {random_seed}: {e}"
                         )
-                    streaming_result = decoder_buffer._test_streaming(random_seed)
-                except Exception as e:
-                    self.assertFalse(
-                        True, f"Error on file {file_path} using seed {random_seed}: {e}"
-                    )
-            self.__assert_streaming_result(file_path, streaming_result)
+                self.__assert_streaming_result(file_path, streaming_result)
+                random_seed += 1
 
     def __assert_streaming_result(self, file_path: Path, streaming_result: bytearray) -> None:
+        """
+        Validates the streaming result read by the decoder buffer.
+
+        :param file_path: Input stream file Path.
+        :param streaming_result: Result of DecoderBuffer `_test_streaming` method.
+        """
         with open(str(file_path), "rb") as istream:
             ref_result: bytearray = bytearray(istream.read())
             self.assertEqual(
