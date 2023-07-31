@@ -8,6 +8,17 @@
 #include <clp_ffi_py/PyObjectUtils.hpp>
 
 namespace clp_ffi_py::ir {
+/**
+ * This Python Object represents a DecoderBuffer that buffers encoded CLP IR
+ * bytes read from the input stream. On the one hand, CLP IR decoding methods
+ * can consume the buffered bytes to decode log events. On the other hand, it
+ * follows the Python buffer protocol so that it can directly read from an
+ * `IO[bytes]` like input stream. This class contains all the necessary data
+ * members to store the buffered bytes and track the buffer states. It is
+ * expected to be passed across different calls of CLP IR decoding methods when
+ * decoding from the same IR stream.
+ *
+ */
 class PyDecoderBuffer {
     /**
      * TODO: add class description to this class.
@@ -101,6 +112,7 @@ public:
      * read buffer.
      */
     [[nodiscard]] auto get_unconsumed_bytes() const -> int8_t* {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         return m_read_buffer + m_num_current_bytes_consumed;
     }
 
@@ -117,7 +129,7 @@ public:
     /**
      * @return Whether the buffer protocol is enabled.
      */
-    [[nodiscard]] auto is_py_buffer_protocol_enabled() -> bool {
+    [[nodiscard]] auto is_py_buffer_protocol_enabled() const -> bool {
         return m_py_buffer_protocol_enabled;
     }
 

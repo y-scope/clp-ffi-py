@@ -16,7 +16,7 @@ namespace {
 extern "C" {
 /**
  * Callback of PyDecoderBuffer `__init__` method:
- * __init__(TODO)
+ * __init__(self, input_stream: IO[bytes], initial_buffer_capacity: int = 4096)
  * Keyword argument parsing is supported.
  * Assumes `self` is uninitialized and will allocate the underlying memory. If
  * `self` is already initialized this will result in memory leaks.
@@ -105,9 +105,7 @@ auto PyDecoderBuffer_getbuffer(PyDecoderBuffer* self, Py_buffer* view, int flags
  * @param view (unused).
  */
 auto PyDecoderBuffer_releasebuffer(PyDecoderBuffer* Py_UNUSED(self), Py_buffer* Py_UNUSED(view))
-        -> void {
-    return;
-}
+        -> void {}
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
@@ -145,13 +143,26 @@ PyMethodDef PyDecoderBuffer_method_table[]{
  * Declaration of Python buffer protocol.
  */
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
-static PyBufferProcs PyDecoderBuffer_as_buffer{
+PyBufferProcs PyDecoderBuffer_as_buffer{
         .bf_getbuffer = py_getbufferproc_cast(PyDecoderBuffer_getbuffer),
         .bf_releasebuffer = py_releasebufferproc_cast(PyDecoderBuffer_releasebuffer),
 };
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
-PyDoc_STRVAR(cPyDecoderBufferDoc, "TODO\n");
+PyDoc_STRVAR(
+        cPyDecoderBufferDoc,
+        "This class represents a CLP IR Decoder Buffer corresponding to a CLP IR stream. "
+        "It buffers encoded CLP IR data read from the input stream, which can be consumed by the "
+        "CLP IR decoding methods to recover encoded log events. The instance of this class is "
+        "expected to be passed across different calls of CLP IR decoding methods when decoding "
+        "from the same IR stream.\n"
+        "The signature of `__init__` method is shown as following:\n\n"
+        "__init__(self, input_stream, initial_buffer_capacity=4096):\n"
+        "Initializes a DecoderBuffer object for the given input IR stream.\n"
+        ":param input_stream: Input stream that contains encoded CLP IR. It should be an instance "
+        "of type `IO[bytes]` with the method `readinto` supported.\n"
+        ":param initial_buffer_capacity: The initial capacity of the underlying byte buffer.\n"
+);
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
 PyType_Slot PyDecoderBuffer_slots[]{
@@ -237,6 +248,7 @@ auto PyDecoderBuffer::py_getbuffer(Py_buffer* view, int flags) -> int {
     if (0 >= buffer_size) {
         return -1;
     }
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     auto* buffer{m_read_buffer + m_buffer_size};
     return PyBuffer_FillInfo(
             view,
@@ -275,6 +287,7 @@ auto PyDecoderBuffer::test_streaming(unsigned seed) -> PyObject* {
             num_bytes_to_read = std::min<Py_ssize_t>(num_bytes_to_read, m_buffer_size);
         }
         auto* unconsumed_bytes{get_unconsumed_bytes()};
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         read_bytes.insert(read_bytes.end(), unconsumed_bytes, unconsumed_bytes + num_bytes_to_read);
         commit_read_buffer_consumption(num_bytes_to_read);
     }

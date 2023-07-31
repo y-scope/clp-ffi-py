@@ -34,7 +34,7 @@ auto parse_py_int(PyObject* py_int, int_type& val) -> bool {
         if (std::numeric_limits<unsigned>::max() < val_as_unsigned_long) {
             PyErr_Format(
                     PyExc_OverflowError,
-                    "The input integer %lu overflows tha range of `unsigned`",
+                    "The input integer %lu overflows the range of type `unsigned`",
                     val_as_unsigned_long
             );
             return false;
