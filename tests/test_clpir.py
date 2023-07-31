@@ -1,4 +1,5 @@
 import dateutil.tz
+import io
 import pickle
 import time
 import unittest
@@ -767,6 +768,22 @@ class TestCaseDecoderBuffer(unittest.TestCase):
     """
 
     input_src_dir = "DecoderBufferTestSrc"
+
+    def test_buffer_protocol(self) -> None:
+        """
+        Tests whether the buffer protocol is disabled by default.
+        """
+        byte_array: bytearray = bytearray(b"Hello, world!")
+        byte_stream: io.BytesIO = io.BytesIO(byte_array)
+        decoder_buffer: DecoderBuffer = DecoderBuffer(byte_stream)
+        exception_captured: bool = False
+        try:
+            byte_stream.readinto(decoder_buffer)  # type: ignore
+        except TypeError:
+            exception_captured = True
+        self.assertTrue(
+            exception_captured, "The buffer protocol should not be enabled in Python layer."
+        )
 
     def test_streaming_small_buffer(self) -> None:
         """

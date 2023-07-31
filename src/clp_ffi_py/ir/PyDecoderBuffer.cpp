@@ -117,7 +117,7 @@ PyDoc_STRVAR(
         "Tests the functionality of the DecoderBuffer by streaming the entire input stream into "
         "a Python bytearray. The stepping size from the read buffer is randomly generated, "
         "initialized by the given seed.\n"
-        "Note: this function should only for testing purpose.\n"
+        "Note: this function should only be used for testing purpose.\n"
         ":param self\n"
         ":param seed_obj: Random seed.\n"
         ":return: The entire input stream stored in a Python bytearray.\n"
@@ -228,13 +228,13 @@ auto PyDecoderBuffer::populate_read_buffer(Py_ssize_t& num_bytes_read) -> bool {
 }
 
 auto PyDecoderBuffer::py_getbuffer(Py_buffer* view, int flags) -> int {
+    // Don't need to set the exception message during the failure.
+    // The Python level caller will set the exception and thus overwrite it.
     if (false == is_py_buffer_protocol_enabled()) {
-        PyErr_SetString(PyExc_RuntimeError, cDecoderBufferPyBufferProtocolNotEnabledError);
         return -1;
     }
     auto const buffer_size{m_buffer_capacity - m_buffer_size};
     if (0 >= buffer_size) {
-        PyErr_SetString(PyExc_RuntimeError, cDecoderBufferFullError);
         return -1;
     }
     auto* buffer{m_read_buffer + m_buffer_size};
