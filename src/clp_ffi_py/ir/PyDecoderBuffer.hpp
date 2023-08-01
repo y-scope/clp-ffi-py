@@ -3,6 +3,8 @@
 
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
+#include <GSL/include/gsl/span>
+
 #include <clp/components/core/src/ffi/ir_stream/decoding_methods.hpp>
 
 #include <clp_ffi_py/PyObjectUtils.hpp>
@@ -46,12 +48,11 @@ public:
      * called once the object is allocated.
      */
     auto default_init() -> void {
+        m_read_buffer_mem_owner = nullptr;
         m_buffer_size = 0;
-        m_buffer_capacity = 0;
         m_num_current_bytes_consumed = 0;
         m_num_decoded_message = 0;
         m_py_buffer_protocol_enabled = false;
-        m_read_buffer = nullptr;
         m_input_ir_stream = nullptr;
     }
 
@@ -61,14 +62,14 @@ public:
      */
     auto clean() -> void {
         Py_XDECREF(m_input_ir_stream);
-        PyMem_Free(m_read_buffer);
+        PyMem_Free(m_read_buffer_mem_owner);
     }
 
     /**
      * Cleans the consumed bytes by shifting the unconsumed bytes to the
      * beginning of the buffer, and fills the read buffer by reading from the
      * input IR stream. If more than half of the bytes are unconsumed in the
-     * read buffer, the buffer capacity will be doubled before reading.
+     * read buffer, the buffer will be doubled before reading.
      * @param num_bytes_read Number of bytes read from the input IR stream to
      * populate the read buffer.
      * @return true on success.
@@ -76,15 +77,6 @@ public:
      * set.
      */
     [[nodiscard]] auto populate_read_buffer(Py_ssize_t& num_bytes_read) -> bool;
-
-    /**
-     * Creates a CLP FFI IRBuffer as a wrapper so that CLP FFI decoding methods
-     * can decode from bytes stored in `m_read_buffer`.
-     * @return ffi::ir_stream::IrBuffer wrapping the unconsumed bytes.
-     */
-    [[nodiscard]] auto create_clp_ir_buffer_wrapper() const -> ffi::ir_stream::IrBuffer {
-        return {get_unconsumed_bytes(), static_cast<size_t>(get_num_unconsumed_bytes())};
-    }
 
     /**
      * Commits the bytes consumed in the read buffer by incrementing the
@@ -108,12 +100,10 @@ public:
     }
 
     /**
-     * @return The pointer to the first unconsumed bytes stored in the current
-     * read buffer.
+     * @return A span containing unconsumed bytes.
      */
-    [[nodiscard]] auto get_unconsumed_bytes() const -> int8_t* {
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-        return m_read_buffer + m_num_current_bytes_consumed;
+    [[nodiscard]] auto get_unconsumed_bytes() const -> gsl::span<int8_t> {
+        return m_read_buffer.subspan(m_num_current_bytes_consumed, get_num_unconsumed_bytes());
     }
 
     /**
@@ -145,7 +135,7 @@ public:
      * @return nullptr on failure with the relevant Python exception and error
      * set.
      */
-    [[nodiscard]] auto test_streaming(unsigned seed) -> PyObject*;
+    [[nodiscard]] auto test_streaming(uint32_t seed) -> PyObject*;
 
     /**
      * Gets the PyTypeObject that represents PyDecoderBuffer's Python type. This
@@ -155,7 +145,8 @@ public:
      */
     [[nodiscard]] static auto get_py_type() -> PyTypeObject*;
 
-    /**
+    /**:w
+     *
      * Creates and initializes PyDecoderBuffer as a Python type, and then
      * incorporates this type as a Python object into the py_module module.
      * @param py_module This is the Python module where the initialized
@@ -168,9 +159,9 @@ public:
 
 private:
     PyObject_HEAD;
-    int8_t* m_read_buffer;
+    int8_t* m_read_buffer_mem_owner;
+    gsl::span<int8_t> m_read_buffer;
     Py_ssize_t m_buffer_size;
-    Py_ssize_t m_buffer_capacity;
     Py_ssize_t m_num_current_bytes_consumed;
     size_t m_num_decoded_message;
     bool m_py_buffer_protocol_enabled;

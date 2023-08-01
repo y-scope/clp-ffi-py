@@ -1,3 +1,6 @@
 [submodule "src/clp"]
 	path = src/clp
 	url = https://github.com/y-scope/clp.git
+[submodule "src/GSL"]
+	path = src/GSL
+	url = https://github.com/microsoft/GSL.git

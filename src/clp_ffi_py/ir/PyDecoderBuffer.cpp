@@ -123,7 +123,7 @@ PyDoc_STRVAR(
 
 auto PyDecoderBuffer_test_streaming(PyDecoderBuffer* self, PyObject* seed_obj) -> PyObject* {
     unsigned seed{0};
-    if (false == parse_py_int<unsigned>(seed_obj, seed)) {
+    if (false == parse_py_int<uint32_t>(seed_obj, seed)) {
         return nullptr;
     }
     return self->test_streaming(seed);
@@ -187,11 +187,11 @@ PyType_Spec PyDecoderBuffer_type_spec{
 }  // namespace
 
 auto PyDecoderBuffer::init(PyObject* input_stream, Py_ssize_t buf_capacity) -> bool {
-    m_buffer_capacity = buf_capacity;
-    m_read_buffer = static_cast<int8_t*>(PyMem_Malloc(buf_capacity));
-    if (nullptr == m_read_buffer) {
+    m_read_buffer_mem_owner = static_cast<int8_t*>(PyMem_Malloc(buf_capacity));
+    if (nullptr == m_read_buffer_mem_owner) {
         return false;
     }
+    m_read_buffer = gsl::span<int8_t>(m_read_buffer_mem_owner, buf_capacity);
     m_input_ir_stream = input_stream;
     Py_INCREF(m_input_ir_stream);
     return true;
@@ -199,21 +199,23 @@ auto PyDecoderBuffer::init(PyObject* input_stream, Py_ssize_t buf_capacity) -> b
 
 auto PyDecoderBuffer::populate_read_buffer(Py_ssize_t& num_bytes_read) -> bool {
     auto const num_unconsumed_bytes{get_num_unconsumed_bytes()};
-    auto const* unconsumed_bytes{get_unconsumed_bytes()};
+    auto const unconsumed_bytes{get_unconsumed_bytes()};
+    auto const buffer_capacity{static_cast<Py_ssize_t>(m_read_buffer.size())};
 
-    if (num_unconsumed_bytes > (m_buffer_capacity / 2)) {
+    if (num_unconsumed_bytes > (buffer_capacity / 2)) {
         // PyMem_Realloc is not used to avoid redundant memory copy
-        auto const new_capacity{m_buffer_capacity * 2};
+        auto const new_capacity{buffer_capacity * 2};
         auto* new_buf{static_cast<int8_t*>(PyMem_Malloc(new_capacity))};
         if (nullptr == new_buf) {
             return false;
         }
-        memcpy(new_buf, unconsumed_bytes, static_cast<size_t>(num_unconsumed_bytes));
-        PyMem_Free(m_read_buffer);
-        m_read_buffer = new_buf;
-        m_buffer_capacity = new_capacity;
+        auto new_read_buffer{gsl::span<int8_t>(new_buf, new_capacity)};
+        memcpy(new_read_buffer.data(), unconsumed_bytes.data(), num_unconsumed_bytes);
+        PyMem_Free(m_read_buffer_mem_owner);
+        m_read_buffer_mem_owner = new_buf;
+        m_read_buffer = new_read_buffer;
     } else if (0 < num_unconsumed_bytes) {
-        memcpy(m_read_buffer, unconsumed_bytes, static_cast<size_t>(num_unconsumed_bytes));
+        memcpy(m_read_buffer.data(), unconsumed_bytes.data(), num_unconsumed_bytes);
     }
     m_num_current_bytes_consumed = 0;
     m_buffer_size = num_unconsumed_bytes;
@@ -244,17 +246,12 @@ auto PyDecoderBuffer::py_getbuffer(Py_buffer* view, int flags) -> int {
     if (false == is_py_buffer_protocol_enabled()) {
         return -1;
     }
-    auto const buffer_size{m_buffer_capacity - m_buffer_size};
-    if (0 >= buffer_size) {
-        return -1;
-    }
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    auto* buffer{m_read_buffer + m_buffer_size};
+    auto const buffer{m_read_buffer.subspan(m_buffer_size, m_read_buffer.size() - m_buffer_size)};
     return PyBuffer_FillInfo(
             view,
             py_reinterpret_cast<PyObject>(this),
-            buffer,
-            buffer_size,
+            buffer.data(),
+            static_cast<Py_ssize_t>(buffer.size()),
             0,
             flags
     );
@@ -269,7 +266,7 @@ auto PyDecoderBuffer::commit_read_buffer_consumption(Py_ssize_t num_bytes_consum
     return true;
 }
 
-auto PyDecoderBuffer::test_streaming(unsigned seed) -> PyObject* {
+auto PyDecoderBuffer::test_streaming(uint32_t seed) -> PyObject* {
     std::default_random_engine rand_generator(seed);
     std::vector<uint8_t> read_bytes;
     bool reach_istream_end{false};
@@ -286,9 +283,9 @@ auto PyDecoderBuffer::test_streaming(unsigned seed) -> PyObject* {
             }
             num_bytes_to_read = std::min<Py_ssize_t>(num_bytes_to_read, m_buffer_size);
         }
-        auto* unconsumed_bytes{get_unconsumed_bytes()};
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-        read_bytes.insert(read_bytes.end(), unconsumed_bytes, unconsumed_bytes + num_bytes_to_read);
+        auto const unconsumed_bytes{get_unconsumed_bytes()};
+        auto const bytes_to_consume{unconsumed_bytes.subspan(0, num_bytes_to_read)};
+        read_bytes.insert(read_bytes.end(), bytes_to_consume.begin(), bytes_to_consume.end());
         commit_read_buffer_consumption(num_bytes_to_read);
     }
     return PyByteArray_FromStringAndSize(
