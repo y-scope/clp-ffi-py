@@ -836,10 +836,12 @@ class TestCaseDecoderBuffer(unittest.TestCase):
                         self.assertFalse(
                             True, f"Error on file {file_path} using seed {random_seed}: {e}"
                         )
-                self.__assert_streaming_result(file_path, streaming_result)
+                self.__assert_streaming_result(file_path, streaming_result, random_seed)
                 random_seed += 1
 
-    def __assert_streaming_result(self, file_path: Path, streaming_result: bytearray) -> None:
+    def __assert_streaming_result(
+        self, file_path: Path, streaming_result: bytearray, random_seed: int
+    ) -> None:
         """
         Validates the streaming result read by the decoder buffer.
 
@@ -851,7 +853,8 @@ class TestCaseDecoderBuffer(unittest.TestCase):
             self.assertEqual(
                 ref_result,
                 streaming_result,
-                f"Streaming result is different from the src: {file_path}.",
+                f"Streaming result is different from the src: {file_path}. Random seed:"
+                f" {random_seed}.",
             )
 
 
