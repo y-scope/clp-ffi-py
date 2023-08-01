@@ -1,6 +1,7 @@
 import dateutil.tz
 import io
 import pickle
+import random
 import time
 import unittest
 
@@ -767,7 +768,7 @@ class TestCaseDecoderBuffer(unittest.TestCase):
     Class for testing clp_ffi_py.ir.DecoderBuffer.
     """
 
-    input_src_dir = "DecoderBufferTestSrc"
+    input_src_dir = "test_data"
 
     def test_buffer_protocol(self) -> None:
         """
@@ -820,9 +821,10 @@ class TestCaseDecoderBuffer(unittest.TestCase):
                 continue
             streaming_result: bytearray
             decoder_buffer: DecoderBuffer
-            random_seed: int = floor(time.time() * 1000) % 1000
+            random_seed: int
             # Run against 10 different seeds:
             for _ in range(10):
+                random_seed = random.randint(1, 3190)
                 with open(str(file_path), "rb") as istream:
                     try:
                         if None is buffer_capacity:
