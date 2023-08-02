@@ -153,7 +153,7 @@ PyDoc_STRVAR(
         cPyDecoderBufferDoc,
         "This class represents a CLP IR Decoder Buffer corresponding to a CLP IR stream. "
         "It buffers encoded CLP IR data read from the input stream, which can be consumed by the "
-        "CLP IR decoding methods to recover encoded log events. The instance of this class is "
+        "CLP IR decoding methods to recover encoded log events. An instance of this class is "
         "expected to be passed across different calls of CLP IR decoding methods when decoding "
         "from the same IR stream.\n"
         "The signature of `__init__` method is shown as following:\n\n"

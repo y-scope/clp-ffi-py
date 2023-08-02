@@ -141,8 +141,7 @@ public:
      */
     [[nodiscard]] static auto get_py_type() -> PyTypeObject*;
 
-    /**:w
-     *
+    /**
      * Creates and initializes PyDecoderBuffer as a Python type, and then
      * incorporates this type as a Python object into the py_module module.
      * @param py_module This is the Python module where the initialized
