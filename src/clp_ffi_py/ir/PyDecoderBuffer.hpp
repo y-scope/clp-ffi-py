@@ -3,9 +3,8 @@
 
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
-#include <GSL/include/gsl/span>
-
 #include <clp/components/core/src/ffi/ir_stream/decoding_methods.hpp>
+#include <gsl/span>
 
 #include <clp_ffi_py/PyObjectUtils.hpp>
 
