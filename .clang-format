@@ -76,6 +76,8 @@ IncludeCategories:
   # Third-party headers. Update when adding new third-party library
   - Regex: '^<(clp)'
     Priority: 3
+  - Regex: '<(gsl)'
+    Priority: 3
   # C headers
   - Regex: '^<.*.h>$'
     Priority: 1

@@ -8,7 +8,10 @@ from typing import Any, Dict, Optional
 ir: Extension = Extension(
     name="clp_ffi_py.ir",
     language="c++",
-    include_dirs=["src"],
+    include_dirs=[
+        "src",
+        "src/GSL/include"
+    ],
     sources=[
         "src/clp/components/core/src/ffi/ir_stream/decoding_methods.cpp",
         "src/clp/components/core/src/ffi/ir_stream/encoding_methods.cpp",
@@ -17,6 +20,7 @@ ir: Extension = Extension(
         "src/clp/components/core/src/TraceableException.cpp",
         "src/clp_ffi_py/ir/encoding_methods.cpp",
         "src/clp_ffi_py/ir/Metadata.cpp",
+        "src/clp_ffi_py/ir/PyDecoderBuffer.cpp",
         "src/clp_ffi_py/ir/PyFourByteEncoder.cpp",
         "src/clp_ffi_py/ir/PyLogEvent.cpp",
         "src/clp_ffi_py/ir/PyMetadata.cpp",

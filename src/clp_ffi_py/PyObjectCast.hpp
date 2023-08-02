@@ -23,6 +23,36 @@ auto py_c_function_cast(Src src) noexcept -> PyCFunction {
 }
 
 /**
+ * Casts a given function pointer to a `getbufferproc` CPython function.
+ * The main purpose of this function is to silence clang-tidy checks on using
+ * `reinterpret_cast`. It does not perform any further function type checking.
+ * @tparam Src The source function pointer type.
+ * @param src The source function pointer.
+ * @return `getbufferproc` using reinterpret_cast.
+ */
+template <typename Src>
+auto py_getbufferproc_cast(Src src) noexcept -> getbufferproc {
+    static_assert(std::is_pointer_v<Src>);
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    return reinterpret_cast<getbufferproc>(src);
+}
+
+/**
+ * Casts a given function pointer to a `releasebufferproc` CPython function.
+ * The main purpose of this function is to silence clang-tidy checks on using
+ * `reinterpret_cast`. It does not perform any further function type checking.
+ * @tparam Src The source function pointer type.
+ * @param src The source function pointer.
+ * @return `releasebufferproc` using reinterpret_cast.
+ */
+template <typename Src>
+auto py_releasebufferproc_cast(Src src) noexcept -> releasebufferproc {
+    static_assert(std::is_pointer_v<Src>);
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    return reinterpret_cast<releasebufferproc>(src);
+}
+
+/**
  * This template struct is used as a compile-time flag that indicates whether
  * type T is a PyObject or not. By default, `cValue` is set to false.
  * @tparam T
@@ -85,11 +115,13 @@ auto py_reinterpret_cast(Src* src) noexcept -> Dst* {
 }
 
 namespace ir {
+class PyDecoderBuffer;
 class PyMetadata;
 class PyLogEvent;
 class PyQuery;
 }  // namespace ir
 
+CLP_FFI_PY_MARK_AS_PYOBJECT(ir::PyDecoderBuffer);
 CLP_FFI_PY_MARK_AS_PYOBJECT(ir::PyLogEvent);
 CLP_FFI_PY_MARK_AS_PYOBJECT(ir::PyMetadata);
 CLP_FFI_PY_MARK_AS_PYOBJECT(ir::PyQuery);

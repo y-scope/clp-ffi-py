@@ -1,6 +1,10 @@
 from clp_ffi_py import WildcardQuery
 from datetime import tzinfo
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, IO, List, Optional
+
+class DecoderBuffer:
+    def __init__(self, input_stream: IO[bytes], initial_buffer_capacity: int = 4096): ...
+    def _test_streaming(self, seed: int) -> bytearray: ...
 
 class Metadata:
     def __init__(self, ref_timestamp: int, timestamp_format: str, timezone_id: str): ...
