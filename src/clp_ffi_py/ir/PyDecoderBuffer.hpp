@@ -52,8 +52,8 @@ public:
     }
 
     /**
-     * Releases the memory allocated for underlying metadata field and the
-     * reference hold for the Python object(s).
+     * Releases the memory allocated for the underlying metadata field and the
+     * reference held for the Python object(s).
      */
     auto clean() -> void {
         Py_XDECREF(m_input_ir_stream);
@@ -112,17 +112,16 @@ public:
     [[nodiscard]] auto py_getbuffer(Py_buffer* view, int flags) -> int;
 
     /**
-     * @return Whether the buffer protocol is enabled.
+     * @return true if the buffer protocol is enabled.
      */
     [[nodiscard]] auto is_py_buffer_protocol_enabled() const -> bool {
         return m_py_buffer_protocol_enabled;
     }
 
     /**
-     * Tests the functionality of the DecoderBuffer by stepping through the
-     * input stream and stream it as random sized byte sequences. It will
-     * attempt to read a random number of bytes from the read buffer and grow
-     * the buffer when necessary until the the entire input stream is consumed.
+     * Tests the functionality of the DecoderBuffer by sequentially reading
+     * through the input stream with randomly sized reads. It will grow the read
+     * buffer when necessary until the the entire input stream is consumed.
      * All the read bytes will be returned as a Python bytearray.
      * @param seed Random seed passing from the tester.
      * @return Python bytearray that contains all the read bytes read from the
