@@ -10,14 +10,16 @@
 
 namespace clp_ffi_py::ir {
 /**
- * This Python Object represents a DecoderBuffer that buffers encoded CLP IR
- * bytes read from the input stream. On the one hand, CLP IR decoding methods
- * can consume the buffered bytes to decode log events. On the other hand, it
- * follows the Python buffer protocol so that it can directly read from an
- * `IO[bytes]` like input stream. This class contains all the necessary data
- * members to store the buffered bytes and track the buffer states. It is
- * expected to be passed across different calls of CLP IR decoding methods when
- * decoding from the same IR stream.
+ * This Python class is designed to buffer encoded CLP IR bytes that are read
+ * from an input stream. This object serves a dual purpose:
+ * - It enables CLP IR decoding methods to access the buffered bytes for the
+ *   purpose of decoding log events.
+ * - It adheres to the Python buffer protocol, allowing for direct reading from
+ *   an `IO[bytes]`-like input stream.
+ *
+ * This class encompasses all essential attributes to hold the buffered bytes
+ * and monitor the state of the buffer. It's meant to be utilized across various
+ * CLP IR decoding method calls when decoding from the same IR stream.
  */
 class PyDecoderBuffer {
 public:
