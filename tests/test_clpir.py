@@ -839,7 +839,6 @@ class TestCaseDecoderBuffer(unittest.TestCase):
                             True, f"Error on file {file_path} using seed {random_seed}: {e}"
                         )
                 self.__assert_streaming_result(file_path, streaming_result, random_seed)
-                random_seed += 1
 
     def __assert_streaming_result(
         self, file_path: Path, streaming_result: bytearray, random_seed: int

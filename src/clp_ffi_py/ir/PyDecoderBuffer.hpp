@@ -19,12 +19,8 @@ namespace clp_ffi_py::ir {
  * members to store the buffered bytes and track the buffer states. It is
  * expected to be passed across different calls of CLP IR decoding methods when
  * decoding from the same IR stream.
- *
  */
 class PyDecoderBuffer {
-    /**
-     * TODO: add class description to this class.
-     */
 public:
     static constexpr Py_ssize_t cDefaultInitialCapacity{4096};
 

@@ -36,7 +36,7 @@ auto PyDecoderBuffer_init(PyDecoderBuffer* self, PyObject* args, PyObject* keywo
 
     // If the argument parsing fails, `self` will be deallocated. We must reset
     // all pointers to nullptr in advance, otherwise the deallocator might
-    // trigger segmentation fault
+    // trigger a segmentation fault.
     self->default_init();
 
     PyObject* input_stream{nullptr};
