@@ -48,6 +48,7 @@ public:
         m_read_buffer_mem_owner = nullptr;
         m_buffer_size = 0;
         m_num_current_bytes_consumed = 0;
+        m_ref_timestamp = 0;
         m_num_decoded_message = 0;
         m_py_buffer_protocol_enabled = false;
         m_input_ir_stream = nullptr;
@@ -87,7 +88,19 @@ public:
 
     [[nodiscard]] auto get_num_decoded_message() const -> size_t { return m_num_decoded_message; }
 
-    auto increment_num_decoded_message() -> void { ++m_num_decoded_message; }
+    /**
+     * Increments the number of decoded message counter, and returns the value
+     * before increment.
+     */
+    [[maybe_unused]] auto get_and_increment_decoded_message_count() -> size_t { 
+        auto current_num_decoded_message{m_num_decoded_message};
+        ++m_num_decoded_message;
+        return current_num_decoded_message;
+    }
+
+    [[nodiscard]] auto get_ref_timestamp() const -> ffi::epoch_time_ms_t { return m_ref_timestamp; }
+
+    auto set_ref_timestamp(ffi::epoch_time_ms_t timestamp) -> void { m_ref_timestamp = timestamp; }
 
     /**
      * @return Number of unconsumed bytes stored in the current read buffer.
@@ -161,6 +174,7 @@ private:
     size_t m_num_decoded_message;
     bool m_py_buffer_protocol_enabled;
     PyObject* m_input_ir_stream;
+    ffi::epoch_time_ms_t m_ref_timestamp;
 
     /**
      * Enable the buffer protocol.

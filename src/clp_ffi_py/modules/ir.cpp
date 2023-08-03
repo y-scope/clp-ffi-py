@@ -1,6 +1,6 @@
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
-#include <clp_ffi_py/ir/encoding_methods.hpp>
+#include <clp_ffi_py/ir/PyDecoder.hpp>
 #include <clp_ffi_py/ir/PyDecoderBuffer.hpp>
 #include <clp_ffi_py/ir/PyFourByteEncoder.hpp>
 #include <clp_ffi_py/ir/PyLogEvent.hpp>
@@ -51,6 +51,11 @@ PyMODINIT_FUNC PyInit_ir() {
     }
 
     if (false == clp_ffi_py::ir::PyQuery::module_level_init(new_module)) {
+        Py_DECREF(new_module);
+        return nullptr;
+    }
+
+    if (false == clp_ffi_py::ir::PyDecoder::module_level_init(new_module)) {
         Py_DECREF(new_module);
         return nullptr;
     }
