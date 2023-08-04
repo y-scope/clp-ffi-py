@@ -15,6 +15,7 @@
 #include <clp_ffi_py/ir/PyQuery.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
 #include <clp_ffi_py/PyObjectUtils.hpp>
+#include <clp_ffi_py/utils.hpp>
 
 namespace clp_ffi_py::ir {
 namespace {
@@ -173,12 +174,14 @@ auto decode_preamble(PyObject* self, PyObject* py_decoder_buffer) -> PyObject* {
         }
     }
 
-    std::string_view const metadata_view{
-            size_checked_pointer_cast<char>(metadata_buffer.data()),
-            metadata_buffer.size()};
-    auto const metadata_json{nlohmann::json::parse(metadata_view)};
+    // Initialization list should not be used in this case:
+    // https://github.com/nlohmann/json/discussions/4096 
+    nlohmann::json const metadata_json
+            = nlohmann::json::parse(metadata_buffer.begin(), metadata_buffer.end());
     auto metadata{PyMetadata::create_new_from_json(metadata_json, is_four_byte_encoding)};
-    decoder_buffer->set_ref_timestamp(metadata->get_metadata()->get_ref_timestamp());
+    if (nullptr != metadata) {
+        decoder_buffer->set_ref_timestamp(metadata->get_metadata()->get_ref_timestamp());
+    }
     return py_reinterpret_cast<PyObject>(metadata);
 }
 
@@ -201,11 +204,11 @@ auto decode_next_log_event(PyObject* self, PyObject* args, PyObject* keywords) -
                 args,
                 keywords,
                 "O!O!|O",
-                keyword_table,
-                &decoder_buffer,
+                static_cast<char**>(keyword_table),
                 PyDecoderBuffer::get_py_type(),
-                &metadata,
+                &decoder_buffer,
                 PyMetadata::get_py_type(),
+                &metadata,
                 &query
         )))
     {

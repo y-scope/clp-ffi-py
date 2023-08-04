@@ -92,7 +92,7 @@ public:
      * Increments the number of decoded message counter, and returns the value
      * before increment.
      */
-    [[maybe_unused]] auto get_and_increment_decoded_message_count() -> size_t { 
+    [[maybe_unused]] auto get_and_increment_decoded_message_count() -> size_t {
         auto current_num_decoded_message{m_num_decoded_message};
         ++m_num_decoded_message;
         return current_num_decoded_message;
