@@ -174,13 +174,20 @@ auto decode_preamble(PyObject* self, PyObject* py_decoder_buffer) -> PyObject* {
         }
     }
 
-    // Initialization list should not be used in this case:
-    // https://github.com/nlohmann/json/discussions/4096 
-    nlohmann::json const metadata_json
-            = nlohmann::json::parse(metadata_buffer.begin(), metadata_buffer.end());
-    auto metadata{PyMetadata::create_new_from_json(metadata_json, is_four_byte_encoding)};
-    if (nullptr != metadata) {
-        decoder_buffer->set_ref_timestamp(metadata->get_metadata()->get_ref_timestamp());
+    PyMetadata* metadata{nullptr};
+    try {
+        // Initialization list should not be used in this case:
+        // https://github.com/nlohmann/json/discussions/4096
+        nlohmann::json metadata_json(
+                std::move(nlohmann::json::parse(metadata_buffer.begin(), metadata_buffer.end()))
+        );
+        metadata = PyMetadata::create_new_from_json(metadata_json, is_four_byte_encoding);
+        if (nullptr != metadata) {
+            decoder_buffer->set_ref_timestamp(metadata->get_metadata()->get_ref_timestamp());
+        }
+    } catch (nlohmann::json::exception& ex) {
+        PyErr_Format(PyExc_RuntimeError, "Json Parsing Error: %s", ex.what());
+        return nullptr;
     }
     return py_reinterpret_cast<PyObject>(metadata);
 }
