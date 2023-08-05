@@ -66,7 +66,7 @@ class FourByteEncoder:
 
 class Decoder:
     @staticmethod
-    def decode_preamble(decoder_buffer: DecoderBuffer) -> Optional[Metadata]: ...
+    def decode_preamble(decoder_buffer: DecoderBuffer) -> Metadata: ...
     @staticmethod
     def decode_next_log_event(
         decoder_buffer: DecoderBuffer, query: Optional[Query] = None

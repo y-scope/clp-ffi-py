@@ -5,17 +5,35 @@ import random
 import time
 import unittest
 
-from clp_ffi_py import DecoderBuffer, FourByteEncoder, LogEvent, Metadata, Query, WildcardQuery
+from clp_ffi_py import (
+    Decoder,
+    DecoderBuffer,
+    FourByteEncoder,
+    LogEvent,
+    Metadata,
+    Query,
+    WildcardQuery,
+)
 from datetime import tzinfo
 from math import floor
 from pathlib import Path
-from smart_open import register_compressor  # type: ignore
-from typing import IO, Optional, List
-from zstandard import ZstdDecompressionReader, ZstdDecompressor
+from smart_open import open, register_compressor  # type: ignore
+from typing import IO, List, Optional, Set, Tuple, Union
+from zstandard import (
+    ZstdCompressionWriter,
+    ZstdCompressor,
+    ZstdDecompressionReader,
+    ZstdDecompressor,
+)
 
 
-def _zstd_comppressions_handler(file_obj: IO[bytes], mode: str) -> ZstdDecompressionReader:
-    if "rb" == mode:
+def _zstd_compressions_handler(
+    file_obj: IO[bytes], mode: str
+) -> Union[ZstdCompressionWriter, ZstdDecompressionReader]:
+    if "wb" == mode:
+        cctx = ZstdCompressor()
+        return cctx.stream_writer(file_obj)
+    elif "rb" == mode:
         dctx = ZstdDecompressor()
         return dctx.stream_reader(file_obj)
     else:
@@ -23,67 +41,34 @@ def _zstd_comppressions_handler(file_obj: IO[bytes], mode: str) -> ZstdDecompres
 
 
 # Register .zst with zstandard library compressor
-register_compressor(".zst", _zstd_comppressions_handler)
+register_compressor(".zst", _zstd_compressions_handler)
 
 
-class TestCaseMetadata(unittest.TestCase):
+def _get_current_timestamp() -> int:
     """
-    Class for testing clp_ffi_py.ir.Metadata.
+    :return: the current Unix epoch time in milliseconds.
+    """
+    timestamp_ms: int = floor(time.time() * 1000)
+    return timestamp_ms
+
+
+LOG_DIR: Path = Path("unittest-logs")
+
+
+class TestBase(unittest.TestCase):
+    """
+    Base class for all the testers.
+
+    Helper functions should be defined here.
     """
 
-    def test_init(self) -> None:
-        """
-        Test the initialization of Metadata object without using keyword.
-        """
-        ref_timestamp: int = 2005689603190
-        timestamp_format: str = "yy/MM/dd HH:mm:ss"
-        timezone_id: str = "America/Chicago"
-        metadata: Metadata = Metadata(ref_timestamp, timestamp_format, timezone_id)
-        self.__check_metadata(metadata, ref_timestamp, timestamp_format, timezone_id)
-
-    def test_keyword_init(self) -> None:
-        """
-        Test the initialization of Metadata object using keyword.
-        """
-        ref_timestamp: int = 2005689603270
-        timestamp_format: str = "MM/dd/yy HH:mm:ss"
-        timezone_id: str = "America/New_York"
-        metadata: Metadata
-
-        metadata = Metadata(
-            ref_timestamp=ref_timestamp, timestamp_format=timestamp_format, timezone_id=timezone_id
-        )
-        self.__check_metadata(metadata, ref_timestamp, timestamp_format, timezone_id)
-
-        metadata = Metadata(
-            timestamp_format=timestamp_format, ref_timestamp=ref_timestamp, timezone_id=timezone_id
-        )
-        self.__check_metadata(metadata, ref_timestamp, timestamp_format, timezone_id)
-
-    def test_timezone_new_reference(self) -> None:
-        """
-        Test the timezone is a new reference returned.
-        """
-        ref_timestamp: int = 2005689603190
-        timestamp_format: str = "yy/MM/dd HH:mm:ss"
-        timezone_id: str = "America/Chicago"
-        metadata: Metadata = Metadata(ref_timestamp, timestamp_format, timezone_id)
-        self.__check_metadata(metadata, ref_timestamp, timestamp_format, timezone_id)
-
-        wrong_tz: Optional[tzinfo] = metadata.get_timezone()
-        self.assertEqual(wrong_tz is metadata.get_timezone(), True)
-
-        wrong_tz = dateutil.tz.gettz("America/New_York")
-        self.assertEqual(wrong_tz is not metadata.get_timezone(), True)
-
-        self.__check_metadata(metadata, ref_timestamp, timestamp_format, timezone_id)
-
-    def __check_metadata(
+    def _check_metadata(
         self,
         metadata: Metadata,
         expected_ref_timestamp: int,
         expected_timestamp_format: str,
         expected_timezone_id: str,
+        extra_test_info: str = "",
     ) -> None:
         """
         Given a Metadata object, check if the content matches the reference.
@@ -92,6 +77,8 @@ class TestCaseMetadata(unittest.TestCase):
         :param expected_ref_timestamp: Expected reference timestamp.
         :param expected_timestamp_format: Expected timestamp format.
         :param expected_timezone_id: Expected timezone ID.
+        :param extra_test_info: Extra test information appended to the assert
+            message.
         """
         ref_timestamp: int = metadata.get_ref_timestamp()
         timestamp_format: str = metadata.get_timestamp_format()
@@ -101,17 +88,19 @@ class TestCaseMetadata(unittest.TestCase):
         self.assertEqual(
             ref_timestamp,
             expected_ref_timestamp,
-            f'Reference Timestamp: "{ref_timestamp}", Expected: "{expected_ref_timestamp}"',
+            f'Reference Timestamp: "{ref_timestamp}", Expected: "{expected_ref_timestamp}"\n'
+            + extra_test_info,
         )
         self.assertEqual(
             timestamp_format,
             expected_timestamp_format,
-            f'Timestamp Format: "{timestamp_format}", Expected: "{expected_timestamp_format}"',
+            f'Timestamp Format: "{timestamp_format}", Expected: "{expected_timestamp_format}"\n'
+            + extra_test_info,
         )
         self.assertEqual(
             timezone_id,
             expected_timezone_id,
-            f'Timezone ID: "{timezone_id}", Expected: "{expected_timezone_id}"',
+            f'Timezone ID: "{timezone_id}", Expected: "{expected_timezone_id}"\n',
         )
 
         expected_tzinfo: Optional[tzinfo] = dateutil.tz.gettz(expected_timezone_id)
@@ -121,155 +110,17 @@ class TestCaseMetadata(unittest.TestCase):
             is_the_same_tz,
             True,
             f"Timezone does not match timezone id. Timezone ID: {timezone_id}, Timezone:"
-            f' {str(timezone)}"',
+            f' {str(timezone)}"\n'
+            + extra_test_info,
         )
 
-
-class TestCaseLogEvent(unittest.TestCase):
-    """
-    Class for testing clp_ffi_py.ir.LogEvent.
-    """
-
-    def test_init(self) -> None:
-        """
-        Test the initialization of LogEvent object without using keyword.
-        """
-        log_message: str = " This is a test log message"
-        timestamp: int = 2005689603190
-        idx: int = 3270
-        metadata: Optional[Metadata] = None
-
-        log_event: LogEvent
-
-        log_event = LogEvent(log_message, timestamp, idx, metadata)
-        self.__check_log_event(log_event, log_message, timestamp, idx)
-
-        log_event = LogEvent(log_message, timestamp)
-        self.__check_log_event(log_event, log_message, timestamp, 0)
-
-    def test_keyword_init(self) -> None:
-        """
-        Test the initialization of LogEvent object using keyword.
-        """
-        log_message: str = " This is a test log message"
-        timestamp: int = 932724000000
-        idx: int = 14111813
-        metadata: Optional[Metadata] = None
-
-        # Initialize with keyword (in-order)
-        log_event = LogEvent(
-            log_message=log_message, timestamp=timestamp, index=idx, metadata=metadata
-        )
-        self.__check_log_event(log_event, log_message, timestamp, idx)
-
-        # Initialize with keyword (out-of-order)
-        log_event = LogEvent(
-            index=idx, timestamp=timestamp, log_message=log_message, metadata=metadata
-        )
-        self.__check_log_event(log_event, log_message, timestamp, idx)
-
-        # Initialize with keyword and default argument (out-of-order)
-        log_event = LogEvent(timestamp=timestamp, log_message=log_message)
-        self.__check_log_event(log_event, log_message, timestamp, 0)
-
-    def test_formatted_message(self) -> None:
-        """
-        Test the reconstruction of the raw message.
-
-        In particular, it checks if the timestamp is properly formatted with the
-        expected tzinfo
-        """
-        log_message: str = " This is a test log message"
-        timestamp: int = 932724000000
-        idx: int = 3190
-        metadata: Optional[Metadata] = Metadata(0, "yy/MM/dd HH:mm:ss", "Asia/Hong_Kong")
-        log_event: LogEvent
-        expected_formatted_message: str
-        formatted_message: str
-
-        # If metadata is given, use the metadata's timezone as default
-        log_event = LogEvent(
-            log_message=log_message, timestamp=timestamp, index=idx, metadata=metadata
-        )
-        self.__check_log_event(log_event, log_message, timestamp, idx)
-        expected_formatted_message = f"1999-07-23 18:00:00.000+08:00{log_message}"
-        formatted_message = log_event.get_formatted_message()
-
-        self.assertEqual(
-            formatted_message,
-            expected_formatted_message,
-            f"Raw message: {formatted_message}; Expected: {expected_formatted_message}",
-        )
-
-        # If metadata is given but another timestamp is specified, use the given
-        # timestamp
-        test_tz: Optional[tzinfo] = dateutil.tz.gettz("America/New_York")
-        assert test_tz is not None
-        expected_formatted_message = f"1999-07-23 06:00:00.000-04:00{log_message}"
-        formatted_message = log_event.get_formatted_message(test_tz)
-        self.assertEqual(
-            formatted_message,
-            expected_formatted_message,
-            f"Raw message: {formatted_message}; Expected: {expected_formatted_message}",
-        )
-
-        # If the metadata is initialized as None, and no tzinfo passed in, UTC
-        # will be used as default
-        log_event = LogEvent(log_message=log_message, timestamp=timestamp, index=idx, metadata=None)
-        self.__check_log_event(log_event, log_message, timestamp, idx)
-        expected_formatted_message = f"1999-07-23 10:00:00.000+00:00{log_message}"
-        formatted_message = log_event.get_formatted_message()
-        self.assertEqual(
-            formatted_message,
-            expected_formatted_message,
-            f"Raw message: {formatted_message}; Expected: {expected_formatted_message}",
-        )
-
-    def test_pickle(self) -> None:
-        """
-        Test the reconstruction of LogEvent object from pickling data.
-
-        For unpickled LogEvent object, even though the metadata is set to None,
-        it should still format the timestamp with the original tz before
-        pickling
-        """
-        log_message: str = " This is a test log message"
-        timestamp: int = 932724000000
-        idx: int = 3190
-        metadata: Optional[Metadata] = Metadata(0, "yy/MM/dd HH:mm:ss", "Asia/Hong_Kong")
-        log_event = LogEvent(
-            log_message=log_message, timestamp=timestamp, index=idx, metadata=metadata
-        )
-        self.__check_log_event(log_event, log_message, timestamp, idx)
-        reconstructed_log_event: LogEvent = pickle.loads(pickle.dumps(log_event))
-        self.__check_log_event(reconstructed_log_event, log_message, timestamp, idx)
-
-        # For unpickled LogEvent object, even though the metadata is set to
-        # None, it should still format the timestamp with the original tz before
-        # pickling
-        expected_formatted_message = f"1999-07-23 18:00:00.000+08:00{log_message}"
-        formatted_message = reconstructed_log_event.get_formatted_message()
-        self.assertEqual(
-            formatted_message,
-            expected_formatted_message,
-            f"Raw message: {formatted_message}; Expected: {expected_formatted_message}",
-        )
-
-        # If we pickle it again, we should still have the same results
-        reconstructed_log_event = pickle.loads(pickle.dumps(reconstructed_log_event))
-        formatted_message = reconstructed_log_event.get_formatted_message()
-        self.assertEqual(
-            formatted_message,
-            expected_formatted_message,
-            f"Raw message: {formatted_message}; Expected: {expected_formatted_message}",
-        )
-
-    def __check_log_event(
+    def _check_log_event(
         self,
         log_event: LogEvent,
         expected_log_message: str,
         expected_timestamp: int,
         expected_idx: int,
+        extra_test_info: str = "",
     ) -> None:
         """
         Given a LogEvent object, check if the content matches the reference.
@@ -278,6 +129,8 @@ class TestCaseLogEvent(unittest.TestCase):
         :param expected_log_message: Expected log message.
         :param expected_timestamp: Expected timestamp.
         :param expected_idx: Expected log event index.
+        :param extra_test_info: Extra test information appended to the assert
+            message.
         """
         log_message: str = log_event.get_log_message()
         timestamp: int = log_event.get_timestamp()
@@ -285,61 +138,16 @@ class TestCaseLogEvent(unittest.TestCase):
         self.assertEqual(
             log_message,
             expected_log_message,
-            f'Log message: "{log_message}", Expected: "{expected_log_message}"',
+            f'Log message: "{log_message}", Expected: "{expected_log_message}"\n' + extra_test_info,
         )
         self.assertEqual(
             timestamp,
             expected_timestamp,
-            f'Timestamp: "{timestamp}", Expected: "{expected_log_message}"',
+            f'Timestamp: "{timestamp}", Expected: "{expected_log_message}"\n' + extra_test_info,
         )
-        self.assertEqual(idx, expected_idx, f"Message idx: {idx}, Expected: {expected_idx}")
-
-
-class TestCaseFourByteEncoder(unittest.TestCase):
-    """
-    Class for testing clp_ffi_py.ir.FourByteEncoder.
-
-    The actual functionality should also be covered by the unittest of CLP
-    Python logging library.
-    TODO: When the decoder is implemented, add some more tests to ensure the
-    encoded bytes can be successfully decoded to recover the original log event.
-    """
-
-    def test_init(self) -> None:
-        type_error_exception_captured: bool = False
-        four_byte_encoder: FourByteEncoder
-        try:
-            four_byte_encoder = FourByteEncoder()  # noqa
-        except TypeError:
-            type_error_exception_captured = True
         self.assertEqual(
-            type_error_exception_captured, True, "FourByteEncoder should be non-instantiable."
+            idx, expected_idx, f"Message idx: {idx}, Expected: {expected_idx}\n" + extra_test_info
         )
-
-    def test_encoding_methods_consistency(self) -> None:
-        """
-        This test checks if the result of encode_message_and_timestamp_delta is
-        consistent with the combination of encode_message and
-        encode_timestamp_delta.
-        """
-        timestamp_delta: int = -3190
-        log_message: str = "This is a test message: Do NOT Reply!"
-        encoded_message_and_ts_delta: bytearray = (
-            FourByteEncoder.encode_message_and_timestamp_delta(
-                timestamp_delta, log_message.encode()
-            )
-        )
-        encoded_message: bytearray = FourByteEncoder.encode_message(log_message.encode())
-        encoded_ts_delta: bytearray = FourByteEncoder.encode_timestamp_delta(timestamp_delta)
-        self.assertEqual(encoded_message_and_ts_delta, encoded_message + encoded_ts_delta)
-
-
-class TestCaseQueryBase(unittest.TestCase):
-    """
-    Base class for Query related testing.
-
-    Helper functions should be defined in this class.
-    """
 
     def _check_wildcard_query(
         self, wildcard_query: WildcardQuery, ref_wildcard_string: str, ref_is_case_sensitive: bool
@@ -429,7 +237,239 @@ class TestCaseQueryBase(unittest.TestCase):
             )
 
 
-class TestCaseWildcardQuery(TestCaseQueryBase):
+class TestCaseMetadata(TestBase):
+    """
+    Class for testing clp_ffi_py.ir.Metadata.
+    """
+
+    def test_init(self) -> None:
+        """
+        Test the initialization of Metadata object without using keyword.
+        """
+        ref_timestamp: int = 2005689603190
+        timestamp_format: str = "yy/MM/dd HH:mm:ss"
+        timezone_id: str = "America/Chicago"
+        metadata: Metadata = Metadata(ref_timestamp, timestamp_format, timezone_id)
+        self._check_metadata(metadata, ref_timestamp, timestamp_format, timezone_id)
+
+    def test_keyword_init(self) -> None:
+        """
+        Test the initialization of Metadata object using keyword.
+        """
+        ref_timestamp: int = 2005689603270
+        timestamp_format: str = "MM/dd/yy HH:mm:ss"
+        timezone_id: str = "America/New_York"
+        metadata: Metadata
+
+        metadata = Metadata(
+            ref_timestamp=ref_timestamp, timestamp_format=timestamp_format, timezone_id=timezone_id
+        )
+        self._check_metadata(metadata, ref_timestamp, timestamp_format, timezone_id)
+
+        metadata = Metadata(
+            timestamp_format=timestamp_format, ref_timestamp=ref_timestamp, timezone_id=timezone_id
+        )
+        self._check_metadata(metadata, ref_timestamp, timestamp_format, timezone_id)
+
+    def test_timezone_new_reference(self) -> None:
+        """
+        Test the timezone is a new reference returned.
+        """
+        ref_timestamp: int = 2005689603190
+        timestamp_format: str = "yy/MM/dd HH:mm:ss"
+        timezone_id: str = "America/Chicago"
+        metadata: Metadata = Metadata(ref_timestamp, timestamp_format, timezone_id)
+        self._check_metadata(metadata, ref_timestamp, timestamp_format, timezone_id)
+
+        wrong_tz: Optional[tzinfo] = metadata.get_timezone()
+        self.assertEqual(wrong_tz is metadata.get_timezone(), True)
+
+        wrong_tz = dateutil.tz.gettz("America/New_York")
+        self.assertEqual(wrong_tz is not metadata.get_timezone(), True)
+
+        self._check_metadata(metadata, ref_timestamp, timestamp_format, timezone_id)
+
+
+class TestCaseLogEvent(TestBase):
+    """
+    Class for testing clp_ffi_py.ir.LogEvent.
+    """
+
+    def test_init(self) -> None:
+        """
+        Test the initialization of LogEvent object without using keyword.
+        """
+        log_message: str = " This is a test log message"
+        timestamp: int = 2005689603190
+        idx: int = 3270
+        metadata: Optional[Metadata] = None
+
+        log_event: LogEvent
+
+        log_event = LogEvent(log_message, timestamp, idx, metadata)
+        self._check_log_event(log_event, log_message, timestamp, idx)
+
+        log_event = LogEvent(log_message, timestamp)
+        self._check_log_event(log_event, log_message, timestamp, 0)
+
+    def test_keyword_init(self) -> None:
+        """
+        Test the initialization of LogEvent object using keyword.
+        """
+        log_message: str = " This is a test log message"
+        timestamp: int = 932724000000
+        idx: int = 14111813
+        metadata: Optional[Metadata] = None
+
+        # Initialize with keyword (in-order)
+        log_event = LogEvent(
+            log_message=log_message, timestamp=timestamp, index=idx, metadata=metadata
+        )
+        self._check_log_event(log_event, log_message, timestamp, idx)
+
+        # Initialize with keyword (out-of-order)
+        log_event = LogEvent(
+            index=idx, timestamp=timestamp, log_message=log_message, metadata=metadata
+        )
+        self._check_log_event(log_event, log_message, timestamp, idx)
+
+        # Initialize with keyword and default argument (out-of-order)
+        log_event = LogEvent(timestamp=timestamp, log_message=log_message)
+        self._check_log_event(log_event, log_message, timestamp, 0)
+
+    def test_formatted_message(self) -> None:
+        """
+        Test the reconstruction of the raw message.
+
+        In particular, it checks if the timestamp is properly formatted with the
+        expected tzinfo
+        """
+        log_message: str = " This is a test log message"
+        timestamp: int = 932724000000
+        idx: int = 3190
+        metadata: Optional[Metadata] = Metadata(0, "yy/MM/dd HH:mm:ss", "Asia/Hong_Kong")
+        log_event: LogEvent
+        expected_formatted_message: str
+        formatted_message: str
+
+        # If metadata is given, use the metadata's timezone as default
+        log_event = LogEvent(
+            log_message=log_message, timestamp=timestamp, index=idx, metadata=metadata
+        )
+        self._check_log_event(log_event, log_message, timestamp, idx)
+        expected_formatted_message = f"1999-07-23 18:00:00.000+08:00{log_message}"
+        formatted_message = log_event.get_formatted_message()
+
+        self.assertEqual(
+            formatted_message,
+            expected_formatted_message,
+            f"Raw message: {formatted_message}; Expected: {expected_formatted_message}",
+        )
+
+        # If metadata is given but another timestamp is specified, use the given
+        # timestamp
+        test_tz: Optional[tzinfo] = dateutil.tz.gettz("America/New_York")
+        assert test_tz is not None
+        expected_formatted_message = f"1999-07-23 06:00:00.000-04:00{log_message}"
+        formatted_message = log_event.get_formatted_message(test_tz)
+        self.assertEqual(
+            formatted_message,
+            expected_formatted_message,
+            f"Raw message: {formatted_message}; Expected: {expected_formatted_message}",
+        )
+
+        # If the metadata is initialized as None, and no tzinfo passed in, UTC
+        # will be used as default
+        log_event = LogEvent(log_message=log_message, timestamp=timestamp, index=idx, metadata=None)
+        self._check_log_event(log_event, log_message, timestamp, idx)
+        expected_formatted_message = f"1999-07-23 10:00:00.000+00:00{log_message}"
+        formatted_message = log_event.get_formatted_message()
+        self.assertEqual(
+            formatted_message,
+            expected_formatted_message,
+            f"Raw message: {formatted_message}; Expected: {expected_formatted_message}",
+        )
+
+    def test_pickle(self) -> None:
+        """
+        Test the reconstruction of LogEvent object from pickling data.
+
+        For unpickled LogEvent object, even though the metadata is set to None,
+        it should still format the timestamp with the original tz before
+        pickling
+        """
+        log_message: str = " This is a test log message"
+        timestamp: int = 932724000000
+        idx: int = 3190
+        metadata: Optional[Metadata] = Metadata(0, "yy/MM/dd HH:mm:ss", "Asia/Hong_Kong")
+        log_event = LogEvent(
+            log_message=log_message, timestamp=timestamp, index=idx, metadata=metadata
+        )
+        self._check_log_event(log_event, log_message, timestamp, idx)
+        reconstructed_log_event: LogEvent = pickle.loads(pickle.dumps(log_event))
+        self._check_log_event(reconstructed_log_event, log_message, timestamp, idx)
+
+        # For unpickled LogEvent object, even though the metadata is set to
+        # None, it should still format the timestamp with the original tz before
+        # pickling
+        expected_formatted_message = f"1999-07-23 18:00:00.000+08:00{log_message}"
+        formatted_message = reconstructed_log_event.get_formatted_message()
+        self.assertEqual(
+            formatted_message,
+            expected_formatted_message,
+            f"Raw message: {formatted_message}; Expected: {expected_formatted_message}",
+        )
+
+        # If we pickle it again, we should still have the same results
+        reconstructed_log_event = pickle.loads(pickle.dumps(reconstructed_log_event))
+        formatted_message = reconstructed_log_event.get_formatted_message()
+        self.assertEqual(
+            formatted_message,
+            expected_formatted_message,
+            f"Raw message: {formatted_message}; Expected: {expected_formatted_message}",
+        )
+
+
+class TestCaseFourByteEncoder(TestBase):
+    """
+    Class for testing clp_ffi_py.ir.FourByteEncoder.
+
+    The actual functionality should also be covered by the unittest of CLP
+    Python logging library.
+    TODO: When the decoder is implemented, add some more tests to ensure the
+    encoded bytes can be successfully decoded to recover the original log event.
+    """
+
+    def test_init(self) -> None:
+        type_error_exception_captured: bool = False
+        four_byte_encoder: FourByteEncoder
+        try:
+            four_byte_encoder = FourByteEncoder()  # noqa
+        except TypeError:
+            type_error_exception_captured = True
+        self.assertEqual(
+            type_error_exception_captured, True, "FourByteEncoder should be non-instantiable."
+        )
+
+    def test_encoding_methods_consistency(self) -> None:
+        """
+        This test checks if the result of encode_message_and_timestamp_delta is
+        consistent with the combination of encode_message and
+        encode_timestamp_delta.
+        """
+        timestamp_delta: int = -3190
+        log_message: str = "This is a test message: Do NOT Reply!"
+        encoded_message_and_ts_delta: bytearray = (
+            FourByteEncoder.encode_message_and_timestamp_delta(
+                timestamp_delta, log_message.encode()
+            )
+        )
+        encoded_message: bytearray = FourByteEncoder.encode_message(log_message.encode())
+        encoded_ts_delta: bytearray = FourByteEncoder.encode_timestamp_delta(timestamp_delta)
+        self.assertEqual(encoded_message_and_ts_delta, encoded_message + encoded_ts_delta)
+
+
+class TestCaseWildcardQuery(TestBase):
     """
     Class for testing clp_ffi_py.wildcard_query.WildcardQuery.
     """
@@ -455,7 +495,7 @@ class TestCaseWildcardQuery(TestCaseQueryBase):
         self._check_wildcard_query(wildcard_query, wildcard_string, True)
 
 
-class TestCaseQuery(TestCaseQueryBase):
+class TestCaseQuery(TestBase):
     """
     Class for testing clp_ffi_py.ir.Query.
     """
@@ -763,7 +803,7 @@ class TestCaseQuery(TestCaseQueryBase):
         self.assertEqual(log_event.match_query(query), True, description)
 
 
-class TestCaseDecoderBuffer(unittest.TestCase):
+class TestCaseDecoderBuffer(TestBase):
     """
     Class for testing clp_ffi_py.ir.DecoderBuffer.
     """
@@ -857,6 +897,535 @@ class TestCaseDecoderBuffer(unittest.TestCase):
                 f"Streaming result is different from the src: {file_path}. Random seed:"
                 f" {random_seed}.",
             )
+
+
+class LogGenerator:
+    """
+    Generates random logs from a list of log types and dictionary words.
+    """
+
+    log_type_list: List[str] = [
+        (
+            "org.apache.hadoop.yarn.event.AsyncDispatcher: Registering class"
+            " org.apache.hadoop.yarn.server.nodemanager.NodeManagerEventType for class"
+            " org.apache.hadoop.yarn.server.nodemanager.NodeManager"
+        ),
+        "\d: Scheduled snapshot period at \i second(s).",
+        (
+            "org.apache.hadoop.ipc.Client: Retrying connect to server: \d:\d Already tried \i"
+            " time(s); retry policy is RetryUpToMaximumCountWithFixedSleep(maxRetries=\i,"
+            " sleepTime=\i MILLISECONDS)"
+        ),
+        (
+            "org.apache.hadoop.yarn.server.nodemanager.containermanager.monitor.ContainersMonitor:"
+            " Memory usage of ProcessTree \i for container-id \d: \f MB of \i GB physical memory"
+            " used; \f MB of \f GB virtual memory used"
+        ),
+        (
+            "org.apache.hadoop.hdfs.server.datanode.DataNode: Namenode Block pool \d (Datanode Uuid"
+            " \d) service to \d:\i trying to claim ACTIVE state with txid=\i"
+        ),
+        " org.apache.hadoop.mapred.MapTask: (RESET) equator \i kv \i(\i) kvi \i(\i)",
+        " org.apache.hadoop.mapred.TaskAttemptListenerImpl: Progress of TaskAttempt \d is : \f",
+        (
+            " \d: Final Stats: PendingReds:\i ScheduledMaps:\i ScheduledReds:\i AssignedMaps:\i"
+            " AssignedReds:\i CompletedMaps:\i CompletedReds:\i ContAlloc:\i ContRel:\i"
+            " HostLocal:\i RackLocal:\i"
+        ),
+        (
+            "org.apache.hadoop.yarn.server.resourcemanager.scheduler.capacity.LeafQueue: Reserved"
+            " container  application=\d resource=<memory:\i, vCores:\i> queue=\d: capacity=\f,"
+            " absoluteCapacity=\f, usedResources=<memory:\i, vCores:\i>, usedCapacity=\f,"
+            " absoluteUsedCapacity=\f, numApps=\i, numContainers=\i usedCapacity=\f"
+            " absoluteUsedCapacity=\f used=<memory:\i, vCores:\i> cluster=<memory:\i, vCores:\i>"
+        ),
+        "org.apache.hadoop.hdfs.server.namenode.TransferFsImage: Transfer took \d at \f KB/s",
+    ]
+
+    dict_words: List[str] = [
+        "attempt_1427088391284_0029_r_000026_0",
+        "blk_1073742594_1770",
+        "container_1427088391284_0034_01_000074",
+        "DFSClient_attempt_1427088391284_0015_r_000003_0_-1867302407_1",
+        "ip-172-31-17-96",
+        "jvm_1427088391284_0034_m_000018",
+        "jvm_1427088391284_0032_m_000200",
+        "task_1427088391284_0034_m_000005",
+        (
+            "/tmp/hadoop-ubuntu/nm-local-dir/usercache/ubuntu/appcache/application_1427088391284_72"
+            "/container_1427088391284_0072_01_000031/default_container_executor.sh"
+        ),
+        (
+            "/tmp/hadoop-ubuntu/nm-local-dir/usercache/ubuntu/appcache/application_1427088391284_27"
+            "/container_1427088391284_0027_01_000008.tokens"
+        ),
+        (
+            "/tmp/hadoop-ubuntu/nm-local-dir/usercache/ubuntu/appcache/application_1427088391284_87"
+            "/container_1427088391284_0087_01_000043/default_container_executor.sh"
+        ),
+        "/tmp/hadoop-yarn/staging/ubuntu/.staging/job_1427088391284_0005",
+        (
+            "/tmp/hadoop-ubuntu/dfs/data/current/BP-1121897155-172.31.17.135-1427088167814/current"
+            "/finalized/subdir0/subdir18/blk_1073746642"
+        ),
+        "328418859ns",
+        "3154ms",
+    ]
+
+    @staticmethod
+    def generate_random_logs(num_log_events: int) -> Tuple[Metadata, List[LogEvent]]:
+        ref_timestamp: int = _get_current_timestamp()
+        timestamp_format: str = "yy/MM/dd HH:mm:ss"
+        timezone_id: str = "America/Chicago"
+        metadata: Metadata = Metadata(ref_timestamp, timestamp_format, timezone_id)
+        log_events: List[LogEvent] = []
+        timestamp: int = ref_timestamp
+        for idx in range(num_log_events):
+            log_message: str = random.choice(LogGenerator.log_type_list)
+            log_message = log_message.replace("\d", random.choice(LogGenerator.dict_words))
+            log_message = log_message.replace("\i", str(random.randint(-999999999, 999999999)))
+            log_message = log_message.replace("\f", str(random.uniform(-999999, 9999999)))
+            timestamp += random.randint(0, 10)
+            log_event: LogEvent = LogEvent(log_message + "\n", timestamp, idx)
+            log_events.append(log_event)
+        return metadata, log_events
+
+    @staticmethod
+    def generate_random_log_type_wildcard_queries(num_wildcard_queries: int) -> List[WildcardQuery]:
+        num_log_types: int = len(LogGenerator.log_type_list)
+        num_wildcard_queries = min(num_log_types, num_wildcard_queries)
+        selected_log_type_idx: Set[int] = set()
+        max_log_type_idx: int = num_log_types - 1
+        wildcard_queries: List[WildcardQuery] = []
+        for _ in range(num_wildcard_queries):
+            idx: int
+            while True:
+                idx = random.randint(0, max_log_type_idx)
+                if idx in selected_log_type_idx:
+                    continue
+                break
+            selected_log_type_idx.add(idx)
+            wildcard_query_str: str = LogGenerator.log_type_list[idx]
+
+            # Replace the placeholders by the wildcard `*`
+            wildcard_query_str = wildcard_query_str.replace("\d", "*")
+            wildcard_query_str = wildcard_query_str.replace("\i", "*")
+            wildcard_query_str = wildcard_query_str.replace("\f", "*")
+
+            # Replace a random character that is not `*` by `?`
+            str_idx_max: int = len(wildcard_query_str) - 1
+            while True:
+                str_idx: int = random.randint(0, str_idx_max)
+                if "*" == wildcard_query_str[str_idx] or "/" == wildcard_query_str[str_idx]:
+                    continue
+                wildcard_query_str = (
+                    wildcard_query_str[:str_idx] + "?" + wildcard_query_str[str_idx + 1 :]
+                )
+                break
+
+            wildcard_queries.append(
+                WildcardQuery(wildcard_query=wildcard_query_str, case_sensitive=True)
+            )
+
+        return wildcard_queries
+
+
+class TestCaseDecoderBase(TestBase):
+    """
+    Class for testing clp_ffi_py.ir.Decoder.
+    """
+
+    encoded_log_path_prefix: str
+    encoded_log_path_postfix: str
+    num_test_iterations: int
+    enable_compression: bool
+    has_query: bool
+
+    # override
+    @classmethod
+    def setUpClass(cls) -> None:
+        if not LOG_DIR.exists():
+            LOG_DIR.mkdir(parents=True, exist_ok=True)
+        assert LOG_DIR.is_dir()
+
+    # override
+    def setUp(self) -> None:
+        self.encoded_log_path_prefix: str = f"{self.id()}"
+        self.encoded_log_path_postfix: str = "clp.zst" if self.enable_compression else "clp"
+        for i in range(self.num_test_iterations):
+            log_path = self._get_log_path(i)
+            if log_path.exists():
+                log_path.unlink()
+
+    def _get_log_path(self, iter: int) -> Path:
+        log_path: Path = LOG_DIR / Path(
+            f"{self.encoded_log_path_prefix}.{iter}.{self.encoded_log_path_postfix}"
+        )
+        return log_path
+
+    def _encode_random_log_stream(
+        self, log_path: Path, num_log_events_to_generate: int, seed: int
+    ) -> Tuple[Metadata, List[LogEvent]]:
+        """
+        Writes a randomly generated log stream into the local path `log_path`.
+
+        :param log_path: Path on the local file system to write the stream.
+        :param num_log_events_to_generate: Number of log events to generate.
+        :param seed: Random seed used to generate the log stream.
+        :return: A tuple containing the generated log events and the metadata.
+        """
+        metadata: Metadata
+        log_events: List[LogEvent]
+        metadata, log_events = LogGenerator.generate_random_logs(num_log_events_to_generate)
+        try:
+            with open(str(log_path), "wb") as ostream:
+                ref_timestamp: int = metadata.get_ref_timestamp()
+                ostream.write(
+                    FourByteEncoder.encode_preamble(
+                        ref_timestamp, metadata.get_timestamp_format(), metadata.get_timezone_id()
+                    )
+                )
+                for log_event in log_events:
+                    curr_ts: int = log_event.get_timestamp()
+                    delta: int = curr_ts - ref_timestamp
+                    ref_timestamp = curr_ts
+                    log_message: str = log_event.get_log_message()
+                    ostream.write(
+                        FourByteEncoder.encode_message_and_timestamp_delta(
+                            delta, log_message.encode()
+                        )
+                    )
+                ostream.write(b"\x00")
+        except Exception as e:
+            self.assertTrue(
+                False, f"Failed to encode random log stream generated using seed {seed}: {e}"
+            )
+        return metadata, log_events
+
+    def _generate_random_query(
+        self, ref_log_events: List[LogEvent]
+    ) -> Tuple[Query, List[LogEvent]]:
+        """
+        Generates a random query and return all the log events in the given
+        `log_events` that matches this random query.
+
+        The derived class might overwrite this method to generate a random query
+        using customized algorithm. By default, this function returns an empty
+        query and `ref_log_events`.
+        :param log_events: reference log events.
+        :return: A tuple that contains the randomly generated query, and a list
+        of log events filtered from `ref_log_events` by the query.
+        """
+        return Query(), ref_log_events
+
+    def _decode_log_stream(
+        self, log_path: Path, query: Optional[Query]
+    ) -> Tuple[Metadata, List[LogEvent]]:
+        """
+        Decodes the log stream specified by `log_path`, using decoding methods
+        provided in clp_ffi_py.ir.Decoder.
+
+        :param log_path: The path to the log stream.
+        :param query: Optional search query.
+        :return: A tuple that contains the decoded metadata and log events
+            returned from decoding methods.
+        """
+        with open(str(log_path), "rb") as istream:
+            decoder_buffer: DecoderBuffer = DecoderBuffer(istream)
+            metadata: Metadata = Decoder.decode_preamble(decoder_buffer)
+            log_events: List[LogEvent] = []
+            while True:
+                log_event: Optional[LogEvent] = Decoder.decode_next_log_event(decoder_buffer, query)
+                if None is log_event:
+                    break
+                log_events.append(log_event)
+        return metadata, log_events
+
+    def _validate_decoded_logs(
+        self,
+        ref_metadata: Metadata,
+        ref_log_events: List[LogEvent],
+        decoded_metadata: Metadata,
+        decoded_log_events: List[LogEvent],
+        log_path: Path,
+        seed: int,
+    ) -> None:
+        """
+        Validates decoded logs from the IR stream specified by `log_path`.
+
+        :param ref_metadata: Reference metadata.
+        :param ref_log_events: A list of reference log events sequence (order
+            sensitive).
+        :param decoded_metadata: Metadata decoded from the IR stream.
+        :param decoded_log_events: A list of log events decoded from the IR
+            stream in sequence.
+        :param log_path: Local path of the IR stream.
+        :param seed: Random seed used to generate the log events sequence.
+        """
+        test_info: str = f"Seed: {seed}, Log Path: {log_path}"
+        self._check_metadata(
+            decoded_metadata,
+            ref_metadata.get_ref_timestamp(),
+            ref_metadata.get_timestamp_format(),
+            ref_metadata.get_timezone_id(),
+            test_info,
+        )
+
+        ref_num_log_events: int = len(ref_log_events)
+        decoded_num_log_events: int = len(decoded_log_events)
+        self.assertEqual(
+            ref_num_log_events,
+            decoded_num_log_events,
+            "Number of log events decoded does not match.\n" + test_info,
+        )
+        for ref_log_event, decoded_log_event in zip(ref_log_events, decoded_log_events):
+            self._check_log_event(
+                decoded_log_event,
+                ref_log_event.get_log_message(),
+                ref_log_event.get_timestamp(),
+                ref_log_event.get_index(),
+                test_info,
+            )
+
+    def test_decoder_with_random_logs(self) -> None:
+        """
+        Tests encoding/decoding methods.
+
+        Check the TestCase class doc string for more details.
+        """
+        for i in range(self.num_test_iterations):
+            seed: int = _get_current_timestamp()
+            random.seed(seed)
+            num_log_events: int = 100 * (i + 1)
+            log_path: Path = self._get_log_path(i)
+
+            ref_metadata: Metadata
+            ref_log_events: List[LogEvent]
+            ref_metadata, ref_log_events = self._encode_random_log_stream(
+                log_path, num_log_events, seed
+            )
+
+            query: Optional[Query] = None
+            if self.has_query:
+                query, ref_log_events = self._generate_random_query(ref_log_events)
+
+            metadata: Metadata
+            log_events: List[LogEvent]
+            try:
+                metadata, log_events = self._decode_log_stream(log_path, query)
+            except Exception as e:
+                self.assertTrue(
+                    False, f"Failed to decode random log stream generated using seed {seed}: {e}"
+                )
+
+            self._validate_decoded_logs(
+                ref_metadata, ref_log_events, metadata, log_events, log_path, seed
+            )
+
+
+class TestCaseDecoderDecompress(TestCaseDecoderBase):
+    """
+    Tests encoding/decoding methods against uncompressed IR stream.
+    """
+
+    # override
+    def setUp(self) -> None:
+        self.enable_compression = False
+        self.has_query = False
+        self.num_test_iterations = 10
+        super().setUp()
+
+
+class TestCaseDecoderDecompressZst(TestCaseDecoderBase):
+    """
+    Tests encoding/decoding methods against zstd compressed IR stream.
+    """
+
+    # override
+    def setUp(self) -> None:
+        self.enable_compression = True
+        self.has_query = False
+        self.num_test_iterations = 10
+        super().setUp()
+
+
+class TestCaseDecoderDecompressDefaultQuery(TestCaseDecoderBase):
+    """
+    Tests encoding/decoding methods against uncompressed IR stream with the
+    default empty query.
+    """
+
+    # override
+    def setUp(self) -> None:
+        self.enable_compression = False
+        self.has_query = True
+        self.num_test_iterations = 1
+        super().setUp()
+
+
+class TestCaseDecoderDecompressZstDefaultQuery(TestCaseDecoderBase):
+    """
+    Tests encoding/decoding methods against zst compressed IR stream with the
+    default empty query.
+    """
+
+    # override
+    def setUp(self) -> None:
+        self.enable_compression = True
+        self.has_query = True
+        self.num_test_iterations = 1
+        super().setUp()
+
+
+class TestCaseDecoderTimeRangeQueryBase(TestCaseDecoderBase):
+    # override
+    def _generate_random_query(
+        self, ref_log_events: List[LogEvent]
+    ) -> Tuple[Query, List[LogEvent]]:
+        self.assertGreater(len(ref_log_events), 0, "The reference log event list is empty.")
+        ts_min: int = ref_log_events[0].get_timestamp()
+        ts_max: int = ref_log_events[-1].get_timestamp()
+        search_time_lower_bound: int = random.randint(ts_min, ts_max)
+        search_time_upper_bound: int = random.randint(search_time_lower_bound, ts_max)
+        query: Query = Query(
+            search_time_lower_bound=search_time_lower_bound,
+            search_time_upper_bound=search_time_upper_bound,
+            search_time_termination_margin=0,
+        )
+        matched_log_events: List[LogEvent] = []
+        for log_event in ref_log_events:
+            if not log_event.match_query(query):
+                continue
+            matched_log_events.append(log_event)
+        return query, matched_log_events
+
+
+class TestCaseDecoderTimeRangeQuery(TestCaseDecoderTimeRangeQueryBase):
+    """
+    Tests encoding/decoding methods against uncompressed IR stream with the
+    query that specifies a search timestamp.
+    """
+
+    # override
+    def setUp(self) -> None:
+        self.enable_compression = False
+        self.has_query = True
+        self.num_test_iterations = 10
+        super().setUp()
+
+
+class TestCaseDecoderTimeRangeQueryZst(TestCaseDecoderTimeRangeQueryBase):
+    """
+    Tests encoding/decoding methods against zst compressed IR stream with the
+    query that specifies a search timestamp.
+    """
+
+    # override
+    def setUp(self) -> None:
+        self.enable_compression = True
+        self.has_query = True
+        self.num_test_iterations = 10
+        super().setUp()
+
+
+class TestCaseDecoderWildcardQueryBase(TestCaseDecoderBase):
+    # override
+    def _generate_random_query(
+        self, ref_log_events: List[LogEvent]
+    ) -> Tuple[Query, List[LogEvent]]:
+        wildcard_queries: List[WildcardQuery] = (
+            LogGenerator.generate_random_log_type_wildcard_queries(3)
+        )
+        query: Query = Query(wildcard_queries=wildcard_queries)
+        matched_log_events: List[LogEvent] = []
+        for log_event in ref_log_events:
+            if not log_event.match_query(query):
+                continue
+            matched_log_events.append(log_event)
+        return query, matched_log_events
+
+
+class TestCaseDecoderWildcardQuery(TestCaseDecoderWildcardQueryBase):
+    """
+    Tests encoding/decoding methods against uncompressed IR stream with the
+    query that specifies wildcard queries.
+    """
+
+    # override
+    def setUp(self) -> None:
+        self.enable_compression = False
+        self.has_query = True
+        self.num_test_iterations = 10
+        super().setUp()
+
+
+class TestCaseDecoderWildcardQueryZst(TestCaseDecoderWildcardQueryBase):
+    """
+    Tests encoding/decoding methods against zst compressed IR stream with the
+    query that specifies a wildcard queries.
+    """
+
+    # override
+    def setUp(self) -> None:
+        self.enable_compression = True
+        self.has_query = True
+        self.num_test_iterations = 10
+        super().setUp()
+
+
+class TestCaseDecoderTimeRangeWildcardQueryBase(TestCaseDecoderBase):
+    # override
+    def _generate_random_query(
+        self, ref_log_events: List[LogEvent]
+    ) -> Tuple[Query, List[LogEvent]]:
+        self.assertGreater(len(ref_log_events), 0, "The reference log event list is empty.")
+        ts_min: int = ref_log_events[0].get_timestamp()
+        ts_max: int = ref_log_events[-1].get_timestamp()
+        search_time_lower_bound: int = random.randint(ts_min, ts_max)
+        search_time_upper_bound: int = random.randint(search_time_lower_bound, ts_max)
+        wildcard_queries: List[WildcardQuery] = (
+            LogGenerator.generate_random_log_type_wildcard_queries(3)
+        )
+        query: Query = Query(
+            search_time_lower_bound=search_time_lower_bound,
+            search_time_upper_bound=search_time_upper_bound,
+            wildcard_queries=wildcard_queries,
+            search_time_termination_margin=0,
+        )
+        matched_log_events: List[LogEvent] = []
+        for log_event in ref_log_events:
+            if not log_event.match_query(query):
+                continue
+            matched_log_events.append(log_event)
+        return query, matched_log_events
+
+
+class TestCaseDecoderTimeRangeWildcardQuery(TestCaseDecoderTimeRangeWildcardQueryBase):
+    """
+    Tests encoding/decoding methods against uncompressed IR stream with the
+    query that specifies both search time range and wildcard queries.
+    """
+
+    # override
+    def setUp(self) -> None:
+        self.enable_compression = False
+        self.has_query = True
+        self.num_test_iterations = 10
+        super().setUp()
+
+
+class TestCaseDecoderTimeRangeWildcardQueryZst(TestCaseDecoderTimeRangeWildcardQueryBase):
+    """
+    Tests encoding/decoding methods against zst compressed IR stream with the
+    query that specifies both search time range and wildcard queries.
+    """
+
+    # override
+    def setUp(self) -> None:
+        self.enable_compression = True
+        self.has_query = True
+        self.num_test_iterations = 10
+        super().setUp()
 
 
 if __name__ == "__main__":
