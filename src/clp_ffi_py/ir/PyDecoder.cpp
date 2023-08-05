@@ -9,10 +9,36 @@
 namespace clp_ffi_py::ir {
 namespace {
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
-PyDoc_STRVAR(cDecodePreambleDoc, "\n");
+PyDoc_STRVAR(
+        cDecodePreambleDoc,
+        "decode_preamble(decoder_buffer)\n"
+        "--\n\n"
+        "Decodes the encoded preamble from the IR stream buffered in the given decoder buffer.\n"
+        ":param decoder_buffer: The decoder buffer of the encoded CLP IR stream.\n"
+        ":return: The decoded preamble presented as a new instance of Metadata.\n"
+        ":raises: Appropriate exceptions with detailed information on any encountered failure.\n"
+);
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
-PyDoc_STRVAR(cDecodeNextLogEventDoc, "\n");
+PyDoc_STRVAR(
+        cDecodeNextLogEventDoc,
+        "decode_next_log_event(decoder_buffer, query=None)\n"
+        "--\n\n"
+        "Decodes the next encoded log event from the IR stream buffered in the given decoder "
+        "buffer. `decode_preamble` must have been successfully invoked and returned with the "
+        "identical decoder buffer used in this argument. "
+        "If the query is provided, only the log event matching the query will be returned.\n"
+
+        ":param decoder_buffer: The decoder buffer of the encoded CLP IR stream.\n"
+        ":param query: A Query object that filters log events. See `Query` documents for more "
+        "details.\n"
+        ":return: A newly created LogEvent instance representing the next decoded log event from "
+        "the IR stream (if the query is `None`).\n"
+        ":return: A newly created LogEvent instance representing the next decoded log event "
+        "matched with the given query in the IR stream (if the query is given).\n"
+        ":return: None when the end of IR stream is reached or the query search terminates.\n"
+        ":raises: Appropriate exceptions with detailed information on any encountered failure.\n"
+);
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyMethodDef PyDecoder_method_table[]{
@@ -24,16 +50,16 @@ PyMethodDef PyDecoder_method_table[]{
         {"decode_next_log_event",
          py_c_function_cast(decode_next_log_event),
          METH_VARARGS | METH_KEYWORDS | METH_STATIC,
-         static_cast<char const*>(cDecodePreambleDoc)},
+         static_cast<char const*>(cDecodeNextLogEventDoc)},
 
         {nullptr, nullptr, 0, nullptr}};
 
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cPyDecoderDoc,
         "Namespace for all CLP IR decoding methods.\n\n"
-        "Methods decode log events from encoded CLP IR stream. This class should never be "
-        "instantiated "
-        "since it only contains static methods.\n"
+        "Methods decode log events from encoded CLP IR streams. This class should never be "
+        "instantiated since it only contains static methods.\n"
 );
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-const-cast)

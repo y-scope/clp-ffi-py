@@ -240,6 +240,20 @@ auto PyDecoderBuffer::populate_read_buffer(Py_ssize_t& num_bytes_read) -> bool {
     return true;
 }
 
+auto PyDecoderBuffer::metadata_init(PyMetadata* metadata) -> bool {
+    if (has_metadata()) {
+        PyErr_SetString(PyExc_RuntimeError, "Metadata has already been initialized.");
+        return false;
+    }
+    if (nullptr == metadata) {
+        return false;
+    }
+    Py_INCREF(metadata);
+    m_metadata = metadata;
+    set_ref_timestamp(metadata->get_metadata()->get_ref_timestamp());
+    return true;
+}
+
 auto PyDecoderBuffer::py_getbuffer(Py_buffer* view, int flags) -> int {
     // Don't need to set the exception message during the failure.
     // The Python level caller will set the exception and thus overwrite it.

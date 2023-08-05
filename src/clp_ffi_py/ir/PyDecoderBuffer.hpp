@@ -6,6 +6,7 @@
 #include <clp/components/core/src/ffi/ir_stream/decoding_methods.hpp>
 #include <gsl/span>
 
+#include <clp_ffi_py/ir/PyMetadata.hpp>
 #include <clp_ffi_py/PyObjectUtils.hpp>
 
 namespace clp_ffi_py::ir {
@@ -52,6 +53,7 @@ public:
         m_num_decoded_message = 0;
         m_py_buffer_protocol_enabled = false;
         m_input_ir_stream = nullptr;
+        m_metadata = nullptr;
     }
 
     /**
@@ -60,6 +62,7 @@ public:
      */
     auto clean() -> void {
         Py_XDECREF(m_input_ir_stream);
+        Py_XDECREF(m_metadata);
         PyMem_Free(m_read_buffer_mem_owner);
     }
 
@@ -115,6 +118,22 @@ public:
     [[nodiscard]] auto get_unconsumed_bytes() const -> gsl::span<int8_t> {
         return m_read_buffer.subspan(m_num_current_bytes_consumed, get_num_unconsumed_bytes());
     }
+
+    /**
+     * @return true if metadata has been set.
+     */
+    [[nodiscard]] auto has_metadata() const -> bool { return (nullptr != m_metadata); }
+
+    /**
+     * Initializes the metadata and the initial reference timestamp.
+     * @param metadata Input metadata.
+     * @return true on success.
+     * @return false if the metadata has already been initialized. The relevant
+     * Python exception and error will be set.
+     */
+    [[nodiscard]] auto metadata_init(PyMetadata* metadata) -> bool;
+
+    [[nodiscard]] auto get_metadata() const -> PyMetadata* { return m_metadata; }
 
     /**
      * Handles the Python buffer protocol's `getbuffer` operation.
@@ -175,6 +194,7 @@ private:
     bool m_py_buffer_protocol_enabled;
     PyObject* m_input_ir_stream;
     ffi::epoch_time_ms_t m_ref_timestamp;
+    PyMetadata* m_metadata;
 
     /**
      * Enable the buffer protocol.

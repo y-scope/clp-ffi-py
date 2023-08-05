@@ -27,7 +27,7 @@ namespace {
  * @return false on failure with the relevant Python exception and error set.
  */
 auto try_read_more(PyDecoderBuffer* decoder_buffer) -> bool {
-    Py_ssize_t num_bytes_read;
+    Py_ssize_t num_bytes_read{0};
     if (false == decoder_buffer->populate_read_buffer(num_bytes_read)) {
         return false;
     }
@@ -66,7 +66,9 @@ auto decode(PyDecoderBuffer* decoder_buffer, PyMetadata* py_metadata, PyQuery* p
             case ffi::ir_stream::IRErrorCode_Success:
                 timestamp += timestamp_delta;
                 current_log_event_idx = decoder_buffer->get_and_increment_decoded_message_count();
-                decoder_buffer->commit_read_buffer_consumption(ir_buffer.get_cursor_pos());
+                decoder_buffer->commit_read_buffer_consumption(
+                        static_cast<Py_ssize_t>(ir_buffer.get_cursor_pos())
+                );
 
                 if (nullptr != py_query) {
                     auto* query{py_query->get_query()};
@@ -104,7 +106,7 @@ auto decode(PyDecoderBuffer* decoder_buffer, PyMetadata* py_metadata, PyQuery* p
 }  // namespace
 
 extern "C" {
-auto decode_preamble(PyObject* self, PyObject* py_decoder_buffer) -> PyObject* {
+auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> PyObject* {
     if (false
         == static_cast<bool>(PyObject_TypeCheck(py_decoder_buffer, PyDecoderBuffer::get_py_type())))
     {
@@ -121,7 +123,9 @@ auto decode_preamble(PyObject* self, PyObject* py_decoder_buffer) -> PyObject* {
         auto const err{ffi::ir_stream::get_encoding_type(ir_buffer, is_four_byte_encoding)};
         switch (err) {
             case ffi::ir_stream::IRErrorCode_Success:
-                decoder_buffer->commit_read_buffer_consumption(ir_buffer.get_cursor_pos());
+                decoder_buffer->commit_read_buffer_consumption(
+                        static_cast<Py_ssize_t>(ir_buffer.get_cursor_pos())
+                );
                 success = true;
                 break;
             case ffi::ir_stream::IRErrorCode_Incomplete_IR:
@@ -160,7 +164,9 @@ auto decode_preamble(PyObject* self, PyObject* py_decoder_buffer) -> PyObject* {
                         metadata_pos,
                         static_cast<size_t>(metadata_size)
                 );
-                decoder_buffer->commit_read_buffer_consumption(ir_buffer.get_cursor_pos());
+                decoder_buffer->commit_read_buffer_consumption(
+                        static_cast<Py_ssize_t>(ir_buffer.get_cursor_pos())
+                );
                 success = true;
                 break;
             case ffi::ir_stream::IRErrorCode_Incomplete_IR:
@@ -178,44 +184,40 @@ auto decode_preamble(PyObject* self, PyObject* py_decoder_buffer) -> PyObject* {
     try {
         // Initialization list should not be used in this case:
         // https://github.com/nlohmann/json/discussions/4096
-        nlohmann::json metadata_json(
-                std::move(nlohmann::json::parse(metadata_buffer.begin(), metadata_buffer.end()))
+        nlohmann::json const metadata_json(
+                nlohmann::json::parse(metadata_buffer.begin(), metadata_buffer.end())
         );
         metadata = PyMetadata::create_new_from_json(metadata_json, is_four_byte_encoding);
-        if (nullptr != metadata) {
-            decoder_buffer->set_ref_timestamp(metadata->get_metadata()->get_ref_timestamp());
-        }
     } catch (nlohmann::json::exception& ex) {
         PyErr_Format(PyExc_RuntimeError, "Json Parsing Error: %s", ex.what());
+        return nullptr;
+    }
+    if (false == decoder_buffer->metadata_init(metadata)) {
         return nullptr;
     }
     return py_reinterpret_cast<PyObject>(metadata);
 }
 
-auto decode_next_log_event(PyObject* self, PyObject* args, PyObject* keywords) -> PyObject* {
+auto decode_next_log_event(PyObject* Py_UNUSED(self), PyObject* args, PyObject* keywords)
+        -> PyObject* {
     static char keyword_decoder_buffer[]{"decoder_buffer"};
-    static char keyword_metadata[]{"metadata"};
     static char keyword_query[]{"query"};
     static char* keyword_table[]{
             static_cast<char*>(keyword_decoder_buffer),
-            static_cast<char*>(keyword_metadata),
             static_cast<char*>(keyword_query),
             nullptr};
 
-    PyObject* decoder_buffer{nullptr};
-    PyObject* metadata{nullptr};
+    PyDecoderBuffer* decoder_buffer{nullptr};
     PyObject* query{Py_None};
 
     if (false
         == static_cast<bool>(PyArg_ParseTupleAndKeywords(
                 args,
                 keywords,
-                "O!O!|O",
+                "O!|O",
                 static_cast<char**>(keyword_table),
                 PyDecoderBuffer::get_py_type(),
                 &decoder_buffer,
-                PyMetadata::get_py_type(),
-                &metadata,
                 &query
         )))
     {
@@ -230,9 +232,17 @@ auto decode_next_log_event(PyObject* self, PyObject* args, PyObject* keywords) -
         return nullptr;
     }
 
+    if (false == decoder_buffer->has_metadata()) {
+        PyErr_SetString(
+                PyExc_RuntimeError,
+                "The given DecoderBuffer does not have a valid CLP IR metadata decoded."
+        );
+        return nullptr;
+    }
+
     return decode(
-            py_reinterpret_cast<PyDecoderBuffer>(decoder_buffer),
-            py_reinterpret_cast<PyMetadata>(metadata),
+            decoder_buffer,
+            decoder_buffer->get_metadata(),
             is_query_given ? py_reinterpret_cast<PyQuery>(query) : nullptr
     );
 }

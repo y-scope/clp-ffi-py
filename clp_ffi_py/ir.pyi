@@ -69,5 +69,5 @@ class Decoder:
     def decode_preamble(decoder_buffer: DecoderBuffer) -> Optional[Metadata]: ...
     @staticmethod
     def decode_next_log_event(
-        decoder_buffer: DecoderBuffer, metadata: Metadata, query: Optional[Query] = None
+        decoder_buffer: DecoderBuffer, query: Optional[Query] = None
     ) -> Optional[LogEvent]: ...
