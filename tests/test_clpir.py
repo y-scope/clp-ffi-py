@@ -901,7 +901,8 @@ class TestCaseDecoderBuffer(TestBase):
 
 class LogGenerator:
     """
-    Generates random logs from a list of log types and dictionary words.
+    Generates random logs or wildcard queries from a list of log types and
+    dictionary words.
     """
 
     log_type_list: List[str] = [
@@ -974,6 +975,16 @@ class LogGenerator:
 
     @staticmethod
     def generate_random_logs(num_log_events: int) -> Tuple[Metadata, List[LogEvent]]:
+        """
+        Generates logs randomly by using log types specified in `log_type_list`.
+        Each log type contains placeholders, and each placeholder will be
+        randomly replaced by randomly generated integers, randomly generated
+        floating point numbers, and randomly selected dictionary words according
+        to the type.
+
+        :param num_log_events: Number of log events to generate.
+        :return: A tuple containing the generated log events and the metadata.
+        """
         ref_timestamp: int = _get_current_timestamp()
         timestamp_format: str = "yy/MM/dd HH:mm:ss"
         timezone_id: str = "America/Chicago"
@@ -992,6 +1003,19 @@ class LogGenerator:
 
     @staticmethod
     def generate_random_log_type_wildcard_queries(num_wildcard_queries: int) -> List[WildcardQuery]:
+        """
+        Generates wildcard queries randomly from log types. A randomly selected
+        log type will be translated into a wildcard query by:
+        1. replacing all the placeholders by `*`
+        2. replacing a random character by `?`
+
+        :param num_wildcard_queries: Number of wildcard queries to generate.
+        Each wildcard query will correspond to a unique log type. If the given
+        number is larger than the number of available log types, it will
+        generate wildcard queries only up to the number of existing log types.
+        :return: A list of generated wildcard queries, each is presented as an
+        instance of WildcardQuery.
+        """
         num_log_types: int = len(LogGenerator.log_type_list)
         num_wildcard_queries = min(num_log_types, num_wildcard_queries)
         selected_log_type_idx: Set[int] = set()
