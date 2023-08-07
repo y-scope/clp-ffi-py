@@ -153,6 +153,15 @@ public:
     }
 
     /**
+     * Attempts to populate the decoder buffer. When this function is called, it
+     * is expected to have more bytes to read from the IR stream.
+     * @return true on success.
+     * @return false on failure with the relevant Python exception and error
+     * set.
+     */
+    [[nodiscard]] auto try_read() -> bool;
+
+    /**
      * Tests the functionality of the DecoderBuffer by sequentially reading
      * through the input stream with randomly sized reads. It will grow the read
      * buffer when necessary until the the entire input stream is consumed.

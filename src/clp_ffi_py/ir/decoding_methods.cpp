@@ -20,25 +20,6 @@
 namespace clp_ffi_py::ir {
 namespace {
 /**
- * Attempts to populate the decoder buffer. When this function is called, it is
- * expected to have more bytes to read from the IR stream.
- * @param decoder_buffer Input decoder buffer.
- * @return true on success.
- * @return false on failure with the relevant Python exception and error set.
- */
-auto try_read(PyDecoderBuffer* decoder_buffer) -> bool {
-    Py_ssize_t num_bytes_read{0};
-    if (false == decoder_buffer->populate_read_buffer(num_bytes_read)) {
-        return false;
-    }
-    if (0 == num_bytes_read) {
-        PyErr_SetString(PyExc_RuntimeError, cDecoderIncompleteIRError);
-        return false;
-    }
-    return true;
-}
-
-/**
  * Decodes the next log event from the CLP IR buffer `decoder_buffer`. If
  * `py_query` is non-null decode until finding a log event that matches the
  * query.
@@ -91,7 +72,7 @@ auto decode(PyDecoderBuffer* decoder_buffer, PyMetadata* py_metadata, PyQuery* p
                         py_metadata
                 ));
             case ffi::ir_stream::IRErrorCode_Incomplete_IR:
-                if (false == try_read(decoder_buffer)) {
+                if (false == decoder_buffer->try_read()) {
                     return nullptr;
                 }
                 break;
@@ -130,7 +111,7 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
                 success = true;
                 break;
             case ffi::ir_stream::IRErrorCode_Incomplete_IR:
-                if (false == try_read(decoder_buffer)) {
+                if (false == decoder_buffer->try_read()) {
                     return nullptr;
                 }
                 break;
@@ -171,7 +152,7 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
                 success = true;
                 break;
             case ffi::ir_stream::IRErrorCode_Incomplete_IR:
-                if (false == try_read(decoder_buffer)) {
+                if (false == decoder_buffer->try_read()) {
                     return nullptr;
                 }
                 break;

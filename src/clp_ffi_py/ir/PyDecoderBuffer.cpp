@@ -189,6 +189,7 @@ PyType_Spec PyDecoderBuffer_type_spec{
 auto PyDecoderBuffer::init(PyObject* input_stream, Py_ssize_t buf_capacity) -> bool {
     m_read_buffer_mem_owner = static_cast<int8_t*>(PyMem_Malloc(buf_capacity));
     if (nullptr == m_read_buffer_mem_owner) {
+        PyErr_NoMemory();
         return false;
     }
     m_read_buffer = gsl::span<int8_t>(m_read_buffer_mem_owner, buf_capacity);
@@ -207,6 +208,7 @@ auto PyDecoderBuffer::populate_read_buffer(Py_ssize_t& num_bytes_read) -> bool {
         auto const new_capacity{buffer_capacity * 2};
         auto* new_buf{static_cast<int8_t*>(PyMem_Malloc(new_capacity))};
         if (nullptr == new_buf) {
+            PyErr_NoMemory();
             return false;
         }
         auto new_read_buffer{gsl::span<int8_t>(new_buf, new_capacity)};
@@ -277,6 +279,18 @@ auto PyDecoderBuffer::commit_read_buffer_consumption(Py_ssize_t num_bytes_consum
         return false;
     }
     m_num_current_bytes_consumed += num_bytes_consumed;
+    return true;
+}
+
+auto PyDecoderBuffer::try_read() -> bool {
+    Py_ssize_t num_bytes_read{0};
+    if (false == populate_read_buffer(num_bytes_read)) {
+        return false;
+    }
+    if (0 == num_bytes_read) {
+        PyErr_SetString(PyExc_RuntimeError, cDecoderIncompleteIRError);
+        return false;
+    }
     return true;
 }
 
