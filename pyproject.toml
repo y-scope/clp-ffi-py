@@ -52,4 +52,8 @@ pretty = true
 
 [tool.ruff]
 line-length = 100
+select = ["E", "I", "F"]
+
+[tool.ruff.isort]
+order-by-type = false
 

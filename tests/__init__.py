@@ -1,7 +1,13 @@
 import unittest
 from typing import Iterable, Optional, Union
 
-from tests.test_clpir import TestBase
+from tests.test_decoder import *  # noqa
+from tests.test_decoder_buffer import *  # noqa
+from tests.test_encoder import *  # noqa
+from tests.test_log_event import *  # noqa
+from tests.test_metadata import *  # noqa
+from tests.test_query import *  # noqa
+from tests.test_utils import TestCLPBase
 
 
 def add_tests(suite: unittest.TestSuite, loader: unittest.TestLoader, test_class: type) -> None:
@@ -29,7 +35,7 @@ def load_tests(
 ) -> unittest.TestSuite:
     suite: unittest.TestSuite = unittest.TestSuite()
 
-    for test_class in TestBase.__subclasses__():
+    for test_class in TestCLPBase.__subclasses__():
         add_tests(suite, loader, test_class)
 
     return suite

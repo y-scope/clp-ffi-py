@@ -1,6 +1,7 @@
-from clp_ffi_py import WildcardQuery
 from datetime import tzinfo
 from typing import Any, Dict, IO, List, Optional
+
+from clp_ffi_py import WildcardQuery
 
 class DecoderBuffer:
     def __init__(self, input_stream: IO[bytes], initial_buffer_capacity: int = 4096): ...
