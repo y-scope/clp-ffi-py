@@ -44,44 +44,45 @@ auto decode(PyDecoderBuffer* decoder_buffer, PyMetadata* py_metadata, PyQuery* p
                 decoded_message,
                 timestamp_delta
         )};
-        switch (err) {
-            case ffi::ir_stream::IRErrorCode_Success:
-                timestamp += timestamp_delta;
-                current_log_event_idx = decoder_buffer->get_and_increment_decoded_message_count();
-                decoder_buffer->commit_read_buffer_consumption(
-                        static_cast<Py_ssize_t>(ir_buffer.get_cursor_pos())
-                );
-
-                if (nullptr != py_query) {
-                    auto* query{py_query->get_query()};
-                    if (query->ts_safely_outside_time_range(timestamp)) {
-                        Py_RETURN_NONE;
-                    }
-                    if (false == query->matches_time_range(timestamp)
-                        || false == query->matches_wildcard_queries(decoded_message))
-                    {
-                        continue;
-                    }
-                }
-
-                decoder_buffer->set_ref_timestamp(timestamp);
-                return py_reinterpret_cast<PyObject>(PyLogEvent::create_new_log_event(
-                        decoded_message,
-                        timestamp,
-                        current_log_event_idx,
-                        py_metadata
-                ));
-            case ffi::ir_stream::IRErrorCode_Incomplete_IR:
-                if (false == decoder_buffer->try_read()) {
-                    return nullptr;
-                }
-                break;
-            case ffi::ir_stream::IRErrorCode_Eof:
-                Py_RETURN_NONE;
-            default:
-                PyErr_Format(PyExc_RuntimeError, cDecoderErrorCodeFormatStr, err);
+        if (ffi::ir_stream::IRErrorCode_Incomplete_IR == err) {
+            if (false == decoder_buffer->try_read()) {
                 return nullptr;
+            }
+            continue;
         }
+        if (ffi::ir_stream::IRErrorCode_Eof == err) {
+            Py_RETURN_NONE;
+        }
+        if (ffi::ir_stream::IRErrorCode_Success != err) {
+            PyErr_Format(PyExc_RuntimeError, cDecoderErrorCodeFormatStr, err);
+            return nullptr;
+        }
+
+        timestamp += timestamp_delta;
+        current_log_event_idx = decoder_buffer->get_and_increment_decoded_message_count();
+        decoder_buffer->commit_read_buffer_consumption(
+                static_cast<Py_ssize_t>(ir_buffer.get_cursor_pos())
+        );
+
+        if (nullptr != py_query) {
+            auto* query{py_query->get_query()};
+            if (query->ts_safely_outside_time_range(timestamp)) {
+                Py_RETURN_NONE;
+            }
+            if (false == query->matches_time_range(timestamp)
+                || false == query->matches_wildcard_queries(decoded_message))
+            {
+                continue;
+            }
+        }
+
+        decoder_buffer->set_ref_timestamp(timestamp);
+        return py_reinterpret_cast<PyObject>(PyLogEvent::create_new_log_event(
+                decoded_message,
+                timestamp,
+                current_log_event_idx,
+                py_metadata
+        ));
     }
     return nullptr;
 }
@@ -96,29 +97,26 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
         return nullptr;
     }
 
-    bool success{false};
     auto* decoder_buffer{py_reinterpret_cast<PyDecoderBuffer>(py_decoder_buffer)};
     bool is_four_byte_encoding{false};
-    while (false == success) {
+    while (true) {
         auto const unconsumed_bytes{decoder_buffer->get_unconsumed_bytes()};
         ffi::ir_stream::IrBuffer ir_buffer{unconsumed_bytes.data(), unconsumed_bytes.size()};
         auto const err{ffi::ir_stream::get_encoding_type(ir_buffer, is_four_byte_encoding)};
-        switch (err) {
-            case ffi::ir_stream::IRErrorCode_Success:
-                decoder_buffer->commit_read_buffer_consumption(
-                        static_cast<Py_ssize_t>(ir_buffer.get_cursor_pos())
-                );
-                success = true;
-                break;
-            case ffi::ir_stream::IRErrorCode_Incomplete_IR:
-                if (false == decoder_buffer->try_read()) {
-                    return nullptr;
-                }
-                break;
-            default:
-                PyErr_Format(PyExc_RuntimeError, cDecoderErrorCodeFormatStr, err);
+        if (ffi::ir_stream::IRErrorCode_Incomplete_IR == err) {
+            if (false == decoder_buffer->try_read()) {
                 return nullptr;
+            }
+            continue;
         }
+        if (ffi::ir_stream::IRErrorCode_Success != err) {
+            PyErr_Format(PyExc_RuntimeError, cDecoderErrorCodeFormatStr, err);
+            return nullptr;
+        }
+        decoder_buffer->commit_read_buffer_consumption(
+                static_cast<Py_ssize_t>(ir_buffer.get_cursor_pos())
+        );
+        break;
     }
 
     if (false == is_four_byte_encoding) {
@@ -130,8 +128,7 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
     size_t metadata_pos{0};
     uint16_t metadata_size{0};
     gsl::span<int8_t> metadata_buffer;
-    success = false;
-    while (false == success) {
+    while (true) {
         auto const unconsumed_bytes{decoder_buffer->get_unconsumed_bytes()};
         ffi::ir_stream::IrBuffer ir_buffer{unconsumed_bytes.data(), unconsumed_bytes.size()};
         auto const err{ffi::ir_stream::decode_preamble(
@@ -140,26 +137,22 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
                 metadata_pos,
                 metadata_size
         )};
-        switch (err) {
-            case ffi::ir_stream::IRErrorCode_Success:
-                metadata_buffer = unconsumed_bytes.subspan(
-                        metadata_pos,
-                        static_cast<size_t>(metadata_size)
-                );
-                decoder_buffer->commit_read_buffer_consumption(
-                        static_cast<Py_ssize_t>(ir_buffer.get_cursor_pos())
-                );
-                success = true;
-                break;
-            case ffi::ir_stream::IRErrorCode_Incomplete_IR:
-                if (false == decoder_buffer->try_read()) {
-                    return nullptr;
-                }
-                break;
-            default:
-                PyErr_Format(PyExc_RuntimeError, cDecoderErrorCodeFormatStr, err);
+        if (ffi::ir_stream::IRErrorCode_Incomplete_IR == err) {
+            if (false == decoder_buffer->try_read()) {
                 return nullptr;
+            }
+            continue;
         }
+        if (ffi::ir_stream::IRErrorCode_Success != err) {
+            PyErr_Format(PyExc_RuntimeError, cDecoderErrorCodeFormatStr, err);
+            return nullptr;
+        }
+        metadata_buffer
+                = unconsumed_bytes.subspan(metadata_pos, static_cast<size_t>(metadata_size));
+        decoder_buffer->commit_read_buffer_consumption(
+                static_cast<Py_ssize_t>(ir_buffer.get_cursor_pos())
+        );
+        break;
     }
 
     PyMetadata* metadata{nullptr};
