@@ -67,19 +67,6 @@ public:
     }
 
     /**
-     * Cleans the consumed bytes by shifting the unconsumed bytes to the
-     * beginning of the buffer, and fills the read buffer by reading from the
-     * input IR stream. If more than half of the bytes are unconsumed in the
-     * read buffer, the buffer will be doubled before reading.
-     * @param num_bytes_read Number of bytes read from the input IR stream to
-     * populate the read buffer.
-     * @return true on success.
-     * @return false on failure with the relevant Python exception and error
-     * set.
-     */
-    [[nodiscard]] auto populate_read_buffer(Py_ssize_t& num_bytes_read) -> bool;
-
-    /**
      * Commits the bytes consumed in the read buffer by incrementing the
      * underlying cursor position.
      * @param num_bytes_consumed Total number of bytes consumed.
@@ -204,6 +191,19 @@ private:
     PyObject* m_input_ir_stream;
     ffi::epoch_time_ms_t m_ref_timestamp;
     PyMetadata* m_metadata;
+
+    /**
+     * Cleans the consumed bytes by shifting the unconsumed bytes to the
+     * beginning of the buffer, and fills the read buffer by reading from the
+     * input IR stream. If more than half of the bytes are unconsumed in the
+     * read buffer, the buffer will be doubled before reading.
+     * @param num_bytes_read Number of bytes read from the input IR stream to
+     * populate the read buffer.
+     * @return true on success.
+     * @return false on failure with the relevant Python exception and error
+     * set.
+     */
+    [[nodiscard]] auto populate_read_buffer(Py_ssize_t& num_bytes_read) -> bool;
 
     /**
      * Enable the buffer protocol.
