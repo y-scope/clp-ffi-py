@@ -39,8 +39,9 @@ auto try_read_more(PyDecoderBuffer* decoder_buffer) -> bool {
 }
 
 /**
- * Decodes the next log event that matches the query (if given) from the input
- * DecoderBuffer using CLP decoding methods.
+ * Decodes the next log event from the CLP IR buffer `decoder_buffer`. If
+ * `py_query` is non-null decode until finding a log event that matches the
+ * query.
  * @param decoder_buffer IR decoder buffer of the input IR stream.
  * @param py_metadata The metadata associated with the input IR stream.
  * @param py_query Search query to filter log events.

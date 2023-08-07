@@ -25,9 +25,9 @@ PyDoc_STRVAR(
         "decode_next_log_event(decoder_buffer, query=None)\n"
         "--\n\n"
         "Decodes the next encoded log event from the IR stream buffered in the given decoder "
-        "buffer. `decode_preamble` must have been successfully invoked and returned with the "
-        "identical decoder buffer used in this argument. "
-        "If the query is provided, only the log event matching the query will be returned.\n"
+        "buffer. `decoder_buffer` must have been returned by a successfully invocation of "
+        "`decode_preamble`. If `query` is provided, only the next log event matching the query "
+        "will be returned.\n"
 
         ":param decoder_buffer: The decoder buffer of the encoded CLP IR stream.\n"
         ":param query: A Query object that filters log events. See `Query` documents for more "
