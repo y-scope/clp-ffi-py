@@ -148,7 +148,6 @@ class TestCLPBase(unittest.TestCase):
         Given a WildcardQuery object, check if the stored data matches the input
         reference.
 
-        :param self
         :param wildcard_query: Input WildcardQuery object.
         :param ref_wildcard_string: Reference wildcard string.
         :param ref_is_case_sensitive: Reference case-sensitive indicator.
@@ -178,7 +177,6 @@ class TestCLPBase(unittest.TestCase):
         Given a Query object, check if the stored data matches the input
         references.
 
-        :param self
         :param query: Input Query object to validate.
         :param ref_search_time_lower_bound: Reference search time lower bound.
         :param ref_search_time_upper_bound: Reference search time upper bound.
