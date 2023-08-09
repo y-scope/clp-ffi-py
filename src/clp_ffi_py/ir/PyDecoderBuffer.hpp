@@ -181,17 +181,6 @@ public:
     [[nodiscard]] static auto module_level_init(PyObject* py_module) -> bool;
 
 private:
-    PyObject_HEAD;
-    int8_t* m_read_buffer_mem_owner;
-    gsl::span<int8_t> m_read_buffer;
-    Py_ssize_t m_buffer_size;
-    Py_ssize_t m_num_current_bytes_consumed;
-    size_t m_num_decoded_message;
-    bool m_py_buffer_protocol_enabled;
-    PyObject* m_input_ir_stream;
-    ffi::epoch_time_ms_t m_ref_timestamp;
-    PyMetadata* m_metadata;
-
     /**
      * Cleans the consumed bytes by shifting the unconsumed bytes to the
      * beginning of the buffer, and fills the read buffer by reading from the
@@ -214,6 +203,17 @@ private:
      * Disable the buffer protocol.
      */
     auto disable_py_buffer_protocol() -> void { m_py_buffer_protocol_enabled = false; }
+
+    PyObject_HEAD;
+    PyObject* m_input_ir_stream;
+    PyMetadata* m_metadata;
+    int8_t* m_read_buffer_mem_owner;
+    gsl::span<int8_t> m_read_buffer;
+    ffi::epoch_time_ms_t m_ref_timestamp;
+    Py_ssize_t m_buffer_size;
+    Py_ssize_t m_num_current_bytes_consumed;
+    size_t m_num_decoded_message;
+    bool m_py_buffer_protocol_enabled;
 
     static PyObjectPtr<PyTypeObject> m_py_type;
 };

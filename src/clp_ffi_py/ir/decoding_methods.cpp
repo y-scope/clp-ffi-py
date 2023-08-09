@@ -36,6 +36,7 @@ auto decode(PyDecoderBuffer* decoder_buffer, PyMetadata* py_metadata, PyQuery* p
     ffi::epoch_time_ms_t timestamp_delta{0};
     auto timestamp{decoder_buffer->get_ref_timestamp()};
     size_t current_log_event_idx{0};
+    bool valid_message_decoded{false};
     while (true) {
         auto const unconsumed_bytes{decoder_buffer->get_unconsumed_bytes()};
         ffi::ir_stream::IrBuffer ir_buffer{unconsumed_bytes.data(), unconsumed_bytes.size()};
@@ -51,7 +52,7 @@ auto decode(PyDecoderBuffer* decoder_buffer, PyMetadata* py_metadata, PyQuery* p
             continue;
         }
         if (ffi::ir_stream::IRErrorCode_Eof == err) {
-            Py_RETURN_NONE;
+            break;
         }
         if (ffi::ir_stream::IRErrorCode_Success != err) {
             PyErr_Format(PyExc_RuntimeError, cDecoderErrorCodeFormatStr, err);
@@ -76,15 +77,21 @@ auto decode(PyDecoderBuffer* decoder_buffer, PyMetadata* py_metadata, PyQuery* p
             }
         }
 
-        decoder_buffer->set_ref_timestamp(timestamp);
-        return py_reinterpret_cast<PyObject>(PyLogEvent::create_new_log_event(
-                decoded_message,
-                timestamp,
-                current_log_event_idx,
-                py_metadata
-        ));
+        valid_message_decoded = true;
+        break;
     }
-    return nullptr;
+
+    if (false == valid_message_decoded) {
+        Py_RETURN_NONE;
+    }
+
+    decoder_buffer->set_ref_timestamp(timestamp);
+    return py_reinterpret_cast<PyObject>(PyLogEvent::create_new_log_event(
+            decoded_message,
+            timestamp,
+            current_log_event_idx,
+            py_metadata
+    ));
 }
 }  // namespace
 
