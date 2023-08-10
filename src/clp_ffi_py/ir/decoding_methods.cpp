@@ -106,26 +106,24 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
 
     auto* decoder_buffer{py_reinterpret_cast<PyDecoderBuffer>(py_decoder_buffer)};
     bool is_four_byte_encoding{false};
+    size_t ir_buffer_cursor_pos{0};
     while (true) {
         auto const unconsumed_bytes{decoder_buffer->get_unconsumed_bytes()};
         ffi::ir_stream::IrBuffer ir_buffer{unconsumed_bytes.data(), unconsumed_bytes.size()};
         auto const err{ffi::ir_stream::get_encoding_type(ir_buffer, is_four_byte_encoding)};
-        if (ffi::ir_stream::IRErrorCode_Incomplete_IR == err) {
-            if (false == decoder_buffer->try_read()) {
-                return nullptr;
-            }
-            continue;
+        if (ffi::ir_stream::IRErrorCode_Success == err) {
+            ir_buffer_cursor_pos = ir_buffer.get_cursor_pos();
+            break;
         }
-        if (ffi::ir_stream::IRErrorCode_Success != err) {
+        if (ffi::ir_stream::IRErrorCode_Incomplete_IR != err) {
             PyErr_Format(PyExc_RuntimeError, cDecoderErrorCodeFormatStr, err);
             return nullptr;
         }
-        decoder_buffer->commit_read_buffer_consumption(
-                static_cast<Py_ssize_t>(ir_buffer.get_cursor_pos())
-        );
-        break;
+        if (false == decoder_buffer->try_read()) {
+            return nullptr;
+        }
     }
-
+    decoder_buffer->commit_read_buffer_consumption(static_cast<Py_ssize_t>(ir_buffer_cursor_pos));
     if (false == is_four_byte_encoding) {
         PyErr_SetString(PyExc_NotImplementedError, "8-byte IR decoding is not supported yet.");
         return nullptr;
@@ -134,9 +132,8 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
     ffi::ir_stream::encoded_tag_t metadata_type_tag{0};
     size_t metadata_pos{0};
     uint16_t metadata_size{0};
-    gsl::span<int8_t> metadata_buffer;
     while (true) {
-        auto const unconsumed_bytes{decoder_buffer->get_unconsumed_bytes()};
+        auto const unconsumed_bytes = decoder_buffer->get_unconsumed_bytes();
         ffi::ir_stream::IrBuffer ir_buffer{unconsumed_bytes.data(), unconsumed_bytes.size()};
         auto const err{ffi::ir_stream::decode_preamble(
                 ir_buffer,
@@ -144,24 +141,23 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
                 metadata_pos,
                 metadata_size
         )};
-        if (ffi::ir_stream::IRErrorCode_Incomplete_IR == err) {
-            if (false == decoder_buffer->try_read()) {
-                return nullptr;
-            }
-            continue;
+        if (ffi::ir_stream::IRErrorCode_Success == err) {
+            ir_buffer_cursor_pos = ir_buffer.get_cursor_pos();
+            break;
         }
-        if (ffi::ir_stream::IRErrorCode_Success != err) {
+        if (ffi::ir_stream::IRErrorCode_Incomplete_IR != err) {
             PyErr_Format(PyExc_RuntimeError, cDecoderErrorCodeFormatStr, err);
             return nullptr;
         }
-        metadata_buffer
-                = unconsumed_bytes.subspan(metadata_pos, static_cast<size_t>(metadata_size));
-        decoder_buffer->commit_read_buffer_consumption(
-                static_cast<Py_ssize_t>(ir_buffer.get_cursor_pos())
-        );
-        break;
+        if (false == decoder_buffer->try_read()) {
+            return nullptr;
+        }
     }
 
+    auto const unconsumed_bytes = decoder_buffer->get_unconsumed_bytes();
+    auto const metadata_buffer{
+            unconsumed_bytes.subspan(metadata_pos, static_cast<size_t>(metadata_size))};
+    decoder_buffer->commit_read_buffer_consumption(static_cast<Py_ssize_t>(ir_buffer_cursor_pos));
     PyMetadata* metadata{nullptr};
     try {
         // Initialization list should not be used in this case:
