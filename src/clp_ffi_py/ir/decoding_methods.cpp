@@ -36,7 +36,7 @@ auto decode(PyDecoderBuffer* decoder_buffer, PyMetadata* py_metadata, PyQuery* p
     ffi::epoch_time_ms_t timestamp_delta{0};
     auto timestamp{decoder_buffer->get_ref_timestamp()};
     size_t current_log_event_idx{0};
-    bool valid_message_decoded{false};
+    bool reached_eof{false};
     while (true) {
         auto const unconsumed_bytes{decoder_buffer->get_unconsumed_bytes()};
         ffi::ir_stream::IrBuffer ir_buffer{unconsumed_bytes.data(), unconsumed_bytes.size()};
@@ -52,6 +52,7 @@ auto decode(PyDecoderBuffer* decoder_buffer, PyMetadata* py_metadata, PyQuery* p
             continue;
         }
         if (ffi::ir_stream::IRErrorCode_Eof == err) {
+            reached_eof = true;
             break;
         }
         if (ffi::ir_stream::IRErrorCode_Success != err) {
@@ -65,23 +66,22 @@ auto decode(PyDecoderBuffer* decoder_buffer, PyMetadata* py_metadata, PyQuery* p
                 static_cast<Py_ssize_t>(ir_buffer.get_cursor_pos())
         );
 
-        if (nullptr != py_query) {
-            auto* query{py_query->get_query()};
-            if (query->ts_safely_outside_time_range(timestamp)) {
-                Py_RETURN_NONE;
-            }
-            if (false == query->matches_time_range(timestamp)
-                || false == query->matches_wildcard_queries(decoded_message))
-            {
-                continue;
-            }
+        if (nullptr == py_query) {
+            break;
         }
 
-        valid_message_decoded = true;
-        break;
+        auto* query{py_query->get_query()};
+        if (query->ts_safely_outside_time_range(timestamp)) {
+            Py_RETURN_NONE;
+        }
+        if (query->matches_time_range(timestamp)
+            && query->matches_wildcard_queries(decoded_message))
+        {
+            break;
+        }
     }
 
-    if (false == valid_message_decoded) {
+    if (reached_eof) {
         Py_RETURN_NONE;
     }
 
