@@ -154,7 +154,7 @@ public:
      * range (see note in the class' docstring).
      */
     [[nodiscard]] auto ts_safely_outside_time_range(ffi::epoch_time_ms_t ts) const -> bool {
-        return m_search_termination_ts <= ts;
+        return m_search_termination_ts < ts;
     }
 
     /**

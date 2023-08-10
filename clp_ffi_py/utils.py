@@ -1,6 +1,7 @@
-import dateutil.tz
 from datetime import datetime, tzinfo
 from typing import Optional
+
+import dateutil.tz
 
 
 def get_formatted_timestamp(timestamp: int, timezone: Optional[tzinfo]) -> str:

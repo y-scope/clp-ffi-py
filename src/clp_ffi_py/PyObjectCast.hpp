@@ -115,12 +115,14 @@ auto py_reinterpret_cast(Src* src) noexcept -> Dst* {
 }
 
 namespace ir {
+class PyDecoder;
 class PyDecoderBuffer;
-class PyMetadata;
 class PyLogEvent;
+class PyMetadata;
 class PyQuery;
 }  // namespace ir
 
+CLP_FFI_PY_MARK_AS_PYOBJECT(ir::PyDecoder);
 CLP_FFI_PY_MARK_AS_PYOBJECT(ir::PyDecoderBuffer);
 CLP_FFI_PY_MARK_AS_PYOBJECT(ir::PyLogEvent);
 CLP_FFI_PY_MARK_AS_PYOBJECT(ir::PyMetadata);
