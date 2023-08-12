@@ -29,17 +29,17 @@ class CLPIRBaseReader(metaclass=ABCMeta):
         self._metadata: Optional[Metadata] = None
 
     def get_metadata(self) -> Metadata:
-        if False is self.has_metadata():
+        if None is self._metadata:
             raise RuntimeError("The metadata has not been successfully decoded yet.")
-        return self.metadata
+        return self._metadata
 
     def has_metadata(self) -> bool:
-        return None is self.metadata
+        return None is not self._metadata
 
     def read_preamble(self) -> None:
         if self.has_metadata():
             raise RuntimeError("The preamble has already been decoded.")
-        self.metadata = Decoder.decode_preamble(self._decoder_buffer)
+        self._metadata = Decoder.decode_preamble(self._decoder_buffer)
 
     def close(self) -> None:
         self.__istream.close()
@@ -50,6 +50,8 @@ class CLPIRBaseReader(metaclass=ABCMeta):
         return self
 
     def __enter__(self) -> Iterator[LogEvent]:
+        if False is self.has_metadata():
+            self.read_preamble()
         return self
 
     @abstractmethod
