@@ -109,6 +109,18 @@ auto PyDecoderBuffer_releasebuffer(PyDecoderBuffer* Py_UNUSED(self), Py_buffer* 
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
+        cPyDecoderBufferGetNumDecodedLogMessages,
+        "get_num_decoded_log_messages(self)\n"
+        "--\n\n"
+        ":return: Total number of messages decoded so far.\n"
+);
+
+auto PyDecoderBuffer_get_num_decoded_log_messages(PyDecoderBuffer* self) -> PyObject* {
+    return PyLong_FromLongLong(static_cast<long long>(self->get_num_decoded_message()));
+}
+
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
+PyDoc_STRVAR(
         cPyDecoderBufferTestStreamingDoc,
         "_test_streaming(self, seed)\n"
         "--\n\n"
@@ -132,6 +144,11 @@ auto PyDecoderBuffer_test_streaming(PyDecoderBuffer* self, PyObject* seed_obj) -
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyMethodDef PyDecoderBuffer_method_table[]{
+        {"get_num_decoded_log_messages",
+         py_c_function_cast(PyDecoderBuffer_get_num_decoded_log_messages),
+         METH_NOARGS,
+         static_cast<char const*>(cPyDecoderBufferGetNumDecodedLogMessages)},
+
         {"_test_streaming",
          py_c_function_cast(PyDecoderBuffer_test_streaming),
          METH_O,
