@@ -2,9 +2,10 @@
 
 #include "decoding_methods.hpp"
 
+#include <json/single_include/nlohmann/json.hpp>
+
 #include <clp/components/core/src/ffi/ir_stream/decoding_methods.hpp>
 #include <clp/components/core/src/type_utils.hpp>
-#include <clp/components/core/submodules/json/single_include/nlohmann/json.hpp>
 #include <gsl/span>
 
 #include <clp_ffi_py/error_messages.hpp>
@@ -223,6 +224,73 @@ auto decode_next_log_event(PyObject* Py_UNUSED(self), PyObject* args, PyObject* 
             decoder_buffer->get_metadata(),
             is_query_given ? py_reinterpret_cast<PyQuery>(query) : nullptr
     );
+}
+
+auto skip_to_time(PyObject* Py_UNUSED(self), PyObject* args, PyObject* keywords) -> PyObject* {
+    static char keyword_decoder_buffer[]{"decoder_buffer"};
+    static char keyword_time_ms[]{"time_ms"};
+    static char* keyword_table[]{
+            static_cast<char*>(keyword_decoder_buffer),
+            static_cast<char*>(keyword_time_ms),
+            nullptr};
+
+    PyDecoderBuffer* decoder_buffer{nullptr};
+    ffi::epoch_time_ms_t time_ms{0};
+
+    if (false
+        == static_cast<bool>(PyArg_ParseTupleAndKeywords(
+                args,
+                keywords,
+                "O!L",
+                static_cast<char**>(keyword_table),
+                PyDecoderBuffer::get_py_type(),
+                &decoder_buffer,
+                &time_ms
+        )))
+    {
+        return nullptr;
+    }
+
+    size_t num_log_event_skipped{0};
+    std::string decoded_message;
+    ffi::epoch_time_ms_t timestamp_delta{0};
+    auto ref_timestamp{decoder_buffer->get_ref_timestamp()};
+    while (true) {
+        auto const unconsumed_bytes{decoder_buffer->get_unconsumed_bytes()};
+        ffi::ir_stream::IrBuffer ir_buffer{unconsumed_bytes.data(), unconsumed_bytes.size()};
+        auto const err{ffi::ir_stream::four_byte_encoding::decode_next_message(
+                ir_buffer,
+                decoded_message,
+                timestamp_delta
+        )};
+        if (ffi::ir_stream::IRErrorCode_Incomplete_IR == err) {
+            if (false == decoder_buffer->try_read()) {
+                return nullptr;
+            }
+            continue;
+        }
+        if (ffi::ir_stream::IRErrorCode_Eof == err) {
+            break;
+        }
+        if (ffi::ir_stream::IRErrorCode_Success != err) {
+            PyErr_Format(PyExc_RuntimeError, cDecoderErrorCodeFormatStr, err);
+            return nullptr;
+        }
+
+        ref_timestamp += timestamp_delta;
+        if (time_ms <= ref_timestamp) {
+            break;
+        }
+
+        ++num_log_event_skipped;
+        decoder_buffer->get_and_increment_decoded_message_count();
+        decoder_buffer->set_ref_timestamp(ref_timestamp);
+        decoder_buffer->commit_read_buffer_consumption(
+                static_cast<Py_ssize_t>(ir_buffer.get_cursor_pos())
+        );
+    }
+
+    return PyLong_FromLongLong(static_cast<int64_t>(num_log_event_skipped));
 }
 }
 }  // namespace clp_ffi_py::ir

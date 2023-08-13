@@ -10,7 +10,8 @@ ir: Extension = Extension(
     language="c++",
     include_dirs=[
         "src",
-        "src/GSL/include"
+        "src/GSL/include",
+        "src/clp/components/core/submodules",
     ],
     sources=[
         "src/clp/components/core/src/ffi/ir_stream/decoding_methods.cpp",
