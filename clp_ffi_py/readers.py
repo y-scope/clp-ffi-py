@@ -20,7 +20,9 @@ class CLPIRStreamReader:
     compressed using `zstd`.
     """
 
-    def __init__(self, istream: IO[bytes], decoder_buffer_size: int, enable_compression: bool):
+    def __init__(
+        self, istream: IO[bytes], decoder_buffer_size: int = 4096, enable_compression: bool = True
+    ):
         self.__istream: Union[IO[bytes], ZstdDecompressionReader]
         if enable_compression:
             dctx: ZstdDecompressor = ZstdDecompressor()
@@ -74,7 +76,7 @@ class CLPIRStreamReader:
     def has_metadata(self) -> bool:
         return None is not self._metadata
 
-    def search_with_query(self, query: Query) -> Generator[LogEvent, None, None]:
+    def search(self, query: Query) -> Generator[LogEvent, None, None]:
         """
         Searches and yields log events that match a specific search query.
 

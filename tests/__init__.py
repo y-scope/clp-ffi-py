@@ -7,6 +7,7 @@ from tests.test_encoder import *  # noqa
 from tests.test_log_event import *  # noqa
 from tests.test_metadata import *  # noqa
 from tests.test_query import *  # noqa
+from tests.test_readers import *  # noqa
 from tests.test_utils import TestCLPBase
 
 
