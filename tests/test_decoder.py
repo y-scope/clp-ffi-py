@@ -28,7 +28,6 @@ class TestCaseDecoderBase(TestCLPBase):
     num_test_iterations: int
     enable_compression: bool
     has_query: bool
-    test_skip: bool
 
     # override
     @classmethod
