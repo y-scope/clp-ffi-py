@@ -228,13 +228,14 @@ class TestCaseDecoderWithSkipBase(TestCaseDecoderBase):
     method(s).
     """
 
-    def _skip_to_time_testing(self, log_path: Path, n: int) -> None:
+    def _skip_to_time_testing(self, log_path: Path, n: int, ref_log_events: List[LogEvent]) -> None:
         """
         Helper function for testing `skip_to_time`.
 
         :param log_path: Local file system path that contains the encoded IR
             stream.
         :param n: Testing parameter ranges from 0 to 50 (exclusive).
+        :param ref_log_events: Reference log event list.
         """
         self.assertTrue(0 < n and n < 50, "The testing parameter must be within the range.")
 
@@ -244,16 +245,19 @@ class TestCaseDecoderWithSkipBase(TestCaseDecoderBase):
             log_event: Optional[LogEvent]
             metadata: Metadata = Decoder.decode_preamble(decoder_buffer)
             base_timestamp: int = metadata.get_ref_timestamp()
+            ref_log_event: LogEvent
 
             num_log_events_skipped = Decoder.skip_to_time(decoder_buffer, 0)
             self.assertEqual(num_log_events_skipped, 0, "No log event should be skipped.")
             log_event = Decoder.decode_next_log_event(decoder_buffer)
             self.assertTrue(log_event is not None, "Log event should be successfully decoded.")
             assert None is not log_event
-            self.assertEqual(
-                log_event.get_index(),
-                0,
-                "The next decoded log event should be the first one in the stream",
+            ref_log_event = ref_log_events[0]
+            self._check_log_event(
+                log_event,
+                ref_log_event.get_log_message(),
+                ref_log_event.get_timestamp(),
+                ref_log_event.get_index(),
             )
 
             # Iterate next n log messages
@@ -265,10 +269,12 @@ class TestCaseDecoderWithSkipBase(TestCaseDecoderBase):
             log_event = Decoder.decode_next_log_event(decoder_buffer)
             self.assertTrue(log_event is not None, "Log event should be successfully decoded.")
             assert None is not log_event
-            self.assertEqual(
-                log_event.get_index(),
-                n + 1,
-                "The next decoded log event should be the first one in the stream",
+            ref_log_event = ref_log_events[n + 1]
+            self._check_log_event(
+                log_event,
+                ref_log_event.get_log_message(),
+                ref_log_event.get_timestamp(),
+                ref_log_event.get_index(),
             )
 
             num_log_events_skipped = Decoder.skip_to_time(decoder_buffer, base_timestamp + 2 * n)
@@ -278,10 +284,12 @@ class TestCaseDecoderWithSkipBase(TestCaseDecoderBase):
             log_event = Decoder.decode_next_log_event(decoder_buffer)
             self.assertTrue(log_event is not None, "Log event should be successfully decoded.")
             assert None is not log_event
-            self.assertEqual(
-                log_event.get_index(),
-                4 * n,
-                "The next decoded log event should be the first one in the stream",
+            ref_log_event = ref_log_events[4 * n]
+            self._check_log_event(
+                log_event,
+                ref_log_event.get_log_message(),
+                ref_log_event.get_timestamp(),
+                ref_log_event.get_index(),
             )
 
             num_log_events_skipped = Decoder.skip_to_time(decoder_buffer, base_timestamp + 1000000)
@@ -311,10 +319,10 @@ class TestCaseDecoderWithSkipBase(TestCaseDecoderBase):
         except Exception:
             self.assertFalse(True, "Failed to encode log events.")
 
-        self._skip_to_time_testing(skip_to_time_path, 1)
-        self._skip_to_time_testing(skip_to_time_path, 10)
-        self._skip_to_time_testing(skip_to_time_path, 31)
-        self._skip_to_time_testing(skip_to_time_path, 49)
+        self._skip_to_time_testing(skip_to_time_path, 1, ref_log_events)
+        self._skip_to_time_testing(skip_to_time_path, 10, ref_log_events)
+        self._skip_to_time_testing(skip_to_time_path, 31, ref_log_events)
+        self._skip_to_time_testing(skip_to_time_path, 49, ref_log_events)
 
 
 class TestCaseDecoderDecompress(TestCaseDecoderWithSkipBase):

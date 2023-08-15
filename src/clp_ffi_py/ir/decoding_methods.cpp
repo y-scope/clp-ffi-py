@@ -250,7 +250,7 @@ auto skip_to_time(PyObject* Py_UNUSED(self), PyObject* args, PyObject* keywords)
         return nullptr;
     }
 
-    size_t num_log_event_skipped{0};
+    auto const num_log_event_decoded_before_skip{decoder_buffer->get_num_decoded_message()};
     std::string decoded_message;
     ffi::epoch_time_ms_t timestamp_delta{0};
     auto ref_timestamp{decoder_buffer->get_ref_timestamp()};
@@ -276,20 +276,23 @@ auto skip_to_time(PyObject* Py_UNUSED(self), PyObject* args, PyObject* keywords)
             return nullptr;
         }
 
-        ref_timestamp += timestamp_delta;
-        if (time_ms <= ref_timestamp) {
+        auto const current_timestamp{ref_timestamp + timestamp_delta};
+        if (current_timestamp >= time_ms) {
             break;
         }
 
-        ++num_log_event_skipped;
+        ref_timestamp = current_timestamp;
         decoder_buffer->get_and_increment_decoded_message_count();
-        decoder_buffer->set_ref_timestamp(ref_timestamp);
         decoder_buffer->commit_read_buffer_consumption(
                 static_cast<Py_ssize_t>(ir_buffer.get_cursor_pos())
         );
     }
 
-    return PyLong_FromLongLong(static_cast<int64_t>(num_log_event_skipped));
+    decoder_buffer->set_ref_timestamp(ref_timestamp);
+    auto const num_log_event_decoded_after_skip{decoder_buffer->get_num_decoded_message()};
+    return PyLong_FromLongLong(static_cast<int64_t>(
+            num_log_event_decoded_after_skip - num_log_event_decoded_before_skip
+    ));
 }
 }
 }  // namespace clp_ffi_py::ir
