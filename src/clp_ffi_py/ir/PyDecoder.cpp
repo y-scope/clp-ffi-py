@@ -41,18 +41,6 @@ PyDoc_STRVAR(
 );
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
-PyDoc_STRVAR(
-        cSkipToTimeDoc,
-        "skip_to_time(decoder_buffer, time_ms)\n"
-        "--\n\n"
-        "Skips the log events by discarding the decoded results until the first log event with "
-        "timestamp greater or equal to `time_ms` is reached.\n"
-        ":param decoder_buffer: The decoder buffer of the encoded CLP IR stream.\n"
-        ":param time_ms: Given Unix epoch timestamp in milliseconds to skip to.\n"
-        ":return: Number of log events skipped.\n"
-);
-
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyMethodDef PyDecoder_method_table[]{
         {"decode_preamble",
          decode_preamble,
@@ -63,11 +51,6 @@ PyMethodDef PyDecoder_method_table[]{
          py_c_function_cast(decode_next_log_event),
          METH_VARARGS | METH_KEYWORDS | METH_STATIC,
          static_cast<char const*>(cDecodeNextLogEventDoc)},
-
-        {"skip_to_time",
-         py_c_function_cast(skip_to_time),
-         METH_VARARGS | METH_KEYWORDS | METH_STATIC,
-         static_cast<char const*>(cSkipToTimeDoc)},
 
         {nullptr, nullptr, 0, nullptr}};
 

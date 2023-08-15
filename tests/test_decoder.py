@@ -222,110 +222,7 @@ class TestCaseDecoderBase(TestCLPBase):
             )
 
 
-class TestCaseDecoderWithSkipBase(TestCaseDecoderBase):
-    """
-    Tests encoding/decoding methods against uncompressed IR stream with skip
-    method(s).
-    """
-
-    def _skip_to_time_testing(self, log_path: Path, n: int, ref_log_events: List[LogEvent]) -> None:
-        """
-        Helper function for testing `skip_to_time`.
-
-        :param log_path: Local file system path that contains the encoded IR
-            stream.
-        :param n: Testing parameter ranges from 0 to 50 (exclusive).
-        :param ref_log_events: Reference log event list.
-        """
-        self.assertTrue(0 < n and n < 50, "The testing parameter must be within the range.")
-
-        with open(str(log_path), "rb") as fin:
-            decoder_buffer: DecoderBuffer = DecoderBuffer(fin)
-            num_log_events_skipped: int
-            log_event: Optional[LogEvent]
-            metadata: Metadata = Decoder.decode_preamble(decoder_buffer)
-            base_timestamp: int = metadata.get_ref_timestamp()
-            ref_log_event: LogEvent
-
-            num_log_events_skipped = Decoder.skip_to_time(decoder_buffer, 0)
-            self.assertEqual(num_log_events_skipped, 0, "No log event should be skipped.")
-            log_event = Decoder.decode_next_log_event(decoder_buffer)
-            self.assertTrue(log_event is not None, "Log event should be successfully decoded.")
-            assert None is not log_event
-            ref_log_event = ref_log_events[0]
-            self._check_log_event(
-                log_event,
-                ref_log_event.get_log_message(),
-                ref_log_event.get_timestamp(),
-                ref_log_event.get_index(),
-            )
-
-            # Iterate next n log messages
-            for _ in range(n):
-                log_event = Decoder.decode_next_log_event(decoder_buffer)
-
-            num_log_events_skipped = Decoder.skip_to_time(decoder_buffer, base_timestamp + n // 2)
-            self.assertEqual(num_log_events_skipped, 0, "No log event should be skipped.")
-            log_event = Decoder.decode_next_log_event(decoder_buffer)
-            self.assertTrue(log_event is not None, "Log event should be successfully decoded.")
-            assert None is not log_event
-            ref_log_event = ref_log_events[n + 1]
-            self._check_log_event(
-                log_event,
-                ref_log_event.get_log_message(),
-                ref_log_event.get_timestamp(),
-                ref_log_event.get_index(),
-            )
-
-            num_log_events_skipped = Decoder.skip_to_time(decoder_buffer, base_timestamp + 2 * n)
-            self.assertEqual(
-                num_log_events_skipped, 4 * n - (n + 2), "No log event should be skipped."
-            )
-            log_event = Decoder.decode_next_log_event(decoder_buffer)
-            self.assertTrue(log_event is not None, "Log event should be successfully decoded.")
-            assert None is not log_event
-            ref_log_event = ref_log_events[4 * n]
-            self._check_log_event(
-                log_event,
-                ref_log_event.get_log_message(),
-                ref_log_event.get_timestamp(),
-                ref_log_event.get_index(),
-            )
-
-            num_log_events_skipped = Decoder.skip_to_time(decoder_buffer, base_timestamp + 1000000)
-            log_event = Decoder.decode_next_log_event(decoder_buffer)
-            self.assertTrue(log_event is None, "All the logs should be escaped.")
-
-    def test_skip_to_time(self) -> None:
-        """
-        Tests `skip_to_time` method in Decoder.
-        """
-        skip_to_time_path: Path = LOG_DIR / Path(
-            f"{self.encoded_log_path_prefix}.{iter}.{self.encoded_log_path_postfix}"
-        )
-        if skip_to_time_path.exists():
-            skip_to_time_path.unlink()
-        base_timestamp: int = 100
-        ref_log_events: List[LogEvent] = []
-        for i in range(200):
-            log_message = (
-                "This is a log message with one unique id per line:"
-                f" app-20230813{i % 100}-{i % 20} from clp-node-{i % 31}"
-            )
-            ref_log_events.append(LogEvent(log_message, base_timestamp + i // 2, i))
-        metadata: Metadata = Metadata(base_timestamp, "", "America/Chicago")
-        try:
-            self._encode_log_stream(skip_to_time_path, metadata, ref_log_events)
-        except Exception:
-            self.assertFalse(True, "Failed to encode log events.")
-
-        self._skip_to_time_testing(skip_to_time_path, 1, ref_log_events)
-        self._skip_to_time_testing(skip_to_time_path, 10, ref_log_events)
-        self._skip_to_time_testing(skip_to_time_path, 31, ref_log_events)
-        self._skip_to_time_testing(skip_to_time_path, 49, ref_log_events)
-
-
-class TestCaseDecoderDecompress(TestCaseDecoderWithSkipBase):
+class TestCaseDecoderDecompress(TestCaseDecoderBase):
     """
     Tests encoding/decoding methods against uncompressed IR stream.
     """
@@ -338,7 +235,7 @@ class TestCaseDecoderDecompress(TestCaseDecoderWithSkipBase):
         super().setUp()
 
 
-class TestCaseDecoderDecompressZst(TestCaseDecoderWithSkipBase):
+class TestCaseDecoderDecompressZst(TestCaseDecoderBase):
     """
     Tests encoding/decoding methods against zstd compressed IR stream.
     """

@@ -32,19 +32,6 @@ class CLPIRStreamReader:
         self._decoder_buffer: DecoderBuffer = DecoderBuffer(self.__istream, decoder_buffer_size)
         self._metadata: Optional[Metadata] = None
 
-    def skip_to_time(self, time_ms: int) -> int:
-        """
-        Skip all logs with Unix epoch timestamp before `time_ms`.
-
-        After being called, the next log event returned from any reader methods
-        will have its timestamp greater or equal to the given time_ms. All the
-        log events whose timestamp is before `time_ms` will be discarded.
-        :return: Number of logs skipped.
-        """
-        if False is self.has_metadata():
-            raise RuntimeError("The preamble hasn't been successfully decoded.")
-        return Decoder.skip_to_time(self._decoder_buffer, time_ms)
-
     def read_next_log_event(self) -> Optional[LogEvent]:
         """
         Reads and decodes the next encoded log event from the IR stream.
