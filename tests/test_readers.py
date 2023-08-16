@@ -76,7 +76,7 @@ class TestCaseReaderDecompress(TestCaseReaderBase):
 
 class TestCaseReaderDecompressZst(TestCaseReaderBase):
     """
-    Tests stream reader against uncompressed IR stream.
+    Tests stream reader against zstd compressed IR stream.
     """
 
     # override
