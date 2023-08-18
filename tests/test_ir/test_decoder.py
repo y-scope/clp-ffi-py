@@ -234,7 +234,7 @@ class TestCaseDecoderDecompress(TestCaseDecoderBase):
         super().setUp()
 
 
-class TestCaseDecoderDecompressZst(TestCaseDecoderBase):
+class TestCaseDecoderDecompressZstd(TestCaseDecoderBase):
     """
     Tests encoding/decoding methods against zstd compressed IR stream.
     """
@@ -261,9 +261,9 @@ class TestCaseDecoderDecompressDefaultQuery(TestCaseDecoderBase):
         super().setUp()
 
 
-class TestCaseDecoderDecompressZstDefaultQuery(TestCaseDecoderBase):
+class TestCaseDecoderDecompressZstdDefaultQuery(TestCaseDecoderBase):
     """
-    Tests encoding/decoding methods against zst compressed IR stream with the
+    Tests encoding/decoding methods against zstd compressed IR stream with the
     default empty query.
     """
 
@@ -312,9 +312,9 @@ class TestCaseDecoderTimeRangeQuery(TestCaseDecoderTimeRangeQueryBase):
         super().setUp()
 
 
-class TestCaseDecoderTimeRangeQueryZst(TestCaseDecoderTimeRangeQueryBase):
+class TestCaseDecoderTimeRangeQueryZstd(TestCaseDecoderTimeRangeQueryBase):
     """
-    Tests encoding/decoding methods against zst compressed IR stream with the
+    Tests encoding/decoding methods against zstd compressed IR stream with the
     query that specifies a search timestamp.
     """
 
@@ -357,9 +357,9 @@ class TestCaseDecoderWildcardQuery(TestCaseDecoderWildcardQueryBase):
         super().setUp()
 
 
-class TestCaseDecoderWildcardQueryZst(TestCaseDecoderWildcardQueryBase):
+class TestCaseDecoderWildcardQueryZstd(TestCaseDecoderWildcardQueryBase):
     """
-    Tests encoding/decoding methods against zst compressed IR stream with the
+    Tests encoding/decoding methods against zstd compressed IR stream with the
     query that specifies a wildcard queries.
     """
 
@@ -412,9 +412,9 @@ class TestCaseDecoderTimeRangeWildcardQuery(TestCaseDecoderTimeRangeWildcardQuer
         super().setUp()
 
 
-class TestCaseDecoderTimeRangeWildcardQueryZst(TestCaseDecoderTimeRangeWildcardQueryBase):
+class TestCaseDecoderTimeRangeWildcardQueryZstd(TestCaseDecoderTimeRangeWildcardQueryBase):
     """
-    Tests encoding/decoding methods against zst compressed IR stream with the
+    Tests encoding/decoding methods against zstd compressed IR stream with the
     query that specifies both search time range and wildcard queries.
     """
 

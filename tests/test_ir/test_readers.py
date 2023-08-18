@@ -75,7 +75,7 @@ class TestCaseReaderDecompress(TestCaseReaderBase):
         super().setUp()
 
 
-class TestCaseReaderDecompressZst(TestCaseReaderBase):
+class TestCaseReaderDecompressZstd(TestCaseReaderBase):
     """
     Tests stream reader against zstd compressed IR stream.
     """
@@ -102,9 +102,9 @@ class TestCaseReaderTimeRangeQuery(TestCaseReaderTimeRangeQueryBase):
         super().setUp()
 
 
-class TestCaseReaderTimeRangeQueryZst(TestCaseReaderTimeRangeQueryBase):
+class TestCaseReaderTimeRangeQueryZstd(TestCaseReaderTimeRangeQueryBase):
     """
-    Tests stream reader against zst compressed IR stream with the query that
+    Tests stream reader against zstd compressed IR stream with the query that
     specifies a search timestamp.
     """
 
@@ -130,9 +130,9 @@ class TestCaseReaderWildcardQuery(TestCaseReaderWildcardQueryBase):
         super().setUp()
 
 
-class TestCaseReaderWildcardQueryZst(TestCaseReaderWildcardQueryBase):
+class TestCaseReaderWildcardQueryZstd(TestCaseReaderWildcardQueryBase):
     """
-    Tests stream reader against zst compressed IR stream with the query that
+    Tests stream reader against zstd compressed IR stream with the query that
     specifies a wildcard queries.
     """
 
@@ -158,9 +158,9 @@ class TestCaseReaderTimeRangeWildcardQuery(TestCaseReaderTimeRangeWildcardQueryB
         super().setUp()
 
 
-class TestCaseReaderTimeRangeWildcardQueryZst(TestCaseReaderTimeRangeWildcardQueryBase):
+class TestCaseReaderTimeRangeWildcardQueryZstd(TestCaseReaderTimeRangeWildcardQueryBase):
     """
-    Tests stream reader against zst compressed IR stream with the query that
+    Tests stream reader against zstd compressed IR stream with the query that
     specifies both search time range and wildcard queries.
     """
 
