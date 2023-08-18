@@ -49,6 +49,8 @@ wrap-descriptions = 80
 [tool.mypy]
 strict = true
 pretty = true
+mypy_path = ["tests"]
+explicit_package_bases = true
 
 [tool.ruff]
 line-length = 100

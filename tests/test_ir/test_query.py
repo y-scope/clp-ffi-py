@@ -1,12 +1,13 @@
 import pickle
 from typing import List
 
+from test_ir.test_utils import TestCLPBase
+
 from clp_ffi_py import (
     LogEvent,
     Query,
     WildcardQuery,
 )
-from tests.test_utils import TestCLPBase
 
 
 class TestCaseWildcardQuery(TestCLPBase):

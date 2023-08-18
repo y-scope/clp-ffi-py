@@ -1,14 +1,15 @@
 from pathlib import Path
 from typing import List, Optional, Tuple
 
-from clp_ffi_py import LogEvent, Metadata, Query
-from clp_ffi_py.readers import CLPIRStreamReader
-from tests.test_decoder import (
+from test_ir.test_decoder import (
     TestCaseDecoderBase,
     TestCaseDecoderTimeRangeQueryBase,
     TestCaseDecoderTimeRangeWildcardQueryBase,
     TestCaseDecoderWildcardQueryBase,
 )
+
+from clp_ffi_py import LogEvent, Metadata, Query
+from clp_ffi_py.readers import CLPIRStreamReader
 
 
 def read_log_stream(

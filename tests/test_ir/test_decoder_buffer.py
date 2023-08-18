@@ -4,9 +4,9 @@ from pathlib import Path
 from typing import Optional
 
 from smart_open import open  # type: ignore
+from test_ir.test_utils import TestCLPBase
 
 from clp_ffi_py import DecoderBuffer
-from tests.test_utils import TestCLPBase
 
 
 class TestCaseDecoderBuffer(TestCLPBase):

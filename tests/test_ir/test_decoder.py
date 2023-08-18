@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import List, Optional, Tuple
 
 from smart_open import open  # type: ignore
+from test_ir.test_utils import get_current_timestamp, LogGenerator, TestCLPBase
 
 from clp_ffi_py import (
     Decoder,
@@ -13,7 +14,6 @@ from clp_ffi_py import (
     Query,
     WildcardQuery,
 )
-from tests.test_utils import get_current_timestamp, LogGenerator, TestCLPBase
 
 LOG_DIR: Path = Path("unittest-logs")
 
