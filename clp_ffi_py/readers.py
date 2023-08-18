@@ -20,8 +20,13 @@ class CLPIRStreamReader:
     compressed using `zstd`.
     """
 
+    DEFAULT_DECODER_BUFFER_SIZE: int = 65536
+
     def __init__(
-        self, istream: IO[bytes], decoder_buffer_size: int = 4096, enable_compression: bool = True
+        self,
+        istream: IO[bytes],
+        decoder_buffer_size: int = DEFAULT_DECODER_BUFFER_SIZE,
+        enable_compression: bool = True,
     ):
         self.__istream: Union[IO[bytes], ZstdDecompressionReader]
         if enable_compression:
@@ -116,7 +121,10 @@ class CLPIRFileReader(CLPIRStreamReader):
     """
 
     def __init__(
-        self, fpath: Path, decoder_buffer_size: int = 4096, enable_compression: bool = True
+        self,
+        fpath: Path,
+        decoder_buffer_size: int = CLPIRStreamReader.DEFAULT_DECODER_BUFFER_SIZE,
+        enable_compression: bool = True,
     ):
         self._path: Path = fpath
         super().__init__(open(fpath, "rb"), decoder_buffer_size, enable_compression)

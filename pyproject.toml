@@ -47,10 +47,10 @@ wrap-summaries = 80
 wrap-descriptions = 80
 
 [tool.mypy]
+explicit_package_bases = true
+mypy_path = ["tests"]
 strict = true
 pretty = true
-mypy_path = ["tests"]
-explicit_package_bases = true
 
 [tool.ruff]
 line-length = 100
