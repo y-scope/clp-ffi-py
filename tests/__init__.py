@@ -1,41 +1,6 @@
-import unittest
-from typing import Iterable, Optional, Union
+import os
+import sys
 
-from tests.test_decoder import *  # noqa
-from tests.test_decoder_buffer import *  # noqa
-from tests.test_encoder import *  # noqa
-from tests.test_log_event import *  # noqa
-from tests.test_metadata import *  # noqa
-from tests.test_query import *  # noqa
-from tests.test_utils import TestCLPBase
-
-
-def add_tests(suite: unittest.TestSuite, loader: unittest.TestLoader, test_class: type) -> None:
-    """
-    Recursively collect tests from concrete classes. Although Test*Base classes
-    are functionally abstract to the user we cannot properly make them abstract
-    as `unittest` will still create instances of these classes.
-
-    :param suite: test suite to add found tests to
-    :param loader: load test from `unittest.TestCase` class
-    :param test_class: current class to search for tests in
-    """
-    if "Base" not in str(test_class):
-        tests = loader.loadTestsFromTestCase(test_class)
-        suite.addTests(tests)
-
-    for subclass in test_class.__subclasses__():
-        add_tests(suite, loader, subclass)
-
-
-def load_tests(
-    loader: unittest.TestLoader,
-    tests: Iterable[Union[unittest.TestCase, unittest.TestSuite]],
-    pattern: Optional[str],
-) -> unittest.TestSuite:
-    suite: unittest.TestSuite = unittest.TestSuite()
-
-    for test_class in TestCLPBase.__subclasses__():
-        add_tests(suite, loader, test_class)
-
-    return suite
+current_directory: str = os.path.dirname(os.path.abspath(__file__))
+if current_directory.endswith("tests") and current_directory not in sys.path:
+    sys.path.append(current_directory)

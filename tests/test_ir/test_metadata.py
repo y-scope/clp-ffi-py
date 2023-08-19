@@ -2,9 +2,9 @@ from datetime import tzinfo
 from typing import Optional
 
 import dateutil.tz
+from test_ir.test_utils import TestCLPBase
 
 from clp_ffi_py import Metadata
-from tests.test_utils import TestCLPBase
 
 
 class TestCaseMetadata(TestCLPBase):

@@ -3,7 +3,7 @@
 
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
-#include <clp/components/core/submodules/json/single_include/nlohmann/json.hpp>
+#include <json/single_include/nlohmann/json.hpp>
 
 #include <clp_ffi_py/ir/Metadata.hpp>
 #include <clp_ffi_py/PyObjectUtils.hpp>

@@ -4,8 +4,8 @@
 
 #include <clp/components/core/src/ffi/ir_stream/decoding_methods.hpp>
 #include <clp/components/core/src/type_utils.hpp>
-#include <clp/components/core/submodules/json/single_include/nlohmann/json.hpp>
 #include <gsl/span>
+#include <json/single_include/nlohmann/json.hpp>
 
 #include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ir/error_messages.hpp>

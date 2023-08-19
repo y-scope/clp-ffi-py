@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import List, Optional, Tuple
 
 from smart_open import open  # type: ignore
+from test_ir.test_utils import get_current_timestamp, LogGenerator, TestCLPBase
 
 from clp_ffi_py import (
     Decoder,
@@ -13,7 +14,6 @@ from clp_ffi_py import (
     Query,
     WildcardQuery,
 )
-from tests.test_utils import get_current_timestamp, LogGenerator, TestCLPBase
 
 LOG_DIR: Path = Path("unittest-logs")
 
@@ -51,6 +51,33 @@ class TestCaseDecoderBase(TestCLPBase):
         )
         return log_path
 
+    def _encode_log_stream(
+        self, log_path: Path, metadata: Metadata, log_events: List[LogEvent]
+    ) -> None:
+        """
+        Encodes the log stream into the given path.
+
+        :param log_path: Path on the local file system to write the stream.
+        :param metadata: Metadata of the log stream.
+        :param log_events: A list of log events to encode.
+        """
+        with open(str(log_path), "wb") as ostream:
+            ref_timestamp: int = metadata.get_ref_timestamp()
+            ostream.write(
+                FourByteEncoder.encode_preamble(
+                    ref_timestamp, metadata.get_timestamp_format(), metadata.get_timezone_id()
+                )
+            )
+            for log_event in log_events:
+                curr_ts: int = log_event.get_timestamp()
+                delta: int = curr_ts - ref_timestamp
+                ref_timestamp = curr_ts
+                log_message: str = log_event.get_log_message()
+                ostream.write(
+                    FourByteEncoder.encode_message_and_timestamp_delta(delta, log_message.encode())
+                )
+            ostream.write(b"\x00")
+
     def _encode_random_log_stream(
         self, log_path: Path, num_log_events_to_generate: int, seed: int
     ) -> Tuple[Metadata, List[LogEvent]]:
@@ -66,24 +93,7 @@ class TestCaseDecoderBase(TestCLPBase):
         log_events: List[LogEvent]
         metadata, log_events = LogGenerator.generate_random_logs(num_log_events_to_generate)
         try:
-            with open(str(log_path), "wb") as ostream:
-                ref_timestamp: int = metadata.get_ref_timestamp()
-                ostream.write(
-                    FourByteEncoder.encode_preamble(
-                        ref_timestamp, metadata.get_timestamp_format(), metadata.get_timezone_id()
-                    )
-                )
-                for log_event in log_events:
-                    curr_ts: int = log_event.get_timestamp()
-                    delta: int = curr_ts - ref_timestamp
-                    ref_timestamp = curr_ts
-                    log_message: str = log_event.get_log_message()
-                    ostream.write(
-                        FourByteEncoder.encode_message_and_timestamp_delta(
-                            delta, log_message.encode()
-                        )
-                    )
-                ostream.write(b"\x00")
+            self._encode_log_stream(log_path, metadata, log_events)
         except Exception as e:
             self.assertTrue(
                 False, f"Failed to encode random log stream generated using seed {seed}: {e}"
@@ -224,7 +234,7 @@ class TestCaseDecoderDecompress(TestCaseDecoderBase):
         super().setUp()
 
 
-class TestCaseDecoderDecompressZst(TestCaseDecoderBase):
+class TestCaseDecoderDecompressZstd(TestCaseDecoderBase):
     """
     Tests encoding/decoding methods against zstd compressed IR stream.
     """
@@ -251,9 +261,9 @@ class TestCaseDecoderDecompressDefaultQuery(TestCaseDecoderBase):
         super().setUp()
 
 
-class TestCaseDecoderDecompressZstDefaultQuery(TestCaseDecoderBase):
+class TestCaseDecoderDecompressZstdDefaultQuery(TestCaseDecoderBase):
     """
-    Tests encoding/decoding methods against zst compressed IR stream with the
+    Tests encoding/decoding methods against zstd compressed IR stream with the
     default empty query.
     """
 
@@ -302,9 +312,9 @@ class TestCaseDecoderTimeRangeQuery(TestCaseDecoderTimeRangeQueryBase):
         super().setUp()
 
 
-class TestCaseDecoderTimeRangeQueryZst(TestCaseDecoderTimeRangeQueryBase):
+class TestCaseDecoderTimeRangeQueryZstd(TestCaseDecoderTimeRangeQueryBase):
     """
-    Tests encoding/decoding methods against zst compressed IR stream with the
+    Tests encoding/decoding methods against zstd compressed IR stream with the
     query that specifies a search timestamp.
     """
 
@@ -347,9 +357,9 @@ class TestCaseDecoderWildcardQuery(TestCaseDecoderWildcardQueryBase):
         super().setUp()
 
 
-class TestCaseDecoderWildcardQueryZst(TestCaseDecoderWildcardQueryBase):
+class TestCaseDecoderWildcardQueryZstd(TestCaseDecoderWildcardQueryBase):
     """
-    Tests encoding/decoding methods against zst compressed IR stream with the
+    Tests encoding/decoding methods against zstd compressed IR stream with the
     query that specifies a wildcard queries.
     """
 
@@ -402,9 +412,9 @@ class TestCaseDecoderTimeRangeWildcardQuery(TestCaseDecoderTimeRangeWildcardQuer
         super().setUp()
 
 
-class TestCaseDecoderTimeRangeWildcardQueryZst(TestCaseDecoderTimeRangeWildcardQueryBase):
+class TestCaseDecoderTimeRangeWildcardQueryZstd(TestCaseDecoderTimeRangeWildcardQueryBase):
     """
-    Tests encoding/decoding methods against zst compressed IR stream with the
+    Tests encoding/decoding methods against zstd compressed IR stream with the
     query that specifies both search time range and wildcard queries.
     """
 

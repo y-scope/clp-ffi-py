@@ -52,6 +52,12 @@ rather than installed locally (`pip install -e .`),
 the tester cannot be launched from the project's root directory.
 If `unittest` is ran from the root directory,
 the local `clp_ffi_py` directory will shadow the `clp_ffi_py` module installed.
+To run the tester with the installed package, try the following:
+
+```bash
+cd tests
+python -m unittest -bv
+```
 
 ## Build and Test with cibuildwheel
 

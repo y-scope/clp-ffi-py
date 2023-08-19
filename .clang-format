@@ -78,6 +78,8 @@ IncludeCategories:
     Priority: 3
   - Regex: '<(gsl)'
     Priority: 3
+  - Regex: '<(json)'
+    Priority: 3
   # C headers
   - Regex: '^<.*.h>$'
     Priority: 1
