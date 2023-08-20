@@ -42,7 +42,7 @@ CLP IR Readers provide a convenient interface for CLP IR decoding and search met
 
 ### CLPIRFileReader
 
-- Simple wrapper around CLPIRStreamHandler that calls open with a given local path.
+- Simple wrapper around CLPIRStreamHandler that calls `open` with a given local path.
 
 ### Example Code: Using CLPIRFileReader
 ```python
@@ -66,9 +66,9 @@ with CLPIRFileReader(Path("example.clp.zst")) as clp_reader:
         else:
             log_event_counts_by_timestamp[timestamp] = 0
 ```
-Each log event is represented by an `LogEvent` object, which offers methods to retrieve its
-underlying details such as timestamp and log message. For more information, refer to the 
-docstring of `LogEvent`.
+Each log event is represented by a `LogEvent` object, which offers methods to retrieve its
+underlying details, such as the timestamp and the log message. For more information, refer
+to the docstring of `LogEvent`.
 
 ### Example Code: Using Query to search log events by specifying a certain time range
 ```python
@@ -102,7 +102,7 @@ from clp_ffi_py.readers import CLPIRFileReader
 
 # Generate a list of wildcard patterns to filter log messages:
 wildcard_query_list: List[WildcardQuery] = [
-    WildcardQuery("*uid=*,state=failed*"),
+    WildcardQuery("*uid=*,status=failed*"),
     WildcardQuery("*UID=*,Status=KILLED*", case_sensitive=True),
 ]
 # Initialize a Query object with the list of wildcard patterns:
