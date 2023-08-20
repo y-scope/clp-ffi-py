@@ -44,27 +44,15 @@ CLP IR Readers provide a convenient interface for CLP IR decoding and search met
 
 - Simple wrapper around CLPIRStreamHandler that calls open with a given local path.
 
-### Example Code: Using CLPIRFileReader
+### Example Code: Using CLPIRFileReader to iterate and print log events
 ```python
 from pathlib import Path
-from typing import Dict, List
-
-from clp_ffi_py import LogEvent
 from clp_ffi_py.readers import CLPIRFileReader
-
-# A list to store all the log events in `example.clp.zst`
-log_events: List[LogEvent] = []
-# A dictionary to record each timestamp and its corresponding log message count
-log_event_counts_by_timestamp: Dict[int, int] = {}
 
 with CLPIRFileReader(Path("example.clp.zst")) as clp_reader:
     for log_event in clp_reader:
-        log_events.append(log_event)
-        timestamp: int = log_event.get_timestamp()
-        if timestamp in log_event_counts_by_timestamp:
-            log_event_counts_by_timestamp[timestamp] += 1
-        else:
-            log_event_counts_by_timestamp[timestamp] = 0
+        # Print the log message with its timestamp properly formatted.
+        print(log_event.get_formatted_message())
 ```
 Each log event is represented by an `LogEvent` object, which offers methods to retrieve its
 underlying details such as timestamp and log message. For more information, refer to the 
