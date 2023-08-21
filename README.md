@@ -55,8 +55,13 @@ with CLPIRFileReader(Path("example.clp.zst")) as clp_reader:
         print(log_event.get_formatted_message())
 ```
 Each log event is represented by a `LogEvent` object, which offers methods to retrieve its
-underlying details, such as the timestamp and the log message. For more information, refer
-to the docstring of `LogEvent`.
+underlying details, such as the timestamp and the log message. For more information, use
+the following code to see all the available methods and the associated docstring.
+
+```python
+from clp_ffi_py import LogEvent
+help(LogEvent)
+```
 
 ### Example Code: Using Query to search log events by specifying a certain time range
 ```python
@@ -66,8 +71,8 @@ from typing import List
 from clp_ffi_py import LogEvent, Query
 from clp_ffi_py.readers import CLPIRFileReader
 
-# Create a search query that specifies a time range by UNIX epoch timestamp.
-# It will search from 2016.Nov.28 21:00 to 2016.Nov.29 3:00
+# Create a search query that specifies a time range by UNIX epoch timestamp in
+# milliseconds. It will search from 2016.Nov.28 21:00 to 2016.Nov.29 3:00.
 time_range_query: Query = Query(
     search_time_lower_bound=1480366800000,  # 2016.11.28 21:00
     search_time_upper_bound=1480388400000,  # 2016.11.29 03:00
@@ -104,7 +109,15 @@ with CLPIRFileReader(Path("example.clp.zst")) as clp_reader:
         matched_log_messages.append((log_event.get_timestamp(), log_event.get_log_message()))
 ```
 A `Query` object may have both the search time range and the wildcard queries specified to support
-more complex search scenarios. For more details, refer to the docstring of `Query`.
+more complex search scenarios. For more details, use the following code to access the related
+docstring.
+```python
+from clp_ffi_py import Query
+help(Query)
+```
+### Parallelization
+The `Query` and `LogEvent` classes can be serialized by [pickle][15]. Therefore, decoding and search
+can be parallelized across streams/files using libraries such as [multiprocessing][13] and [tqlm][14].
 
 ## Testing
 
@@ -194,3 +207,6 @@ using `pip`. Developers need to install them using other package management tool
 [10]: https://beta.ruff.rs/docs/
 [11]: https://docformatter.readthedocs.io/en/latest/
 [12]: https://docformatter.readthedocs.io/en/latest/faq.html#interaction-with-black
+[13]: https://docs.python.org/3/library/multiprocessing.html
+[14]: https://tqdm.github.io/
+[15]: https://docs.python.org/3/library/pickle.html
