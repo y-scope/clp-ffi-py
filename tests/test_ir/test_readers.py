@@ -9,7 +9,7 @@ from test_ir.test_decoder import (
 )
 
 from clp_ffi_py import LogEvent, Metadata, Query
-from clp_ffi_py.readers import CLPIRStreamReader
+from clp_ffi_py.readers import ClpIrStreamReader
 
 
 def read_log_stream(
@@ -18,7 +18,7 @@ def read_log_stream(
     metadata: Metadata
     log_events: List[LogEvent] = []
     with open(str(log_path), "rb") as fin:
-        reader = CLPIRStreamReader(fin, enable_compression=enable_compression)
+        reader = ClpIrStreamReader(fin, enable_compression=enable_compression)
         if None is query:
             for log_event in reader:
                 log_events.append(log_event)

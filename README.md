@@ -28,6 +28,105 @@ git submodule update --init --recursive
 python -m build
 ```
 
+## CLP IR Readers
+
+CLP IR Readers provide a convenient interface for CLP IR decoding and search methods.
+
+### ClpIrStreamReader
+
+- Read/decode any arbitrary CLP IR stream (as an instance of `IO[bytes]`).
+- Can be used as an iterator that returns each log event as a `LogEvent` object.
+- Can search target log events by giving a search query:
+  - Searching log events within a certain time range.
+  - Searching log messages that match certain wildcard queries.
+
+### ClpIrFileReader
+
+- Simple wrapper around CLPIRStreamHandler that calls `open` with a given local path.
+
+### Example Code: Using ClpIrFileReader to iterate and print log events
+
+```python
+from pathlib import Path
+from clp_ffi_py.readers import ClpIrFileReader
+
+with ClpIrFileReader(Path("example.clp.zst")) as clp_reader:
+    for log_event in clp_reader:
+        # Print the log message with its timestamp properly formatted.
+        print(log_event.get_formatted_message())
+```
+
+Each log event is represented by a `LogEvent` object, which offers methods to retrieve its
+underlying details, such as the timestamp and the log message. For more information, use
+the following code to see all the available methods and the associated docstring.
+
+```python
+from clp_ffi_py import LogEvent
+help(LogEvent)
+```
+
+### Example Code: Using Query to search log events by specifying a certain time range
+
+```python
+from pathlib import Path
+from typing import List
+
+from clp_ffi_py import LogEvent, Query
+from clp_ffi_py.readers import ClpIrFileReader
+
+# Create a search query that specifies a time range by UNIX epoch timestamp in
+# milliseconds. It will search from 2016.Nov.28 21:00 to 2016.Nov.29 3:00.
+time_range_query: Query = Query(
+    search_time_lower_bound=1480366800000,  # 2016.11.28 21:00
+    search_time_upper_bound=1480388400000,  # 2016.11.29 03:00
+)
+# A list to store all the log events within the search time range
+log_events: List[LogEvent] = []
+
+with ClpIrFileReader(Path("example.clp.zst")) as clp_reader:
+    for log_event in clp_reader.search(time_range_query):
+        log_events.append(log_event)
+```
+
+### Example Code: Using Query to search log messages of certain pattern(s) specified by wildcard queries.
+
+```python
+from pathlib import Path
+from typing import List, Tuple
+
+from clp_ffi_py import Query, WildcardQuery
+from clp_ffi_py.readers import ClpIrFileReader
+
+# Generate a list of wildcard patterns to filter log messages:
+wildcard_query_list: List[WildcardQuery] = [
+    WildcardQuery("*uid=*,status=failed*"),
+    WildcardQuery("*UID=*,Status=KILLED*", case_sensitive=True),
+]
+# Initialize a Query object with the list of wildcard patterns:
+wildcard_search_query: Query = Query(wildcard_queries=wildcard_query_list)
+# Store the log events that match the criteria in the format:
+# [timestamp, message]
+matched_log_messages: List[Tuple[int, str]] = []
+
+with ClpIrFileReader(Path("example.clp.zst")) as clp_reader:
+    for log_event in clp_reader.search(wildcard_search_query):
+        matched_log_messages.append((log_event.get_timestamp(), log_event.get_log_message()))
+```
+
+A `Query` object may have both the search time range and the wildcard queries specified to support
+more complex search scenarios. For more details, use the following code to access the related
+docstring.
+
+```python
+from clp_ffi_py import Query
+help(Query)
+```
+
+### Parallelization
+
+The `Query` and `LogEvent` classes can be serialized by [pickle][15]. Therefore, decoding and search
+can be parallelized across streams/files using libraries such as [multiprocessing][13] and [tqlm][14].
+
 ## Testing
 
 ```bash
@@ -116,3 +215,6 @@ using `pip`. Developers need to install them using other package management tool
 [10]: https://beta.ruff.rs/docs/
 [11]: https://docformatter.readthedocs.io/en/latest/
 [12]: https://docformatter.readthedocs.io/en/latest/faq.html#interaction-with-black
+[13]: https://docs.python.org/3/library/multiprocessing.html
+[14]: https://tqdm.github.io/
+[15]: https://docs.python.org/3/library/pickle.html
