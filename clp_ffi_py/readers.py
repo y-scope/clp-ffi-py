@@ -8,7 +8,7 @@ from zstandard import ZstdDecompressionReader, ZstdDecompressor
 from clp_ffi_py import Decoder, DecoderBuffer, LogEvent, Metadata, Query
 
 
-class CLPIRStreamReader:
+class ClpIrStreamReader:
     """
     This class represents a stream reader used to read/decode encoded log events
     from a CLP IR stream. It also provides method(s) to instantiate a log event
@@ -115,15 +115,15 @@ class CLPIRStreamReader:
         self.close()
 
 
-class CLPIRFileReader(CLPIRStreamReader):
+class ClpIrFileReader(ClpIrStreamReader):
     """
-    Wrapper class of `CLPIRStreamReader` that calls `open` for convenience.
+    Wrapper class of `ClpIrStreamReader` that calls `open` for convenience.
     """
 
     def __init__(
         self,
         fpath: Path,
-        decoder_buffer_size: int = CLPIRStreamReader.DEFAULT_DECODER_BUFFER_SIZE,
+        decoder_buffer_size: int = ClpIrStreamReader.DEFAULT_DECODER_BUFFER_SIZE,
         enable_compression: bool = True,
     ):
         self._path: Path = fpath

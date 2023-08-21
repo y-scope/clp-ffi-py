@@ -32,7 +32,7 @@ python -m build
 
 CLP IR Readers provide a convenient interface for CLP IR decoding and search methods.
 
-### CLPIRStreamReader
+### ClpIrStreamReader
 
 - Read/decode any arbitrary CLP IR stream (as an instance of `IO[bytes]`).
 - Can be used as an iterator that returns each log event as a `LogEvent` object.
@@ -40,20 +40,22 @@ CLP IR Readers provide a convenient interface for CLP IR decoding and search met
   - Searching log events within a certain time range.
   - Searching log messages that match certain wildcard queries.
 
-### CLPIRFileReader
+### ClpIrFileReader
 
 - Simple wrapper around CLPIRStreamHandler that calls `open` with a given local path.
 
-### Example Code: Using CLPIRFileReader to iterate and print log events
+### Example Code: Using ClpIrFileReader to iterate and print log events
+
 ```python
 from pathlib import Path
-from clp_ffi_py.readers import CLPIRFileReader
+from clp_ffi_py.readers import ClpIrFileReader
 
-with CLPIRFileReader(Path("example.clp.zst")) as clp_reader:
+with ClpIrFileReader(Path("example.clp.zst")) as clp_reader:
     for log_event in clp_reader:
         # Print the log message with its timestamp properly formatted.
         print(log_event.get_formatted_message())
 ```
+
 Each log event is represented by a `LogEvent` object, which offers methods to retrieve its
 underlying details, such as the timestamp and the log message. For more information, use
 the following code to see all the available methods and the associated docstring.
@@ -64,12 +66,13 @@ help(LogEvent)
 ```
 
 ### Example Code: Using Query to search log events by specifying a certain time range
+
 ```python
 from pathlib import Path
 from typing import List
 
 from clp_ffi_py import LogEvent, Query
-from clp_ffi_py.readers import CLPIRFileReader
+from clp_ffi_py.readers import ClpIrFileReader
 
 # Create a search query that specifies a time range by UNIX epoch timestamp in
 # milliseconds. It will search from 2016.Nov.28 21:00 to 2016.Nov.29 3:00.
@@ -80,18 +83,19 @@ time_range_query: Query = Query(
 # A list to store all the log events within the search time range
 log_events: List[LogEvent] = []
 
-with CLPIRFileReader(Path("example.clp.zst")) as clp_reader:
+with ClpIrFileReader(Path("example.clp.zst")) as clp_reader:
     for log_event in clp_reader.search(time_range_query):
         log_events.append(log_event)
 ```
 
 ### Example Code: Using Query to search log messages of certain pattern(s) specified by wildcard queries.
+
 ```python
 from pathlib import Path
 from typing import List, Tuple
 
 from clp_ffi_py import Query, WildcardQuery
-from clp_ffi_py.readers import CLPIRFileReader
+from clp_ffi_py.readers import ClpIrFileReader
 
 # Generate a list of wildcard patterns to filter log messages:
 wildcard_query_list: List[WildcardQuery] = [
@@ -104,18 +108,22 @@ wildcard_search_query: Query = Query(wildcard_queries=wildcard_query_list)
 # [timestamp, message]
 matched_log_messages: List[Tuple[int, str]] = []
 
-with CLPIRFileReader(Path("example.clp.zst")) as clp_reader:
+with ClpIrFileReader(Path("example.clp.zst")) as clp_reader:
     for log_event in clp_reader.search(wildcard_search_query):
         matched_log_messages.append((log_event.get_timestamp(), log_event.get_log_message()))
 ```
+
 A `Query` object may have both the search time range and the wildcard queries specified to support
 more complex search scenarios. For more details, use the following code to access the related
 docstring.
+
 ```python
 from clp_ffi_py import Query
 help(Query)
 ```
+
 ### Parallelization
+
 The `Query` and `LogEvent` classes can be serialized by [pickle][15]. Therefore, decoding and search
 can be parallelized across streams/files using libraries such as [multiprocessing][13] and [tqlm][14].
 
