@@ -6,10 +6,17 @@ At present, this library supplies built-in functions for encoding/decoding log
 messages using [CLP][2].
 
 ## Quick Start
-The package is hosted with pypi (https://pypi.org/project/clp-ffi-py/), so it
-can be installed with `pip`:
+### Install with `pip`:
+```bash
+# Install the latest version
+python3 -m pip install --upgrade clp-ffi-py
+```
+Note:
+- Python 3.6 or higher is required.
+- Only Linux and macOS are supported at present.
 
-`python3 -m pip install --upgrade clp-ffi-py`
+To install an older version or download the prebuilt `whl` package, check the project
+homepage on PyPI [here][16].
 
 ## Compatibility
 
@@ -224,3 +231,4 @@ using `pip`. Developers need to install them using other package management tool
 [13]: https://docs.python.org/3/library/multiprocessing.html
 [14]: https://tqdm.github.io/
 [15]: https://docs.python.org/3/library/pickle.html
+[16]: https://pypi.org/project/clp-ffi-py/
