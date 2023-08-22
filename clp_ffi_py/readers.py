@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pathlib import Path
 from sys import stderr
 from types import TracebackType
@@ -8,7 +10,7 @@ from zstandard import ZstdDecompressionReader, ZstdDecompressor
 from clp_ffi_py import Decoder, DecoderBuffer, LogEvent, Metadata, Query
 
 
-class ClpIrStreamReader:
+class ClpIrStreamReader(Iterator):
     """
     This class represents a stream reader used to read/decode encoded log events
     from a CLP IR stream. It also provides method(s) to instantiate a log event
@@ -90,12 +92,12 @@ class ClpIrStreamReader:
     def close(self) -> None:
         self.__istream.close()
 
-    def __iter__(self) -> Iterator[LogEvent]:
+    def __iter__(self) -> ClpIrStreamReader[LogEvent]:
         if False is self.has_metadata():
             self.read_preamble()
         return self
 
-    def __enter__(self) -> Iterator[LogEvent]:
+    def __enter__(self) -> ClpIrStreamReader[LogEvent]:
         if False is self.has_metadata():
             self.read_preamble()
         return self
