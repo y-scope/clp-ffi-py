@@ -5,6 +5,12 @@ through CLP's FFI (foreign function interface).
 At present, this library supplies built-in functions for encoding/decoding log
 messages using [CLP][2].
 
+## Quick Start
+The package is hosted with pypi (https://pypi.org/project/clp-ffi-py/), so it
+can be installed with `pip`:
+
+`python3 -m pip install --upgrade clp-ffi-py`
+
 ## Compatibility
 
 Tested on Python 3.8, 3.9 and 3.10, and it should work on any Python version >= 3.6.
