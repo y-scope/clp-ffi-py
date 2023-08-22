@@ -72,7 +72,7 @@ from pathlib import Path
 from typing import List
 
 from clp_ffi_py import LogEvent, Query
-from clp_ffi_py.readers import ClpIrFileReader
+from clp_ffi_py.readers import ClpIrStreamReader
 
 # Create a search query that specifies a time range by UNIX epoch timestamp in
 # milliseconds. It will search from 2016.Nov.28 21:00 to 2016.Nov.29 3:00.
@@ -83,15 +83,16 @@ time_range_query: Query = Query(
 # A list to store all the log events within the search time range
 log_events: List[LogEvent] = []
 
-with ClpIrFileReader(Path("example.clp.zst")) as clp_reader:
-    for log_event in clp_reader.search(time_range_query):
-        log_events.append(log_event)
+# Open IRstream compressed log file as a binary file stream, then pass it to CLpIrStreamReader
+with open("example.clp.zst", "rb") as compressed_log_file:
+    with ClpIrStreamReader(compressed_log_file) as clp_reader:
+        for log_event in clp_reader.search(time_range_query):
+            log_events.append(log_event)
 ```
 
 ### Example Code: Using Query to search log messages of certain pattern(s) specified by wildcard queries.
 
 ```python
-from pathlib import Path
 from typing import List, Tuple
 
 from clp_ffi_py import Query, WildcardQuery
@@ -108,7 +109,8 @@ wildcard_search_query: Query = Query(wildcard_queries=wildcard_query_list)
 # [timestamp, message]
 matched_log_messages: List[Tuple[int, str]] = []
 
-with ClpIrFileReader(Path("example.clp.zst")) as clp_reader:
+# A convenience file reader class is also available to directly interact with IRstream compressed log file
+with ClpIrFileReader("example.clp.zst") as clp_reader:
     for log_event in clp_reader.search(wildcard_search_query):
         matched_log_messages.append((log_event.get_timestamp(), log_event.get_log_message()))
 ```
