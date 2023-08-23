@@ -5,6 +5,19 @@ through CLP's FFI (foreign function interface).
 At present, this library supplies built-in functions for encoding/decoding log
 messages using [CLP][2].
 
+## Quick Start
+### Install with `pip`:
+```bash
+# Install the latest version
+python3 -m pip install --upgrade clp-ffi-py
+```
+Note:
+- Python 3.6 or higher is required.
+- Only Linux and macOS are supported at present.
+
+To install an older version or download the prebuilt `whl` package, check the project
+homepage on PyPI [here][16].
+
 ## Compatibility
 
 Tested on Python 3.8, 3.9 and 3.10, and it should work on any Python version >= 3.6.
@@ -218,3 +231,4 @@ using `pip`. Developers need to install them using other package management tool
 [13]: https://docs.python.org/3/library/multiprocessing.html
 [14]: https://tqdm.github.io/
 [15]: https://docs.python.org/3/library/pickle.html
+[16]: https://pypi.org/project/clp-ffi-py/
