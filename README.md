@@ -83,7 +83,8 @@ time_range_query: Query = Query(
 # A list to store all the log events within the search time range
 log_events: List[LogEvent] = []
 
-# Open IRstream compressed log file as a binary file stream, then pass it to CLpIrStreamReader
+# Open IRstream compressed log file as a binary file stream, then pass it to
+# CLpIrStreamReader.
 with open("example.clp.zst", "rb") as compressed_log_file:
     with ClpIrStreamReader(compressed_log_file) as clp_reader:
         for log_event in clp_reader.search(time_range_query):
@@ -109,7 +110,8 @@ wildcard_search_query: Query = Query(wildcard_queries=wildcard_query_list)
 # [timestamp, message]
 matched_log_messages: List[Tuple[int, str]] = []
 
-# A convenience file reader class is also available to directly interact with IRstream compressed log file
+# A convenience file reader class is also available to interact with a file that
+# represents an encoded CLP IR stream directly.
 with ClpIrFileReader("example.clp.zst") as clp_reader:
     for log_event in clp_reader.search(wildcard_search_query):
         matched_log_messages.append((log_event.get_timestamp(), log_event.get_log_message()))
