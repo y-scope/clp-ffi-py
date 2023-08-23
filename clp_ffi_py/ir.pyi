@@ -71,5 +71,9 @@ class Decoder:
     def decode_preamble(decoder_buffer: DecoderBuffer) -> Metadata: ...
     @staticmethod
     def decode_next_log_event(
-        decoder_buffer: DecoderBuffer, query: Optional[Query] = None
+        decoder_buffer: DecoderBuffer,
+        query: Optional[Query] = None,
+        allow_incomplete_stream: bool = False,
     ) -> Optional[LogEvent]: ...
+
+class IncompleteStreamError(Exception): ...

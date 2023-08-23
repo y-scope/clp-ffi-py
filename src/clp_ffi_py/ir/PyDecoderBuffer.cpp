@@ -201,6 +201,14 @@ PyType_Spec PyDecoderBuffer_type_spec{
         0,
         Py_TPFLAGS_DEFAULT,
         static_cast<PyType_Slot*>(PyDecoderBuffer_slots)};
+
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
+PyDoc_STRVAR(
+        cPyIncompleteStreamErrorDoc,
+        "This exception will be raised if the decoder buffer cannot read more data from the "
+        "input stream while the decoding method expects more bytes.\n"
+        "Typically, this error indicates the input stream has been truncated.\n"
+);
 }  // namespace
 
 auto PyDecoderBuffer::init(PyObject* input_stream, Py_ssize_t buf_capacity) -> bool {
@@ -305,7 +313,7 @@ auto PyDecoderBuffer::try_read() -> bool {
         return false;
     }
     if (0 == num_bytes_read) {
-        PyErr_SetString(PyExc_RuntimeError, cDecoderIncompleteIRError);
+        PyErr_SetString(get_py_incomplete_stream_error(), cDecoderIncompleteIRError);
         return false;
     }
     return true;
@@ -340,13 +348,32 @@ auto PyDecoderBuffer::test_streaming(uint32_t seed) -> PyObject* {
 }
 
 PyObjectPtr<PyTypeObject> PyDecoderBuffer::m_py_type{nullptr};
+PyObjectPtr<PyObject> PyDecoderBuffer::m_py_incomplete_stream_error{nullptr};
 
 auto PyDecoderBuffer::get_py_type() -> PyTypeObject* {
     return m_py_type.get();
 }
 
+auto PyDecoderBuffer::get_py_incomplete_stream_error() -> PyObject* {
+    return m_py_incomplete_stream_error.get();
+}
+
 auto PyDecoderBuffer::module_level_init(PyObject* py_module) -> bool {
     static_assert(std::is_trivially_destructible<PyDecoderBuffer>());
+    auto* py_incomplete_stream_error{PyErr_NewExceptionWithDoc(
+            "clp_ffi_py.ir.IncompleteStreamError",
+            static_cast<char const*>(cPyIncompleteStreamErrorDoc),
+            nullptr,
+            nullptr
+    )};
+    m_py_incomplete_stream_error.reset(py_incomplete_stream_error);
+    if (nullptr == py_incomplete_stream_error) {
+        return false;
+    }
+    if (0 > PyModule_AddObject(py_module, "IncompleteStreamError", py_incomplete_stream_error)) {
+        return false;
+    }
+
     auto* type{py_reinterpret_cast<PyTypeObject>(PyType_FromSpec(&PyDecoderBuffer_type_spec))};
     m_py_type.reset(type);
     if (nullptr == type) {

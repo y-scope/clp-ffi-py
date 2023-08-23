@@ -22,7 +22,7 @@ PyDoc_STRVAR(
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cDecodeNextLogEventDoc,
-        "decode_next_log_event(decoder_buffer, query=None)\n"
+        "decode_next_log_event(decoder_buffer, query=None, allow_incomplete_stream=False)\n"
         "--\n\n"
         "Decodes the next encoded log event from the IR stream buffered in the given decoder "
         "buffer. `decoder_buffer` must have been returned by a successfully invocation of "
@@ -32,6 +32,9 @@ PyDoc_STRVAR(
         ":param decoder_buffer: The decoder buffer of the encoded CLP IR stream.\n"
         ":param query: A Query object that filters log events. See `Query` documents for more "
         "details.\n"
+        ":param allow_incomplete_stream: If set to `True`, an incomplete CLP IR stream is not "
+        "treated as an error. Instead, encountering such a stream is seen as reaching its end, and "
+        "the function will return None without raising any exceptions.\n"
         ":return: A newly created LogEvent instance representing the next decoded log event from "
         "the IR stream (if the query is `None`).\n"
         ":return: A newly created LogEvent instance representing the next decoded log event "
