@@ -126,7 +126,39 @@ from clp_ffi_py import Query
 help(Query)
 ```
 
-### Parallelization
+### Streaming Decode/Search Directly from S3 Remote Storage
+
+When working with CLP IR files stored on S3-compatible storage systems, [smart_open][17] can be used to
+open and read the IR stream for the following benefits:
+- It only performs stream operation and does not download the file to the disk.
+- It only invokes a single `GET` request so that the API access cost is minimized.
+
+Here is an example:
+
+```python
+from pathlib import Path
+from clp_ffi_py.readers import ClpIrStreamReader
+
+import boto3
+import os
+import smart_open
+
+# Create a boto3 session by reading AWS credentials from environment variables.
+session = boto3.Session(
+    aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
+    aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],
+)
+
+url = 's3://clp-example-s3-bucket/example.clp.zst'
+# Using `smart_open.open` to stream the encoded CLP IR:
+with smart_open.open(url, "rb", transport_params={'client': session.client('s3')}) as istream:
+    with ClpIrStreamReader(istream) as clp_reader:
+        for log_event in clp_reader:
+            # Print the log message with its timestamp properly formatted.
+            print(log_event.get_formatted_message())
+```
+
+### Parallel Processing
 
 The `Query` and `LogEvent` classes can be serialized by [pickle][15]. Therefore, decoding and search
 can be parallelized across streams/files using libraries such as [multiprocessing][13] and [tqlm][14].
@@ -222,3 +254,4 @@ using `pip`. Developers need to install them using other package management tool
 [13]: https://docs.python.org/3/library/multiprocessing.html
 [14]: https://tqdm.github.io/
 [15]: https://docs.python.org/3/library/pickle.html
+[17]: https://github.com/RaRe-Technologies/smart_open
