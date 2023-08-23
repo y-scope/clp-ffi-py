@@ -85,7 +85,7 @@ from pathlib import Path
 from typing import List
 
 from clp_ffi_py import LogEvent, Query
-from clp_ffi_py.readers import ClpIrFileReader
+from clp_ffi_py.readers import ClpIrStreamReader
 
 # Create a search query that specifies a time range by UNIX epoch timestamp in
 # milliseconds. It will search from 2016.Nov.28 21:00 to 2016.Nov.29 3:00.
@@ -96,15 +96,17 @@ time_range_query: Query = Query(
 # A list to store all the log events within the search time range
 log_events: List[LogEvent] = []
 
-with ClpIrFileReader(Path("example.clp.zst")) as clp_reader:
-    for log_event in clp_reader.search(time_range_query):
-        log_events.append(log_event)
+# Open IRstream compressed log file as a binary file stream, then pass it to
+# CLpIrStreamReader.
+with open("example.clp.zst", "rb") as compressed_log_file:
+    with ClpIrStreamReader(compressed_log_file) as clp_reader:
+        for log_event in clp_reader.search(time_range_query):
+            log_events.append(log_event)
 ```
 
 ### Example Code: Using Query to search log messages of certain pattern(s) specified by wildcard queries.
 
 ```python
-from pathlib import Path
 from typing import List, Tuple
 
 from clp_ffi_py import Query, WildcardQuery
@@ -121,7 +123,9 @@ wildcard_search_query: Query = Query(wildcard_queries=wildcard_query_list)
 # [timestamp, message]
 matched_log_messages: List[Tuple[int, str]] = []
 
-with ClpIrFileReader(Path("example.clp.zst")) as clp_reader:
+# A convenience file reader class is also available to interact with a file that
+# represents an encoded CLP IR stream directly.
+with ClpIrFileReader("example.clp.zst") as clp_reader:
     for log_event in clp_reader.search(wildcard_search_query):
         matched_log_messages.append((log_event.get_timestamp(), log_event.get_log_message()))
 ```
@@ -135,7 +139,39 @@ from clp_ffi_py import Query
 help(Query)
 ```
 
-### Parallelization
+### Streaming Decode/Search Directly from S3 Remote Storage
+
+When working with CLP IR files stored on S3-compatible storage systems, [smart_open][17] can be used to
+open and read the IR stream for the following benefits:
+- It only performs stream operation and does not download the file to the disk.
+- It only invokes a single `GET` request so that the API access cost is minimized.
+
+Here is an example:
+
+```python
+from pathlib import Path
+from clp_ffi_py.readers import ClpIrStreamReader
+
+import boto3
+import os
+import smart_open
+
+# Create a boto3 session by reading AWS credentials from environment variables.
+session = boto3.Session(
+    aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
+    aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],
+)
+
+url = 's3://clp-example-s3-bucket/example.clp.zst'
+# Using `smart_open.open` to stream the encoded CLP IR:
+with smart_open.open(url, "rb", transport_params={'client': session.client('s3')}) as istream:
+    with ClpIrStreamReader(istream) as clp_reader:
+        for log_event in clp_reader:
+            # Print the log message with its timestamp properly formatted.
+            print(log_event.get_formatted_message())
+```
+
+### Parallel Processing
 
 The `Query` and `LogEvent` classes can be serialized by [pickle][15]. Therefore, decoding and search
 can be parallelized across streams/files using libraries such as [multiprocessing][13] and [tqlm][14].
@@ -232,3 +268,4 @@ using `pip`. Developers need to install them using other package management tool
 [14]: https://tqdm.github.io/
 [15]: https://docs.python.org/3/library/pickle.html
 [16]: https://pypi.org/project/clp-ffi-py/
+[17]: https://github.com/RaRe-Technologies/smart_open
