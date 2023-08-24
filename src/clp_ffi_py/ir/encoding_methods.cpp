@@ -132,7 +132,7 @@ auto encode_four_byte_timestamp_delta(PyObject* Py_UNUSED(self), PyObject* args)
     );
 }
 
-auto encode_eof(PyObject* Py_UNUSED(self)) -> PyObject* {
+auto encode_end_of_ir(PyObject* Py_UNUSED(self)) -> PyObject* {
     static constexpr char cEof{ffi::ir_stream::cProtocol::Eof};
     return PyByteArray_FromStringAndSize(&cEof, sizeof(cEof));
 }
