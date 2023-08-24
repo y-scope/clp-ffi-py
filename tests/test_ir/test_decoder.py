@@ -76,7 +76,7 @@ class TestCaseDecoderBase(TestCLPBase):
                 ostream.write(
                     FourByteEncoder.encode_message_and_timestamp_delta(delta, log_message.encode())
                 )
-            ostream.write(b"\x00")
+            ostream.write(FourByteEncoder.encode_eof())
 
     def _encode_random_log_stream(
         self, log_path: Path, num_log_events_to_generate: int, seed: int
