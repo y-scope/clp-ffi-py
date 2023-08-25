@@ -67,8 +67,8 @@ PyDoc_STRVAR(
         cEncodeEndOfIrDoc,
         "encode_end_of_ir()\n"
         "--\n\n"
-        "Encodes the EOIR that indicates the end of a CLP IR stream. A stream that does not "
-        "contain EOIR will be considered as an incomplete IR stream.\n"
+        "Encodes the byte sequence that indicates the end of a CLP IR stream. A stream that does "
+        "not contain this will be considered as an incomplete IR stream.\n"
 );
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
