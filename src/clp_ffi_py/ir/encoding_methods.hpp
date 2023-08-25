@@ -10,6 +10,7 @@ auto encode_four_byte_preamble(PyObject* self, PyObject* args) -> PyObject*;
 auto encode_four_byte_message_and_timestamp_delta(PyObject* self, PyObject* args) -> PyObject*;
 auto encode_four_byte_message(PyObject* self, PyObject* args) -> PyObject*;
 auto encode_four_byte_timestamp_delta(PyObject* self, PyObject* args) -> PyObject*;
+auto encode_end_of_ir(PyObject* self) -> PyObject*;
 }  // namespace clp_ffi_py::ir
 
 #endif

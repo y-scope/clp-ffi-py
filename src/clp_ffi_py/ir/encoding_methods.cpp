@@ -4,6 +4,7 @@
 
 #include <clp/components/core/src/ffi/encoding_methods.hpp>
 #include <clp/components/core/src/ffi/ir_stream/encoding_methods.hpp>
+#include <clp/components/core/src/ffi/ir_stream/protocol_constants.hpp>
 #include <clp/components/core/src/type_utils.hpp>
 
 #include <clp_ffi_py/ir/error_messages.hpp>
@@ -129,5 +130,10 @@ auto encode_four_byte_timestamp_delta(PyObject* Py_UNUSED(self), PyObject* args)
             size_checked_pointer_cast<char>(ir_buf.data()),
             static_cast<Py_ssize_t>(ir_buf.size())
     );
+}
+
+auto encode_end_of_ir(PyObject* Py_UNUSED(self)) -> PyObject* {
+    static constexpr char cEof{ffi::ir_stream::cProtocol::Eof};
+    return PyByteArray_FromStringAndSize(&cEof, sizeof(cEof));
 }
 }  // namespace clp_ffi_py::ir

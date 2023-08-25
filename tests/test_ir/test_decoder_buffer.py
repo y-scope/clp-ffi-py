@@ -14,7 +14,7 @@ class TestCaseDecoderBuffer(TestCLPBase):
     Class for testing clp_ffi_py.ir.DecoderBuffer.
     """
 
-    input_src_dir = "test_data"
+    input_src_dir: str = "test_data"
 
     def test_buffer_protocol(self) -> None:
         """

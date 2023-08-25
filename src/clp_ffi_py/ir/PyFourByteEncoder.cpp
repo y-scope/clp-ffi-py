@@ -63,6 +63,15 @@ PyDoc_STRVAR(
 );
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
+PyDoc_STRVAR(
+        cEncodeEndOfIrDoc,
+        "encode_end_of_ir()\n"
+        "--\n\n"
+        "Encodes the byte sequence that indicates the end of a CLP IR stream. A stream that does "
+        "not contain this will be considered as an incomplete IR stream.\n"
+);
+
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyMethodDef PyFourByteEncoder_method_table[]{
         {"encode_preamble",
          clp_ffi_py::ir::encode_four_byte_preamble,
@@ -83,6 +92,11 @@ PyMethodDef PyFourByteEncoder_method_table[]{
          clp_ffi_py::ir::encode_four_byte_timestamp_delta,
          METH_VARARGS | METH_STATIC,
          static_cast<char const*>(cEncodeTimestampDeltaDoc)},
+
+        {"encode_end_of_ir",
+         py_c_function_cast(clp_ffi_py::ir::encode_end_of_ir),
+         METH_NOARGS | METH_STATIC,
+         static_cast<char const*>(cEncodeEndOfIrDoc)},
 
         {nullptr, nullptr, 0, nullptr}};
 

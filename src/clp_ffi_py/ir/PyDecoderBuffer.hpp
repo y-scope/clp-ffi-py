@@ -143,8 +143,8 @@ public:
      * Attempts to populate the decoder buffer. When this function is called, it
      * is expected to have more bytes to read from the IR stream.
      * @return true on success.
-     * @return false on failure with the relevant Python exception and error
-     * set.
+     * @return false on failure. The Python exception and error will be properly
+     * set if the error
      */
     [[nodiscard]] auto try_read() -> bool;
 
@@ -168,6 +168,12 @@ public:
      * @return Python type object associated with PyDecoderBuffer.
      */
     [[nodiscard]] static auto get_py_type() -> PyTypeObject*;
+
+    /**
+     * Gets a PyObject that represents the incomplete stream error as a Python
+     * exception.
+     */
+    [[nodiscard]] static auto get_py_incomplete_stream_error() -> PyObject*;
 
     /**
      * Creates and initializes PyDecoderBuffer as a Python type, and then
@@ -216,6 +222,7 @@ private:
     bool m_py_buffer_protocol_enabled;
 
     static PyObjectPtr<PyTypeObject> m_py_type;
+    static PyObjectPtr<PyObject> m_py_incomplete_stream_error;
 };
 }  // namespace clp_ffi_py::ir
 #endif

@@ -7,9 +7,10 @@ from test_ir.test_decoder import (
     TestCaseDecoderTimeRangeWildcardQueryBase,
     TestCaseDecoderWildcardQueryBase,
 )
+from test_ir.test_utils import TestCLPBase
 
-from clp_ffi_py import LogEvent, Metadata, Query
-from clp_ffi_py.readers import ClpIrStreamReader
+from clp_ffi_py import IncompleteStreamError, LogEvent, Metadata, Query
+from clp_ffi_py.readers import ClpIrFileReader, ClpIrStreamReader
 
 
 def read_log_stream(
@@ -170,3 +171,57 @@ class TestCaseReaderTimeRangeWildcardQueryZstd(TestCaseReaderTimeRangeWildcardQu
         self.has_query = True
         self.num_test_iterations = 10
         super().setUp()
+
+
+class TestIncompleteIRStream(TestCLPBase):
+    """
+    Tests on reading an incomplete stream.
+    """
+
+    test_src: Path = Path(__file__).resolve().parent / "test_data/incomplete_ir.log.zst"
+
+    def test_incomplete_ir_stream_error(self) -> None:
+        """
+        Tests the reader against an incomplete IR file with
+        `allow_incomplete_stream` disabled.
+        """
+        incomplete_stream_error_captured: bool = False
+        other_exception_captured: bool = False
+        log_counter: int = 0
+        with ClpIrFileReader(TestIncompleteIRStream.test_src) as clp_reader:
+            try:
+                for _ in clp_reader.search(Query()):
+                    log_counter += 1
+            except IncompleteStreamError:
+                incomplete_stream_error_captured = True
+            except Exception:
+                other_exception_captured = True
+        self.assertTrue(
+            incomplete_stream_error_captured, "Incomplete Stream Error is not properly set."
+        )
+        self.assertFalse(other_exception_captured, "No other exception should be set.")
+        self.assertTrue(0 != log_counter, "No logs are decoded.")
+
+    def test_allow_incomplete_ir_stream_error(self) -> None:
+        """
+        Tests the reader against an incomplete IR file with
+        `allow_incomplete_stream` enabled.
+        """
+        incomplete_stream_error_captured: bool = False
+        other_exception_captured: bool = False
+        log_event: Optional[LogEvent] = None
+        with ClpIrFileReader(
+            TestIncompleteIRStream.test_src, allow_incomplete_stream=True
+        ) as clp_reader:
+            try:
+                while None is not log_event:
+                    log_event = clp_reader.read_next_log_event()
+            except IncompleteStreamError:
+                incomplete_stream_error_captured = True
+            except Exception:
+                other_exception_captured = True
+        self.assertFalse(
+            incomplete_stream_error_captured, "Incomplete Stream Error shouldn't be set."
+        )
+        self.assertFalse(other_exception_captured, "No other exception should be set.")
+        self.assertTrue(None is log_event, "None is not reached.")
