@@ -15,17 +15,19 @@ Note:
 - Python 3.6 or higher is required.
 - Only Linux and macOS are supported at present.
 
-To install an older version or download the prebuilt `whl` package, check the project
-homepage on PyPI [here][16].
+To install an older version or download the prebuilt `whl` package, check the
+project homepage on PyPI [here][16].
 
 ## Compatibility
 
-Tested on Python 3.8, 3.9 and 3.10, and it should work on any Python version >= 3.6.
+Tested on Python 3.8, 3.9 and 3.10, and it should work on any Python version
+>= 3.6.
 
 ## Building/Packaging
 
 To manually build a package for distribution, run the following steps.
-This process will generate both .tar.gz package and .whl package under `./dist/` directory.
+This process will generate both .tar.gz package and .whl package under `./dist/`
+directory.
 
 ```bash
 # 1. Create and enter a virtual environment
@@ -43,7 +45,8 @@ python -m build
 
 ## CLP IR Readers
 
-CLP IR Readers provide a convenient interface for CLP IR decoding and search methods.
+CLP IR Readers provide a convenient interface for CLP IR decoding and search
+methods.
 
 ### ClpIrStreamReader
 
@@ -55,7 +58,8 @@ CLP IR Readers provide a convenient interface for CLP IR decoding and search met
 
 ### ClpIrFileReader
 
-- Simple wrapper around CLPIRStreamHandler that calls `open` with a given local path.
+- Simple wrapper around CLPIRStreamHandler that calls `open` with a given local
+path.
 
 ### Example Code: Using ClpIrFileReader to iterate and print log events
 
@@ -69,9 +73,10 @@ with ClpIrFileReader(Path("example.clp.zst")) as clp_reader:
         print(log_event.get_formatted_message())
 ```
 
-Each log event is represented by a `LogEvent` object, which offers methods to retrieve its
-underlying details, such as the timestamp and the log message. For more information, use
-the following code to see all the available methods and the associated docstring.
+Each log event is represented by a `LogEvent` object, which offers methods to
+retrieve its underlying details, such as the timestamp and the log message. For
+more information, use the following code to see all the available methods and
+the associated docstring.
 
 ```python
 from clp_ffi_py import LogEvent
@@ -130,9 +135,9 @@ with ClpIrFileReader("example.clp.zst") as clp_reader:
         matched_log_messages.append((log_event.get_timestamp(), log_event.get_log_message()))
 ```
 
-A `Query` object may have both the search time range and the wildcard queries specified to support
-more complex search scenarios. For more details, use the following code to access the related
-docstring.
+A `Query` object may have both the search time range and the wildcard queries
+specified to support more complex search scenarios. For more details, use the
+following code to access the related docstring.
 
 ```python
 from clp_ffi_py import Query
@@ -141,10 +146,12 @@ help(Query)
 
 ### Streaming Decode/Search Directly from S3 Remote Storage
 
-When working with CLP IR files stored on S3-compatible storage systems, [smart_open][17] can be used to
-open and read the IR stream for the following benefits:
+When working with CLP IR files stored on S3-compatible storage systems,
+[smart_open][17] can be used to open and read the IR stream for the following
+benefits:
 - It only performs stream operation and does not download the file to the disk.
-- It only invokes a single `GET` request so that the API access cost is minimized.
+- It only invokes a single `GET` request so that the API access cost is
+  minimized.
 
 Here is an example:
 
@@ -172,14 +179,17 @@ with smart_open.open(url, "rb", transport_params={'client': session.client('s3')
 ```
 
 Note: 
-When `allow_incomplete_stream` is set to False (default), the reader will raise `clp_ffi_py.IncompleteStreamError`
-if the stream is incomplete (it doesn't end with the byte sequence indicating the stream's end). In practice, this
-can occur if you're reading a stream that is still being written or wasn't properly closed.
+When `allow_incomplete_stream` is set to False (default), the reader will raise
+`clp_ffi_py.IncompleteStreamError` if the stream is incomplete (it doesn't end
+with the byte sequence indicating the stream's end). In practice, this can occur
+if you're reading a stream that is still being written or wasn't properly
+closed.
 
 ### Parallel Processing
 
-The `Query` and `LogEvent` classes can be serialized by [pickle][15]. Therefore, decoding and search
-can be parallelized across streams/files using libraries such as [multiprocessing][13] and [tqlm][14].
+The `Query` and `LogEvent` classes can be serialized by [pickle][15]. Therefore,
+decoding and search can be parallelized across streams/files using libraries
+such as [multiprocessing][13] and [tqlm][14].
 
 ## Testing
 
@@ -217,10 +227,11 @@ python -m unittest -bv
 This project utilizes [cibuildwheel][7] configuration.
 Whenever modifications are made and committed to GitHub,
 the cibuildwheel Action will automatically initiate,
-building this library for several Python environments across diverse OS and architectures.
-You can access the build outcomes (wheel files) via the GitHub Action page.
-For instructions on customizing the build targets or running cibuildwheel locally,
-please refer to the official documentation of cibuildwheel.
+building this library for several Python environments across diverse OS and
+architectures. You can access the build outcomes (wheel files) via the GitHub
+Action page. For instructions on customizing the build targets or running
+cibuildwheel locally, please refer to the official documentation of
+cibuildwheel.
 
 ## Contributing
 
@@ -234,28 +245,32 @@ and formatting tools (found in [pyproject.toml]):
 * [docformatter][11]: `docformatter -i clp_ffi_py tests`
   * This formats docstrings. You should review and add any changes to your PR.
 * [Black][5]: `black clp_ffi_py`
-  * This formats the Python code according to Black's code-style rules. You should
-    review and add any changes to your PR.
+  * This formats the Python code according to Black's code-style rules. You
+    should review and add any changes to your PR.
 * [clang-format][6]: `clang-format -i src/clp_ffi_py/**`
-  * This formats the C++ code according to the code-style rules specified in `.clang-format`.
-    You should review and add any changes to your PR.
+  * This formats the C++ code according to the code-style rules specified in
+    `.clang-format`. You should review and add any changes to your PR.
 * [ruff][10]: `ruff check --fix clp_ffi_py tests`
   * This performs linting according to PEPs. You should review and add any
     changes to your PR.
 
-Note that `docformatter` should be run before `black` to give Black the [last][12].
+Note that `docformatter` should be run before `black` to give Black the
+[last][12].
 
-Additionally, the following tools can be useful during development. However, they cannot be installed
-using `pip`. Developers need to install them using other package management tools such as `apt-get`:
+Additionally, the following tools can be useful during development. However,
+they cannot be installed using `pip`. Developers need to install them using
+other package management tools such as `apt-get`:
 
 * [clang-tidy][8]: `clang-tidy --extra-arg=-std=c++17 PATH_TO_THE_FILE`
-  * This static analysis tool catches improper coding behaviors based on the rules specified in
-    `.clang-tidy`, and sends suggestions corresponding to each warning. Developers should manually
-    review all the warnings and try with their best effort to fix the reasonable ones.
+  * This static analysis tool catches improper coding behaviors based on the
+    rules specified in `.clang-tidy`, and sends suggestions corresponding to
+    each warning. Developers should manually review all the warnings and try
+    with their best effort to fix the reasonable ones.
 * [bear][9]: `bear python setup.py build`
-  * This tool generates a JSON compilation database on the project's root directory named
-    `compile_commands.json`. This file will be used by clang-tidy to execute the static analysis.
-    It also helps IDEs to configure code completion (such as VSCode).
+  * This tool generates a JSON compilation database on the project's root
+    directory named `compile_commands.json`. This file will be used by
+    clang-tidy to execute the static analysis. It also helps IDEs to configure
+    code completion (such as VSCode).
 
 [1]: https://github.com/y-scope/clp/tree/main/components/core
 [2]: https://github.com/y-scope/clp
