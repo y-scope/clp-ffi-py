@@ -165,11 +165,16 @@ session = boto3.Session(
 url = 's3://clp-example-s3-bucket/example.clp.zst'
 # Using `smart_open.open` to stream the encoded CLP IR:
 with smart_open.open(url, "rb", transport_params={'client': session.client('s3')}) as istream:
-    with ClpIrStreamReader(istream) as clp_reader:
+    with ClpIrStreamReader(istream, allow_incomplete_stream=True) as clp_reader:
         for log_event in clp_reader:
             # Print the log message with its timestamp properly formatted.
             print(log_event.get_formatted_message())
 ```
+
+Note: If you are reading CLP IR streams that have not finished or terminated yet, the
+`clp_ffi_py.IncompleteStreamError` exception will be raised at the end. This occurs because the byte
+sequence signaling the stream's end is not present. To suppress this exception, activate the
+`allow_incomplete_stream`` option when initializing the reader.
 
 ### Parallel Processing
 
