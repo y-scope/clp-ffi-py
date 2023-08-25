@@ -174,7 +174,7 @@ with smart_open.open(url, "rb", transport_params={'client': session.client('s3')
 Note: If you are reading CLP IR streams that have not finished or terminated yet, the
 `clp_ffi_py.IncompleteStreamError` exception will be raised at the end. This occurs because the byte
 sequence signaling the stream's end is not present. To suppress this exception, activate the
-`allow_incomplete_stream`` option when initializing the reader.
+`allow_incomplete_stream` option when initializing the reader.
 
 ### Parallel Processing
 
