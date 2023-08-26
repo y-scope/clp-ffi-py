@@ -1,9 +1,8 @@
 # clp-ffi-py
 
 This module provides Python packages to interface with [CLP Core Features][1]
-through CLP's FFI (foreign function interface).
-At present, this library supplies built-in functions for encoding/decoding log
-messages using [CLP][2].
+through CLP's FFI (foreign function interface). At present, this library
+supplies built-in functions for encoding/decoding log messages using [CLP][2].
 
 ## Quick Start
 ### Install with `pip`:
@@ -25,8 +24,8 @@ Tested on Python 3.8, 3.9 and 3.10, and it should work on any Python version
 
 ## Building/Packaging
 
-To manually build a package for distribution, run the following steps.
-This process will generate both .tar.gz package and .whl package under `./dist/`
+To manually build a package for distribution, run the following steps. This
+process will generate both .tar.gz package and .whl package under `./dist/`
 directory.
 
 ```bash
@@ -211,11 +210,10 @@ python -m unittest -bv
 ```
 
 Note: If the package is installed from a `whl` file into the site packages,
-rather than installed locally (`pip install -e .`),
-the tester cannot be launched from the project's root directory.
-If `unittest` is ran from the root directory,
-the local `clp_ffi_py` directory will shadow the `clp_ffi_py` module installed.
-To run the tester with the installed package, try the following:
+rather than installed locally (`pip install -e .`), the tester cannot be
+launched from the project's root directory. If `unittest` is ran from the root
+directory, the local `clp_ffi_py` directory will shadow the `clp_ffi_py` module
+installed. To run the tester with the installed package, try the following:
 
 ```bash
 cd tests
@@ -224,19 +222,18 @@ python -m unittest -bv
 
 ## Build and Test with cibuildwheel
 
-This project utilizes [cibuildwheel][7] configuration.
-Whenever modifications are made and committed to GitHub,
-the cibuildwheel Action will automatically initiate,
-building this library for several Python environments across diverse OS and
-architectures. You can access the build outcomes (wheel files) via the GitHub
-Action page. For instructions on customizing the build targets or running
+This project utilizes [cibuildwheel][7] configuration. Whenever modifications
+are made and committed to GitHub, the cibuildwheel Action will automatically
+initiate, building this library for several Python environments across diverse
+OS and architectures. You can access the build outcomes (wheel files) via the
+GitHub Action page. For instructions on customizing the build targets or running
 cibuildwheel locally, please refer to the official documentation of
 cibuildwheel.
 
 ## Contributing
 
-Before submitting a pull request, run the following error-checking
-and formatting tools (found in [pyproject.toml]):
+Before submitting a pull request, run the following error-checking and
+formatting tools (found in [pyproject.toml]):
 
 * [mypy][3]: `mypy clp_ffi_py`
   * mypy checks for typing errors. You should resolve all typing errors or if an
