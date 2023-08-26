@@ -58,7 +58,7 @@ methods.
 ### ClpIrFileReader
 
 - Simple wrapper around CLPIRStreamHandler that calls `open` with a given local
-path.
+  path.
 
 ### Example Code: Using ClpIrFileReader to iterate and print log events
 
