@@ -19,8 +19,8 @@ project homepage on PyPI [here][16].
 
 ## Compatibility
 
-Tested on Python 3.8, 3.9 and 3.10, and it should work on any Python version
->= 3.6.
+Tested on Python 3.8, 3.9 and 3.10, and it should work on any Python
+version >= 3.6.
 
 ## Building/Packaging
 
