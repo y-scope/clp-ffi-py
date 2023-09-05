@@ -20,7 +20,7 @@ templates_path = ["_templates"]
 # -- HTML output options -------------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_favicon = "../src/_static/favicon.ico"
+html_favicon = "https://docs.yscope.com/_static/favicon.ico"
 html_title = "clp-ffi-py"
 html_show_copyright = False
 html_static_path = ["../src/_static"]
