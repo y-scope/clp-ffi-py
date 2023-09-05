@@ -1,0 +1,68 @@
+version: "3"
+
+vars:
+  PROJECT_ROOT: "../"
+  PROJECT_VENV: "{{.PROJECT_ROOT}}/venv"
+  BUILD_DIR: "{{.PROJECT_ROOT}}/build"
+  DOCS_BUILD_DIR: "{{.BUILD_DIR}}/docs"
+  DOCS_VENV: "{{.BUILD_DIR}}/docs/venv"
+  PYTHON_VERSION:
+    sh: python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')"
+
+tasks:
+  default:
+    deps: [ docs ]
+  
+  clean:
+    cmds:
+      - rm -rf {{.DOCS_BUILD_DIR}}
+  
+  docs:
+    deps: [ clp_ffi_py_install ]
+    cmds:
+      - |-
+        source {{.DOCS_VENV}}/bin/activate
+        sphinx-apidoc --force --separate --no-toc -o src/api {{.DOCS_VENV}}/lib/python{{.PYTHON_VERSION}}/site-packages/clp_ffi_py/
+        sphinx-build -a -c conf -b html src {{.DOCS_BUILD_DIR}}/html
+    sources:
+      - conf/**/*
+      - src/**/*
+      - "{{.DOCS_VENV}}/lib/python3*/site-packages/clp_ffi_py-*/**/*"
+    generates:
+      - "{{.DOCS_BUILD_DIR}}/html/**/*"
+  
+  clp_ffi_py_install:
+    deps: [ docs_venv, project_venv ]
+    cmds:
+      - |-
+        source {{.PROJECT_VENV}}/bin/activate
+        pip3 install --upgrade --target={{.DOCS_VENV}}/lib/python{{.PYTHON_VERSION}}/site-packages/ {{.PROJECT_ROOT}}
+    sources:
+      - "{{.PROJECT_ROOT}}/clp_ffi_py/**/*"
+      - "{{.PROJECT_ROOT}}/src/**/*"
+    generates:
+      - "{{.DOCS_VENV}}/lib/python3*/site-packages/clp_ffi_py-*/**/*"
+
+  docs_venv:
+    cmds:
+      - rm -rf {{.DOCS_VENV}}
+      - python3 -m venv {{.DOCS_VENV}}
+      - |-
+        source {{.DOCS_VENV}}/bin/activate
+        pip3 install --upgrade -r requirements.txt
+    sources:
+      - requirements.txt
+    generates:
+      - "{{.DOCS_VENV}}/**/*"
+  
+  project_venv:
+    cmds:
+      - rm -rf {{.PROJECT_VENV}}
+      - python3 -m venv {{.PROJECT_VENV}}
+      - |-
+        source {{.PROJECT_VENV}}/bin/activate
+        pip3 install --upgrade -r {{.PROJECT_ROOT}}/requirements-dev.txt
+    sources:
+      - "{{.PROJECT_ROOT}}/requirements-dev.txt"
+    generates:
+      - "{{.PROJECT_VENV}}/**/*"

@@ -39,7 +39,7 @@ pip install -r requirements-dev.txt
 git submodule update --init --recursive
 
 # 4. Build
-python -m build
+python -m build --outdir build/dist
 ```
 
 ## CLP IR Readers

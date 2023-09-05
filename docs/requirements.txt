@@ -1,0 +1,6 @@
+furo>=2023.8.19
+myst-parser>=2.0.0
+sphinx>=7.1.2
+sphinx-design>=0.5.0
+sphinx-copybutton>=0.5.2
+sphinx_tippy>=0.4.1
