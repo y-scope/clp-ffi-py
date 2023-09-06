@@ -85,7 +85,7 @@ class ClpIrStreamReader(Iterator[LogEvent]):
         :param query: The input query object used to match log events. Check the
             document of `clp_ffi_py.Query` for more details.
         :yield: The next unread encoded log event that matches the given search
-        query from the IR stream.
+            query from the IR stream.
         """
         if False is self.has_metadata():
             self.read_preamble()
