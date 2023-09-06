@@ -35,11 +35,12 @@ PyDoc_STRVAR(
         "treated as an error. Instead, encountering such a stream is seen as reaching its end, and "
         "the function will return None without raising any exceptions.\n"
         ":raises: Appropriate exceptions with detailed information on any encountered failure.\n"
-        ":return: A newly created LogEvent instance representing the next decoded log event from "
+        ":return:\n"
+        "- A newly created LogEvent instance representing the next decoded log event from "
         "the IR stream (if the query is `None`).\n"
-        ":return: A newly created LogEvent instance representing the next decoded log event "
+        "- A newly created LogEvent instance representing the next decoded log event "
         "matched with the given query in the IR stream (if the query is given).\n"
-        ":return: None when the end of IR stream is reached or the query search terminates.\n"
+        "- None when the end of IR stream is reached or the query search terminates.\n"
 );
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)

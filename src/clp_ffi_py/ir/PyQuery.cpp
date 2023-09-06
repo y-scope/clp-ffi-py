@@ -373,9 +373,10 @@ PyDoc_STRVAR(
         "--\n\n"
         "Validates whether the input log message matches the query.\n\n"
         ":param log_event: Input log event.\n"
-        ":return: True if the timestamp is in range, and the wildcard query list is empty or has "
-        "at least one match.\n"
-        ":return: False otherwise."
+        ":return:\n"
+        "- True if the timestamp is in range, and the wildcard query list is empty or has at least "
+        "one match.\n"
+        "- False otherwise.\n"
 );
 
 auto PyQuery_match_log_event(PyQuery* self, PyObject* log_event) -> PyObject* {

@@ -19,7 +19,7 @@ class ClpIrStreamReader(Iterator[LogEvent]):
     :param istream: Input stream that contains encoded CLP IR.
     :param decoder_buffer_size: Initial size of the decoder buffer.
     :param enable_compression: A flag indicating whether the istream is
-    compressed using `zstd`.
+        compressed using `zstd`.
     :param allow_incomplete_stream: If set to `True`, an incomplete CLP IR
     stream is not treated as an error. Instead, encountering such a stream is
     seen as reaching its end without raising any exceptions.
@@ -48,8 +48,9 @@ class ClpIrStreamReader(Iterator[LogEvent]):
         """
         Reads and decodes the next encoded log event from the IR stream.
 
-        :return: Next unread log event represented as an instance of LogEvent.
-        :return: None if the end of IR stream is reached.
+        :return:
+            - Next unread log event represented as an instance of LogEvent.
+            - None if the end of IR stream is reached.
         :raise Exception: If `Decoder.decode_next_log_event` fails.
         """
         return Decoder.decode_next_log_event(
@@ -82,7 +83,7 @@ class ClpIrStreamReader(Iterator[LogEvent]):
         Searches and yields log events that match a specific search query.
 
         :param query: The input query object used to match log events. Check the
-        document of `clp_ffi_py.Query` for more details.
+            document of `clp_ffi_py.Query` for more details.
         :yield: The next unread encoded log event that matches the given search
         query from the IR stream.
         """
