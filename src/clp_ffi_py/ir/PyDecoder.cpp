@@ -13,10 +13,10 @@ PyDoc_STRVAR(
         cDecodePreambleDoc,
         "decode_preamble(decoder_buffer)\n"
         "--\n\n"
-        "Decodes the encoded preamble from the IR stream buffered in the given decoder buffer.\n"
+        "Decodes the encoded preamble from the IR stream buffered in the given decoder buffer.\n\n"
         ":param decoder_buffer: The decoder buffer of the encoded CLP IR stream.\n"
-        ":return: The decoded preamble presented as a new instance of Metadata.\n"
         ":raises: Appropriate exceptions with detailed information on any encountered failure.\n"
+        ":return: The decoded preamble presented as a new instance of Metadata.\n"
 );
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
@@ -27,20 +27,19 @@ PyDoc_STRVAR(
         "Decodes the next encoded log event from the IR stream buffered in the given decoder "
         "buffer. `decoder_buffer` must have been returned by a successfully invocation of "
         "`decode_preamble`. If `query` is provided, only the next log event matching the query "
-        "will be returned.\n"
-
+        "will be returned.\n\n"
         ":param decoder_buffer: The decoder buffer of the encoded CLP IR stream.\n"
         ":param query: A Query object that filters log events. See `Query` documents for more "
         "details.\n"
         ":param allow_incomplete_stream: If set to `True`, an incomplete CLP IR stream is not "
         "treated as an error. Instead, encountering such a stream is seen as reaching its end, and "
         "the function will return None without raising any exceptions.\n"
+        ":raises: Appropriate exceptions with detailed information on any encountered failure.\n"
         ":return: A newly created LogEvent instance representing the next decoded log event from "
         "the IR stream (if the query is `None`).\n"
         ":return: A newly created LogEvent instance representing the next decoded log event "
         "matched with the given query in the IR stream (if the query is given).\n"
         ":return: None when the end of IR stream is reached or the query search terminates.\n"
-        ":raises: Appropriate exceptions with detailed information on any encountered failure.\n"
 );
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
@@ -55,7 +54,8 @@ PyMethodDef PyDecoder_method_table[]{
          METH_VARARGS | METH_KEYWORDS | METH_STATIC,
          static_cast<char const*>(cDecodeNextLogEventDoc)},
 
-        {nullptr, nullptr, 0, nullptr}};
+        {nullptr, nullptr, 0, nullptr}
+};
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
@@ -69,7 +69,8 @@ PyDoc_STRVAR(
 PyType_Slot PyDecoder_slots[]{
         {Py_tp_methods, static_cast<void*>(PyDecoder_method_table)},
         {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyDecoderDoc))},
-        {0, nullptr}};
+        {0, nullptr}
+};
 // NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-const-cast)
 
 /**
@@ -80,7 +81,8 @@ PyType_Spec PyDecoder_type_spec{
         sizeof(PyDecoder),
         0,
         Py_TPFLAGS_DEFAULT,
-        static_cast<PyType_Slot*>(PyDecoder_slots)};
+        static_cast<PyType_Slot*>(PyDecoder_slots)
+};
 }  // namespace
 
 PyObjectPtr<PyTypeObject> PyDecoder::m_py_type{nullptr};

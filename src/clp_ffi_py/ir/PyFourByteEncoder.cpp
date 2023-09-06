@@ -14,7 +14,7 @@ PyDoc_STRVAR(
         "encode_preamble(ref_timestamp, timestamp_format, timezone)\n"
         "--\n\n"
         "Creates the encoded CLP preamble for a stream of encoded log messages"
-        " using the 4-byte encoding.\n"
+        " using the 4-byte encoding.\n\n"
         ":param ref_timestamp: Reference timestamp used to calculate deltas emitted with each "
         "message.\n"
         ":param timestamp_format: Timestamp format to be use when generating the logs with a "
@@ -30,7 +30,7 @@ PyDoc_STRVAR(
         cEncodeMessageAndTimestampDeltaDoc,
         "encode_message_and_timestamp_delta(timestamp_delta, msg)\n"
         "--\n\n"
-        "Encodes the log `msg` along with the timestamp delta using the 4-byte encoding.\n"
+        "Encodes the log `msg` along with the timestamp delta using the 4-byte encoding.\n\n"
         ":param timestamp_delta: Timestamp difference in milliseconds between the current log "
         "message and the previous log message.\n"
         ":param msg: Log message to encode.\n"
@@ -44,7 +44,7 @@ PyDoc_STRVAR(
         cEncodeMessageDoc,
         "encode_message(msg)\n"
         "--\n\n"
-        "Encodes the log `msg` using the 4-byte encoding.\n"
+        "Encodes the log `msg` using the 4-byte encoding.\n\n"
         ":param msg: Log message to encode.\n"
         ":raises NotImplementedError: If the log message failed to encode.\n"
         ":return: The encoded message.\n"
@@ -55,7 +55,7 @@ PyDoc_STRVAR(
         cEncodeTimestampDeltaDoc,
         "encode_timestamp_delta(timestamp_delta)\n"
         "--\n\n"
-        "Encodes the timestamp using the 4-byte encoding.\n"
+        "Encodes the timestamp using the 4-byte encoding.\n\n"
         ":param timestamp_delta: Timestamp difference in milliseconds between the current log "
         "message and the previous log message.\n"
         ":raises NotImplementedError: If the timestamp failed to encode.\n"
@@ -98,7 +98,8 @@ PyMethodDef PyFourByteEncoder_method_table[]{
          METH_NOARGS | METH_STATIC,
          static_cast<char const*>(cEncodeEndOfIrDoc)},
 
-        {nullptr, nullptr, 0, nullptr}};
+        {nullptr, nullptr, 0, nullptr}
+};
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
@@ -112,7 +113,8 @@ PyDoc_STRVAR(
 PyType_Slot PyFourByteEncoder_slots[]{
         {Py_tp_methods, static_cast<void*>(PyFourByteEncoder_method_table)},
         {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyFourByteEncoderDoc))},
-        {0, nullptr}};
+        {0, nullptr}
+};
 // NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-const-cast)
 
 /**
@@ -123,7 +125,8 @@ PyType_Spec PyFourByteEncoder_type_spec{
         sizeof(PyFourByteEncoder),
         0,
         Py_TPFLAGS_DEFAULT,
-        static_cast<PyType_Slot*>(PyFourByteEncoder_slots)};
+        static_cast<PyType_Slot*>(PyFourByteEncoder_slots)
+};
 }  // namespace
 
 PyObjectPtr<PyTypeObject> PyFourByteEncoder::m_py_type{nullptr};
