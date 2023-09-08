@@ -4,10 +4,12 @@ class WildcardQuery:
     boolean value to indicate if the match is case-sensitive.
 
     A wildcard string may contain the following types of supported wildcards:
+
     1. '*': match 0 or more characters.
     2. '?': match any single character.
-    Each wildcard can be escaped using a preceding '\'. Other characters which
-    are escaped are treated as normal characters.
+
+    Each wildcard can be escaped using a preceding '\\\\' (a single backslash).
+    Other characters which are escaped are treated as normal characters.
     """
 
     def __init__(self, wildcard_query: str, case_sensitive: bool = False):

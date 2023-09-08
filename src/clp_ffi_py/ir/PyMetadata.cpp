@@ -32,7 +32,8 @@ auto PyMetadata_init(PyMetadata* self, PyObject* args, PyObject* keywords) -> in
             static_cast<char*>(keyword_ref_timestamp),
             static_cast<char*>(keyword_timestamp_format),
             static_cast<char*>(keyword_timezone_id),
-            nullptr};
+            nullptr
+    };
 
     ffi::epoch_time_ms_t ref_timestamp{0};
     char const* input_timestamp_format{nullptr};
@@ -75,8 +76,7 @@ PyDoc_STRVAR(
         cPyMetadataIsUsingFourByteEncodingDoc,
         "is_using_four_byte_encoding(self)\n"
         "--\n\n"
-        "Checks whether the CLP IR is encoded using 4-byte or 8-byte encoding methods.\n"
-        ":param self\n"
+        "Checks whether the CLP IR is encoded using 4-byte or 8-byte encoding methods.\n\n"
         ":return: True for 4-byte encoding, and False for 8-byte encoding.\n"
 );
 
@@ -93,8 +93,7 @@ PyDoc_STRVAR(
         "get_ref_timestamp(self)\n"
         "--\n\n"
         "Gets the reference Unix epoch timestamp in milliseconds used to calculate the timestamp "
-        "of the first log message in the IR stream.\n"
-        ":param self\n"
+        "of the first log message in the IR stream.\n\n"
         ":return: The reference timestamp.\n"
 );
 
@@ -107,8 +106,7 @@ PyDoc_STRVAR(
         cPyMetadataGetTimestampFormatDoc,
         "get_timestamp_format(self)\n"
         "--\n\n"
-        "Gets the timestamp format to be use when generating the logs with a reader.\n"
-        ":param self\n"
+        "Gets the timestamp format to be use when generating the logs with a reader.\n\n"
         ":return: The timestamp format.\n"
 );
 
@@ -121,8 +119,7 @@ PyDoc_STRVAR(
         cPyMetadataGetTimezoneIdDoc,
         "get_timezone_id(self)\n"
         "--\n\n"
-        "Gets the timezone id to be use when generating the timestamp from Unix epoch time.\n"
-        ":param self\n"
+        "Gets the timezone id to be use when generating the timestamp from Unix epoch time.\n\n"
         ":return: The timezone ID in TZID format.\n"
 );
 
@@ -136,8 +133,7 @@ PyDoc_STRVAR(
         "get_timezone(self)\n"
         "--\n\n"
         "Gets the timezone represented as tzinfo to be use when generating the timestamp from Unix "
-        "epoch time.\n"
-        ":param self\n"
+        "epoch time.\n\n"
         ":return: A new reference to the timezone as tzinfo.\n"
 );
 
@@ -179,7 +175,8 @@ PyMethodDef PyMetadata_method_table[]{
          METH_NOARGS,
          static_cast<char const*>(cPyMetadataGetTimezoneDoc)},
 
-        {nullptr}};
+        {nullptr}
+};
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
@@ -188,18 +185,17 @@ PyDoc_STRVAR(
         "metadata. Normally, this class will be instantiated by the FFI IR decoding methods.\n"
         "However, with the `__init__` method provided below, direct instantiation is also "
         "possible.\n\n"
-        "__init__(self, ref_timestamp, timestamp_format, timezone_id)\n"
+        "The signature of `__init__` method is shown as following:\n\n"
+        "__init__(self, ref_timestamp, timestamp_format, timezone_id)\n\n"
         "Initializes an object that represents CLP IR metadata. "
         "Assumes `self` is uninitialized and will allocate the underlying memory. If "
-        "`self` is already initialized this will result in memory leaks.\n"
-        ":param self\n"
+        "`self` is already initialized this will result in memory leaks.\n\n"
         ":param ref_timestamp: the reference Unix epoch timestamp in milliseconds used to "
         "calculate the timestamp of the first log message in the IR stream.\n"
         ":param timestamp_format: the timestamp format to be use when generating the logs with a "
         "reader.\n"
         ":param timezone_id: the timezone id to be use when generating the timestamp from Unix "
         "epoch time.\n"
-        ":return: 0 on success, -1 on failure with relevant Python exceptions and error set.\n"
 );
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
@@ -210,7 +206,8 @@ PyType_Slot PyMetadata_slots[]{
         {Py_tp_new, reinterpret_cast<void*>(PyType_GenericNew)},
         {Py_tp_methods, static_cast<void*>(PyMetadata_method_table)},
         {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyMetadataDoc))},
-        {0, nullptr}};
+        {0, nullptr}
+};
 // NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
 
 PyType_Spec PyMetadata_type_spec{
@@ -218,7 +215,8 @@ PyType_Spec PyMetadata_type_spec{
         sizeof(PyMetadata),
         0,
         Py_TPFLAGS_DEFAULT,
-        static_cast<PyType_Slot*>(PyMetadata_slots)};
+        static_cast<PyType_Slot*>(PyMetadata_slots)
+};
 }  // namespace
 
 auto PyMetadata::init(

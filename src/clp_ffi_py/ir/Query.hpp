@@ -58,9 +58,11 @@ class Query {
 public:
     static constexpr ffi::epoch_time_ms_t const cTimestampMin{0};
     static constexpr ffi::epoch_time_ms_t const cTimestampMax{
-            std::numeric_limits<ffi::epoch_time_ms_t>::max()};
+            std::numeric_limits<ffi::epoch_time_ms_t>::max()
+    };
     static constexpr ffi::epoch_time_ms_t const cDefaultSearchTimeTerminationMargin{
-            static_cast<ffi::epoch_time_ms_t>(60 * 1000)};
+            static_cast<ffi::epoch_time_ms_t>(60 * 1000)
+    };
 
     /**
      * Constructs an empty query object that will match all logs. The wildcard
@@ -91,7 +93,8 @@ public:
               m_search_termination_ts{
                       (cTimestampMax - search_time_termination_margin > search_time_upper_bound)
                               ? search_time_upper_bound + search_time_termination_margin
-                              : cTimestampMax} {
+                              : cTimestampMax
+              } {
         throw_if_ts_range_invalid();
     }
 
@@ -114,7 +117,8 @@ public:
               m_search_termination_ts{
                       (cTimestampMax - search_time_termination_margin > search_time_upper_bound)
                               ? search_time_upper_bound + search_time_termination_margin
-                              : cTimestampMax},
+                              : cTimestampMax
+              },
               m_wildcard_queries{std::move(wildcard_queries)} {
         throw_if_ts_range_invalid();
     }

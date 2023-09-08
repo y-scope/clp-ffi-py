@@ -99,14 +99,15 @@ auto serialize_wildcard_queries(std::vector<WildcardQuery> const& wildcard_queri
     Py_ssize_t idx{0};
     for (auto const& wildcard_query : wildcard_queries) {
         PyObjectPtr<PyObject> const wildcard_py_str_ptr{
-                PyUnicode_FromString(wildcard_query.get_wildcard_query().c_str())};
+                PyUnicode_FromString(wildcard_query.get_wildcard_query().c_str())
+        };
         auto* wildcard_py_str{wildcard_py_str_ptr.get()};
         if (nullptr == wildcard_py_str) {
             Py_DECREF(py_wildcard_queries);
             return nullptr;
         }
-        PyObjectPtr<PyObject> const is_case_sensitive{
-                get_py_bool(wildcard_query.is_case_sensitive())};
+        PyObjectPtr<PyObject> const is_case_sensitive{get_py_bool(wildcard_query.is_case_sensitive()
+        )};
         PyObject* py_wildcard_query{PyObject_CallFunction(
                 PyQuery::get_py_wildcard_query_type(),
                 "OO",
@@ -154,7 +155,8 @@ auto PyQuery_init(PyQuery* self, PyObject* args, PyObject* keywords) -> int {
             static_cast<char*>(keyword_search_time_upper_bound),
             static_cast<char*>(keyword_wildcard_queries),
             static_cast<char*>(keyword_search_time_termination_margin),
-            nullptr};
+            nullptr
+    };
 
     // If the argument parsing fails, `self` will be deallocated. We must reset
     // all pointers to nullptr in advance, otherwise the deallocator might
@@ -222,8 +224,7 @@ PyDoc_STRVAR(
         cPyQueryGetStateDoc,
         "__getstate__(self)\n"
         "--\n\n"
-        "Serializes the Query object (should be called by the Python pickle module).\n"
-        ":param self\n"
+        "Serializes the Query object (should be called by the Python pickle module).\n\n"
         ":return: Serialized query in a Python dictionary.\n"
 );
 
@@ -260,8 +261,7 @@ PyDoc_STRVAR(
         "Deserializes the query from a state dictionary.\n"
         "Note: this function is exclusively designed for invocation by the Python pickle module. "
         "Assumes `self` is uninitialized and will allocate the underlying memory."
-        "If `self` is already initialized this will result in memory leaks.\n"
-        ":param self\n"
+        "If `self` is already initialized this will result in memory leaks.\n\n"
         ":param state: Serialized query represented by a Python dictionary. It is anticipated "
         "to be the valid output of the `__getstate__` method.\n"
         ":return: None\n"
@@ -328,7 +328,8 @@ auto PyQuery_setstate(PyQuery* self, PyObject* state) -> PyObject* {
     }
 
     auto* search_time_termination_margin_obj{
-            PyDict_GetItemString(state, cStateSearchTimeTerminationMargin)};
+            PyDict_GetItemString(state, cStateSearchTimeTerminationMargin)
+    };
     if (nullptr == search_time_termination_margin_obj) {
         PyErr_Format(
                 PyExc_KeyError,
@@ -366,12 +367,12 @@ PyDoc_STRVAR(
         cPyQueryMatchLogEventDoc,
         "match_log_event(self, log_event: LogEvent)\n"
         "--\n\n"
-        "Validates whether the input log message matches the query.\n"
-        ":param self\n"
+        "Validates whether the input log message matches the query.\n\n"
         ":param log_event: Input log event.\n"
-        ":return: True if the timestamp is in range, and the wildcard query list is empty or has "
-        "at least one match.\n"
-        ":return: False otherwise."
+        ":return:\n"
+        "   - True if the timestamp is in range, and the wildcard query list is empty or has at "
+        "     least one match.\n"
+        "   - False otherwise.\n"
 );
 
 auto PyQuery_match_log_event(PyQuery* self, PyObject* log_event) -> PyObject* {
@@ -522,7 +523,8 @@ PyMethodDef PyQuery_method_table[]{
          METH_NOARGS | METH_STATIC,
          static_cast<char const*>(cPyQueryDefaultSearchTimeTerminationMargin)},
 
-        {nullptr}};
+        {nullptr}
+};
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
@@ -532,11 +534,11 @@ PyDoc_STRVAR(
         "log messages, and a timestamp range with a lower and upper bound. This class provides an "
         "interface to set up a search query, as well as methods to validate whether the query can "
         "be matched by a log event. Note that an empty wildcard query list will match any log "
-        "within the range.\n"
+        "within the range.\n\n"
         "By default, the wildcard query list is empty and the timestamp range is set to include "
         "all the valid Unix epoch timestamps. To filter certain log messages, use customized "
         "wildcard queries to initialize the wildcard query list. For more details, check the "
-        "documentation of the class `WildcardQuery`.\n"
+        "documentation of the class `WildcardQuery`.\n\n"
         "NOTE: When searching an IR stream with a query, ideally, the search would terminate once "
         "the current log event's timestamp exceeds the upper bound of the query's time range. "
         "However, the timestamps in the IR stream might not be monotonically increasing; they can "
@@ -546,14 +548,13 @@ PyDoc_STRVAR(
         "initialization. This margin is set to a default value specified by the static method "
         "`default_search_time_termination_margin()`. Users can customized this margin accordingly, "
         "for example, the margin can be set to 0 if the CLP IR stream is generated from a "
-        "single-threaded program execution.\n"
+        "single-threaded program execution.\n\n"
         "The signature of `__init__` method is shown as following:\n\n"
         "__init__(self, search_time_lower_bound=Query.default_search_time_lower_bound(), "
         "search_time_upper_bound=Query.default_search_time_upper_bound(), "
         "wildcard_queries=None,search_time_termination_margin=Query.default_search_time_"
-        "termination_margin()):\n"
-        "Initializes a Query object using the given inputs.\n"
-        ":param self\n"
+        "termination_margin())\n\n"
+        "Initializes a Query object using the given inputs.\n\n"
         ":param search_time_lower_bound: Start of search time range (inclusive).\n"
         ":param search_time_upper_bound: End of search time range (inclusive).\n"
         ":param wildcard_queries: A list of wildcard queries.\n"
@@ -569,7 +570,8 @@ PyType_Slot PyQuery_slots[]{
         {Py_tp_init, reinterpret_cast<void*>(PyQuery_init)},
         {Py_tp_methods, static_cast<void*>(PyQuery_method_table)},
         {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyQueryDoc))},
-        {0, nullptr}};
+        {0, nullptr}
+};
 // NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
 
 /**
@@ -580,7 +582,8 @@ PyType_Spec PyQuery_type_spec{
         sizeof(Query),
         0,
         Py_TPFLAGS_DEFAULT,
-        static_cast<PyType_Slot*>(PyQuery_slots)};
+        static_cast<PyType_Slot*>(PyQuery_slots)
+};
 }  // namespace
 
 auto PyQuery::init(

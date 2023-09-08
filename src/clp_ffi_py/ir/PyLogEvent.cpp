@@ -34,7 +34,8 @@ auto PyLogEvent_init(PyLogEvent* self, PyObject* args, PyObject* keywords) -> in
             static_cast<char*>(keyword_timestamp),
             static_cast<char*>(keyword_message_idx),
             static_cast<char*>(keyword_metadata),
-            nullptr};
+            nullptr
+    };
 
     // If the argument parsing fails, `self` will be deallocated. We must reset
     // all pointers to nullptr in advance, otherwise the deallocator might
@@ -104,8 +105,7 @@ PyDoc_STRVAR(
         cPyLogEventGetStateDoc,
         "__getstate__(self)\n"
         "--\n\n"
-        "Serializes the log event (should be called by the Python pickle module).\n"
-        ":param self\n"
+        "Serializes the log event (should be called by the Python pickle module).\n\n"
         ":return: Serialized log event in a Python dictionary.\n"
 );
 
@@ -122,7 +122,8 @@ auto PyLogEvent_getstate(PyLogEvent* self) -> PyObject* {
                 clp_ffi_py::py_utils_get_formatted_timestamp(
                         log_event->get_timestamp(),
                         self->has_metadata() ? self->get_py_metadata()->get_py_timezone() : Py_None
-                )};
+                )
+        };
         auto* formatted_timestamp_ptr{formatted_timestamp_object.get()};
         if (nullptr == formatted_timestamp_ptr) {
             return nullptr;
@@ -152,11 +153,10 @@ PyDoc_STRVAR(
         cPyLogEventSetStateDoc,
         "__setstate__(self, state)\n"
         "--\n\n"
-        "Deserializes the log event from a state dictionary.\n"
+        "Deserializes the log event from a state dictionary.\n\n"
         "Note: this function is exclusively designed for invocation by the Python pickle module. "
         "Assumes `self` is uninitialized and will allocate the underlying memory. If"
-        "`self` is already initialized this will result in memory leaks.\n"
-        ":param self\n"
+        "`self` is already initialized this will result in memory leaks.\n\n"
         ":param state: Serialized log event represented by a Python dictionary. It is anticipated "
         "to be the valid output of the `__getstate__` method.\n"
         ":return: None\n"
@@ -254,8 +254,7 @@ PyDoc_STRVAR(
         cPyLogEventGetLogMessageDoc,
         "get_log_message(self)\n"
         "--\n\n"
-        "Gets the log message of the log event.\n"
-        ":param self\n"
+        "Gets the log message of the log event.\n\n"
         ":return: The log message.\n"
 );
 
@@ -268,8 +267,7 @@ PyDoc_STRVAR(
         cPyLogEventGetTimestampDoc,
         "get_timestamp(self)\n"
         "--\n\n"
-        "Gets the Unix epoch timestamp in milliseconds of the log event.\n"
-        ":param self\n"
+        "Gets the Unix epoch timestamp in milliseconds of the log event.\n\n"
         ":return: The timestamp in milliseconds.\n"
 );
 
@@ -283,8 +281,7 @@ PyDoc_STRVAR(
         "get_index(self)\n"
         "--\n\n"
         "Gets the message index (relative to the source CLP IR stream) of the log event. This "
-        "index is set to 0 by default.\n"
-        ":param self\n"
+        "index is set to 0 by default.\n\n"
         ":return: The log event index.\n"
 );
 
@@ -298,8 +295,7 @@ PyDoc_STRVAR(
         "match_query(self, query)\n"
         "--\n\n"
         "Matches the underlying log event against the given query. Refer to the documentation of "
-        "clp_ffi_py.Query for more details.\n"
-        ":param self\n"
+        "clp_ffi_py.Query for more details.\n\n"
         ":param query: Input Query object.\n"
         ":return: True if the log event matches the query, False otherwise.\n"
 );
@@ -318,11 +314,10 @@ PyDoc_STRVAR(
         cPyLogEventGetFormattedMessageDoc,
         "get_formatted_message(self, timezone=None)\n"
         "--\n\n"
-        "Gets the formatted log message of the log event.\n"
+        "Gets the formatted log message of the log event.\n\n"
         "If a specific timezone is provided, it will be used to format the timestamp. "
         "Otherwise, the timestamp will be formatted using the timezone from the source CLP IR "
-        "stream.\n"
-        ":param self\n"
+        "stream.\n\n"
         ":param timezone: Python tzinfo object that specifies a timezone.\n"
         ":return: The formatted message.\n"
 );
@@ -386,7 +381,8 @@ PyMethodDef PyLogEvent_method_table[]{
          METH_O,
          static_cast<char const*>(cPyLogEventSetStateDoc)},
 
-        {nullptr}};
+        {nullptr}
+};
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
@@ -396,16 +392,15 @@ PyDoc_STRVAR(
         "Normally, this class will be instantiated by the FFI IR decoding methods.\n"
         "However, with the `__init__` method provided below, direct instantiation is also "
         "possible.\n\n"
-        "__init__(self, log_message, timestamp, index=0, metadata=None)\n"
+        "The signature of `__init__` method is shown as following:\n\n"
+        "__init__(self, log_message, timestamp, index=0, metadata=None)\n\n"
         "Initializes an object that represents a log event. Notice that each object should be "
-        "strictly initialized only once. Double initialization will result in memory leaks.\n"
-        ":param self\n"
+        "strictly initialized only once. Double initialization will result in memory leaks.\n\n"
         ":param log_message: The message content of the log event.\n"
         ":param timestamp: The timestamp of the log event.\n"
         ":param index: The message index (relative to the source CLP IR stream) of the log event.\n"
         ":param metadata: The PyMetadata instance that represents the source CLP IR stream. "
         "It is set to None by default.\n"
-        ":return: 0 on success, -1 on failure with relevant Python exceptions and error set.\n"
 );
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
@@ -418,7 +413,8 @@ PyType_Slot PyLogEvent_slots[]{
         {Py_tp_repr, reinterpret_cast<void*>(PyLogEvent_repr)},
         {Py_tp_methods, static_cast<void*>(PyLogEvent_method_table)},
         {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyLogEventDoc))},
-        {0, nullptr}};
+        {0, nullptr}
+};
 // NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
 
 /**
@@ -429,7 +425,8 @@ PyType_Spec PyLogEvent_type_spec{
         sizeof(PyLogEvent),
         0,
         Py_TPFLAGS_DEFAULT,
-        static_cast<PyType_Slot*>(PyLogEvent_slots)};
+        static_cast<PyType_Slot*>(PyLogEvent_slots)
+};
 }  // namespace
 
 auto PyLogEvent::get_formatted_message(PyObject* timezone) -> PyObject* {
@@ -451,7 +448,8 @@ auto PyLogEvent::get_formatted_message(PyObject* timezone) -> PyObject* {
     }
 
     PyObjectPtr<PyObject> const formatted_timestamp_object{
-            py_utils_get_formatted_timestamp(m_log_event->get_timestamp(), timezone)};
+            py_utils_get_formatted_timestamp(m_log_event->get_timestamp(), timezone)
+    };
     auto* formatted_timestamp_ptr{formatted_timestamp_object.get()};
     if (nullptr == formatted_timestamp_ptr) {
         return nullptr;
