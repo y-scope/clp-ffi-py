@@ -36,11 +36,11 @@ PyDoc_STRVAR(
         "the function will return None without raising any exceptions.\n"
         ":raises: Appropriate exceptions with detailed information on any encountered failure.\n"
         ":return:\n"
-        "- A newly created LogEvent instance representing the next decoded log event from "
-        "the IR stream (if the query is `None`).\n"
-        "- A newly created LogEvent instance representing the next decoded log event "
-        "matched with the given query in the IR stream (if the query is given).\n"
-        "- None when the end of IR stream is reached or the query search terminates.\n"
+        "     - A newly created LogEvent instance representing the next decoded log event from "
+        "       the IR stream (if the query is `None`).\n"
+        "     - A newly created LogEvent instance representing the next decoded log event "
+        "       matched with the given query in the IR stream (if the query is given).\n"
+        "     - None when the end of IR stream is reached or the query search terminates.\n"
 );
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)

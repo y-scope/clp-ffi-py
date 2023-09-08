@@ -224,9 +224,7 @@ PyDoc_STRVAR(
         cPyQueryGetStateDoc,
         "__getstate__(self)\n"
         "--\n\n"
-        "Serializes the Query object (should be called by the Python pickle module).\n"
-        "\n"
-        ":param self\n"
+        "Serializes the Query object (should be called by the Python pickle module).\n\n"
         ":return: Serialized query in a Python dictionary.\n"
 );
 
@@ -263,9 +261,7 @@ PyDoc_STRVAR(
         "Deserializes the query from a state dictionary.\n"
         "Note: this function is exclusively designed for invocation by the Python pickle module. "
         "Assumes `self` is uninitialized and will allocate the underlying memory."
-        "If `self` is already initialized this will result in memory leaks.\n"
-        "\n"
-        ":param self\n"
+        "If `self` is already initialized this will result in memory leaks.\n\n"
         ":param state: Serialized query represented by a Python dictionary. It is anticipated "
         "to be the valid output of the `__getstate__` method.\n"
         ":return: None\n"
@@ -374,9 +370,9 @@ PyDoc_STRVAR(
         "Validates whether the input log message matches the query.\n\n"
         ":param log_event: Input log event.\n"
         ":return:\n"
-        "- True if the timestamp is in range, and the wildcard query list is empty or has at least "
-        "one match.\n"
-        "- False otherwise.\n"
+        "   - True if the timestamp is in range, and the wildcard query list is empty or has at "
+        "     least one match.\n"
+        "   - False otherwise.\n"
 );
 
 auto PyQuery_match_log_event(PyQuery* self, PyObject* log_event) -> PyObject* {

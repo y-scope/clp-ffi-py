@@ -21,8 +21,8 @@ class ClpIrStreamReader(Iterator[LogEvent]):
     :param enable_compression: A flag indicating whether the istream is
         compressed using `zstd`.
     :param allow_incomplete_stream: If set to `True`, an incomplete CLP IR
-    stream is not treated as an error. Instead, encountering such a stream is
-    seen as reaching its end without raising any exceptions.
+        stream is not treated as an error. Instead, encountering such a stream
+        is seen as reaching its end without raising any exceptions.
     """
 
     DEFAULT_DECODER_BUFFER_SIZE: int = 65536
