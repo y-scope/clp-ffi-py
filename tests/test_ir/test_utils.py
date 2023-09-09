@@ -203,7 +203,7 @@ class TestCLPBase(unittest.TestCase):
         self.assertEqual(
             search_time_termination_margin,
             ref_search_time_termination_margin,
-            f"Search time lower bound: {search_time_termination_margin}; Expected:"
+            f"Search time termination margin: {search_time_termination_margin}; Expected:"
             f" {ref_search_time_termination_margin}",
         )
 

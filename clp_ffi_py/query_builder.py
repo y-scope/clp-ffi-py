@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import List, Optional
+
 from clp_ffi_py.ir import Query
 from clp_ffi_py.wildcard_query import WildcardQuery
 
@@ -14,10 +16,11 @@ class QueryBuilderException(Exception):
     pass
 
 
-class QueryBuilder:
+class QueryBuilder(object):
     """
     This class serves as an interface for conveniently constructing Query
-    objects utilized in CLP IR streaming search. It provides methods for
+    objects utilized in CLP IR streaming search. It provides methods for.
+
     configuring and resetting search parameters, which encompass:
         - search_time_lower_bound: Start of search time range (inclusive).
         - search_time_upper_bound: End of search time range (inclusive).
@@ -35,7 +38,7 @@ class QueryBuilder:
     `clp_ffi_py.wildcard_query.WildcardQuery`.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._search_time_lower_bound: int = Query.default_search_time_lower_bound()
         self._search_time_upper_bound: int = Query.default_search_time_upper_bound()
         self._search_time_termination_margin: int = Query.default_search_time_termination_margin()
@@ -54,8 +57,8 @@ class QueryBuilder:
         return self._search_time_termination_margin
 
     @property
-    def wild_card_queries(self) -> List[WildcardQuery]:
-        return self._wildcard_queries
+    def wildcard_queries(self) -> List[WildcardQuery]:
+        return deepcopy(self._wildcard_queries)
 
     def set_search_time_lower_bound(self, ts: int) -> QueryBuilder:
         """
