@@ -5,6 +5,7 @@ from test_ir.test_utils import TestCLPBase
 from clp_ffi_py import (
     Query,
     QueryBuilder,
+    QueryBuilderException,
     WildcardQuery,
 )
 
@@ -191,4 +192,27 @@ class TestCaseQueryBuilder(TestCLPBase):
             Query.default_search_time_upper_bound(),
             None,
             0,
+        )
+
+    def test_exception(self) -> None:
+        """
+        Test whether QueryBuilderException is triggered as expected.
+        """
+        query_builder: QueryBuilder = QueryBuilder()
+        search_time_lower_bound: int = 3270
+        search_time_upper_bound: int = 3190
+        query_builder.set_search_time_lower_bound(search_time_lower_bound)
+        query_builder.set_search_time_upper_bound(search_time_upper_bound)
+
+        query_builder_exception_captured: bool = False
+        try:
+            query_builder.build_query()
+        except QueryBuilderException:
+            query_builder_exception_captured = True
+        except Exception:
+            pass
+        self.assertTrue(
+            query_builder_exception_captured,
+            "QueryBuilderException is not triggered when the search time lower bound exceeds the"
+            " search time upper bound",
         )
