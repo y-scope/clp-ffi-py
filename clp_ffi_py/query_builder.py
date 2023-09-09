@@ -16,7 +16,7 @@ class QueryBuilderException(Exception):
     pass
 
 
-class QueryBuilder(object):
+class QueryBuilder:
     """
     This class serves as an interface for conveniently constructing Query
     objects utilized in CLP IR streaming search. It provides methods for.
