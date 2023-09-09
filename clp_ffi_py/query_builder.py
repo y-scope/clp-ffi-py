@@ -9,8 +9,7 @@ from clp_ffi_py.wildcard_query import WildcardQuery
 
 class QueryBuilderException(Exception):
     """
-    This exception will be raised when illegal parameters are used to build a
-    Query object.
+    Exception raised when building a :class:`clp_ffi_py.ir.Query` fails.
     """
 
     pass
