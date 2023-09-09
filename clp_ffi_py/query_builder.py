@@ -18,19 +18,8 @@ class QueryBuilderException(Exception):
 class QueryBuilder:
     """
     This class serves as an interface for conveniently constructing Query
-    objects utilized in CLP IR streaming search. It provides methods for.
-
-    configuring and resetting search parameters, which encompass:
-        - search_time_lower_bound: Start of search time range (inclusive).
-        - search_time_upper_bound: End of search time range (inclusive).
-        - search_time_termination_margin: The margin used to determine the
-          search termination timestamp.
-        - wildcard_queries: A list of wildcard search queries.
-
-    Timestamps are specified using Unix epoch timestamps in milliseconds. By
-    default, the lower and upper bounds for search timestamps encompass the
-    entire valid range of Unix epoch timestamps, while the wildcard queries list
-    is empty.
+    objects utilized in CLP IR streaming search. It provides methods for
+    configuring and resetting search parameters.
 
     For more details about the search query CLP IR stream supports, see
     :class:`~clp_ffi_py.ir.Query` and
@@ -57,13 +46,15 @@ class QueryBuilder:
 
     @property
     def wildcard_queries(self) -> List[WildcardQuery]:
+        """
+        :return: A deep copy of the underlying wildcard query list.
+        """
         return deepcopy(self._wildcard_queries)
 
     def set_search_time_lower_bound(self, ts: int) -> QueryBuilder:
         """
-        Sets the search time lower bound.
-
-        :param ts: The timestamp of search time lower bound.
+        :param ts: Start of the search time range (inclusive) as a UNIX epoch
+            timestamp in milliseconds.
         :return: self.
         """
         self._search_time_lower_bound = ts
@@ -71,9 +62,8 @@ class QueryBuilder:
 
     def set_search_time_upper_bound(self, ts: int) -> QueryBuilder:
         """
-        Sets the search time upper bound.
-
-        :param ts: The timestamp of search time upper bound.
+        :param ts: End of the search time range (inclusive) as a UNIX epoch
+            timestamp in milliseconds.
         :return: self.
         """
         self._search_time_upper_bound = ts
@@ -81,9 +71,8 @@ class QueryBuilder:
 
     def set_search_time_termination_margin(self, ts: int) -> QueryBuilder:
         """
-        Sets the search time termination margin.
-
-        :param ts: The timestamp of search time termination margin.
+        :param ts: The search time termination margin as a UNIX epoch timestamp
+            in milliseconds.
         :return: self.
         """
         self._search_time_termination_margin = ts
@@ -113,8 +102,8 @@ class QueryBuilder:
 
     def reset_search_time_lower_bound(self) -> QueryBuilder:
         """
-        Resets the search time lower bound to the default value (the smallest
-        legal Unix epoch timestamp).
+        Resets the search time lower bound to the default value
+        (:meth:`~clp_ffi_py.ir.Query.default_search_time_lower_bound`).
 
         :return: self.
         """
@@ -123,8 +112,8 @@ class QueryBuilder:
 
     def reset_search_time_upper_bound(self) -> QueryBuilder:
         """
-        Resets the search time upper bound to the default value (the largest
-        legal Unix epoch timestamp).
+        Resets the search time upper bound to the default value
+        (:meth:`~clp_ffi_py.ir.Query.default_search_time_upper_bound`).
 
         :return: self.
         """
@@ -133,7 +122,8 @@ class QueryBuilder:
 
     def reset_search_time_termination_margin(self) -> QueryBuilder:
         """
-        Resets the search time termination margin to the default value.
+        Resets the search time termination margin to the default value
+        (:meth:`~clp_ffi_py.ir.Query.default_search_time_termination_margin`).
 
         :return: self.
         """
@@ -165,7 +155,6 @@ class QueryBuilder:
     def build_query(self) -> Query:
         """
         :return: A :class:`~clp_ffi_py.ir.Query` object initialized with the
-            parameters set by the builder.
             parameters set by the builder.
         """
         if self._search_time_lower_bound > self._search_time_upper_bound:
