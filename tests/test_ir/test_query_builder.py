@@ -17,7 +17,7 @@ class TestCaseQueryBuilder(TestCLPBase):
 
     def test_init(self) -> None:
         """
-        Test the default initialized Query Builder and its behavior.
+        Tests the default initialized Query Builder and its behavior.
         """
         query_builder: QueryBuilder = QueryBuilder()
         empty_query: Query = Query()
@@ -71,7 +71,7 @@ class TestCaseQueryBuilder(TestCLPBase):
 
     def test_set_value(self) -> None:
         """
-        Test QueryBuilder by building different Query objects.
+        Tests QueryBuilder by building different Query objects.
         """
         search_time_lower_bound: int
         search_time_upper_bound: int
@@ -196,7 +196,7 @@ class TestCaseQueryBuilder(TestCLPBase):
 
     def test_exception(self) -> None:
         """
-        Test whether QueryBuilderException is triggered as expected.
+        Tests whether QueryBuilderException is triggered as expected.
         """
         query_builder: QueryBuilder = QueryBuilder()
         search_time_lower_bound: int = 3270

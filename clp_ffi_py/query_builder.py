@@ -33,9 +33,9 @@ class QueryBuilder:
     entire valid range of Unix epoch timestamps, while the wildcard queries list
     is empty.
 
-    For more details about the search query CLP IR stream supports, please read
-    the documents of `clp_ffi_py.ir.Query` and
-    `clp_ffi_py.wildcard_query.WildcardQuery`.
+    For more details about the search query CLP IR stream supports, see
+    :class:`~clp_ffi_py.ir.Query` and
+    :class:`~clp_ffi_py.wildcard_query.WildcardQuery`.
     """
 
     def __init__(self) -> None:
@@ -92,10 +92,11 @@ class QueryBuilder:
 
     def add_wildcard_query(self, wildcard_query: str, case_sensitive: bool = False) -> QueryBuilder:
         """
-        Adds a wildcard query to the builder's wildcard query list.
+        Constructs and adds a :class:`~clp_ffi_py.wildcard_query.WildcardQuery`
+        to the wildcard query list.
 
         :param wildcard_query: The wildcard query string to add.
-        :param case_sensitive: Case sensitive indicator.
+        :param case_sensitive: Whether to perform case-sensitive matching.
         :return: self.
         """
         self._wildcard_queries.append(WildcardQuery(wildcard_query, case_sensitive))
@@ -103,9 +104,9 @@ class QueryBuilder:
 
     def add_wildcard_queries(self, wildcard_queries: List[WildcardQuery]) -> QueryBuilder:
         """
-        Adds a list wildcard queries to the builder's wildcard query list.
+        Adds a list of wildcard queries to the wildcard query list.
 
-        :param wildcard_queries: The list of wildcard queries to be added.
+        :param wildcard_queries: The list of wildcard queries to add.
         :return: self.
         """
         self._wildcard_queries.extend(wildcard_queries)
@@ -142,7 +143,7 @@ class QueryBuilder:
 
     def reset_wildcard_queries(self) -> QueryBuilder:
         """
-        Resets the wildcard queries to an empty list.
+        Clears the wildcard query list.
 
         :return: self.
         """
@@ -151,7 +152,7 @@ class QueryBuilder:
 
     def reset(self) -> QueryBuilder:
         """
-        Resets all the settings to the default.
+        Resets all settings to their defaults.
 
         :return: self.
         """
@@ -164,7 +165,8 @@ class QueryBuilder:
 
     def build_query(self) -> Query:
         """
-        :return: A new reference of a Query object initialized with the search
+        :return: A :class:`~clp_ffi_py.ir.Query` object initialized with the
+            parameters set by the builder.
             parameters set by the builder.
         """
         if self._search_time_lower_bound > self._search_time_upper_bound:
