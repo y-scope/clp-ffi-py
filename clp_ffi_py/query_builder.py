@@ -1,0 +1,174 @@
+from __future__ import annotations
+
+from copy import deepcopy
+from typing import List, Optional
+
+from clp_ffi_py.ir import Query
+from clp_ffi_py.wildcard_query import WildcardQuery
+
+
+class QueryBuilderException(Exception):
+    """
+    Exception raised when building a :class:`~clp_ffi_py.ir.Query` fails.
+    """
+
+    pass
+
+
+class QueryBuilder:
+    """
+    This class serves as an interface for conveniently constructing Query
+    objects utilized in CLP IR streaming search. It provides methods for
+    configuring and resetting search parameters.
+
+    For more details about the search query CLP IR stream supports, see
+    :class:`~clp_ffi_py.ir.Query` and
+    :class:`~clp_ffi_py.wildcard_query.WildcardQuery`.
+    """
+
+    def __init__(self) -> None:
+        self._search_time_lower_bound: int = Query.default_search_time_lower_bound()
+        self._search_time_upper_bound: int = Query.default_search_time_upper_bound()
+        self._search_time_termination_margin: int = Query.default_search_time_termination_margin()
+        self._wildcard_queries: List[WildcardQuery] = []
+
+    @property
+    def search_time_lower_bound(self) -> int:
+        return self._search_time_lower_bound
+
+    @property
+    def search_time_upper_bound(self) -> int:
+        return self._search_time_upper_bound
+
+    @property
+    def search_time_termination_margin(self) -> int:
+        return self._search_time_termination_margin
+
+    @property
+    def wildcard_queries(self) -> List[WildcardQuery]:
+        """
+        :return: A deep copy of the underlying wildcard query list.
+        """
+        return deepcopy(self._wildcard_queries)
+
+    def set_search_time_lower_bound(self, ts: int) -> QueryBuilder:
+        """
+        :param ts: Start of the search time range (inclusive) as a UNIX epoch
+            timestamp in milliseconds.
+        :return: self.
+        """
+        self._search_time_lower_bound = ts
+        return self
+
+    def set_search_time_upper_bound(self, ts: int) -> QueryBuilder:
+        """
+        :param ts: End of the search time range (inclusive) as a UNIX epoch
+            timestamp in milliseconds.
+        :return: self.
+        """
+        self._search_time_upper_bound = ts
+        return self
+
+    def set_search_time_termination_margin(self, ts: int) -> QueryBuilder:
+        """
+        :param ts: The search time termination margin as a UNIX epoch timestamp
+            in milliseconds.
+        :return: self.
+        """
+        self._search_time_termination_margin = ts
+        return self
+
+    def add_wildcard_query(self, wildcard_query: str, case_sensitive: bool = False) -> QueryBuilder:
+        """
+        Constructs and adds a :class:`~clp_ffi_py.wildcard_query.WildcardQuery`
+        to the wildcard query list.
+
+        :param wildcard_query: The wildcard query string to add.
+        :param case_sensitive: Whether to perform case-sensitive matching.
+        :return: self.
+        """
+        self._wildcard_queries.append(WildcardQuery(wildcard_query, case_sensitive))
+        return self
+
+    def add_wildcard_queries(self, wildcard_queries: List[WildcardQuery]) -> QueryBuilder:
+        """
+        Adds a list of wildcard queries to the wildcard query list.
+
+        :param wildcard_queries: The list of wildcard queries to add.
+        :return: self.
+        """
+        self._wildcard_queries.extend(wildcard_queries)
+        return self
+
+    def reset_search_time_lower_bound(self) -> QueryBuilder:
+        """
+        Resets the search time lower bound to the default value
+        (:meth:`~clp_ffi_py.ir.Query.default_search_time_lower_bound`).
+
+        :return: self.
+        """
+        self._search_time_lower_bound = Query.default_search_time_lower_bound()
+        return self
+
+    def reset_search_time_upper_bound(self) -> QueryBuilder:
+        """
+        Resets the search time upper bound to the default value
+        (:meth:`~clp_ffi_py.ir.Query.default_search_time_upper_bound`).
+
+        :return: self.
+        """
+        self._search_time_upper_bound = Query.default_search_time_upper_bound()
+        return self
+
+    def reset_search_time_termination_margin(self) -> QueryBuilder:
+        """
+        Resets the search time termination margin to the default value
+        (:meth:`~clp_ffi_py.ir.Query.default_search_time_termination_margin`).
+
+        :return: self.
+        """
+        self._search_time_termination_margin = Query.default_search_time_termination_margin()
+        return self
+
+    def reset_wildcard_queries(self) -> QueryBuilder:
+        """
+        Clears the wildcard query list.
+
+        :return: self.
+        """
+        self._wildcard_queries.clear()
+        return self
+
+    def reset(self) -> QueryBuilder:
+        """
+        Resets all settings to their defaults.
+
+        :return: self.
+        """
+        return (
+            self.reset_wildcard_queries()
+            .reset_search_time_termination_margin()
+            .reset_search_time_upper_bound()
+            .reset_search_time_lower_bound()
+        )
+
+    def build(self) -> Query:
+        """
+        :raises QueryBuilderException: If the search time range lower bound
+            exceeds the search time range upper bound.
+        :return: A :class:`~clp_ffi_py.ir.Query` object initialized with the
+            parameters set by the builder.
+        """
+        if self._search_time_lower_bound > self._search_time_upper_bound:
+            raise QueryBuilderException(
+                "The search time lower bound exceeds the search time upper bound."
+            )
+        wildcard_queries: Optional[List[WildcardQuery]] = None
+        if 0 != len(self._wildcard_queries):
+            wildcard_queries = self._wildcard_queries
+        return Query(
+            search_time_lower_bound=self._search_time_lower_bound,
+            search_time_upper_bound=self._search_time_upper_bound,
+            search_time_termination_margin=self._search_time_termination_margin,
+            wildcard_queries=wildcard_queries,
+        )
