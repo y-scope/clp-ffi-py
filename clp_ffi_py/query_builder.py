@@ -9,7 +9,7 @@ from clp_ffi_py.wildcard_query import WildcardQuery
 
 class QueryBuilderException(Exception):
     """
-    Exception raised when building a :class:`clp_ffi_py.ir.Query` fails.
+    Exception raised when building a :class:`~clp_ffi_py.ir.Query` fails.
     """
 
     pass
@@ -154,6 +154,8 @@ class QueryBuilder:
 
     def build_query(self) -> Query:
         """
+        :raises QueryBuilderException: If the search time range lower bound
+            exceeds the search time range upper bound.
         :return: A :class:`~clp_ffi_py.ir.Query` object initialized with the
             parameters set by the builder.
         """
