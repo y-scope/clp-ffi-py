@@ -152,7 +152,7 @@ class QueryBuilder:
             .reset_search_time_lower_bound()
         )
 
-    def build_query(self) -> Query:
+    def build(self) -> Query:
         """
         :raises QueryBuilderException: If the search time range lower bound
             exceeds the search time range upper bound.

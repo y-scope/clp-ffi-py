@@ -24,7 +24,7 @@ class TestCaseQueryBuilder(TestCLPBase):
         attributes_exception_captured: bool
 
         self._check_query(
-            query_builder.build_query(),
+            query_builder.build(),
             empty_query.get_search_time_lower_bound(),
             empty_query.get_search_time_upper_bound(),
             empty_query.get_wildcard_queries(),
@@ -85,7 +85,7 @@ class TestCaseQueryBuilder(TestCLPBase):
         wildcard_queries = None
         query_builder.set_search_time_lower_bound(search_time_lower_bound)
         self._check_query(
-            query_builder.build_query(),
+            query_builder.build(),
             search_time_lower_bound,
             search_time_upper_bound,
             wildcard_queries,
@@ -95,7 +95,7 @@ class TestCaseQueryBuilder(TestCLPBase):
         search_time_upper_bound = 3270
         query_builder.set_search_time_upper_bound(search_time_upper_bound)
         self._check_query(
-            query_builder.build_query(),
+            query_builder.build(),
             search_time_lower_bound,
             search_time_upper_bound,
             wildcard_queries,
@@ -105,7 +105,7 @@ class TestCaseQueryBuilder(TestCLPBase):
         search_time_termination_margin = 123
         query_builder.set_search_time_termination_margin(search_time_termination_margin)
         self._check_query(
-            query_builder.build_query(),
+            query_builder.build(),
             search_time_lower_bound,
             search_time_upper_bound,
             wildcard_queries,
@@ -121,7 +121,7 @@ class TestCaseQueryBuilder(TestCLPBase):
         query_builder.add_wildcard_queries(extra_wildcard_queries)
         wildcard_queries.extend(extra_wildcard_queries)
         self._check_query(
-            query_builder.build_query(),
+            query_builder.build(),
             search_time_lower_bound,
             search_time_upper_bound,
             wildcard_queries,
@@ -134,7 +134,7 @@ class TestCaseQueryBuilder(TestCLPBase):
             search_time_lower_bound
         ).set_search_time_upper_bound(search_time_upper_bound)
         self._check_query(
-            query_builder.build_query(),
+            query_builder.build(),
             search_time_lower_bound,
             search_time_upper_bound,
             wildcard_queries,
@@ -148,7 +148,7 @@ class TestCaseQueryBuilder(TestCLPBase):
         ).add_wildcard_query(wildcard_query_string)
         wildcard_queries.append(WildcardQuery(wildcard_query_string))
         self._check_query(
-            query_builder.build_query(),
+            query_builder.build(),
             search_time_lower_bound,
             search_time_upper_bound,
             wildcard_queries,
@@ -167,7 +167,7 @@ class TestCaseQueryBuilder(TestCLPBase):
             .set_search_time_upper_bound(search_time_upper_bound)
         )
         self._check_query(
-            query_builder.build_query(),
+            query_builder.build(),
             search_time_lower_bound,
             search_time_upper_bound,
             wildcard_queries,
@@ -178,7 +178,7 @@ class TestCaseQueryBuilder(TestCLPBase):
         query_builder.add_wildcard_query(wildcard_query_string)
         wildcard_queries = [WildcardQuery(wildcard_query_string)]
         self._check_query(
-            query_builder.build_query(),
+            query_builder.build(),
             search_time_lower_bound,
             search_time_upper_bound,
             wildcard_queries,
@@ -187,7 +187,7 @@ class TestCaseQueryBuilder(TestCLPBase):
 
         query_builder = query_builder.reset()
         self._check_query(
-            query_builder.build_query(),
+            query_builder.build(),
             Query.default_search_time_lower_bound(),
             Query.default_search_time_upper_bound(),
             None,
@@ -206,7 +206,7 @@ class TestCaseQueryBuilder(TestCLPBase):
 
         query_builder_exception_captured: bool = False
         try:
-            query_builder.build_query()
+            query_builder.build()
         except QueryBuilderException:
             query_builder_exception_captured = True
         except Exception:
