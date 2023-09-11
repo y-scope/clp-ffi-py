@@ -51,7 +51,7 @@ class ClpIrStreamReader(Iterator[LogEvent]):
         :return:
             - Next unread log event represented as an instance of LogEvent.
             - None if the end of IR stream is reached.
-        :raise Exception: 
+        :raise Exception:
             If :meth:`~clp_ffi_py.ir.ir_ffi.Decoder.decode_next_log_event` fails.
         """
         return Decoder.decode_next_log_event(

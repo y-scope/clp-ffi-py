@@ -123,8 +123,8 @@ class QueryBuilder:
 
     def reset_search_time_termination_margin(self) -> QueryBuilder:
         """
-        Resets the search time termination margin to the default value
-        (:meth:`~clp_ffi_py.ir.ir_ffi.Query.default_search_time_termination_margin`).
+        Resets the search time termination margin to the default value (:meth:`~
+        clp_ffi_py.ir.ir_ffi.Query.default_search_time_termination_margin`).
 
         :return: self.
         """

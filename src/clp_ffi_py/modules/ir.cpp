@@ -20,7 +20,8 @@ PyModuleDef Py_ir_ffi{
         "ir_ffi",
         static_cast<char const*>(cModuleDoc),
         -1,
-        static_cast<PyMethodDef*>(Py_ir_ffi_method_table)};
+        static_cast<PyMethodDef*>(Py_ir_ffi_method_table)
+};
 }  // namespace
 
 // NOLINTNEXTLINE(modernize-use-trailing-return-type)
