@@ -85,17 +85,22 @@ help(LogEvent)
 ### Example Code: Using Query to search log events by specifying a certain time range
 
 ```python
-from pathlib import Path
 from typing import List
 
-from clp_ffi_py.ir import ClpIrStreamReader, LogEvent, Query
+from clp_ffi_py.ir import ClpIrStreamReader, LogEvent, Query, QueryBuilder
+
+# Create a QueryBuilder object to build the search query.
+query_builder: QueryBuilder = QueryBuilder()
 
 # Create a search query that specifies a time range by UNIX epoch timestamp in
 # milliseconds. It will search from 2016.Nov.28 21:00 to 2016.Nov.29 3:00.
-time_range_query: Query = Query(
-    search_time_lower_bound=1480366800000,  # 2016.11.28 21:00
-    search_time_upper_bound=1480388400000,  # 2016.11.29 03:00
+time_range_query: Query = (
+    query_builder
+    .set_search_time_lower_bound(1480366800000) # 2016.11.28 21:00
+    .set_search_time_upper_bound(1480388400000) # 2016.11.29 03:00
+    .build()
 )
+
 # A list to store all the log events within the search time range
 log_events: List[LogEvent] = []
 
@@ -110,35 +115,41 @@ with open("example.clp.zst", "rb") as compressed_log_file:
 ### Example Code: Using Query to search log messages of certain pattern(s) specified by wildcard queries.
 
 ```python
+from pathlib import Path
 from typing import List, Tuple
 
-from clp_ffi_py.ir import ClpIrFileReader, Query, WildcardQuery
+from clp_ffi_py.ir import ClpIrFileReader, Query, QueryBuilder
 
-# Generate a list of wildcard patterns to filter log messages:
-wildcard_query_list: List[WildcardQuery] = [
-    WildcardQuery("*uid=*,status=failed*"),
-    WildcardQuery("*UID=*,Status=KILLED*", case_sensitive=True),
-]
-# Initialize a Query object with the list of wildcard patterns:
-wildcard_search_query: Query = Query(wildcard_queries=wildcard_query_list)
+# Create a QueryBuilder object to build the search query.
+query_builder: QueryBuilder = QueryBuilder()
+
+# Add wildcard patterns to filter log messages:
+query_builder.add_wildcard_query("*uid=*,status=failed*")
+query_builder.add_wildcard_query("*UID=*,Status=KILLED*", case_sensitive=True)
+
+# Initialize a Query object using the builder:
+wildcard_search_query: Query = query_builder.build()
 # Store the log events that match the criteria in the format:
 # [timestamp, message]
 matched_log_messages: List[Tuple[int, str]] = []
 
 # A convenience file reader class is also available to interact with a file that
 # represents an encoded CLP IR stream directly.
-with ClpIrFileReader("example.clp.zst") as clp_reader:
+with ClpIrFileReader(Path("example.clp.zst")) as clp_reader:
     for log_event in clp_reader.search(wildcard_search_query):
         matched_log_messages.append((log_event.get_timestamp(), log_event.get_log_message()))
 ```
 
 A `Query` object may have both the search time range and the wildcard queries
-specified to support more complex search scenarios. For more details, use the
-following code to access the related docstring.
+(`WildcardQuery`) specified to support more complex search scenarios.
+`QueryBuilder` can be used to conveniently construct Query objects. For more
+details, use the following code to access the related docstring.
 
 ```python
-from clp_ffi_py.ir import Query
+from clp_ffi_py.ir import Query, QueryBuilder, WildcardQuery
 help(Query)
+help(QueryBuilder)
+help(WildcardQuery)
 ```
 
 ### Streaming Decode/Search Directly from S3 Remote Storage
