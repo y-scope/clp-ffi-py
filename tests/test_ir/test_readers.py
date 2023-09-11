@@ -9,8 +9,7 @@ from test_ir.test_decoder import (
 )
 from test_ir.test_utils import TestCLPBase
 
-from clp_ffi_py import IncompleteStreamError, LogEvent, Metadata, Query
-from clp_ffi_py.readers import ClpIrFileReader, ClpIrStreamReader
+from clp_ffi_py.ir import IncompleteStreamError, LogEvent, Metadata, Query, ClpIrFileReader, ClpIrStreamReader
 
 
 def read_log_stream(

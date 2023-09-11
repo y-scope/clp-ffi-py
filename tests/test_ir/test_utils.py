@@ -14,7 +14,7 @@ from zstandard import (
     ZstdDecompressor,
 )
 
-from clp_ffi_py import (
+from clp_ffi_py.ir import (
     LogEvent,
     Metadata,
     Query,

@@ -64,7 +64,7 @@ methods.
 
 ```python
 from pathlib import Path
-from clp_ffi_py.readers import ClpIrFileReader
+from clp_ffi_py.ir import ClpIrFileReader
 
 with ClpIrFileReader(Path("example.clp.zst")) as clp_reader:
     for log_event in clp_reader:
@@ -88,8 +88,7 @@ help(LogEvent)
 from pathlib import Path
 from typing import List
 
-from clp_ffi_py import LogEvent, Query
-from clp_ffi_py.readers import ClpIrStreamReader
+from clp_ffi_py.ir import ClpIrStreamReader, LogEvent, Query
 
 # Create a search query that specifies a time range by UNIX epoch timestamp in
 # milliseconds. It will search from 2016.Nov.28 21:00 to 2016.Nov.29 3:00.
@@ -113,8 +112,7 @@ with open("example.clp.zst", "rb") as compressed_log_file:
 ```python
 from typing import List, Tuple
 
-from clp_ffi_py import Query, WildcardQuery
-from clp_ffi_py.readers import ClpIrFileReader
+from clp_ffi_py.ir import ClpIrFileReader, Query, WildcardQuery
 
 # Generate a list of wildcard patterns to filter log messages:
 wildcard_query_list: List[WildcardQuery] = [
@@ -139,7 +137,7 @@ specified to support more complex search scenarios. For more details, use the
 following code to access the related docstring.
 
 ```python
-from clp_ffi_py import Query
+from clp_ffi_py.ir import Query
 help(Query)
 ```
 
@@ -156,7 +154,7 @@ Here is an example:
 
 ```python
 from pathlib import Path
-from clp_ffi_py.readers import ClpIrStreamReader
+from clp_ffi_py.ir import ClpIrStreamReader
 
 import boto3
 import os
@@ -179,7 +177,7 @@ with smart_open.open(url, "rb", transport_params={'client': session.client('s3')
 
 Note: 
 When `allow_incomplete_stream` is set to False (default), the reader will raise
-`clp_ffi_py.IncompleteStreamError` if the stream is incomplete (it doesn't end
+`clp_ffi_py.ir.IncompleteStreamError` if the stream is incomplete (it doesn't end
 with the byte sequence indicating the stream's end). In practice, this can occur
 if you're reading a stream that is still being written or wasn't properly
 closed.

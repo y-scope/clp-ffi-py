@@ -3,13 +3,13 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import List, Optional
 
-from clp_ffi_py.ir import Query
-from clp_ffi_py.wildcard_query import WildcardQuery
+from clp_ffi_py.ir.ir_ffi import Query
+from clp_ffi_py.ir.wildcard_query import WildcardQuery
 
 
 class QueryBuilderException(Exception):
     """
-    Exception raised when building a :class:`~clp_ffi_py.ir.Query` fails.
+    Exception raised when building a :class:`~clp_ffi_py.ir.ir_ffi.Query` fails.
     """
 
     pass
@@ -22,8 +22,8 @@ class QueryBuilder:
     configuring and resetting search parameters.
 
     For more details about the search query CLP IR stream supports, see
-    :class:`~clp_ffi_py.ir.Query` and
-    :class:`~clp_ffi_py.wildcard_query.WildcardQuery`.
+    :class:`~clp_ffi_py.ir.ir_ffi.Query` and
+    :class:`~clp_ffi_py.ir.wildcard_query.WildcardQuery`.
     """
 
     def __init__(self) -> None:
@@ -80,8 +80,9 @@ class QueryBuilder:
 
     def add_wildcard_query(self, wildcard_query: str, case_sensitive: bool = False) -> QueryBuilder:
         """
-        Constructs and adds a :class:`~clp_ffi_py.wildcard_query.WildcardQuery`
-        to the wildcard query list.
+        Constructs and adds a
+        :class:`~clp_ffi_py.ir.wildcard_query.WildcardQuery` to the wildcard
+        query list.
 
         :param wildcard_query: The wildcard query string to add.
         :param case_sensitive: Whether to perform case-sensitive matching.
@@ -103,7 +104,7 @@ class QueryBuilder:
     def reset_search_time_lower_bound(self) -> QueryBuilder:
         """
         Resets the search time lower bound to the default value
-        (:meth:`~clp_ffi_py.ir.Query.default_search_time_lower_bound`).
+        (:meth:`~clp_ffi_py.ir.ir_ffi.Query.default_search_time_lower_bound`).
 
         :return: self.
         """
@@ -113,7 +114,7 @@ class QueryBuilder:
     def reset_search_time_upper_bound(self) -> QueryBuilder:
         """
         Resets the search time upper bound to the default value
-        (:meth:`~clp_ffi_py.ir.Query.default_search_time_upper_bound`).
+        (:meth:`~clp_ffi_py.ir.ir_ffi.Query.default_search_time_upper_bound`).
 
         :return: self.
         """
@@ -123,7 +124,7 @@ class QueryBuilder:
     def reset_search_time_termination_margin(self) -> QueryBuilder:
         """
         Resets the search time termination margin to the default value
-        (:meth:`~clp_ffi_py.ir.Query.default_search_time_termination_margin`).
+        (:meth:`~clp_ffi_py.ir.ir_ffi.Query.default_search_time_termination_margin`).
 
         :return: self.
         """
@@ -156,7 +157,7 @@ class QueryBuilder:
         """
         :raises QueryBuilderException: If the search time range lower bound
             exceeds the search time range upper bound.
-        :return: A :class:`~clp_ffi_py.ir.Query` object initialized with the
+        :return: A :class:`~clp_ffi_py.ir.ir_ffi.Query` object initialized with the
             parameters set by the builder.
         """
         if self._search_time_lower_bound > self._search_time_upper_bound:

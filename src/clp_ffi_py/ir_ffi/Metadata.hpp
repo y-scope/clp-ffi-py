@@ -6,7 +6,7 @@
 #include <clp/components/core/src/ffi/encoding_methods.hpp>
 #include <clp/components/core/submodules/json/single_include/nlohmann/json.hpp>
 
-namespace clp_ffi_py::ir {
+namespace clp_ffi_py::ir_ffi {
 /**
  * A class that represents a decoded IR preamble. Contains ways to access (get)
  * metadata such as the timestamp format. After construction, the metadata is
@@ -61,5 +61,5 @@ private:
     std::string m_timestamp_format;
     std::string m_timezone_id;
 };
-}  // namespace clp_ffi_py::ir
+}  // namespace clp_ffi_py::ir_ffi
 #endif  // CLP_FFI_PY_METADATA_HPP

@@ -3,7 +3,7 @@ from typing import List
 
 from test_ir.test_utils import TestCLPBase
 
-from clp_ffi_py import (
+from clp_ffi_py.ir import (
     LogEvent,
     Query,
     WildcardQuery,
@@ -12,7 +12,7 @@ from clp_ffi_py import (
 
 class TestCaseWildcardQuery(TestCLPBase):
     """
-    Class for testing clp_ffi_py.wildcard_query.WildcardQuery.
+    Class for testing clp_ffi_py.ir.WildcardQuery.
     """
 
     def test_init(self) -> None:

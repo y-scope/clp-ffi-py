@@ -5,7 +5,7 @@
 
 #include <clp/components/core/src/string_utils.hpp>
 
-namespace clp_ffi_py::ir {
+namespace clp_ffi_py::ir_ffi {
 auto Query::matches_wildcard_queries(std::string_view log_message) const -> bool {
     if (m_wildcard_queries.empty()) {
         return true;
@@ -22,4 +22,4 @@ auto Query::matches_wildcard_queries(std::string_view log_message) const -> bool
             }
     );
 }
-}  // namespace clp_ffi_py::ir
+}  // namespace clp_ffi_py::ir_ffi

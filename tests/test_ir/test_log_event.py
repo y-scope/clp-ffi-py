@@ -5,7 +5,7 @@ from typing import Optional
 import dateutil.tz
 from test_ir.test_utils import TestCLPBase
 
-from clp_ffi_py import LogEvent, Metadata
+from clp_ffi_py.ir import LogEvent, Metadata
 
 
 class TestCaseLogEvent(TestCLPBase):

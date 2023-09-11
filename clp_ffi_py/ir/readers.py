@@ -7,7 +7,7 @@ from typing import Generator, IO, Iterator, Optional, Type, Union
 
 from zstandard import ZstdDecompressionReader, ZstdDecompressor
 
-from clp_ffi_py import Decoder, DecoderBuffer, LogEvent, Metadata, Query
+from clp_ffi_py.ir.ir_ffi import Decoder, DecoderBuffer, LogEvent, Metadata, Query
 
 
 class ClpIrStreamReader(Iterator[LogEvent]):
@@ -51,7 +51,8 @@ class ClpIrStreamReader(Iterator[LogEvent]):
         :return:
             - Next unread log event represented as an instance of LogEvent.
             - None if the end of IR stream is reached.
-        :raise Exception: If `Decoder.decode_next_log_event` fails.
+        :raise Exception: 
+            If :meth:`~clp_ffi_py.ir.ir_ffi.Decoder.decode_next_log_event` fails.
         """
         return Decoder.decode_next_log_event(
             self._decoder_buffer, allow_incomplete_stream=self._allow_incomplete_stream
@@ -64,7 +65,8 @@ class ClpIrStreamReader(Iterator[LogEvent]):
         so that the input stream does not need to be readable on a reader's
         construction, but until the user starts to iterate logs.
 
-        :raise Exception: If `Decoder.decode_preamble` fails.
+        :raise Exception:
+            If :meth:`~clp_ffi_py.ir.ir_ffi.Decoder.decode_preamble` fails.
         """
         if self.has_metadata():
             return
@@ -83,7 +85,7 @@ class ClpIrStreamReader(Iterator[LogEvent]):
         Searches and yields log events that match a specific search query.
 
         :param query: The input query object used to match log events. Check the
-            document of `clp_ffi_py.Query` for more details.
+            document of :class:`~clp_ffi_py.ir.Query` for more details.
         :yield: The next unread encoded log event that matches the given search
             query from the IR stream.
         """

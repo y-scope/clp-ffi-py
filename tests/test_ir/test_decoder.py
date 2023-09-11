@@ -5,7 +5,7 @@ from typing import List, Optional, Tuple
 from smart_open import open  # type: ignore
 from test_ir.test_utils import get_current_timestamp, LogGenerator, TestCLPBase
 
-from clp_ffi_py import (
+from clp_ffi_py.ir import (
     Decoder,
     DecoderBuffer,
     FourByteEncoder,

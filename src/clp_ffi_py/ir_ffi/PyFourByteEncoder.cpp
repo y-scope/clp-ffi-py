@@ -2,11 +2,11 @@
 
 #include "PyFourByteEncoder.hpp"
 
-#include <clp_ffi_py/ir/encoding_methods.hpp>
+#include <clp_ffi_py/ir_ffi/encoding_methods.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
 #include <clp_ffi_py/utils.hpp>
 
-namespace clp_ffi_py::ir {
+namespace clp_ffi_py::ir_ffi {
 namespace {
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
@@ -74,27 +74,27 @@ PyDoc_STRVAR(
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyMethodDef PyFourByteEncoder_method_table[]{
         {"encode_preamble",
-         clp_ffi_py::ir::encode_four_byte_preamble,
+         clp_ffi_py::ir_ffi::encode_four_byte_preamble,
          METH_VARARGS | METH_STATIC,
          static_cast<char const*>(cEncodePreambleDoc)},
 
         {"encode_message_and_timestamp_delta",
-         clp_ffi_py::ir::encode_four_byte_message_and_timestamp_delta,
+         clp_ffi_py::ir_ffi::encode_four_byte_message_and_timestamp_delta,
          METH_VARARGS | METH_STATIC,
          static_cast<char const*>(cEncodeMessageAndTimestampDeltaDoc)},
 
         {"encode_message",
-         clp_ffi_py::ir::encode_four_byte_message,
+         clp_ffi_py::ir_ffi::encode_four_byte_message,
          METH_VARARGS | METH_STATIC,
          static_cast<char const*>(cEncodeMessageDoc)},
 
         {"encode_timestamp_delta",
-         clp_ffi_py::ir::encode_four_byte_timestamp_delta,
+         clp_ffi_py::ir_ffi::encode_four_byte_timestamp_delta,
          METH_VARARGS | METH_STATIC,
          static_cast<char const*>(cEncodeTimestampDeltaDoc)},
 
         {"encode_end_of_ir",
-         py_c_function_cast(clp_ffi_py::ir::encode_end_of_ir),
+         py_c_function_cast(clp_ffi_py::ir_ffi::encode_end_of_ir),
          METH_NOARGS | METH_STATIC,
          static_cast<char const*>(cEncodeEndOfIrDoc)},
 
@@ -121,7 +121,7 @@ PyType_Slot PyFourByteEncoder_slots[]{
  * PyFourByteEncoder Python type specifications.
  */
 PyType_Spec PyFourByteEncoder_type_spec{
-        "clp_ffi_py.ir.FourByteEncoder",
+        "clp_ffi_py.ir.ir_ffi.FourByteEncoder",
         sizeof(PyFourByteEncoder),
         0,
         Py_TPFLAGS_DEFAULT,
@@ -142,4 +142,4 @@ auto PyFourByteEncoder::module_level_init(PyObject* py_module) -> bool {
     type->tp_new = nullptr;
     return add_python_type(type, "FourByteEncoder", py_module);
 }
-}  // namespace clp_ffi_py::ir
+}  // namespace clp_ffi_py::ir_ffi

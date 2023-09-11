@@ -6,13 +6,13 @@
 #include <clp/components/core/src/string_utils.hpp>
 
 #include <clp_ffi_py/error_messages.hpp>
-#include <clp_ffi_py/ir/LogEvent.hpp>
-#include <clp_ffi_py/ir/PyLogEvent.hpp>
-#include <clp_ffi_py/ir/Query.hpp>
+#include <clp_ffi_py/ir_ffi/LogEvent.hpp>
+#include <clp_ffi_py/ir_ffi/PyLogEvent.hpp>
+#include <clp_ffi_py/ir_ffi/Query.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
 #include <clp_ffi_py/utils.hpp>
 
-namespace clp_ffi_py::ir {
+namespace clp_ffi_py::ir_ffi {
 namespace {
 /**
  * Deserializes the wildcard queries from a list of Python wildcard queries into
@@ -578,7 +578,7 @@ PyType_Slot PyQuery_slots[]{
  * PyQuery Python type specifications.
  */
 PyType_Spec PyQuery_type_spec{
-        "clp_ffi_py.ir.Query",
+        "clp_ffi_py.ir.ir_ffi.Query",
         sizeof(Query),
         0,
         Py_TPFLAGS_DEFAULT,
@@ -638,7 +638,7 @@ auto PyQuery::module_level_init(PyObject* py_module) -> bool {
         return false;
     }
 
-    PyObjectPtr<PyObject> const query_module(PyImport_ImportModule("clp_ffi_py.wildcard_query"));
+    PyObjectPtr<PyObject> const query_module(PyImport_ImportModule("clp_ffi_py.ir.wildcard_query"));
     auto* py_query{query_module.get()};
     if (nullptr == py_query) {
         return false;
@@ -650,4 +650,4 @@ auto PyQuery::module_level_init(PyObject* py_module) -> bool {
     m_py_wildcard_query_type.reset(py_wildcard_query_type);
     return true;
 }
-}  // namespace clp_ffi_py::ir
+}  // namespace clp_ffi_py::ir_ffi

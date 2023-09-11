@@ -4,12 +4,12 @@
 
 #include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ExceptionFFI.hpp>
-#include <clp_ffi_py/ir/Metadata.hpp>
+#include <clp_ffi_py/ir_ffi/Metadata.hpp>
 #include <clp_ffi_py/Py_utils.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
 #include <clp_ffi_py/utils.hpp>
 
-namespace clp_ffi_py::ir {
+namespace clp_ffi_py::ir_ffi {
 namespace {
 extern "C" {
 /**
@@ -211,7 +211,7 @@ PyType_Slot PyMetadata_slots[]{
 // NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
 
 PyType_Spec PyMetadata_type_spec{
-        "clp_ffi_py.ir.Metadata",
+        "clp_ffi_py.ir.ir_ffi.Metadata",
         sizeof(PyMetadata),
         0,
         Py_TPFLAGS_DEFAULT,
@@ -292,4 +292,4 @@ auto PyMetadata::create_new_from_json(nlohmann::json const& metadata, bool is_fo
     }
     return self;
 }
-}  // namespace clp_ffi_py::ir
+}  // namespace clp_ffi_py::ir_ffi

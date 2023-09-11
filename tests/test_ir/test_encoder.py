@@ -1,8 +1,6 @@
 from test_ir.test_utils import TestCLPBase
 
-from clp_ffi_py import (
-    FourByteEncoder,
-)
+from clp_ffi_py.ir import FourByteEncoder
 
 
 class TestCaseFourByteEncoder(TestCLPBase):
