@@ -5,7 +5,7 @@
 
 #include <clp/components/core/src/ffi/encoding_methods.hpp>
 
-namespace clp_ffi_py::ir_ffi {
+namespace clp_ffi_py::ir_native {
 /**
  * A class that represents a decoded IR log event. Contains ways to access (get
  * or set) the log message, the timestamp, and the log event index.
@@ -73,6 +73,6 @@ private:
     size_t m_index;
     std::string m_formatted_timestamp;
 };
-}  // namespace clp_ffi_py::ir_ffi
+}  // namespace clp_ffi_py::ir_native
 
 #endif  // CLP_FFI_PY_LOG_EVENT_HPP

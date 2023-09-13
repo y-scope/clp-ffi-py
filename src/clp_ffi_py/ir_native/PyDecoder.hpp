@@ -5,7 +5,7 @@
 
 #include <clp_ffi_py/PyObjectUtils.hpp>
 
-namespace clp_ffi_py::ir_ffi {
+namespace clp_ffi_py::ir_native {
 /**
  * This class provides a Python-level namespace for IR decoding methods.
  */
@@ -27,6 +27,6 @@ private:
 
     static PyObjectPtr<PyTypeObject> m_py_type;
 };
-}  // namespace clp_ffi_py::ir_ffi
+}  // namespace clp_ffi_py::ir_native
 
 #endif

@@ -6,13 +6,13 @@
 #include <clp/components/core/src/string_utils.hpp>
 
 #include <clp_ffi_py/error_messages.hpp>
-#include <clp_ffi_py/ir_ffi/LogEvent.hpp>
-#include <clp_ffi_py/ir_ffi/PyLogEvent.hpp>
-#include <clp_ffi_py/ir_ffi/Query.hpp>
+#include <clp_ffi_py/ir_native/LogEvent.hpp>
+#include <clp_ffi_py/ir_native/PyLogEvent.hpp>
+#include <clp_ffi_py/ir_native/Query.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
 #include <clp_ffi_py/utils.hpp>
 
-namespace clp_ffi_py::ir_ffi {
+namespace clp_ffi_py::ir_native {
 namespace {
 /**
  * Deserializes the wildcard queries from a list of Python wildcard queries into
@@ -578,7 +578,7 @@ PyType_Slot PyQuery_slots[]{
  * PyQuery Python type specifications.
  */
 PyType_Spec PyQuery_type_spec{
-        "clp_ffi_py.ir.ir_ffi.Query",
+        "clp_ffi_py.ir.ir_native.Query",
         sizeof(Query),
         0,
         Py_TPFLAGS_DEFAULT,
@@ -650,4 +650,4 @@ auto PyQuery::module_level_init(PyObject* py_module) -> bool {
     m_py_wildcard_query_type.reset(py_wildcard_query_type);
     return true;
 }
-}  // namespace clp_ffi_py::ir_ffi
+}  // namespace clp_ffi_py::ir_native

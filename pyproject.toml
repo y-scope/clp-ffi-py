@@ -53,6 +53,9 @@ strict = true
 pretty = true
 
 [tool.ruff]
+exclude = [
+    "clp_ffi_py/ir/__init__.py"
+]
 line-length = 100
 select = ["E", "I", "F"]
 

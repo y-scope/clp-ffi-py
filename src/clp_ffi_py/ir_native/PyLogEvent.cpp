@@ -3,13 +3,13 @@
 #include "PyLogEvent.hpp"
 
 #include <clp_ffi_py/error_messages.hpp>
-#include <clp_ffi_py/ir_ffi/LogEvent.hpp>
-#include <clp_ffi_py/ir_ffi/PyQuery.hpp>
+#include <clp_ffi_py/ir_native/LogEvent.hpp>
+#include <clp_ffi_py/ir_native/PyQuery.hpp>
 #include <clp_ffi_py/Py_utils.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
 #include <clp_ffi_py/utils.hpp>
 
-namespace clp_ffi_py::ir_ffi {
+namespace clp_ffi_py::ir_native {
 namespace {
 extern "C" {
 /**
@@ -421,7 +421,7 @@ PyType_Slot PyLogEvent_slots[]{
  * PyLogEvent Python type specifications.
  */
 PyType_Spec PyLogEvent_type_spec{
-        "clp_ffi_py.ir.ir_ffi.LogEvent",
+        "clp_ffi_py.ir.ir_native.LogEvent",
         sizeof(PyLogEvent),
         0,
         Py_TPFLAGS_DEFAULT,
@@ -520,4 +520,4 @@ auto PyLogEvent::create_new_log_event(
     }
     return self;
 }
-}  // namespace clp_ffi_py::ir_ffi
+}  // namespace clp_ffi_py::ir_native

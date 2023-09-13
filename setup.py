@@ -5,8 +5,8 @@ import toml
 from setuptools import setup, Extension
 from typing import Any, Dict, Optional
 
-ir: Extension = Extension(
-    name="clp_ffi_py.ir.ir_ffi",
+ir_native: Extension = Extension(
+    name="clp_ffi_py.ir.ir_native",
     language="c++",
     include_dirs=[
         "src",
@@ -19,17 +19,17 @@ ir: Extension = Extension(
         "src/clp/components/core/src/ffi/encoding_methods.cpp",
         "src/clp/components/core/src/string_utils.cpp",
         "src/clp/components/core/src/TraceableException.cpp",
-        "src/clp_ffi_py/ir_ffi/decoding_methods.cpp",
-        "src/clp_ffi_py/ir_ffi/encoding_methods.cpp",
-        "src/clp_ffi_py/ir_ffi/Metadata.cpp",
-        "src/clp_ffi_py/ir_ffi/PyDecoder.cpp",
-        "src/clp_ffi_py/ir_ffi/PyDecoderBuffer.cpp",
-        "src/clp_ffi_py/ir_ffi/PyFourByteEncoder.cpp",
-        "src/clp_ffi_py/ir_ffi/PyLogEvent.cpp",
-        "src/clp_ffi_py/ir_ffi/PyMetadata.cpp",
-        "src/clp_ffi_py/ir_ffi/PyQuery.cpp",
-        "src/clp_ffi_py/ir_ffi/Query.cpp",
-        "src/clp_ffi_py/modules/ir.cpp",
+        "src/clp_ffi_py/ir_native/decoding_methods.cpp",
+        "src/clp_ffi_py/ir_native/encoding_methods.cpp",
+        "src/clp_ffi_py/ir_native/Metadata.cpp",
+        "src/clp_ffi_py/ir_native/PyDecoder.cpp",
+        "src/clp_ffi_py/ir_native/PyDecoderBuffer.cpp",
+        "src/clp_ffi_py/ir_native/PyFourByteEncoder.cpp",
+        "src/clp_ffi_py/ir_native/PyLogEvent.cpp",
+        "src/clp_ffi_py/ir_native/PyMetadata.cpp",
+        "src/clp_ffi_py/ir_native/PyQuery.cpp",
+        "src/clp_ffi_py/ir_native/Query.cpp",
+        "src/clp_ffi_py/modules/ir_native.cpp",
         "src/clp_ffi_py/Py_utils.cpp",
         "src/clp_ffi_py/utils.cpp",
     ],
@@ -55,7 +55,7 @@ if "__main__" == __name__:
         setup(
             name="clp_ffi_py",
             description="CLP FFI Python Interface",
-            ext_modules=[ir],
+            ext_modules=[ir_native],
             packages=["clp_ffi_py"],
             version=version,
         )

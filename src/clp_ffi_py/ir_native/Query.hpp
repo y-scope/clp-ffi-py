@@ -10,9 +10,9 @@
 #include <clp/components/core/src/ffi/encoding_methods.hpp>
 
 #include <clp_ffi_py/ExceptionFFI.hpp>
-#include <clp_ffi_py/ir_ffi/LogEvent.hpp>
+#include <clp_ffi_py/ir_native/LogEvent.hpp>
 
-namespace clp_ffi_py::ir_ffi {
+namespace clp_ffi_py::ir_native {
 /**
  * This class defines a wildcard query, which includes a wildcard string and a
  * boolean value to indicate if the match is case-sensitive.
@@ -203,5 +203,5 @@ private:
     ffi::epoch_time_ms_t m_search_termination_ts;
     std::vector<WildcardQuery> m_wildcard_queries;
 };
-}  // namespace clp_ffi_py::ir_ffi
+}  // namespace clp_ffi_py::ir_native
 #endif
