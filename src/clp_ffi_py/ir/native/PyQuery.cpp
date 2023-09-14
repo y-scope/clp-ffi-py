@@ -365,7 +365,7 @@ auto PyQuery_setstate(PyQuery* self, PyObject* state) -> PyObject* {
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cPyQueryMatchLogEventDoc,
-        "match_log_event(self, log_event: LogEvent)\n"
+        "match_log_event(self, log_event)\n"
         "--\n\n"
         "Validates whether the input log message matches the query.\n\n"
         ":param log_event: Input log event.\n"
@@ -638,7 +638,7 @@ auto PyQuery::module_level_init(PyObject* py_module) -> bool {
         return false;
     }
 
-    PyObjectPtr<PyObject> const query_module(PyImport_ImportModule("clp_ffi_py.ir.wildcard_query"));
+    PyObjectPtr<PyObject> const query_module(PyImport_ImportModule("clp_ffi_py.wildcard_query"));
     auto* py_query{query_module.get()};
     if (nullptr == py_query) {
         return false;

@@ -1,7 +1,6 @@
 from clp_ffi_py.ir.native import *
 from clp_ffi_py.ir.query_builder import *
 from clp_ffi_py.ir.readers import *
-from clp_ffi_py.ir.wildcard_query import *
 
 from typing import List
 

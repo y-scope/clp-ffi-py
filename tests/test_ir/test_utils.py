@@ -18,8 +18,8 @@ from clp_ffi_py.ir import (
     LogEvent,
     Metadata,
     Query,
-    WildcardQuery,
 )
+from clp_ffi_py.wildcard_query import WildcardQuery
 
 
 def _zstd_compressions_handler(

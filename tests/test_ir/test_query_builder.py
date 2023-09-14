@@ -6,8 +6,8 @@ from clp_ffi_py.ir import (
     Query,
     QueryBuilder,
     QueryBuilderException,
-    WildcardQuery,
 )
+from clp_ffi_py.wildcard_query import WildcardQuery
 
 
 class TestCaseQueryBuilder(TestCLPBase):

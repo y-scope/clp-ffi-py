@@ -4,7 +4,7 @@ from copy import deepcopy
 from typing import List, Optional
 
 from clp_ffi_py.ir.native import Query
-from clp_ffi_py.ir.wildcard_query import WildcardQuery
+from clp_ffi_py.wildcard_query import WildcardQuery
 
 
 class QueryBuilderException(Exception):

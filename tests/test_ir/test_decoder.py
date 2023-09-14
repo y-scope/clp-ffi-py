@@ -12,8 +12,8 @@ from clp_ffi_py.ir import (
     LogEvent,
     Metadata,
     Query,
-    WildcardQuery,
 )
+from clp_ffi_py.wildcard_query import WildcardQuery
 
 LOG_DIR: Path = Path("unittest-logs")
 
