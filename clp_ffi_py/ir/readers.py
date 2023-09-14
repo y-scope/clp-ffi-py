@@ -7,7 +7,7 @@ from typing import Generator, IO, Iterator, Optional, Type, Union
 
 from zstandard import ZstdDecompressionReader, ZstdDecompressor
 
-from clp_ffi_py.ir.ir_native import Decoder, DecoderBuffer, LogEvent, Metadata, Query
+from clp_ffi_py.ir.native import Decoder, DecoderBuffer, LogEvent, Metadata, Query
 
 
 class ClpIrStreamReader(Iterator[LogEvent]):
@@ -52,7 +52,7 @@ class ClpIrStreamReader(Iterator[LogEvent]):
             - Next unread log event represented as an instance of LogEvent.
             - None if the end of IR stream is reached.
         :raise Exception:
-            If :meth:`~clp_ffi_py.ir.ir_native.Decoder.decode_next_log_event`
+            If :meth:`~clp_ffi_py.ir.native.Decoder.decode_next_log_event`
             fails.
         """
         return Decoder.decode_next_log_event(
@@ -67,7 +67,7 @@ class ClpIrStreamReader(Iterator[LogEvent]):
         construction, but until the user starts to iterate logs.
 
         :raise Exception:
-            If :meth:`~clp_ffi_py.ir.ir_native.Decoder.decode_preamble` fails.
+            If :meth:`~clp_ffi_py.ir.native.Decoder.decode_preamble` fails.
         """
         if self.has_metadata():
             return

@@ -3,14 +3,13 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import List, Optional
 
-from clp_ffi_py.ir.ir_native import Query
+from clp_ffi_py.ir.native import Query
 from clp_ffi_py.ir.wildcard_query import WildcardQuery
 
 
 class QueryBuilderException(Exception):
     """
-    Exception raised when building a :class:`~clp_ffi_py.ir.ir_native.Query`
-    fails.
+    Exception raised when building a :class:`~clp_ffi_py.ir.native.Query` fails.
     """
 
     pass
@@ -23,7 +22,7 @@ class QueryBuilder:
     configuring and resetting search parameters.
 
     For more details about the search query CLP IR stream supports, see
-    :class:`~clp_ffi_py.ir.ir_native.Query` and
+    :class:`~clp_ffi_py.ir.native.Query` and
     :class:`~clp_ffi_py.ir.wildcard_query.WildcardQuery`.
     """
 
@@ -155,7 +154,7 @@ class QueryBuilder:
         """
         :raises QueryBuilderException: If the search time range lower bound
             exceeds the search time range upper bound.
-        :return: A :class:`~clp_ffi_py.ir.ir_native.Query` object initialized
+        :return: A :class:`~clp_ffi_py.ir.native.Query` object initialized
             with the parameters set by the builder.
         """
         if self._search_time_lower_bound > self._search_time_upper_bound:

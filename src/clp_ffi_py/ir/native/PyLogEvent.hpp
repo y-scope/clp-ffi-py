@@ -5,11 +5,11 @@
 
 #include <optional>
 
-#include <clp_ffi_py/ir_native/LogEvent.hpp>
-#include <clp_ffi_py/ir_native/PyMetadata.hpp>
+#include <clp_ffi_py/ir/native/LogEvent.hpp>
+#include <clp_ffi_py/ir/native/PyMetadata.hpp>
 #include <clp_ffi_py/PyObjectUtils.hpp>
 
-namespace clp_ffi_py::ir_native {
+namespace clp_ffi_py::ir::native {
 /**
  * A PyObject structure functioning as a Python-compatible interface to retrieve
  * a log event. The underlying data is pointed to by `m_log_event`. The object
@@ -146,5 +146,5 @@ private:
 
     static PyObjectPtr<PyTypeObject> m_py_type;
 };
-}  // namespace clp_ffi_py::ir_native
+}  // namespace clp_ffi_py::ir::native
 #endif  // CLP_FFI_PY_PY_LOG_EVENT_HPP

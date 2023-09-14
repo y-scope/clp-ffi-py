@@ -5,7 +5,7 @@
 
 #include <clp_ffi_py/PyObjectUtils.hpp>
 
-namespace clp_ffi_py::ir_native {
+namespace clp_ffi_py::ir::native {
 /**
  * This class provides a Python-level namespace for CLP 4-byte IR encoding
  * methods.
@@ -28,5 +28,5 @@ private:
 
     static PyObjectPtr<PyTypeObject> m_py_type;
 };
-}  // namespace clp_ffi_py::ir_native
+}  // namespace clp_ffi_py::ir::native
 #endif

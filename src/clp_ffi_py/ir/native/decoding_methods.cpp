@@ -8,16 +8,16 @@
 #include <json/single_include/nlohmann/json.hpp>
 
 #include <clp_ffi_py/error_messages.hpp>
-#include <clp_ffi_py/ir_native/error_messages.hpp>
-#include <clp_ffi_py/ir_native/PyDecoderBuffer.hpp>
-#include <clp_ffi_py/ir_native/PyLogEvent.hpp>
-#include <clp_ffi_py/ir_native/PyMetadata.hpp>
-#include <clp_ffi_py/ir_native/PyQuery.hpp>
+#include <clp_ffi_py/ir/native/error_messages.hpp>
+#include <clp_ffi_py/ir/native/PyDecoderBuffer.hpp>
+#include <clp_ffi_py/ir/native/PyLogEvent.hpp>
+#include <clp_ffi_py/ir/native/PyMetadata.hpp>
+#include <clp_ffi_py/ir/native/PyQuery.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
 #include <clp_ffi_py/PyObjectUtils.hpp>
 #include <clp_ffi_py/utils.hpp>
 
-namespace clp_ffi_py::ir_native {
+namespace clp_ffi_py::ir::native {
 namespace {
 /**
  * Decodes the next log event from the CLP IR buffer `decoder_buffer`. If
@@ -247,4 +247,4 @@ auto decode_next_log_event(PyObject* Py_UNUSED(self), PyObject* args, PyObject* 
     );
 }
 }
-}  // namespace clp_ffi_py::ir_native
+}  // namespace clp_ffi_py::ir::native

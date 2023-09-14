@@ -6,10 +6,10 @@
 #include <clp/components/core/src/ffi/ir_stream/decoding_methods.hpp>
 #include <gsl/span>
 
-#include <clp_ffi_py/ir_native/PyMetadata.hpp>
+#include <clp_ffi_py/ir/native/PyMetadata.hpp>
 #include <clp_ffi_py/PyObjectUtils.hpp>
 
-namespace clp_ffi_py::ir_native {
+namespace clp_ffi_py::ir::native {
 /**
  * This Python class is designed to buffer encoded CLP IR bytes that are read
  * from an input stream. This object serves a dual purpose:
@@ -224,5 +224,5 @@ private:
     static PyObjectPtr<PyTypeObject> m_py_type;
     static PyObjectPtr<PyObject> m_py_incomplete_stream_error;
 };
-}  // namespace clp_ffi_py::ir_native
+}  // namespace clp_ffi_py::ir::native
 #endif

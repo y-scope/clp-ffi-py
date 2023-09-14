@@ -3,10 +3,10 @@
 
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
-#include <clp_ffi_py/ir_native/Query.hpp>
+#include <clp_ffi_py/ir/native/Query.hpp>
 #include <clp_ffi_py/PyObjectUtils.hpp>
 
-namespace clp_ffi_py::ir_native {
+namespace clp_ffi_py::ir::native {
 /**
  * A PyObject structure functioning as a Python-compatible interface to retrieve
  * a search query that is used to filter log events in a CLP IR stream. The
@@ -83,5 +83,5 @@ private:
     static PyObjectPtr<PyTypeObject> m_py_type;
     static PyObjectPtr<PyObject> m_py_wildcard_query_type;
 };
-}  // namespace clp_ffi_py::ir_native
+}  // namespace clp_ffi_py::ir::native
 #endif
