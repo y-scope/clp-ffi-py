@@ -6,13 +6,13 @@
 #include <clp/components/core/src/string_utils.hpp>
 
 #include <clp_ffi_py/error_messages.hpp>
-#include <clp_ffi_py/ir/LogEvent.hpp>
-#include <clp_ffi_py/ir/PyLogEvent.hpp>
-#include <clp_ffi_py/ir/Query.hpp>
+#include <clp_ffi_py/ir/native/LogEvent.hpp>
+#include <clp_ffi_py/ir/native/PyLogEvent.hpp>
+#include <clp_ffi_py/ir/native/Query.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
 #include <clp_ffi_py/utils.hpp>
 
-namespace clp_ffi_py::ir {
+namespace clp_ffi_py::ir::native {
 namespace {
 /**
  * Deserializes the wildcard queries from a list of Python wildcard queries into
@@ -365,7 +365,7 @@ auto PyQuery_setstate(PyQuery* self, PyObject* state) -> PyObject* {
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cPyQueryMatchLogEventDoc,
-        "match_log_event(self, log_event: LogEvent)\n"
+        "match_log_event(self, log_event)\n"
         "--\n\n"
         "Validates whether the input log message matches the query.\n\n"
         ":param log_event: Input log event.\n"
@@ -578,7 +578,7 @@ PyType_Slot PyQuery_slots[]{
  * PyQuery Python type specifications.
  */
 PyType_Spec PyQuery_type_spec{
-        "clp_ffi_py.ir.Query",
+        "clp_ffi_py.ir.native.Query",
         sizeof(Query),
         0,
         Py_TPFLAGS_DEFAULT,
@@ -650,4 +650,4 @@ auto PyQuery::module_level_init(PyObject* py_module) -> bool {
     m_py_wildcard_query_type.reset(py_wildcard_query_type);
     return true;
 }
-}  // namespace clp_ffi_py::ir
+}  // namespace clp_ffi_py::ir::native

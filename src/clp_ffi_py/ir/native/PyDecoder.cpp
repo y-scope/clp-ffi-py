@@ -2,11 +2,11 @@
 
 #include "PyDecoder.hpp"
 
-#include <clp_ffi_py/ir/decoding_methods.hpp>
+#include <clp_ffi_py/ir/native/decoding_methods.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
 #include <clp_ffi_py/utils.hpp>
 
-namespace clp_ffi_py::ir {
+namespace clp_ffi_py::ir::native {
 namespace {
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
@@ -78,7 +78,7 @@ PyType_Slot PyDecoder_slots[]{
  * PyDecoder Python type specifications.
  */
 PyType_Spec PyDecoder_type_spec{
-        "clp_ffi_py.ir.Decoder",
+        "clp_ffi_py.ir.native.Decoder",
         sizeof(PyDecoder),
         0,
         Py_TPFLAGS_DEFAULT,
@@ -99,4 +99,4 @@ auto PyDecoder::module_level_init(PyObject* py_module) -> bool {
     type->tp_new = nullptr;
     return add_python_type(type, "Decoder", py_module);
 }
-}  // namespace clp_ffi_py::ir
+}  // namespace clp_ffi_py::ir::native

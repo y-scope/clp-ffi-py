@@ -6,12 +6,12 @@
 #include <random>
 
 #include <clp_ffi_py/error_messages.hpp>
-#include <clp_ffi_py/ir/error_messages.hpp>
+#include <clp_ffi_py/ir/native/error_messages.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
 #include <clp_ffi_py/PyObjectUtils.hpp>
 #include <clp_ffi_py/utils.hpp>
 
-namespace clp_ffi_py::ir {
+namespace clp_ffi_py::ir::native {
 namespace {
 extern "C" {
 /**
@@ -198,7 +198,7 @@ PyType_Slot PyDecoderBuffer_slots[]{
  * PyDecoderBuffer Python type specifications.
  */
 PyType_Spec PyDecoderBuffer_type_spec{
-        "clp_ffi_py.ir.DecoderBuffer",
+        "clp_ffi_py.ir.native.DecoderBuffer",
         sizeof(PyDecoderBuffer),
         0,
         Py_TPFLAGS_DEFAULT,
@@ -364,7 +364,7 @@ auto PyDecoderBuffer::get_py_incomplete_stream_error() -> PyObject* {
 auto PyDecoderBuffer::module_level_init(PyObject* py_module) -> bool {
     static_assert(std::is_trivially_destructible<PyDecoderBuffer>());
     auto* py_incomplete_stream_error{PyErr_NewExceptionWithDoc(
-            "clp_ffi_py.ir.IncompleteStreamError",
+            "clp_ffi_py.native.IncompleteStreamError",
             static_cast<char const*>(cPyIncompleteStreamErrorDoc),
             nullptr,
             nullptr
@@ -385,4 +385,4 @@ auto PyDecoderBuffer::module_level_init(PyObject* py_module) -> bool {
     type->tp_as_buffer = &PyDecoderBuffer_as_buffer;
     return add_python_type(get_py_type(), "DecoderBuffer", py_module);
 }
-}  // namespace clp_ffi_py::ir
+}  // namespace clp_ffi_py::ir::native

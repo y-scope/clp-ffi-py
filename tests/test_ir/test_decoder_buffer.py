@@ -6,7 +6,7 @@ from typing import Optional
 from smart_open import open  # type: ignore
 from test_ir.test_utils import TestCLPBase
 
-from clp_ffi_py import DecoderBuffer
+from clp_ffi_py.ir import DecoderBuffer
 
 
 class TestCaseDecoderBuffer(TestCLPBase):

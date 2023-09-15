@@ -114,19 +114,19 @@ auto py_reinterpret_cast(Src* src) noexcept -> Dst* {
     }
 }
 
-namespace ir {
+namespace ir::native {
 class PyDecoder;
 class PyDecoderBuffer;
 class PyLogEvent;
 class PyMetadata;
 class PyQuery;
-}  // namespace ir
+}  // namespace ir::native
 
-CLP_FFI_PY_MARK_AS_PYOBJECT(ir::PyDecoder);
-CLP_FFI_PY_MARK_AS_PYOBJECT(ir::PyDecoderBuffer);
-CLP_FFI_PY_MARK_AS_PYOBJECT(ir::PyLogEvent);
-CLP_FFI_PY_MARK_AS_PYOBJECT(ir::PyMetadata);
-CLP_FFI_PY_MARK_AS_PYOBJECT(ir::PyQuery);
+CLP_FFI_PY_MARK_AS_PYOBJECT(ir::native::PyDecoder);
+CLP_FFI_PY_MARK_AS_PYOBJECT(ir::native::PyDecoderBuffer);
+CLP_FFI_PY_MARK_AS_PYOBJECT(ir::native::PyLogEvent);
+CLP_FFI_PY_MARK_AS_PYOBJECT(ir::native::PyMetadata);
+CLP_FFI_PY_MARK_AS_PYOBJECT(ir::native::PyQuery);
 CLP_FFI_PY_MARK_AS_PYOBJECT(PyTypeObject);
 }  // namespace clp_ffi_py
 #endif

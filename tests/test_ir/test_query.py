@@ -3,11 +3,11 @@ from typing import List
 
 from test_ir.test_utils import TestCLPBase
 
-from clp_ffi_py import (
+from clp_ffi_py.ir import (
     LogEvent,
     Query,
-    WildcardQuery,
 )
+from clp_ffi_py.wildcard_query import WildcardQuery
 
 
 class TestCaseWildcardQuery(TestCLPBase):

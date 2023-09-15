@@ -5,10 +5,10 @@
 
 #include <json/single_include/nlohmann/json.hpp>
 
-#include <clp_ffi_py/ir/Metadata.hpp>
+#include <clp_ffi_py/ir/native/Metadata.hpp>
 #include <clp_ffi_py/PyObjectUtils.hpp>
 
-namespace clp_ffi_py::ir {
+namespace clp_ffi_py::ir::native {
 /**
  * A PyObject structure functioning as a Python-compatible interface to retrieve
  * CLP IR metadata. The underlying data is pointed to by `m_metadata`.
@@ -119,5 +119,5 @@ private:
 
     static PyObjectPtr<PyTypeObject> m_py_type;
 };
-}  // namespace clp_ffi_py::ir
+}  // namespace clp_ffi_py::ir::native
 #endif  // CLP_FFI_PY_PY_METADATA_HPP

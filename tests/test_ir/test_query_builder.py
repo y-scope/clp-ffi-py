@@ -2,17 +2,17 @@ from typing import List, Optional
 
 from test_ir.test_utils import TestCLPBase
 
-from clp_ffi_py import (
+from clp_ffi_py.ir import (
     Query,
     QueryBuilder,
     QueryBuilderException,
-    WildcardQuery,
 )
+from clp_ffi_py.wildcard_query import WildcardQuery
 
 
 class TestCaseQueryBuilder(TestCLPBase):
     """
-    Class for testing clp_ffi_py.query_builder.QueryBuilder.
+    Class for testing clp_ffi_py.ir.QueryBuilder.
     """
 
     def test_init(self) -> None:
