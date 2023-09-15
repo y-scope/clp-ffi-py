@@ -23,7 +23,7 @@ class QueryBuilder:
 
     For more details about the search query CLP IR stream supports, see
     :class:`~clp_ffi_py.ir.native.Query` and
-    :class:`~clp_ffi_py.ir.wildcard_query.WildcardQuery`.
+    :class:`~clp_ffi_py.wildcard_query.WildcardQuery`.
     """
 
     def __init__(self) -> None:
@@ -81,7 +81,7 @@ class QueryBuilder:
     def add_wildcard_query(self, wildcard_query: str, case_sensitive: bool = False) -> QueryBuilder:
         """
         Constructs and adds a
-        :class:`~clp_ffi_py.ir.wildcard_query.WildcardQuery` to the wildcard
+        :class:`~clp_ffi_py.wildcard_query.WildcardQuery` to the wildcard
         query list.
 
         :param wildcard_query: The wildcard query string to add.

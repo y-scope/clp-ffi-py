@@ -12,7 +12,7 @@ from clp_ffi_py.wildcard_query import WildcardQuery
 
 class TestCaseWildcardQuery(TestCLPBase):
     """
-    Class for testing clp_ffi_py.ir.WildcardQuery.
+    Class for testing clp_ffi_py.wildcard_query.WildcardQuery.
     """
 
     def test_init(self) -> None:
