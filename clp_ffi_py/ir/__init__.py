@@ -13,7 +13,6 @@ __all__: List[str] = [
     "Metadata",  # native
     "Query",  # native
     "QueryBuilder",  # query_builder
-    "WildcardQuery",  # wildcard_query
     "ClpIrFileReader",  # readers
     "ClpIrStreamReader",  # readers
 ]

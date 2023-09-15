@@ -5,12 +5,16 @@ through CLP's FFI (foreign function interface). At present, this library
 supplies built-in functions for encoding/decoding log messages using [CLP][2].
 
 ## Quick Start
+
 ### Install with `pip`:
+
 ```bash
 # Install the latest version
 python3 -m pip install --upgrade clp-ffi-py
 ```
+
 Note:
+
 - Python 3.6 or higher is required.
 - Only Linux and macOS are supported at present.
 
@@ -78,7 +82,7 @@ more information, use the following code to see all the available methods and
 the associated docstring.
 
 ```python
-from clp_ffi_py import LogEvent
+from clp_ffi_py.ir import LogEvent
 help(LogEvent)
 ```
 
@@ -146,7 +150,8 @@ A `Query` object may have both the search time range and the wildcard queries
 details, use the following code to access the related docstring.
 
 ```python
-from clp_ffi_py.ir import Query, QueryBuilder, WildcardQuery
+from clp_ffi_py.ir import Query, QueryBuilder
+from clp_ffi_py import WildcardQuery
 help(Query)
 help(QueryBuilder)
 help(WildcardQuery)
@@ -157,6 +162,7 @@ help(WildcardQuery)
 When working with CLP IR files stored on S3-compatible storage systems,
 [smart_open][17] can be used to open and read the IR stream for the following
 benefits:
+
 - It only performs stream operation and does not download the file to the disk.
 - It only invokes a single `GET` request so that the API access cost is
   minimized.
@@ -186,7 +192,7 @@ with smart_open.open(url, "rb", transport_params={'client': session.client('s3')
             print(log_event.get_formatted_message())
 ```
 
-Note: 
+Note:
 When `allow_incomplete_stream` is set to False (default), the reader will raise
 `clp_ffi_py.ir.IncompleteStreamError` if the stream is incomplete (it doesn't end
 with the byte sequence indicating the stream's end). In practice, this can occur
