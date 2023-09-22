@@ -473,7 +473,7 @@ auto PyQuery_default_search_time_termination_margin(PyObject* Py_UNUSED(self)) -
 /**
  * Callback of PyQuery `__str__` method.
  * @param self
- * @return Python string representation of the serialzed PyQuery dictionary.
+ * @return Python string representation of the serialzed PyQuery object.
  */
 auto PyQuery_str(PyQuery* self) -> PyObject* {
     return PyObject_Str(PyQuery_getstate(self));
@@ -482,7 +482,7 @@ auto PyQuery_str(PyQuery* self) -> PyObject* {
 /**
  * Callback of PyQuery `__repr__` method.
  * @param self
- * @return __repr__ of the serialzied PyQuery dictionary.
+ * @return __repr__ of the serialzied PyQuery object.
  */
 auto PyQuery_repr(PyQuery* self) -> PyObject* {
     return PyObject_Repr(PyQuery_getstate(self));
