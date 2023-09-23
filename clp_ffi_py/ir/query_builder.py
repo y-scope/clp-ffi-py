@@ -80,9 +80,8 @@ class QueryBuilder:
 
     def add_wildcard_query(self, wildcard_query: str, case_sensitive: bool = False) -> QueryBuilder:
         """
-        Constructs and adds a
-        :class:`~clp_ffi_py.wildcard_query.WildcardQuery` to the wildcard
-        query list.
+        Constructs and adds a :class:`~clp_ffi_py.wildcard_query.WildcardQuery`
+        to the wildcard query list.
 
         :param wildcard_query: The wildcard query string to add.
         :param case_sensitive: Whether to perform case-sensitive matching.

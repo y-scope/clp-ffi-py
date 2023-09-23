@@ -469,6 +469,24 @@ PyDoc_STRVAR(
 auto PyQuery_default_search_time_termination_margin(PyObject* Py_UNUSED(self)) -> PyObject* {
     return PyLong_FromLongLong(Query::cDefaultSearchTimeTerminationMargin);
 }
+
+/**
+ * Callback of PyQuery `__str__` method.
+ * @param self
+ * @return Python string representation of the serialzed PyQuery object.
+ */
+auto PyQuery_str(PyQuery* self) -> PyObject* {
+    return PyObject_Str(PyQuery_getstate(self));
+}
+
+/**
+ * Callback of PyQuery `__repr__` method.
+ * @param self
+ * @return __repr__ of the serialzied PyQuery object.
+ */
+auto PyQuery_repr(PyQuery* self) -> PyObject* {
+    return PyObject_Repr(PyQuery_getstate(self));
+}
 }
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
@@ -568,6 +586,8 @@ PyType_Slot PyQuery_slots[]{
         {Py_tp_dealloc, reinterpret_cast<void*>(PyQuery_dealloc)},
         {Py_tp_new, reinterpret_cast<void*>(PyType_GenericNew)},
         {Py_tp_init, reinterpret_cast<void*>(PyQuery_init)},
+        {Py_tp_str, reinterpret_cast<void*>(PyQuery_str)},
+        {Py_tp_repr, reinterpret_cast<void*>(PyQuery_repr)},
         {Py_tp_methods, static_cast<void*>(PyQuery_method_table)},
         {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyQueryDoc))},
         {0, nullptr}
