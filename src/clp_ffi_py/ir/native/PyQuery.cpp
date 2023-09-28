@@ -3,8 +3,6 @@
 
 #include "PyQuery.hpp"
 
-#include <clp/components/core/src/string_utils.hpp>
-
 #include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ir/native/LogEvent.hpp>
 #include <clp_ffi_py/ir/native/PyLogEvent.hpp>
@@ -50,6 +48,7 @@ auto deserialize_wildcard_queries(
             PyErr_SetString(PyExc_TypeError, clp_ffi_py::cPyTypeError);
             return false;
         }
+
         auto* wildcard_query_py_str{PyObject_GetAttrString(wildcard_query, "wildcard_query")};
         if (nullptr == wildcard_query_py_str) {
             return false;
@@ -58,6 +57,11 @@ auto deserialize_wildcard_queries(
         if (nullptr == case_sensitive_py_bool) {
             return false;
         }
+        auto* partial_match_py_bool{PyObject_GetAttrString(wildcard_query, "partial_match")};
+        if (nullptr == partial_match_py_bool) {
+            return false;
+        }
+
         std::string_view wildcard_query_view;
         if (false == parse_py_string_as_string_view(wildcard_query_py_str, wildcard_query_view)) {
             return false;
@@ -66,9 +70,15 @@ auto deserialize_wildcard_queries(
         if (-1 == is_case_sensitive && nullptr != PyErr_Occurred()) {
             return false;
         }
+        int const is_partial_match{PyObject_IsTrue(partial_match_py_bool)};
+        if (-1 == is_partial_match && nullptr != PyErr_Occurred()) {
+            return false;
+        }
+
         wildcard_queries.emplace_back(
-                clean_up_wildcard_search_string(wildcard_query_view),
-                static_cast<bool>(is_case_sensitive)
+                std::string{wildcard_query_view},
+                static_cast<bool>(is_case_sensitive),
+                static_cast<bool>(is_partial_match)
         );
     }
     return true;
@@ -99,7 +109,7 @@ auto serialize_wildcard_queries(std::vector<WildcardQuery> const& wildcard_queri
     Py_ssize_t idx{0};
     for (auto const& wildcard_query : wildcard_queries) {
         PyObjectPtr<PyObject> const wildcard_py_str_ptr{
-                PyUnicode_FromString(wildcard_query.get_wildcard_query().c_str())
+                PyUnicode_FromString(wildcard_query.get_uncleaned_wildcard_query().c_str())
         };
         auto* wildcard_py_str{wildcard_py_str_ptr.get()};
         if (nullptr == wildcard_py_str) {
@@ -108,11 +118,14 @@ auto serialize_wildcard_queries(std::vector<WildcardQuery> const& wildcard_queri
         }
         PyObjectPtr<PyObject> const is_case_sensitive{get_py_bool(wildcard_query.is_case_sensitive()
         )};
+        PyObjectPtr<PyObject> const is_partial_match{get_py_bool(wildcard_query.is_partial_match())
+        };
         PyObject* py_wildcard_query{PyObject_CallFunction(
                 PyQuery::get_py_wildcard_query_type(),
-                "OO",
+                "OOO",
                 wildcard_py_str,
-                is_case_sensitive.get()
+                is_case_sensitive.get(),
+                is_partial_match.get()
         )};
         if (nullptr == py_wildcard_query) {
             Py_DECREF(py_wildcard_queries);

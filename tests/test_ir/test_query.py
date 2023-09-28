@@ -24,16 +24,19 @@ class TestCaseWildcardQuery(TestCLPBase):
 
         wildcard_string = "Are you the lord of *Pleiades*?"
         wildcard_query = WildcardQuery(wildcard_string)
-        self._check_wildcard_query(wildcard_query, wildcard_string, False)
+        self._check_wildcard_query(wildcard_query, wildcard_string, False, True)
 
         wildcard_query = WildcardQuery(wildcard_string, True)
-        self._check_wildcard_query(wildcard_query, wildcard_string, True)
+        self._check_wildcard_query(wildcard_query, wildcard_string, True, True)
 
         wildcard_query = WildcardQuery(wildcard_string, case_sensitive=True)
-        self._check_wildcard_query(wildcard_query, wildcard_string, True)
+        self._check_wildcard_query(wildcard_query, wildcard_string, True, True)
 
         wildcard_query = WildcardQuery(case_sensitive=True, wildcard_query=wildcard_string)
-        self._check_wildcard_query(wildcard_query, wildcard_string, True)
+        self._check_wildcard_query(wildcard_query, wildcard_string, True, True)
+
+        wildcard_query = WildcardQuery(partial_match=False, wildcard_query=wildcard_string)
+        self._check_wildcard_query(wildcard_query, wildcard_string, False, False)
 
 
 class TestCaseQuery(TestCLPBase):
@@ -173,20 +176,15 @@ class TestCaseQuery(TestCLPBase):
 
         wildcard_queries = [
             WildcardQuery("who is \*** pleiades??\\"),
-            WildcardQuery("a\?m********I?\\"),
-            WildcardQuery("\g\%\*\??***"),
-        ]
-        ref_wildcard_queries = [
-            WildcardQuery("who is \** pleiades??"),
-            WildcardQuery("a\?m*I?"),
-            WildcardQuery("g%\*\??*"),
+            WildcardQuery("a\?m********I?\\", case_sensitive=True),
+            WildcardQuery("\g\%\*\??***", partial_match=False),
         ]
         query = Query(wildcard_queries=wildcard_queries)
         self._check_query(
             query,
             Query.default_search_time_lower_bound(),
             Query.default_search_time_upper_bound(),
-            ref_wildcard_queries,
+            wildcard_queries,
             0,
         )
 
@@ -203,7 +201,7 @@ class TestCaseQuery(TestCLPBase):
             query,
             search_time_lower_bound,
             search_time_upper_bound,
-            ref_wildcard_queries,
+            wildcard_queries,
             search_time_termination_margin,
         )
 
@@ -287,7 +285,7 @@ class TestCaseQuery(TestCLPBase):
             "Only log events whose message matches the wildcard query should match the query."
         )
         log_event = LogEvent("fhakjhLFISHfashfShfiuSLSZkfSUSFS", 0)
-        wildcard_query_string = "*JHlfish*SH?IU*s"
+        wildcard_query_string = "JHlfish*SH?IU*s"
         query = Query(wildcard_queries=[WildcardQuery(wildcard_query_string)])
         self.assertEqual(query.match_log_event(log_event), True, description)
         self.assertEqual(log_event.match_query(query), True, description)
@@ -295,7 +293,7 @@ class TestCaseQuery(TestCLPBase):
         self.assertEqual(query.match_log_event(log_event), False, description)
         self.assertEqual(log_event.match_query(query), False, description)
         log_event = LogEvent("j:flJo;jsf:LSJDFoiASFoasjzFZA", 0)
-        wildcard_query_string = "*flJo*s?*AS*A"
+        wildcard_query_string = "flJo*s?*AS"
         query = Query(wildcard_queries=[WildcardQuery(wildcard_query_string)])
         self.assertEqual(query.match_log_event(log_event), True, description)
         self.assertEqual(log_event.match_query(query), True, description)
@@ -307,12 +305,12 @@ class TestCaseQuery(TestCLPBase):
             "Log event whose messages matches any one of the wildcard queries should be considered"
             " as a match of the query."
         )
-        wildcard_queries: List[WildcardQuery] = [WildcardQuery("*b&A*"), WildcardQuery("*A|a*")]
+        wildcard_queries: List[WildcardQuery] = [WildcardQuery("b&A"), WildcardQuery("A|a")]
         log_event = LogEvent("-----a-A-----", 0)
         query = Query(wildcard_queries=wildcard_queries)
         self.assertEqual(query.match_log_event(log_event), False, description)
         self.assertEqual(log_event.match_query(query), False, description)
-        wildcard_queries.append(WildcardQuery("*a?a*"))
+        wildcard_queries.append(WildcardQuery("a?a"))
         query = Query(wildcard_queries=wildcard_queries)
         self.assertEqual(query.match_log_event(log_event), True, description)
         self.assertEqual(log_event.match_query(query), True, description)
@@ -323,12 +321,37 @@ class TestCaseQuery(TestCLPBase):
 
         description = (
             "The match of query requires both timestamp in range and log message matching any one"
-            " of the wildcard queries."
+            " of the wildcard queries. (Partial Match)"
         )
         query = Query(
             search_time_lower_bound=3190,
             search_time_upper_bound=3270,
-            wildcard_queries=[WildcardQuery("*q?Q*"), WildcardQuery("*t?t*", True)],
+            wildcard_queries=[WildcardQuery("q?Q"), WildcardQuery("t?t", True)],
+        )
+        log_event = LogEvent("I'm not matching anything...", 3213)
+        self.assertEqual(query.match_log_event(log_event), False, description)
+        self.assertEqual(log_event.match_query(query), False, description)
+        log_event = LogEvent("I'm not matching anything... T.T", 3213)
+        self.assertEqual(query.match_log_event(log_event), False, description)
+        self.assertEqual(log_event.match_query(query), False, description)
+        log_event = LogEvent("I'm not matching anything... QAQ", 2887)
+        self.assertEqual(query.match_log_event(log_event), False, description)
+        self.assertEqual(log_event.match_query(query), False, description)
+        log_event = LogEvent("I'm finally matching something... QAQ", 3213)
+        self.assertEqual(query.match_log_event(log_event), True, description)
+        self.assertEqual(log_event.match_query(query), True, description)
+
+        description = (
+            "The match of query requires both timestamp in range and log message matching any one"
+            " of the wildcard queries. (Full Match)"
+        )
+        query = Query(
+            search_time_lower_bound=3190,
+            search_time_upper_bound=3270,
+            wildcard_queries=[
+                WildcardQuery("*q?Q*", partial_match=False),
+                WildcardQuery("*t?t*", case_sensitive=True, partial_match=False),
+            ],
         )
         log_event = LogEvent("I'm not matching anything...", 3213)
         self.assertEqual(query.match_log_event(log_event), False, description)

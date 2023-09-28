@@ -8,33 +8,54 @@
 
 #include <clp/components/core/src/ErrorCode.hpp>
 #include <clp/components/core/src/ffi/encoding_methods.hpp>
+#include <clp/components/core/src/string_utils.hpp>
 
 #include <clp_ffi_py/ExceptionFFI.hpp>
 #include <clp_ffi_py/ir/native/LogEvent.hpp>
 
 namespace clp_ffi_py::ir::native {
 /**
- * This class defines a wildcard query, which includes a wildcard string and a
- * boolean value to indicate if the match is case-sensitive.
+ * This class defines a wildcard query, which includes a wildcard string a
+ * boolean value to indicate if the match is case-sensitive, and a boolean value
+ * to indicate if the query is a partial match.
  */
 class WildcardQuery {
 public:
     /**
-     * Initializes the wildcard query.
+     * Initializes the wildcard query by cleaning the wildcard string.
      * @param wildcard_query Wildcard query.
      * @param case_sensitive Case sensitive indicator.
+     * @param partial_match Partial match indicator.
      */
-    WildcardQuery(std::string wildcard_query, bool case_sensitive)
-            : m_wildcard_query(std::move(wildcard_query)),
-              m_case_sensitive(case_sensitive){};
+    WildcardQuery(std::string wildcard_query, bool case_sensitive, bool partial_match)
+            : m_uncleaned_wildcard_query(std::move(wildcard_query)),
+              m_case_sensitive(case_sensitive),
+              m_partial_match(partial_match) {
+        if (partial_match) {
+            m_wildcard_query = "*";
+            m_wildcard_query += m_uncleaned_wildcard_query;
+            m_wildcard_query += "*";
+            m_wildcard_query = clean_up_wildcard_search_string(m_wildcard_query);
+        } else {
+            m_wildcard_query = clean_up_wildcard_search_string(m_uncleaned_wildcard_query);
+        }
+    }
+
+    [[nodiscard]] auto get_uncleaned_wildcard_query() const -> std::string const& {
+        return m_uncleaned_wildcard_query;
+    }
 
     [[nodiscard]] auto get_wildcard_query() const -> std::string const& { return m_wildcard_query; }
 
     [[nodiscard]] auto is_case_sensitive() const -> bool { return m_case_sensitive; }
 
+    [[nodiscard]] auto is_partial_match() const -> bool { return m_partial_match; }
+
 private:
+    std::string m_uncleaned_wildcard_query;
     std::string m_wildcard_query;
     bool m_case_sensitive;
+    bool m_partial_match;
 };
 
 /**
