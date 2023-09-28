@@ -78,16 +78,19 @@ class QueryBuilder:
         self._search_time_termination_margin = ts
         return self
 
-    def add_wildcard_query(self, wildcard_query: str, case_sensitive: bool = False) -> QueryBuilder:
+    def add_wildcard_query(
+        self, wildcard_query: str, case_sensitive: bool = False, partial_match: bool = True
+    ) -> QueryBuilder:
         """
         Constructs and adds a :class:`~clp_ffi_py.wildcard_query.WildcardQuery`
         to the wildcard query list.
 
         :param wildcard_query: The wildcard query string to add.
         :param case_sensitive: Whether to perform case-sensitive matching.
+        :param partial_match: Whether to perform partial matching.
         :return: self.
         """
-        self._wildcard_queries.append(WildcardQuery(wildcard_query, case_sensitive))
+        self._wildcard_queries.append(WildcardQuery(wildcard_query, case_sensitive, partial_match))
         return self
 
     def add_wildcard_queries(self, wildcard_queries: List[WildcardQuery]) -> QueryBuilder:

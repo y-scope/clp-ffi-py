@@ -112,10 +112,16 @@ class TestCaseQueryBuilder(TestCLPBase):
             search_time_termination_margin,
         )
 
-        wildcard_queries = [WildcardQuery("aaa*aaa"), WildcardQuery("bbb*bbb", True)]
+        wildcard_queries = [
+            WildcardQuery("aaa*aaa"),
+            WildcardQuery("bbb*bbb", True),
+            WildcardQuery("full match", True, False),
+        ]
         for wildcard_query in wildcard_queries:
             query_builder.add_wildcard_query(
-                wildcard_query.wildcard_query, wildcard_query.case_sensitive
+                wildcard_query.wildcard_query,
+                wildcard_query.case_sensitive,
+                wildcard_query.partial_match,
             )
         extra_wildcard_queries = [WildcardQuery("ccc?ccc", True), WildcardQuery("ddd?ddd")]
         query_builder.add_wildcard_queries(extra_wildcard_queries)
