@@ -28,21 +28,21 @@ public:
      * @param partial_match Partial match indicator.
      */
     WildcardQuery(std::string wildcard_query, bool case_sensitive, bool partial_match)
-            : m_uncleaned_wildcard_query(std::move(wildcard_query)),
+            : m_original_query_string(std::move(wildcard_query)),
               m_case_sensitive(case_sensitive),
               m_partial_match(partial_match) {
         if (partial_match) {
             m_wildcard_query = "*";
-            m_wildcard_query += m_uncleaned_wildcard_query;
+            m_wildcard_query += m_original_query_string;
             m_wildcard_query += "*";
             m_wildcard_query = clean_up_wildcard_search_string(m_wildcard_query);
         } else {
-            m_wildcard_query = clean_up_wildcard_search_string(m_uncleaned_wildcard_query);
+            m_wildcard_query = clean_up_wildcard_search_string(m_original_query_string);
         }
     }
 
-    [[nodiscard]] auto get_uncleaned_wildcard_query() const -> std::string const& {
-        return m_uncleaned_wildcard_query;
+    [[nodiscard]] auto get_original_query_string() const -> std::string const& {
+        return m_original_query_string;
     }
 
     [[nodiscard]] auto get_wildcard_query() const -> std::string const& { return m_wildcard_query; }
@@ -52,7 +52,7 @@ public:
     [[nodiscard]] auto is_partial_match() const -> bool { return m_partial_match; }
 
 private:
-    std::string m_uncleaned_wildcard_query;
+    std::string m_original_query_string;
     std::string m_wildcard_query;
     bool m_case_sensitive;
     bool m_partial_match;

@@ -127,7 +127,9 @@ from clp_ffi_py.ir import ClpIrFileReader, Query, QueryBuilder
 # Create a QueryBuilder object to build the search query.
 query_builder: QueryBuilder = QueryBuilder()
 
-# Add wildcard patterns to filter log messages:
+# Add wildcard patterns to filter log messages.By default, the partial match
+# will be executed. Please refer to the documents of `WildcardQuery` object for
+# the difference between partial and full matches.
 query_builder.add_wildcard_query("uid=*,status=failed")
 query_builder.add_wildcard_query("UID=*,Status=KILLED", case_sensitive=True)
 

@@ -109,7 +109,7 @@ auto serialize_wildcard_queries(std::vector<WildcardQuery> const& wildcard_queri
     Py_ssize_t idx{0};
     for (auto const& wildcard_query : wildcard_queries) {
         PyObjectPtr<PyObject> const wildcard_py_str_ptr{
-                PyUnicode_FromString(wildcard_query.get_uncleaned_wildcard_query().c_str())
+                PyUnicode_FromString(wildcard_query.get_original_query_string().c_str())
         };
         auto* wildcard_py_str{wildcard_py_str_ptr.get()};
         if (nullptr == wildcard_py_str) {
