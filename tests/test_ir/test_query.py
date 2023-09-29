@@ -20,23 +20,25 @@ class TestCaseWildcardQuery(TestCLPBase):
         Test the initialization of WildcardQuery object.
         """
         wildcard_string: str
+        processed_wildcard_string: str
         wildcard_query: WildcardQuery
 
         wildcard_string = "Are you the lord of *Pleiades*?"
+        processed_wildcard_string = "*" + wildcard_string + "*"
         wildcard_query = WildcardQuery(wildcard_string)
-        self._check_wildcard_query(wildcard_query, wildcard_string, False, True)
+        self._check_wildcard_query(wildcard_query, processed_wildcard_string, False)
 
         wildcard_query = WildcardQuery(wildcard_string, True)
-        self._check_wildcard_query(wildcard_query, wildcard_string, True, True)
+        self._check_wildcard_query(wildcard_query, processed_wildcard_string, True)
 
         wildcard_query = WildcardQuery(wildcard_string, case_sensitive=True)
-        self._check_wildcard_query(wildcard_query, wildcard_string, True, True)
+        self._check_wildcard_query(wildcard_query, processed_wildcard_string, True)
 
         wildcard_query = WildcardQuery(case_sensitive=True, wildcard_query=wildcard_string)
-        self._check_wildcard_query(wildcard_query, wildcard_string, True, True)
+        self._check_wildcard_query(wildcard_query, processed_wildcard_string, True)
 
         wildcard_query = WildcardQuery(partial_match=False, wildcard_query=wildcard_string)
-        self._check_wildcard_query(wildcard_query, wildcard_string, False, False)
+        self._check_wildcard_query(wildcard_query, wildcard_string, False)
 
 
 class TestCaseQuery(TestCLPBase):
@@ -175,9 +177,9 @@ class TestCaseQuery(TestCLPBase):
         )
 
         wildcard_queries = [
-            WildcardQuery("who is \*** pleiades??\\"),
-            WildcardQuery("a\?m********I?\\", case_sensitive=True),
-            WildcardQuery("\g\%\*\??***", partial_match=False),
+            WildcardQuery("who is \** pleiades??\\"),
+            WildcardQuery("a\?m*I?\\", case_sensitive=True),
+            WildcardQuery("g%\*\??*", partial_match=False),
         ]
         query = Query(wildcard_queries=wildcard_queries)
         self._check_query(

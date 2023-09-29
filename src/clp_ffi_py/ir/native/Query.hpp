@@ -25,37 +25,18 @@ public:
      * Initializes the wildcard query by cleaning the wildcard string.
      * @param wildcard_query Wildcard query.
      * @param case_sensitive Case sensitive indicator.
-     * @param partial_match Partial match indicator.
      */
-    WildcardQuery(std::string wildcard_query, bool case_sensitive, bool partial_match)
-            : m_original_query_string(std::move(wildcard_query)),
-              m_case_sensitive(case_sensitive),
-              m_partial_match(partial_match) {
-        if (partial_match) {
-            m_wildcard_query = "*";
-            m_wildcard_query += m_original_query_string;
-            m_wildcard_query += "*";
-            m_wildcard_query = clean_up_wildcard_search_string(m_wildcard_query);
-        } else {
-            m_wildcard_query = clean_up_wildcard_search_string(m_original_query_string);
-        }
-    }
-
-    [[nodiscard]] auto get_original_query_string() const -> std::string const& {
-        return m_original_query_string;
-    }
+    WildcardQuery(std::string wildcard_query, bool case_sensitive)
+            : m_wildcard_query(std::move(wildcard_query)),
+              m_case_sensitive(case_sensitive) {}
 
     [[nodiscard]] auto get_wildcard_query() const -> std::string const& { return m_wildcard_query; }
 
     [[nodiscard]] auto is_case_sensitive() const -> bool { return m_case_sensitive; }
 
-    [[nodiscard]] auto is_partial_match() const -> bool { return m_partial_match; }
-
 private:
-    std::string m_original_query_string;
     std::string m_wildcard_query;
     bool m_case_sensitive;
-    bool m_partial_match;
 };
 
 /**
@@ -79,11 +60,9 @@ class Query {
 public:
     static constexpr ffi::epoch_time_ms_t const cTimestampMin{0};
     static constexpr ffi::epoch_time_ms_t const cTimestampMax{
-            std::numeric_limits<ffi::epoch_time_ms_t>::max()
-    };
+            std::numeric_limits<ffi::epoch_time_ms_t>::max()};
     static constexpr ffi::epoch_time_ms_t const cDefaultSearchTimeTerminationMargin{
-            static_cast<ffi::epoch_time_ms_t>(60 * 1000)
-    };
+            static_cast<ffi::epoch_time_ms_t>(60 * 1000)};
 
     /**
      * Constructs an empty query object that will match all logs. The wildcard
@@ -114,8 +93,7 @@ public:
               m_search_termination_ts{
                       (cTimestampMax - search_time_termination_margin > search_time_upper_bound)
                               ? search_time_upper_bound + search_time_termination_margin
-                              : cTimestampMax
-              } {
+                              : cTimestampMax} {
         throw_if_ts_range_invalid();
     }
 
@@ -138,8 +116,7 @@ public:
               m_search_termination_ts{
                       (cTimestampMax - search_time_termination_margin > search_time_upper_bound)
                               ? search_time_upper_bound + search_time_termination_margin
-                              : cTimestampMax
-              },
+                              : cTimestampMax},
               m_wildcard_queries{std::move(wildcard_queries)} {
         throw_if_ts_range_invalid();
     }

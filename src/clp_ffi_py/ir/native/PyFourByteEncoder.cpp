@@ -98,8 +98,7 @@ PyMethodDef PyFourByteEncoder_method_table[]{
          METH_NOARGS | METH_STATIC,
          static_cast<char const*>(cEncodeEndOfIrDoc)},
 
-        {nullptr, nullptr, 0, nullptr}
-};
+        {nullptr, nullptr, 0, nullptr}};
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
@@ -113,8 +112,7 @@ PyDoc_STRVAR(
 PyType_Slot PyFourByteEncoder_slots[]{
         {Py_tp_methods, static_cast<void*>(PyFourByteEncoder_method_table)},
         {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyFourByteEncoderDoc))},
-        {0, nullptr}
-};
+        {0, nullptr}};
 // NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-const-cast)
 
 /**
@@ -125,8 +123,7 @@ PyType_Spec PyFourByteEncoder_type_spec{
         sizeof(PyFourByteEncoder),
         0,
         Py_TPFLAGS_DEFAULT,
-        static_cast<PyType_Slot*>(PyFourByteEncoder_slots)
-};
+        static_cast<PyType_Slot*>(PyFourByteEncoder_slots)};
 }  // namespace
 
 PyObjectPtr<PyTypeObject> PyFourByteEncoder::m_py_type{nullptr};

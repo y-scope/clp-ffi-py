@@ -33,8 +33,7 @@ auto encode_four_byte_preamble(PyObject* Py_UNUSED(self), PyObject* args) -> PyO
 
     std::string_view const timestamp_format{
             input_timestamp_format,
-            static_cast<size_t>(input_timestamp_format_size)
-    };
+            static_cast<size_t>(input_timestamp_format_size)};
     std::string_view const timezone{input_timezone, static_cast<size_t>(input_timezone_size)};
     std::vector<int8_t> ir_buf;
 

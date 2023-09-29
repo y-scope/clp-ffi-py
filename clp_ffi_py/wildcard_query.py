@@ -31,9 +31,12 @@ class WildcardQuery:
         :param case_sensitive: Case sensitive indicator.
         :param partial_match: Partial match indicator.
         """
-        self._wildcard_query: str = wildcard_query
+        self._wildcard_query: str
         self._case_sensitive: bool = case_sensitive
-        self._partial_match: bool = partial_match
+        if partial_match:
+            self._wildcard_query = "*" + wildcard_query + "*"
+        else:
+            self._wildcard_query = wildcard_query
 
     def __str__(self) -> str:
         """
@@ -41,8 +44,7 @@ class WildcardQuery:
         """
         return (
             f'WildcardQuery(wildcard_query="{self._wildcard_query}",'
-            f" case_sensitive={self._case_sensitive}),"
-            f" partial_match={self._partial_match}"
+            f" case_sensitive={self._case_sensitive})"
         )
 
     def __repr__(self) -> str:
@@ -58,7 +60,3 @@ class WildcardQuery:
     @property
     def case_sensitive(self) -> bool:
         return self._case_sensitive
-
-    @property
-    def partial_match(self) -> bool:
-        return self._partial_match

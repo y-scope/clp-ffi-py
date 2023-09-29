@@ -32,8 +32,7 @@ auto PyDecoderBuffer_init(PyDecoderBuffer* self, PyObject* args, PyObject* keywo
     static char* keyword_table[]{
             static_cast<char*>(keyword_input_stream),
             static_cast<char*>(keyword_initial_buffer_capacity),
-            nullptr
-    };
+            nullptr};
 
     // If the argument parsing fails, `self` will be deallocated. We must reset
     // all pointers to nullptr in advance, otherwise the deallocator might
@@ -55,8 +54,8 @@ auto PyDecoderBuffer_init(PyDecoderBuffer* self, PyObject* args, PyObject* keywo
         return -1;
     }
 
-    PyObjectPtr<PyObject> const readinto_method_obj{PyObject_GetAttrString(input_stream, "readinto")
-    };
+    PyObjectPtr<PyObject> const readinto_method_obj{
+            PyObject_GetAttrString(input_stream, "readinto")};
     auto* readinto_method{readinto_method_obj.get()};
     if (nullptr == readinto_method) {
         return -1;
@@ -154,8 +153,7 @@ PyMethodDef PyDecoderBuffer_method_table[]{
          METH_O,
          static_cast<char const*>(cPyDecoderBufferTestStreamingDoc)},
 
-        {nullptr}
-};
+        {nullptr}};
 
 /**
  * Declaration of Python buffer protocol.
@@ -190,8 +188,7 @@ PyType_Slot PyDecoderBuffer_slots[]{
         {Py_tp_init, reinterpret_cast<void*>(PyDecoderBuffer_init)},
         {Py_tp_methods, static_cast<void*>(PyDecoderBuffer_method_table)},
         {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyDecoderBufferDoc))},
-        {0, nullptr}
-};
+        {0, nullptr}};
 // NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
 
 /**
@@ -202,8 +199,7 @@ PyType_Spec PyDecoderBuffer_type_spec{
         sizeof(PyDecoderBuffer),
         0,
         Py_TPFLAGS_DEFAULT,
-        static_cast<PyType_Slot*>(PyDecoderBuffer_slots)
-};
+        static_cast<PyType_Slot*>(PyDecoderBuffer_slots)};
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(

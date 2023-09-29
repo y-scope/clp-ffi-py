@@ -31,8 +31,7 @@ Metadata::Metadata(nlohmann::json const& metadata, bool is_four_byte_encoding) {
     m_is_four_byte_encoding = is_four_byte_encoding;
 
     auto const* ref_timestamp_key{
-            static_cast<char const*>(ffi::ir_stream::cProtocol::Metadata::ReferenceTimestampKey)
-    };
+            static_cast<char const*>(ffi::ir_stream::cProtocol::Metadata::ReferenceTimestampKey)};
     if (false == is_valid_json_string_data(metadata, ref_timestamp_key)) {
         throw ExceptionFFI(
                 ErrorCode_MetadataCorrupted,
@@ -49,8 +48,7 @@ Metadata::Metadata(nlohmann::json const& metadata, bool is_four_byte_encoding) {
     }
 
     auto const* timestamp_format_key{
-            static_cast<char const*>(ffi::ir_stream::cProtocol::Metadata::TimestampPatternKey)
-    };
+            static_cast<char const*>(ffi::ir_stream::cProtocol::Metadata::TimestampPatternKey)};
     if (false == is_valid_json_string_data(metadata, timestamp_format_key)) {
         throw ExceptionFFI(
                 ErrorCode_MetadataCorrupted,
@@ -62,8 +60,7 @@ Metadata::Metadata(nlohmann::json const& metadata, bool is_four_byte_encoding) {
     m_timestamp_format = metadata[timestamp_format_key];
 
     auto const* timezone_id_key{
-            static_cast<char const*>(ffi::ir_stream::cProtocol::Metadata::TimeZoneIdKey)
-    };
+            static_cast<char const*>(ffi::ir_stream::cProtocol::Metadata::TimeZoneIdKey)};
     if (false == is_valid_json_string_data(metadata, timezone_id_key)) {
         throw ExceptionFFI(
                 ErrorCode_MetadataCorrupted,

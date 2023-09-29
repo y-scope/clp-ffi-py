@@ -171,8 +171,7 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
 
     auto const unconsumed_bytes = decoder_buffer->get_unconsumed_bytes();
     auto const metadata_buffer{
-            unconsumed_bytes.subspan(metadata_pos, static_cast<size_t>(metadata_size))
-    };
+            unconsumed_bytes.subspan(metadata_pos, static_cast<size_t>(metadata_size))};
     decoder_buffer->commit_read_buffer_consumption(static_cast<Py_ssize_t>(ir_buffer_cursor_pos));
     PyMetadata* metadata{nullptr};
     try {
@@ -201,8 +200,7 @@ auto decode_next_log_event(PyObject* Py_UNUSED(self), PyObject* args, PyObject* 
             static_cast<char*>(keyword_decoder_buffer),
             static_cast<char*>(keyword_query),
             static_cast<char*>(keyword_allow_incomplete_stream),
-            nullptr
-    };
+            nullptr};
 
     PyDecoderBuffer* decoder_buffer{nullptr};
     PyObject* query{Py_None};

@@ -146,7 +146,6 @@ class TestCLPBase(unittest.TestCase):
         wildcard_query: WildcardQuery,
         ref_wildcard_string: str,
         ref_is_case_sensitive: bool,
-        ref_is_partial_match: bool,
     ) -> None:
         """
         Given a WildcardQuery object, check if the stored data matches the input
@@ -155,11 +154,9 @@ class TestCLPBase(unittest.TestCase):
         :param wildcard_query: Input WildcardQuery object.
         :param ref_wildcard_string: Reference wildcard string.
         :param ref_is_case_sensitive: Reference case-sensitive indicator.
-        :param ref_is_partial_match: Reference partial-match indicator.
         """
         wildcard_string: str = wildcard_query.wildcard_query
         is_case_sensitive: bool = wildcard_query.case_sensitive
-        is_partial_match: bool = wildcard_query.partial_match
         self.assertEqual(
             wildcard_string,
             ref_wildcard_string,
@@ -169,11 +166,6 @@ class TestCLPBase(unittest.TestCase):
             is_case_sensitive,
             ref_is_case_sensitive,
             f"Expected case-sensitive indicator: {ref_is_case_sensitive}",
-        )
-        self.assertEqual(
-            is_partial_match,
-            ref_is_partial_match,
-            f"Expected partial-match indicator: {ref_is_partial_match}",
         )
 
     def _check_query(
@@ -235,7 +227,6 @@ class TestCLPBase(unittest.TestCase):
                 wildcard_queries[i],
                 ref_wildcard_queries[i].wildcard_query,
                 ref_wildcard_queries[i].case_sensitive,
-                ref_wildcard_queries[i].partial_match,
             )
 
 

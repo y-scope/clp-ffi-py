@@ -34,8 +34,7 @@ auto PyLogEvent_init(PyLogEvent* self, PyObject* args, PyObject* keywords) -> in
             static_cast<char*>(keyword_timestamp),
             static_cast<char*>(keyword_message_idx),
             static_cast<char*>(keyword_metadata),
-            nullptr
-    };
+            nullptr};
 
     // If the argument parsing fails, `self` will be deallocated. We must reset
     // all pointers to nullptr in advance, otherwise the deallocator might
@@ -122,8 +121,7 @@ auto PyLogEvent_getstate(PyLogEvent* self) -> PyObject* {
                 clp_ffi_py::py_utils_get_formatted_timestamp(
                         log_event->get_timestamp(),
                         self->has_metadata() ? self->get_py_metadata()->get_py_timezone() : Py_None
-                )
-        };
+                )};
         auto* formatted_timestamp_ptr{formatted_timestamp_object.get()};
         if (nullptr == formatted_timestamp_ptr) {
             return nullptr;
@@ -381,8 +379,7 @@ PyMethodDef PyLogEvent_method_table[]{
          METH_O,
          static_cast<char const*>(cPyLogEventSetStateDoc)},
 
-        {nullptr}
-};
+        {nullptr}};
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
@@ -413,8 +410,7 @@ PyType_Slot PyLogEvent_slots[]{
         {Py_tp_repr, reinterpret_cast<void*>(PyLogEvent_repr)},
         {Py_tp_methods, static_cast<void*>(PyLogEvent_method_table)},
         {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyLogEventDoc))},
-        {0, nullptr}
-};
+        {0, nullptr}};
 // NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
 
 /**
@@ -425,8 +421,7 @@ PyType_Spec PyLogEvent_type_spec{
         sizeof(PyLogEvent),
         0,
         Py_TPFLAGS_DEFAULT,
-        static_cast<PyType_Slot*>(PyLogEvent_slots)
-};
+        static_cast<PyType_Slot*>(PyLogEvent_slots)};
 }  // namespace
 
 auto PyLogEvent::get_formatted_message(PyObject* timezone) -> PyObject* {
@@ -448,8 +443,7 @@ auto PyLogEvent::get_formatted_message(PyObject* timezone) -> PyObject* {
     }
 
     PyObjectPtr<PyObject> const formatted_timestamp_object{
-            py_utils_get_formatted_timestamp(m_log_event->get_timestamp(), timezone)
-    };
+            py_utils_get_formatted_timestamp(m_log_event->get_timestamp(), timezone)};
     auto* formatted_timestamp_ptr{formatted_timestamp_object.get()};
     if (nullptr == formatted_timestamp_ptr) {
         return nullptr;

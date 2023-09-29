@@ -55,8 +55,7 @@ PyMethodDef PyDecoder_method_table[]{
          METH_VARARGS | METH_KEYWORDS | METH_STATIC,
          static_cast<char const*>(cDecodeNextLogEventDoc)},
 
-        {nullptr, nullptr, 0, nullptr}
-};
+        {nullptr, nullptr, 0, nullptr}};
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
@@ -70,8 +69,7 @@ PyDoc_STRVAR(
 PyType_Slot PyDecoder_slots[]{
         {Py_tp_methods, static_cast<void*>(PyDecoder_method_table)},
         {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyDecoderDoc))},
-        {0, nullptr}
-};
+        {0, nullptr}};
 // NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-const-cast)
 
 /**
@@ -82,8 +80,7 @@ PyType_Spec PyDecoder_type_spec{
         sizeof(PyDecoder),
         0,
         Py_TPFLAGS_DEFAULT,
-        static_cast<PyType_Slot*>(PyDecoder_slots)
-};
+        static_cast<PyType_Slot*>(PyDecoder_slots)};
 }  // namespace
 
 PyObjectPtr<PyTypeObject> PyDecoder::m_py_type{nullptr};
