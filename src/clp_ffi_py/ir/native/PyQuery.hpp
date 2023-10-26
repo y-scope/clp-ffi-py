@@ -80,8 +80,8 @@ private:
     PyObject_HEAD;
     Query* m_query;
 
-    static PyObjectPtr<PyTypeObject> m_py_type;
-    static PyObjectPtr<PyObject> m_py_wildcard_query_type;
+    static PyObjectStaticPtr<PyTypeObject> m_py_type;
+    static PyObjectStaticPtr<PyObject> m_py_wildcard_query_type;
 };
 }  // namespace clp_ffi_py::ir::native
 #endif

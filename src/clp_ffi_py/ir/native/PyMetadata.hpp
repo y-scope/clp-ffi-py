@@ -117,7 +117,7 @@ private:
     Metadata* m_metadata;
     PyObject* m_py_timezone;
 
-    static PyObjectPtr<PyTypeObject> m_py_type;
+    static PyObjectStaticPtr<PyTypeObject> m_py_type;
 };
 }  // namespace clp_ffi_py::ir::native
 #endif  // CLP_FFI_PY_PY_METADATA_HPP

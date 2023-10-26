@@ -636,8 +636,8 @@ auto PyQuery::init(
     return true;
 }
 
-PyObjectPtr<PyTypeObject> PyQuery::m_py_type{nullptr};
-PyObjectPtr<PyObject> PyQuery::m_py_wildcard_query_type{nullptr};
+PyObjectStaticPtr<PyTypeObject> PyQuery::m_py_type{nullptr};
+PyObjectStaticPtr<PyObject> PyQuery::m_py_wildcard_query_type{nullptr};
 
 auto PyQuery::get_py_type() -> PyTypeObject* {
     return m_py_type.get();

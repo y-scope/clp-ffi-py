@@ -26,7 +26,7 @@ public:
 private:
     PyObject_HEAD;
 
-    static PyObjectPtr<PyTypeObject> m_py_type;
+    static PyObjectStaticPtr<PyTypeObject> m_py_type;
 };
 }  // namespace clp_ffi_py::ir::native
 #endif

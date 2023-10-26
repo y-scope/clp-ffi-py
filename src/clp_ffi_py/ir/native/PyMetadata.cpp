@@ -263,7 +263,7 @@ auto PyMetadata::init_py_timezone() -> bool {
     return true;
 }
 
-PyObjectPtr<PyTypeObject> PyMetadata::m_py_type{nullptr};
+PyObjectStaticPtr<PyTypeObject> PyMetadata::m_py_type{nullptr};
 
 auto PyMetadata::get_py_type() -> PyTypeObject* {
     return m_py_type.get();
