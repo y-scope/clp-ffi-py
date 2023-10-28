@@ -38,10 +38,14 @@ template <typename PyObjectType>
 using PyObjectPtr = std::unique_ptr<PyObjectType, PyObjectDeleter<PyObjectType>>;
 
 /**
- * A type of smart pointer that holds a static Python object raw pointer. For
- * static/global variables, the destructor will be executed after the Python
- * interpreter exits. Therefore, the destructor is set to empty to avoid unsafe
- * memory operations.
+ * A smart pointer to be used for raw Python object pointers that have static
+ * storage duration. It holds a reference of the underlying Python object.
+ * Compared to PyObjectPtr, when destructed, this smart pointer does not
+ * decrease the reference count of the contained Python object. Since this
+ * pointer has static storage duration, it's possible that the Python
+ * interpreter exits before this pointer's destructor is called; attempting to
+ * decrement the reference count (maintained by the interpreter) in this
+ * situation would lead to undefined behaviour.
  * @tparam PyObjectType
  */
 template <typename PyObjectType>
