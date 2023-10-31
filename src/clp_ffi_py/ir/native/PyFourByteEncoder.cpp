@@ -129,7 +129,7 @@ PyType_Spec PyFourByteEncoder_type_spec{
 };
 }  // namespace
 
-PyObjectPtr<PyTypeObject> PyFourByteEncoder::m_py_type{nullptr};
+PyObjectStaticPtr<PyTypeObject> PyFourByteEncoder::m_py_type{nullptr};
 
 auto PyFourByteEncoder::module_level_init(PyObject* py_module) -> bool {
     static_assert(std::is_trivially_destructible<PyFourByteEncoder>());

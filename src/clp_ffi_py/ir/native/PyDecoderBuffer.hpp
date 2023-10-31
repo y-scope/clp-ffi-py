@@ -221,8 +221,8 @@ private:
     size_t m_num_decoded_message;
     bool m_py_buffer_protocol_enabled;
 
-    static PyObjectPtr<PyTypeObject> m_py_type;
-    static PyObjectPtr<PyObject> m_py_incomplete_stream_error;
+    static PyObjectStaticPtr<PyTypeObject> m_py_type;
+    static PyObjectStaticPtr<PyObject> m_py_incomplete_stream_error;
 };
 }  // namespace clp_ffi_py::ir::native
 #endif

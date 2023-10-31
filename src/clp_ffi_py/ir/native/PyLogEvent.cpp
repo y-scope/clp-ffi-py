@@ -486,7 +486,7 @@ auto PyLogEvent::init(
     return true;
 }
 
-PyObjectPtr<PyTypeObject> PyLogEvent::m_py_type{nullptr};
+PyObjectStaticPtr<PyTypeObject> PyLogEvent::m_py_type{nullptr};
 
 auto PyLogEvent::get_py_type() -> PyTypeObject* {
     return m_py_type.get();
