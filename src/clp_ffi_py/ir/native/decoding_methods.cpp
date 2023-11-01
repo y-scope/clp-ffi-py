@@ -4,6 +4,7 @@
 
 #include <clp/components/core/src/BufferReader.hpp>
 #include <clp/components/core/src/ffi/ir_stream/decoding_methods.hpp>
+#include <clp/components/core/src/ffi/ir_stream/protocol_constants.hpp>
 #include <clp/components/core/src/type_utils.hpp>
 #include <gsl/span>
 #include <json/single_include/nlohmann/json.hpp>
@@ -186,6 +187,29 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
         nlohmann::json const metadata_json(
                 nlohmann::json::parse(metadata_buffer.begin(), metadata_buffer.end())
         );
+        std::string const version{
+                metadata_json.at(ffi::ir_stream::cProtocol::Metadata::VersionKey)};
+        auto const error_code{ffi::ir_stream::validate_protocol_version(version)};
+        if (ffi::ir_stream::IRProtocolErrorCode_Supported != error_code) {
+            switch (error_code) {
+                case ffi::ir_stream::IRProtocolErrorCode_Invalid:
+                    PyErr_Format(PyExc_RuntimeError, "Invalid version number: %s", version.c_str());
+                    break;
+                case ffi::ir_stream::IRProtocolErrorCode_Too_New:
+                    PyErr_Format(PyExc_RuntimeError, "Version too new: %s", version.c_str());
+                    break;
+                case ffi::ir_stream::IRProtocolErrorCode_Too_Old:
+                    PyErr_Format(PyExc_RuntimeError, "Version too old: %s", version.c_str());
+                default:
+                    PyErr_Format(
+                            PyExc_NotImplementedError,
+                            "Unrecognized return code %d with version value %s",
+                            error_code,
+                            version.c_str()
+                    );
+            }
+            return nullptr;
+        }
         metadata = PyMetadata::create_new_from_json(metadata_json, is_four_byte_encoding);
     } catch (nlohmann::json::exception& ex) {
         PyErr_Format(PyExc_RuntimeError, "Json Parsing Error: %s", ex.what());
