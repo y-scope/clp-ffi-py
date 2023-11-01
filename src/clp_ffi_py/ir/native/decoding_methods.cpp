@@ -200,6 +200,7 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
                     break;
                 case ffi::ir_stream::IRProtocolErrorCode_Too_Old:
                     PyErr_Format(PyExc_RuntimeError, "Version too old: %s", version.c_str());
+                    break;
                 default:
                     PyErr_Format(
                             PyExc_NotImplementedError,
