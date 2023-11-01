@@ -1,3 +1,4 @@
+recursive-include src/clp/components/core/src *.h
 recursive-include src/clp/components/core/src *.hpp
 recursive-include src/clp/components/core/src *.tpp
 recursive-include src/clp/components/core/src *.inc
