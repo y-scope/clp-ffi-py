@@ -2,6 +2,7 @@
 
 #include "decoding_methods.hpp"
 
+#include <clp/components/core/src/BufferReader.hpp>
 #include <clp/components/core/src/ffi/ir_stream/decoding_methods.hpp>
 #include <clp/components/core/src/type_utils.hpp>
 #include <gsl/span>
@@ -46,7 +47,9 @@ auto decode(
     bool reached_eof{false};
     while (true) {
         auto const unconsumed_bytes{decoder_buffer->get_unconsumed_bytes()};
-        ffi::ir_stream::IrBuffer ir_buffer{unconsumed_bytes.data(), unconsumed_bytes.size()};
+        BufferReader ir_buffer{
+                size_checked_pointer_cast<char const>(unconsumed_bytes.data()),
+                unconsumed_bytes.size()};
         auto const err{ffi::ir_stream::four_byte_encoding::decode_next_message(
                 ir_buffer,
                 decoded_message,
@@ -77,8 +80,7 @@ auto decode(
 
         timestamp += timestamp_delta;
         current_log_event_idx = decoder_buffer->get_and_increment_decoded_message_count();
-        decoder_buffer->commit_read_buffer_consumption(
-                static_cast<Py_ssize_t>(ir_buffer.get_cursor_pos())
+        decoder_buffer->commit_read_buffer_consumption(static_cast<Py_ssize_t>(ir_buffer.get_pos())
         );
 
         if (nullptr == py_query) {
@@ -124,10 +126,12 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
     size_t ir_buffer_cursor_pos{0};
     while (true) {
         auto const unconsumed_bytes{decoder_buffer->get_unconsumed_bytes()};
-        ffi::ir_stream::IrBuffer ir_buffer{unconsumed_bytes.data(), unconsumed_bytes.size()};
+        BufferReader ir_buffer{
+                size_checked_pointer_cast<char const>(unconsumed_bytes.data()),
+                unconsumed_bytes.size()};
         auto const err{ffi::ir_stream::get_encoding_type(ir_buffer, is_four_byte_encoding)};
         if (ffi::ir_stream::IRErrorCode_Success == err) {
-            ir_buffer_cursor_pos = ir_buffer.get_cursor_pos();
+            ir_buffer_cursor_pos = ir_buffer.get_pos();
             break;
         }
         if (ffi::ir_stream::IRErrorCode_Incomplete_IR != err) {
@@ -149,7 +153,9 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
     uint16_t metadata_size{0};
     while (true) {
         auto const unconsumed_bytes = decoder_buffer->get_unconsumed_bytes();
-        ffi::ir_stream::IrBuffer ir_buffer{unconsumed_bytes.data(), unconsumed_bytes.size()};
+        BufferReader ir_buffer{
+                size_checked_pointer_cast<char const>(unconsumed_bytes.data()),
+                unconsumed_bytes.size()};
         auto const err{ffi::ir_stream::decode_preamble(
                 ir_buffer,
                 metadata_type_tag,
@@ -157,7 +163,7 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
                 metadata_size
         )};
         if (ffi::ir_stream::IRErrorCode_Success == err) {
-            ir_buffer_cursor_pos = ir_buffer.get_cursor_pos();
+            ir_buffer_cursor_pos = ir_buffer.get_pos();
             break;
         }
         if (ffi::ir_stream::IRErrorCode_Incomplete_IR != err) {
@@ -171,8 +177,7 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
 
     auto const unconsumed_bytes = decoder_buffer->get_unconsumed_bytes();
     auto const metadata_buffer{
-            unconsumed_bytes.subspan(metadata_pos, static_cast<size_t>(metadata_size))
-    };
+            unconsumed_bytes.subspan(metadata_pos, static_cast<size_t>(metadata_size))};
     decoder_buffer->commit_read_buffer_consumption(static_cast<Py_ssize_t>(ir_buffer_cursor_pos));
     PyMetadata* metadata{nullptr};
     try {
@@ -201,8 +206,7 @@ auto decode_next_log_event(PyObject* Py_UNUSED(self), PyObject* args, PyObject* 
             static_cast<char*>(keyword_decoder_buffer),
             static_cast<char*>(keyword_query),
             static_cast<char*>(keyword_allow_incomplete_stream),
-            nullptr
-    };
+            nullptr};
 
     PyDecoderBuffer* decoder_buffer{nullptr};
     PyObject* query{Py_None};

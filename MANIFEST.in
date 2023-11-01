@@ -1,5 +1,6 @@
 recursive-include src/clp/components/core/src *.hpp
 recursive-include src/clp/components/core/src *.tpp
+recursive-include src/clp/components/core/src *.inc
 recursive-include src/clp_ffi_py *.hpp
 recursive-include src/clp_ffi_py *.tpp
 recursive-include clp_ffi_py *.py
