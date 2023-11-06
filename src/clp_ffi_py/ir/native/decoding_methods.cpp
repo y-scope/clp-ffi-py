@@ -204,10 +204,11 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
                 default:
                     PyErr_Format(
                             PyExc_NotImplementedError,
-                            "Unrecognized return code %d with version value %s",
+                            "Unrecognized return code %d with version: %s",
                             error_code,
                             version.c_str()
                     );
+                    break;
             }
             return nullptr;
         }

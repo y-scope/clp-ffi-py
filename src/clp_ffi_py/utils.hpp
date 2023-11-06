@@ -61,5 +61,5 @@ template <typename int_type>
 auto parse_py_int(PyObject* py_int, int_type& val) -> bool;
 }  // namespace clp_ffi_py
 
-#include <clp_ffi_py/utils.tpp>
+#include <clp_ffi_py/utils.inc>
 #endif  // CLP_FFI_PY_UTILS_HPP
