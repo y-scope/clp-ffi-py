@@ -3,7 +3,7 @@ import platform
 import sys
 import toml
 from setuptools import setup, Extension
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 ir_native: Extension = Extension(
     name="clp_ffi_py.ir.native",
@@ -55,13 +55,29 @@ if "__main__" == __name__:
         if None is version:
             sys.exit("Error: The version number was not found in pyproject.toml")
 
-        setup(
-            name="clp_ffi_py",
-            description="CLP FFI Python Interface",
-            ext_modules=[ir_native],
-            packages=["clp_ffi_py"],
-            version=version,
-        )
+        if (3, 7) > sys.version_info:
+            # For Python3.6, we need to explicitly specify the packages and the
+            # package data. Submodules and .pyi/.type files are not
+            # automatically included.
+            packages: List[str] = ["clp_ffi_py", "clp_ffi_py.ir"]
+            data_to_include: List[str] = ["*.py", "*.pyi", "*.typed"]
+            package_data: Dict[str, List[str]] = {package: data_to_include for package in packages}
+            setup(
+                name="clp_ffi_py",
+                description="CLP FFI Python Interface",
+                ext_modules=[ir_native],
+                packages=packages,
+                package_data=package_data,
+                version=version,
+            )
+        else:
+            setup(
+                name="clp_ffi_py",
+                description="CLP FFI Python Interface",
+                ext_modules=[ir_native],
+                packages=["clp_ffi_py"],
+                version=version,
+            )
 
     except Exception as e:
         sys.exit(f"Error: {e}")
