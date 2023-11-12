@@ -57,7 +57,7 @@ if "__main__" == __name__:
 
         project_name: str = "clp_ffi_py"
         description: str = "CLP FFI Python Interface"
-        extension_modules: List[Exception] = [ir_native]
+        extension_modules: List[Extension] = [ir_native]
         if (3, 7) > sys.version_info:
             # For Python3.6, setuptools doesn't automatically include submodules
             # and .pyi/.type files, so we need to explicitly specify the
