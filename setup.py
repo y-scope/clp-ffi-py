@@ -55,26 +55,29 @@ if "__main__" == __name__:
         if None is version:
             sys.exit("Error: The version number was not found in pyproject.toml")
 
+        project_name: str = "clp_ffi_py"
+        description: str = "CLP FFI Python Interface"
+        extension_modules: List[Exception] = [ir_native]
         if (3, 7) > sys.version_info:
-            # For Python3.6, we need to explicitly specify the packages and the
-            # package data. Submodules and .pyi/.type files are not
-            # automatically included.
+            # For Python3.6, setuptools doesn't automatically include submodules
+            # and .pyi/.type files, so we need to explicitly specify the
+            # packages and the files to include per package (package_data).
             packages: List[str] = ["clp_ffi_py", "clp_ffi_py.ir"]
             data_to_include: List[str] = ["*.py", "*.pyi", "*.typed"]
             package_data: Dict[str, List[str]] = {package: data_to_include for package in packages}
             setup(
-                name="clp_ffi_py",
-                description="CLP FFI Python Interface",
-                ext_modules=[ir_native],
+                name=project_name,
+                description=description,
+                ext_modules=extension_modules,
                 packages=packages,
                 package_data=package_data,
                 version=version,
             )
         else:
             setup(
-                name="clp_ffi_py",
-                description="CLP FFI Python Interface",
-                ext_modules=[ir_native],
+                name=project_name,
+                description=description,
+                ext_modules=extension_modules,
                 packages=["clp_ffi_py"],
                 version=version,
             )
