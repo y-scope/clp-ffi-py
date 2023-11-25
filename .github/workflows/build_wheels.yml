@@ -37,7 +37,7 @@ jobs:
 
   test:
     needs: [build_wheels]
-    name: Unit Test on ${{ matrix.os }} with Python ${{ python-version }}
+    name: Unit Test on ${{ matrix.os }} with Python ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     matrix:
         os: [ubuntu-22.04, macos-11]
