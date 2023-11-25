@@ -327,7 +327,7 @@ auto PyDecoderBuffer::test_streaming(uint32_t seed) -> PyObject* {
     std::vector<uint8_t> read_bytes;
     bool reach_istream_end{false};
     while (false == reach_istream_end) {
-        std::uniform_int_distribution<Py_ssize_t> distribution(1, m_buffer_size);
+        std::uniform_int_distribution<Py_ssize_t> distribution(1, m_read_buffer.size());
         auto num_bytes_to_read{distribution(rand_generator)};
         if (get_num_unconsumed_bytes() < num_bytes_to_read) {
             Py_ssize_t num_bytes_read_from_istream{0};
