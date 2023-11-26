@@ -245,7 +245,7 @@ auto PyDecoderBuffer::populate_read_buffer(Py_ssize_t& num_bytes_read) -> bool {
         m_read_buffer_mem_owner = new_buf;
         m_read_buffer = new_read_buffer;
     } else if (0 < num_unconsumed_bytes) {
-        memcpy(m_read_buffer.data(), unconsumed_bytes.data(), num_unconsumed_bytes);
+        memmove(m_read_buffer.data(), unconsumed_bytes.data(), num_unconsumed_bytes);
     }
     m_num_current_bytes_consumed = 0;
     m_buffer_size = num_unconsumed_bytes;
