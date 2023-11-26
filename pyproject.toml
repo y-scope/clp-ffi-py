@@ -37,6 +37,7 @@ color = true
 preview = true
 
 [tool.cibuildwheel]
+skip = "pp*"
 test-command = [
   "cd {package}/tests",
   "python -m unittest -fv",
