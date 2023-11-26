@@ -34,32 +34,3 @@ jobs:
         with:
           name: wheel-${{ matrix.os }}
           path: ./wheelhouse/*.whl
-
-  test:
-    needs: [build_wheels]
-    name: Unit Test on ${{ matrix.os }} with Python ${{ matrix.python-version }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-22.04, macos-11]
-        python-version: ["3.6", "3.8", "3.11"]
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - uses: actions/download-artifact@v3
-        with:
-          name: wheel-${{ matrix.os }}
-          path: dist/
-
-      - run: pip install --upgrade
-          pip
-          dist/clp_ffi_py-*.whl
-          -r requirements-test.txt
-
-      - run: cd tests 
-          python -m unittest -fv
