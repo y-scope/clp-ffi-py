@@ -43,7 +43,6 @@ musllinux-aarch64-image = "musllinux_1_2"
 musllinux-ppc64le-image = "musllinux_1_2"
 musllinux-s390x-image = "musllinux_1_2"
 skip = "pp*"
-build = "*-musllinux*"
 test-command = [
   "cd {package}/tests",
   "python -m unittest -fv",
@@ -57,6 +56,9 @@ test-skip = [
     "*-*linux_i686",
     "*-macosx_x86_64",
 ]
+
+[tool.ciduilwheel.linux]
+build = "*-musllinux*"
 
 [tool.cibuildwheel.macos]
 archs = ["x86_64", "universal2", "arm64"]
