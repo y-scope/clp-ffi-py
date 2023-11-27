@@ -14,7 +14,7 @@ jobs:
       
       - run: |
           pip install --upgrade pip
-          pip -r requirements-dev.txt
+          pip install -r requirements-dev.txt
 
       - run: docformatter --check --diff clp_ffi_py tests
 
