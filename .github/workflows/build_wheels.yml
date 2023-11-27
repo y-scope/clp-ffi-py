@@ -3,10 +3,10 @@ name: Build
 on: [push, pull_request]
 
 jobs:
-  linter_check:
+  linters:
     runs-on: ubuntu-latest
     steps:
-      - uses: action/checkout@v3
+      - uses: actions/checkout@v3
 
       - uses: actions/setup-python@v4
         with:
@@ -31,7 +31,7 @@ jobs:
             src/clp_ffi_py/*/*/*.* \
 
   build_wheels:
-    needs: [linter_check]
+    needs: [linters]
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
