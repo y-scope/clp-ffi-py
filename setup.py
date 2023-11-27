@@ -37,7 +37,7 @@ ir_native: Extension = Extension(
         "src/clp_ffi_py/utils.cpp",
     ],
     extra_compile_args=[
-        "-std=c++20",
+        "-std=c++17",
         "-O3",
     ],
     define_macros=[("SOURCE_PATH_SIZE", str(len(os.path.abspath("./src/clp/components/core"))))],
