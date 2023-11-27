@@ -57,9 +57,6 @@ test-skip = [
     "*-macosx_x86_64",
 ]
 
-[tool.ciduilwheel.linux]
-build = "*-musllinux*"
-
 [tool.cibuildwheel.macos]
 archs = ["x86_64", "universal2", "arm64"]
 
