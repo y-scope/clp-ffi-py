@@ -43,6 +43,7 @@ musllinux-aarch64-image = "musllinux_1_2"
 musllinux-ppc64le-image = "musllinux_1_2"
 musllinux-s390x-image = "musllinux_1_2"
 skip = "pp*"
+build = "*-musllinux*"
 test-command = [
   "cd {package}/tests",
   "python -m unittest -fv",
