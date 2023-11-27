@@ -13,7 +13,7 @@ jobs:
           python-version: "3.11"
       
       - run: |
-          pip install --upgrade
+          pip install --upgrade pip
           pip -r requirements-dev.txt
 
       - run: docformatter --check --diff clp_ffi_py tests
