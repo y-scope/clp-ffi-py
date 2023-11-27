@@ -22,7 +22,7 @@ jobs:
 
       - run: ruff check --output-format=github clp_ffi_py tests
 
-      - run: mypy src tests
+      - run: mypy clp_ffi_py tests
 
       - run: |
           clang-format --dry-run --Werror \
