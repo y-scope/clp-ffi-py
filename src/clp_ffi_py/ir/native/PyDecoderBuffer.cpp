@@ -32,8 +32,7 @@ auto PyDecoderBuffer_init(PyDecoderBuffer* self, PyObject* args, PyObject* keywo
     static char* keyword_table[]{
             static_cast<char*>(keyword_input_stream),
             static_cast<char*>(keyword_initial_buffer_capacity),
-            nullptr
-    };
+            nullptr};
 
     // If the argument parsing fails, `self` will be deallocated. We must reset
     // all pointers to nullptr in advance, otherwise the deallocator might
@@ -55,8 +54,8 @@ auto PyDecoderBuffer_init(PyDecoderBuffer* self, PyObject* args, PyObject* keywo
         return -1;
     }
 
-    PyObjectPtr<PyObject> const readinto_method_obj{PyObject_GetAttrString(input_stream, "readinto")
-    };
+    PyObjectPtr<PyObject> const readinto_method_obj{
+            PyObject_GetAttrString(input_stream, "readinto")};
     auto* readinto_method{readinto_method_obj.get()};
     if (nullptr == readinto_method) {
         return -1;
@@ -154,8 +153,7 @@ PyMethodDef PyDecoderBuffer_method_table[]{
          METH_O,
          static_cast<char const*>(cPyDecoderBufferTestStreamingDoc)},
 
-        {nullptr}
-};
+        {nullptr}};
 
 /**
  * Declaration of Python buffer protocol.
@@ -190,8 +188,7 @@ PyType_Slot PyDecoderBuffer_slots[]{
         {Py_tp_init, reinterpret_cast<void*>(PyDecoderBuffer_init)},
         {Py_tp_methods, static_cast<void*>(PyDecoderBuffer_method_table)},
         {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyDecoderBufferDoc))},
-        {0, nullptr}
-};
+        {0, nullptr}};
 // NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
 
 /**
@@ -202,8 +199,7 @@ PyType_Spec PyDecoderBuffer_type_spec{
         sizeof(PyDecoderBuffer),
         0,
         Py_TPFLAGS_DEFAULT,
-        static_cast<PyType_Slot*>(PyDecoderBuffer_slots)
-};
+        static_cast<PyType_Slot*>(PyDecoderBuffer_slots)};
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
@@ -227,8 +223,9 @@ auto PyDecoderBuffer::init(PyObject* input_stream, Py_ssize_t buf_capacity) -> b
 }
 
 auto PyDecoderBuffer::populate_read_buffer(Py_ssize_t& num_bytes_read) -> bool {
-    auto const num_unconsumed_bytes{get_num_unconsumed_bytes()};
-    auto const unconsumed_bytes{get_unconsumed_bytes()};
+    auto const unconsumed_bytes_in_curr_read_buffer{get_unconsumed_bytes()};
+    auto const num_unconsumed_bytes{
+            static_cast<Py_ssize_t>(unconsumed_bytes_in_curr_read_buffer.size())};
     auto const buffer_capacity{static_cast<Py_ssize_t>(m_read_buffer.size())};
 
     if (num_unconsumed_bytes > (buffer_capacity / 2)) {
@@ -240,12 +237,20 @@ auto PyDecoderBuffer::populate_read_buffer(Py_ssize_t& num_bytes_read) -> bool {
             return false;
         }
         auto new_read_buffer{gsl::span<int8_t>(new_buf, new_capacity)};
-        memcpy(new_read_buffer.data(), unconsumed_bytes.data(), num_unconsumed_bytes);
+        std::copy(
+                unconsumed_bytes_in_curr_read_buffer.begin(),
+                unconsumed_bytes_in_curr_read_buffer.end(),
+                new_read_buffer.begin()
+        );
         PyMem_Free(m_read_buffer_mem_owner);
         m_read_buffer_mem_owner = new_buf;
         m_read_buffer = new_read_buffer;
     } else if (0 < num_unconsumed_bytes) {
-        memmove(m_read_buffer.data(), unconsumed_bytes.data(), num_unconsumed_bytes);
+        std::copy(
+                unconsumed_bytes_in_curr_read_buffer.begin(),
+                unconsumed_bytes_in_curr_read_buffer.end(),
+                m_read_buffer.begin()
+        );
     }
     m_num_current_bytes_consumed = 0;
     m_buffer_size = num_unconsumed_bytes;
@@ -327,7 +332,10 @@ auto PyDecoderBuffer::test_streaming(uint32_t seed) -> PyObject* {
     std::vector<uint8_t> read_bytes;
     bool reach_istream_end{false};
     while (false == reach_istream_end) {
-        std::uniform_int_distribution<Py_ssize_t> distribution(1, m_read_buffer.size());
+        std::uniform_int_distribution<Py_ssize_t> distribution(
+                1,
+                static_cast<Py_ssize_t>(m_read_buffer.size())
+        );
         auto num_bytes_to_read{distribution(rand_generator)};
         if (get_num_unconsumed_bytes() < num_bytes_to_read) {
             Py_ssize_t num_bytes_read_from_istream{0};
