@@ -47,14 +47,14 @@ test-command = [
   "cd {package}/tests",
   "python -m unittest -fv",
 ]
-test-requires = "smart_open"
+test-requires = [
+    "smart_open"
+]
 test-skip = [
-    "cp36-*",
     "cp37-*",
     "cp39-*",
     "cp310-*",
     "*-*linux_i686",
-    "*-macosx_x86_64",
 ]
 
 [tool.cibuildwheel.macos]
@@ -82,4 +82,3 @@ select = ["E", "I", "F"]
 
 [tool.ruff.isort]
 order-by-type = false
-
