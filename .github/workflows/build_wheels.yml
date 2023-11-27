@@ -3,7 +3,35 @@ name: Build
 on: [push, pull_request]
 
 jobs:
+  linter_check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: action/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      
+      - run: |
+          pip install --upgrade
+          pip -r requirements-dev.txt
+
+      - run: docformatter --check --diff clp_ffi_py tests
+
+      - run: black --diff --check clp_ffi_py tests
+
+      - run: ruff check --output-format=github clp_ffi_py tests
+
+      - run: mypy src tests
+
+      - run: |
+          clang-format --dry-run --Werror \
+            src/clp_ffi_py/*.* \
+            src/clp_ffi_py/*/*.* \
+            src/clp_ffi_py/*/*/*.* \
+
   build_wheels:
+    needs: [linter_check]
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
