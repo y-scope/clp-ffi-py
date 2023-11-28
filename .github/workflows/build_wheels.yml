@@ -25,10 +25,7 @@ jobs:
       - run: mypy clp_ffi_py tests
 
       - run: |
-          clang-format --dry-run --Werror \
-            src/clp_ffi_py/*.* \
-            src/clp_ffi_py/*/*.* \
-            src/clp_ffi_py/*/*/*.* \
+          find src/clp_ffi_py/ -type f | xargs clang-format --dry-run --Werror
 
   build_wheels:
     needs: [linters]
