@@ -36,6 +36,23 @@ target-version = ["py311"]
 color = true
 preview = true
 
+[tool.cibuildwheel]
+skip = "pp*"
+
+test-command = [
+  "cd {package}/tests",
+  "python -m unittest -fv",
+]
+test-requires = [
+    "smart_open"
+]
+test-skip = [
+    "cp37-*",
+    "cp39-*",
+    "cp310-*",
+    "*-*linux_i686",
+]
+
 [tool.cibuildwheel.macos]
 archs = ["x86_64", "universal2", "arm64"]
 
@@ -61,4 +78,3 @@ select = ["E", "I", "F"]
 
 [tool.ruff.isort]
 order-by-type = false
-
