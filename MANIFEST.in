@@ -8,5 +8,4 @@ recursive-include clp_ffi_py *.pyi
 recursive-include clp_ffi_py py.typed
 include setup.cfg
 include src/clp/components/core/submodules/json/single_include/nlohmann/json.hpp
-include src/GSL/include/gsl/*
 recursive-include tests *

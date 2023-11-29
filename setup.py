@@ -10,7 +10,6 @@ ir_native: Extension = Extension(
     language="c++",
     include_dirs=[
         "src",
-        "src/GSL/include",
         "src/clp/components/core/submodules",
     ],
     sources=[
