@@ -3,8 +3,9 @@
 
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
+#include <span>
+
 #include <clp/components/core/src/ffi/ir_stream/decoding_methods.hpp>
-#include <gsl/span>
 
 #include <clp_ffi_py/ir/native/PyMetadata.hpp>
 #include <clp_ffi_py/PyObjectUtils.hpp>
@@ -102,7 +103,7 @@ public:
     /**
      * @return A span containing unconsumed bytes.
      */
-    [[nodiscard]] auto get_unconsumed_bytes() const -> gsl::span<int8_t> {
+    [[nodiscard]] auto get_unconsumed_bytes() const -> std::span<int8_t> {
         return m_read_buffer.subspan(m_num_current_bytes_consumed, get_num_unconsumed_bytes());
     }
 
@@ -214,7 +215,7 @@ private:
     PyObject* m_input_ir_stream;
     PyMetadata* m_metadata;
     int8_t* m_read_buffer_mem_owner;
-    gsl::span<int8_t> m_read_buffer;
+    std::span<int8_t> m_read_buffer;
     ffi::epoch_time_ms_t m_ref_timestamp;
     Py_ssize_t m_buffer_size;
     Py_ssize_t m_num_current_bytes_consumed;

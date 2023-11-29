@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <random>
+#include <span>
 
 #include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ir/native/error_messages.hpp>
@@ -220,7 +221,7 @@ auto PyDecoderBuffer::init(PyObject* input_stream, Py_ssize_t buf_capacity) -> b
         PyErr_NoMemory();
         return false;
     }
-    m_read_buffer = gsl::span<int8_t>(m_read_buffer_mem_owner, buf_capacity);
+    m_read_buffer = std::span<int8_t>{m_read_buffer_mem_owner, static_cast<size_t>(buf_capacity)};
     m_input_ir_stream = input_stream;
     Py_INCREF(m_input_ir_stream);
     return true;
@@ -241,7 +242,7 @@ auto PyDecoderBuffer::populate_read_buffer(Py_ssize_t& num_bytes_read) -> bool {
             PyErr_NoMemory();
             return false;
         }
-        auto new_read_buffer{gsl::span<int8_t>(new_buf, new_capacity)};
+        std::span<int8_t> const new_read_buffer{new_buf, static_cast<size_t>(new_capacity)};
         std::copy(
                 unconsumed_bytes_in_curr_read_buffer.begin(),
                 unconsumed_bytes_in_curr_read_buffer.end(),

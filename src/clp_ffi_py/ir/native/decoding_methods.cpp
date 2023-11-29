@@ -2,11 +2,12 @@
 
 #include "decoding_methods.hpp"
 
+#include <span>
+
 #include <clp/components/core/src/BufferReader.hpp>
 #include <clp/components/core/src/ffi/ir_stream/decoding_methods.hpp>
 #include <clp/components/core/src/ffi/ir_stream/protocol_constants.hpp>
 #include <clp/components/core/src/type_utils.hpp>
-#include <gsl/span>
 #include <json/single_include/nlohmann/json.hpp>
 
 #include <clp_ffi_py/error_messages.hpp>
@@ -191,8 +192,9 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
         nlohmann::json const metadata_json(
                 nlohmann::json::parse(metadata_buffer.begin(), metadata_buffer.end())
         );
-        std::string const version{metadata_json.at(ffi::ir_stream::cProtocol::Metadata::VersionKey)
-        };
+        std::string const version{metadata_json.at(
+                static_cast<char const*>(ffi::ir_stream::cProtocol::Metadata::VersionKey)
+        )};
         auto const error_code{ffi::ir_stream::validate_protocol_version(version)};
         if (ffi::ir_stream::IRProtocolErrorCode_Supported != error_code) {
             switch (error_code) {
