@@ -242,7 +242,7 @@ auto PyDecoderBuffer::populate_read_buffer(Py_ssize_t& num_bytes_read) -> bool {
             PyErr_NoMemory();
             return false;
         }
-        auto new_read_buffer{std::span<int8_t>(new_buf, new_capacity)};
+        std::span<int8_t> new_read_buffer{new_buf, static_cast<size_t>(new_capacity)};
         std::copy(
                 unconsumed_bytes_in_curr_read_buffer.begin(),
                 unconsumed_bytes_in_curr_read_buffer.end(),
