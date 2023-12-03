@@ -328,8 +328,7 @@ auto decode_next_log_event(PyObject* Py_UNUSED(self), PyObject* args, PyObject* 
     );
 }
 
-auto skip_next_n_log_events(PyObject* Py_UNUSED(self), PyObject* args, PyObject* keywords)
-        -> PyObject* {
+auto skip_forward(PyObject* Py_UNUSED(self), PyObject* args, PyObject* keywords) -> PyObject* {
     static char keyword_decoder_buffer[]{"decoder_buffer"};
     static char keyword_num_events_to_skip[]{"num_events_to_skip"};
     static char keyword_allow_incomplete_stream[]{"allow_incomplete_stream"};

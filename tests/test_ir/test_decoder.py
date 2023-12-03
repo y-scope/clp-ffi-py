@@ -51,7 +51,7 @@ class TestCaseDecoderSkip(TestCLPBase):
         _ = Decoder.decode_preamble(decoder_buffer)
         error_captured: bool = False
         try:
-            Decoder.skip_next_n_log_events(decoder_buffer, -1)
+            Decoder.skip_forward(decoder_buffer, -1)
         except NotImplementedError:
             error_captured = True
         except Exception as e:
@@ -67,7 +67,7 @@ class TestCaseDecoderSkip(TestCLPBase):
         decoder_buffer: DecoderBuffer = DecoderBuffer(ir_stream)
         _ = Decoder.decode_preamble(decoder_buffer)
         for i in range(num_events):
-            Decoder.skip_next_n_log_events(decoder_buffer, 0)
+            Decoder.skip_forward(decoder_buffer, 0)
             log_event: Optional[LogEvent] = Decoder.decode_next_log_event(decoder_buffer)
             if None is log_event:
                 self.assertTrue(False, "EOF shouldn't be reached before all log events are decoded")
@@ -85,7 +85,7 @@ class TestCaseDecoderSkip(TestCLPBase):
         ir_stream: IO[bytes] = self._create_simple_encoded_IR_stream(1)
         decoder_buffer: DecoderBuffer = DecoderBuffer(ir_stream)
         _ = Decoder.decode_preamble(decoder_buffer)
-        Decoder.skip_next_n_log_events(decoder_buffer, 1000)
+        Decoder.skip_forward(decoder_buffer, 1000)
         eof: Optional[LogEvent] = Decoder.decode_next_log_event(decoder_buffer)
         self.assertEqual(None, eof, "EOF should be reached since all the log events are decoded")
 
@@ -106,7 +106,7 @@ class TestCaseDecoderSkip(TestCLPBase):
         num_events_decoded: int = 0
         for i in range(num_arithmetic_sequence_term):
             term_idx = i + 1
-            Decoder.skip_next_n_log_events(decoder_buffer, term_idx)
+            Decoder.skip_forward(decoder_buffer, term_idx)
             num_events_skipped += term_idx
             for _ in range(term_idx):
                 log_event: Optional[LogEvent] = Decoder.decode_next_log_event(decoder_buffer)

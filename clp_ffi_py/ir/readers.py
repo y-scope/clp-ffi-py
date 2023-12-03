@@ -100,6 +100,15 @@ class ClpIrStreamReader(Iterator[LogEvent]):
                 break
             yield log_event
 
+    def skip_forward(self, num_events_to_skip: int) -> None:
+        """
+        Decodes and discards the next `num_events_to_skip` log events from the
+        underlying IR stream.
+
+        :param: num_events_to_skip
+        """
+        Decoder.skip_forward(self._decoder_buffer, num_events_to_skip)
+
     def close(self) -> None:
         self.__istream.close()
 
