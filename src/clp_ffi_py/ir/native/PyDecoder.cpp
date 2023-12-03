@@ -44,6 +44,24 @@ PyDoc_STRVAR(
 );
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
+PyDoc_STRVAR(
+        cSkipNextNLogEventsDoc,
+        "skip_next_n_log_events( "
+        "decoder_buffer, num_events_to_skip, allow_incomplete_stream=False)\n"
+        "--\n\n"
+        "Decodes and discard the next n log events from the IR stream buffered in the given "
+        "decoder buffer. `decoder_buffer` must have been returned by a successfully invocation of "
+        "`decode_preamble`. It will stop whenever EOF.\n\n"
+        ":param decoder_buffer: The decoder buffer of the encoded CLP IR stream.\n"
+        ":param num_events_to_skip: Number of events to skip forward.\n"
+        ":param allow_incomplete_stream: If set to `True`, an incomplete CLP IR stream is not "
+        "treated as an error. Instead, encountering such a stream is seen as reaching its end, and "
+        "the function will return None without raising any exceptions.\n"
+        ":raises: Appropriate exceptions with detailed information on any encountered failure.\n"
+        ":return: None\n"
+);
+
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyMethodDef PyDecoder_method_table[]{
         {"decode_preamble",
          decode_preamble,
@@ -54,6 +72,11 @@ PyMethodDef PyDecoder_method_table[]{
          py_c_function_cast(decode_next_log_event),
          METH_VARARGS | METH_KEYWORDS | METH_STATIC,
          static_cast<char const*>(cDecodeNextLogEventDoc)},
+
+        {"skip_next_n_log_events",
+         py_c_function_cast(skip_next_n_log_events),
+         METH_VARARGS | METH_KEYWORDS | METH_STATIC,
+         static_cast<char const*>(cSkipNextNLogEventsDoc)},
 
         {nullptr, nullptr, 0, nullptr}
 };

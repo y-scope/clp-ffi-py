@@ -503,7 +503,7 @@ auto PyLogEvent::module_level_init(PyObject* py_module) -> bool {
 }
 
 auto PyLogEvent::create_new_log_event(
-        std::string const& log_message,
+        std::string_view log_message,
         ffi::epoch_time_ms_t timestamp,
         size_t index,
         PyMetadata* metadata

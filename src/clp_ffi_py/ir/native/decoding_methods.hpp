@@ -9,6 +9,7 @@ namespace clp_ffi_py::ir::native {
 extern "C" {
 auto decode_preamble(PyObject* self, PyObject* py_decoder_buffer) -> PyObject*;
 auto decode_next_log_event(PyObject* self, PyObject* args, PyObject* keywords) -> PyObject*;
+auto skip_next_n_log_events(PyObject* self, PyObject* args, PyObject* keywords) -> PyObject*;
 }
 }  // namespace clp_ffi_py::ir::native
 

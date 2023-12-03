@@ -23,30 +23,36 @@
 namespace clp_ffi_py::ir::native {
 namespace {
 /**
- * Decodes the next log event from the CLP IR buffer `decoder_buffer`. If
- * `py_query` is non-null decode until finding a log event that matches the
- * query.
+ * Decodes the next log event from the CLP IR buffer `decoder_buffer` until
+ * terminate handler returns true.
  * @param decoder_buffer IR decoder buffer of the input IR stream.
- * @param py_metadata The metadata associated with the input IR stream.
- * @param py_query Search query to filter log events.
  * @param allow_incomplete_stream A flag to indicate whether the incomplete
  * stream error should be ignored. If it is set to true, incomplete stream error
  * should be treated as the termination.
- * @return Log event represented as PyLogEvent on success.
- * @return PyNone on termination.
+ * @param terminate_handler Determine if the decoding process should terminate
+ * after decoding the current log event and set the return value if terminating.
+ * Signature:
+ * [] (
+ *         ffi::epoch_timestamp_ms timestamp,
+ *         std::string_view log_message,
+ *         size_t log_event_idx,
+ *         PyObject*& return_value
+ * ) -> bool;
+ * @return The return value set by `terminate_handler`.
  * @return nullptr on failure with the relevant Python exception and error set.
  */
-auto decode(
+template <typename TerminateHandler>
+auto generic_decode_log_events(
         PyDecoderBuffer* decoder_buffer,
-        PyMetadata* py_metadata,
-        PyQuery* py_query,
-        bool allow_incomplete_stream
+        bool allow_incomplete_stream,
+        TerminateHandler terminate_handler
 ) -> PyObject* {
     std::string decoded_message;
     ffi::epoch_time_ms_t timestamp_delta{0};
     auto timestamp{decoder_buffer->get_ref_timestamp()};
     size_t current_log_event_idx{0};
-    bool reached_eof{false};
+    PyObject* return_value{nullptr};
+
     while (true) {
         auto const unconsumed_bytes{decoder_buffer->get_unconsumed_bytes()};
         BufferReader ir_buffer{
@@ -59,22 +65,23 @@ auto decode(
                 timestamp_delta
         )};
         if (ffi::ir_stream::IRErrorCode_Incomplete_IR == err) {
-            if (false == decoder_buffer->try_read()) {
-                if (allow_incomplete_stream
-                    && static_cast<bool>(PyErr_ExceptionMatches(
-                            PyDecoderBuffer::get_py_incomplete_stream_error()
-                    )))
-                {
-                    PyErr_Clear();
-                    Py_RETURN_NONE;
-                }
+            if (decoder_buffer->try_read()) {
+                continue;
+            }
+            if (false == allow_incomplete_stream) {
                 return nullptr;
             }
-            continue;
+            auto const is_incomplete_stream_error{static_cast<bool>(
+                    PyErr_ExceptionMatches(PyDecoderBuffer::get_py_incomplete_stream_error())
+            )};
+            if (false == is_incomplete_stream_error) {
+                return nullptr;
+            }
+            PyErr_Clear();
+            Py_RETURN_NONE;
         }
         if (ffi::ir_stream::IRErrorCode_Eof == err) {
-            reached_eof = true;
-            break;
+            Py_RETURN_NONE;
         }
         if (ffi::ir_stream::IRErrorCode_Success != err) {
             PyErr_Format(PyExc_RuntimeError, cDecoderErrorCodeFormatStr, err);
@@ -83,35 +90,21 @@ auto decode(
 
         timestamp += timestamp_delta;
         current_log_event_idx = decoder_buffer->get_and_increment_decoded_message_count();
-        decoder_buffer->commit_read_buffer_consumption(static_cast<Py_ssize_t>(ir_buffer.get_pos())
-        );
+        auto const num_bytes_consumed{static_cast<Py_ssize_t>(ir_buffer.get_pos())};
+        decoder_buffer->commit_read_buffer_consumption(num_bytes_consumed);
 
-        if (nullptr == py_query) {
-            break;
-        }
-
-        auto* query{py_query->get_query()};
-        if (query->ts_safely_outside_time_range(timestamp)) {
-            Py_RETURN_NONE;
-        }
-        if (query->matches_time_range(timestamp)
-            && query->matches_wildcard_queries(decoded_message))
-        {
+        if (terminate_handler(timestamp, decoded_message, current_log_event_idx, return_value)) {
+            decoder_buffer->set_ref_timestamp(timestamp);
             break;
         }
     }
 
-    if (reached_eof) {
-        Py_RETURN_NONE;
-    }
+    return return_value;
+}
 
-    decoder_buffer->set_ref_timestamp(timestamp);
-    return py_reinterpret_cast<PyObject>(PyLogEvent::create_new_log_event(
-            decoded_message,
-            timestamp,
-            current_log_event_idx,
-            py_metadata
-    ));
+[[nodiscard]] auto get_new_ref_to_py_none() -> PyObject* {
+    Py_INCREF(Py_None);
+    return Py_None;
 }
 }  // namespace
 
@@ -242,7 +235,7 @@ auto decode_next_log_event(PyObject* Py_UNUSED(self), PyObject* args, PyObject* 
     };
 
     PyDecoderBuffer* decoder_buffer{nullptr};
-    PyObject* query{Py_None};
+    PyObject* query_obj{Py_None};
     int allow_incomplete_stream{0};
 
     if (false
@@ -253,16 +246,16 @@ auto decode_next_log_event(PyObject* Py_UNUSED(self), PyObject* args, PyObject* 
                 static_cast<char**>(keyword_table),
                 PyDecoderBuffer::get_py_type(),
                 &decoder_buffer,
-                &query,
+                &query_obj,
                 &allow_incomplete_stream
         )))
     {
         return nullptr;
     }
 
-    bool const is_query_given{Py_None != query};
+    bool const is_query_given{Py_None != query_obj};
     if (is_query_given
-        && false == static_cast<bool>(PyObject_TypeCheck(query, PyQuery::get_py_type())))
+        && false == static_cast<bool>(PyObject_TypeCheck(query_obj, PyQuery::get_py_type())))
     {
         PyErr_SetString(PyExc_TypeError, cPyTypeError);
         return nullptr;
@@ -275,12 +268,134 @@ auto decode_next_log_event(PyObject* Py_UNUSED(self), PyObject* args, PyObject* 
         );
         return nullptr;
     }
+    auto* metadata{decoder_buffer->get_metadata()};
 
-    return decode(
+    if (false == is_query_given) {
+        auto terminate_handler{
+                [metadata](
+                        ffi::epoch_time_ms_t timestamp,
+                        std::string_view log_message,
+                        size_t log_event_idx,
+                        PyObject*& return_value
+                ) -> bool {
+                    return_value = py_reinterpret_cast<PyObject>(PyLogEvent::create_new_log_event(
+                            log_message,
+                            timestamp,
+                            log_event_idx,
+                            metadata
+                    ));
+                    return true;
+                }
+        };
+        return generic_decode_log_events(
+                decoder_buffer,
+                static_cast<bool>(allow_incomplete_stream),
+                terminate_handler
+        );
+    }
+
+    auto* py_query{py_reinterpret_cast<PyQuery>(query_obj)};
+    auto const* query{py_query->get_query()};
+    auto query_terminate_handler{
+            [query, metadata](
+                    ffi::epoch_time_ms_t timestamp,
+                    std::string_view log_message,
+                    size_t log_event_idx,
+                    PyObject*& return_value
+            ) -> bool {
+                if (query->ts_safely_outside_time_range(timestamp)) {
+                    return_value = get_new_ref_to_py_none();
+                    return true;
+                }
+                if (false == query->matches_time_range(timestamp)
+                    || false == query->matches_wildcard_queries(log_message))
+                {
+                    return false;
+                }
+                return_value = py_reinterpret_cast<PyObject>(PyLogEvent::create_new_log_event(
+                        log_message,
+                        timestamp,
+                        log_event_idx,
+                        metadata
+                ));
+                return true;
+            }
+    };
+    return generic_decode_log_events(
             decoder_buffer,
-            decoder_buffer->get_metadata(),
-            is_query_given ? py_reinterpret_cast<PyQuery>(query) : nullptr,
-            static_cast<bool>(allow_incomplete_stream)
+            static_cast<bool>(allow_incomplete_stream),
+            query_terminate_handler
+    );
+}
+
+auto skip_next_n_log_events(PyObject* Py_UNUSED(self), PyObject* args, PyObject* keywords)
+        -> PyObject* {
+    static char keyword_decoder_buffer[]{"decoder_buffer"};
+    static char keyword_num_events_to_skip[]{"num_events_to_skip"};
+    static char keyword_allow_incomplete_stream[]{"allow_incomplete_stream"};
+    static char* keyword_table[]{
+            static_cast<char*>(keyword_decoder_buffer),
+            static_cast<char*>(keyword_num_events_to_skip),
+            static_cast<char*>(keyword_allow_incomplete_stream),
+            nullptr
+    };
+
+    PyDecoderBuffer* decoder_buffer{nullptr};
+    Py_ssize_t num_events_to_skip{0};
+    int allow_incomplete_stream{0};
+
+    if (false
+        == static_cast<bool>(PyArg_ParseTupleAndKeywords(
+                args,
+                keywords,
+                "O!n|p",
+                static_cast<char**>(keyword_table),
+                PyDecoderBuffer::get_py_type(),
+                &decoder_buffer,
+                &num_events_to_skip,
+                &allow_incomplete_stream
+        )))
+    {
+        return nullptr;
+    }
+
+    if (false == decoder_buffer->has_metadata()) {
+        PyErr_SetString(
+                PyExc_RuntimeError,
+                "The given DecoderBuffer does not have a valid CLP IR metadata decoded."
+        );
+        return nullptr;
+    }
+
+    if (0 > num_events_to_skip) {
+        PyErr_SetString(PyExc_NotImplementedError, "Backward skipping is unsupported.");
+        return nullptr;
+    }
+    if (0 == num_events_to_skip) {
+        Py_RETURN_NONE;
+    }
+
+    Py_ssize_t num_events_decoded{0};
+    auto terminate_handler{
+            [&num_events_decoded, num_events_to_skip](
+                    [[maybe_unused]] ffi::epoch_time_ms_t timestamp,
+                    [[maybe_unused]] std::string_view log_message,
+                    [[maybe_unused]] size_t log_event_idx,
+                    PyObject*& return_value
+            ) -> bool {
+                ++num_events_decoded;
+                if (num_events_to_skip > num_events_decoded) {
+                    return false;
+                }
+                return_value = get_new_ref_to_py_none();
+                return true;
+            }
+    };
+
+    return generic_decode_log_events(
+            decoder_buffer,
+            static_cast<bool>(allow_incomplete_stream),
+            terminate_handler
     );
 }
 }
