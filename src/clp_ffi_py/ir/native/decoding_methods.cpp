@@ -25,19 +25,19 @@ namespace {
 /**
  * Decodes the next log event from the CLP IR buffer `decoder_buffer` until
  * terminate handler returns true.
+ * @tparam TerminateHandler Method to determine if the decoding should
+ * terminate, and set the return value for termination.
+ * Signature: (
+ *         [maybe_unused] ffi::epoch_timestamp_ms timestamp,
+ *         [maybe_unused] std::string_view decoded_log_message,
+ *         [maybe_unused] size_t decoded_log_event_idx,
+ *         PyObject*& return_value
+ * ) -> bool;
  * @param decoder_buffer IR decoder buffer of the input IR stream.
  * @param allow_incomplete_stream A flag to indicate whether the incomplete
  * stream error should be ignored. If it is set to true, incomplete stream error
  * should be treated as the termination.
- * @param terminate_handler Determine if the decoding process should terminate
- * after decoding the current log event and set the return value if terminating.
- * Signature:
- * [] (
- *         ffi::epoch_timestamp_ms timestamp,
- *         std::string_view log_message,
- *         size_t log_event_idx,
- *         PyObject*& return_value
- * ) -> bool;
+ * @param terminate_handler
  * @return The return value set by `terminate_handler`.
  * @return nullptr on failure with the relevant Python exception and error set.
  */
