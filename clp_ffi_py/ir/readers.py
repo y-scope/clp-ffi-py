@@ -15,6 +15,8 @@ class ClpIrStreamReader(Iterator[LogEvent]):
     generator with a customized search query.
 
     :param istream: Input stream that contains encoded CLP IR.
+    :param starting_index: Starting index for reading log events. Log events
+        preceding this index will be sequentially decoded and then disregarded.
     :param decoder_buffer_size: Initial size of the decoder buffer.
     :param enable_compression: A flag indicating whether the istream is
         compressed using `zstd`.
@@ -28,6 +30,7 @@ class ClpIrStreamReader(Iterator[LogEvent]):
     def __init__(
         self,
         istream: IO[bytes],
+        starting_index: int = 0,
         decoder_buffer_size: int = DEFAULT_DECODER_BUFFER_SIZE,
         enable_compression: bool = True,
         allow_incomplete_stream: bool = False,
@@ -38,6 +41,9 @@ class ClpIrStreamReader(Iterator[LogEvent]):
             self.__istream = dctx.stream_reader(istream, read_across_frames=True)
         else:
             self.__istream = istream
+        self._starting_index: int = starting_index
+        if 0 > self._starting_index:
+            raise IndexError(f"Negative starting index are not supported: {self._starting_index}")
         self._decoder_buffer: DecoderBuffer = DecoderBuffer(self.__istream, decoder_buffer_size)
         self._metadata: Optional[Metadata] = None
         self._allow_incomplete_stream: bool = allow_incomplete_stream
@@ -59,10 +65,11 @@ class ClpIrStreamReader(Iterator[LogEvent]):
 
     def read_preamble(self) -> None:
         """
-        Try to decode the preamble and set `metadata`. If `metadata` has been
-        set already, it will instantly return. It is separated from `__init__`
-        so that the input stream does not need to be readable on a reader's
-        construction, but until the user starts to iterate logs.
+        Try to decode the preamble and set `metadata`, and set the stream to
+        read from the position specified `starting_index`. If `metadata` has
+        been set already, it will instantly return. It is separated from
+        `__init__` so that the input stream does not need to be readable on a
+        reader's construction, but until the user starts to iterate logs.
 
         :raise Exception:
             If :meth:`~clp_ffi_py.ir.native.Decoder.decode_preamble` fails.
@@ -70,6 +77,11 @@ class ClpIrStreamReader(Iterator[LogEvent]):
         if self.has_metadata():
             return
         self._metadata = Decoder.decode_preamble(self._decoder_buffer)
+        Decoder.skip_forward(
+            self._decoder_buffer,
+            num_events_to_skip=self._starting_index,
+            allow_incomplete_stream=self._allow_incomplete_stream,
+        )
 
     def get_metadata(self) -> Metadata:
         if None is self._metadata:
@@ -99,15 +111,6 @@ class ClpIrStreamReader(Iterator[LogEvent]):
             if None is log_event:
                 break
             yield log_event
-
-    def skip_forward(self, num_events_to_skip: int) -> None:
-        """
-        Decodes and discards the next `num_events_to_skip` log events from the
-        underlying IR stream.
-
-        :param: num_events_to_skip
-        """
-        Decoder.skip_forward(self._decoder_buffer, num_events_to_skip)
 
     def close(self) -> None:
         self.__istream.close()
