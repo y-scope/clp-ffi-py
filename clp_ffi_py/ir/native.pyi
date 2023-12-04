@@ -79,11 +79,5 @@ class Decoder:
         query: Optional[Query] = None,
         allow_incomplete_stream: bool = False,
     ) -> Optional[LogEvent]: ...
-    @staticmethod
-    def skip_forward(
-        decoder_buffer: DecoderBuffer,
-        num_events_to_skip: int,
-        allow_incomplete_stream: bool = False,
-    ) -> None: ...
 
 class IncompleteStreamError(Exception): ...

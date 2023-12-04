@@ -102,6 +102,9 @@ auto generic_decode_log_events(
     return return_value;
 }
 
+/**
+ * @return A new reference to `Py_None`.
+ */
 [[nodiscard]] auto get_new_ref_to_py_none() -> PyObject* {
     Py_INCREF(Py_None);
     return Py_None;
@@ -325,76 +328,6 @@ auto decode_next_log_event(PyObject* Py_UNUSED(self), PyObject* args, PyObject* 
             decoder_buffer,
             static_cast<bool>(allow_incomplete_stream),
             query_terminate_handler
-    );
-}
-
-auto skip_forward(PyObject* Py_UNUSED(self), PyObject* args, PyObject* keywords) -> PyObject* {
-    static char keyword_decoder_buffer[]{"decoder_buffer"};
-    static char keyword_num_events_to_skip[]{"num_events_to_skip"};
-    static char keyword_allow_incomplete_stream[]{"allow_incomplete_stream"};
-    static char* keyword_table[]{
-            static_cast<char*>(keyword_decoder_buffer),
-            static_cast<char*>(keyword_num_events_to_skip),
-            static_cast<char*>(keyword_allow_incomplete_stream),
-            nullptr
-    };
-
-    PyDecoderBuffer* decoder_buffer{nullptr};
-    Py_ssize_t num_events_to_skip{0};
-    int allow_incomplete_stream{0};
-
-    if (false
-        == static_cast<bool>(PyArg_ParseTupleAndKeywords(
-                args,
-                keywords,
-                "O!n|p",
-                static_cast<char**>(keyword_table),
-                PyDecoderBuffer::get_py_type(),
-                &decoder_buffer,
-                &num_events_to_skip,
-                &allow_incomplete_stream
-        )))
-    {
-        return nullptr;
-    }
-
-    if (false == decoder_buffer->has_metadata()) {
-        PyErr_SetString(
-                PyExc_RuntimeError,
-                "The given DecoderBuffer does not have a valid CLP IR metadata decoded."
-        );
-        return nullptr;
-    }
-
-    if (0 > num_events_to_skip) {
-        PyErr_SetString(PyExc_NotImplementedError, "Backward skipping is unsupported.");
-        return nullptr;
-    }
-    if (0 == num_events_to_skip) {
-        Py_RETURN_NONE;
-    }
-
-    Py_ssize_t num_events_decoded{0};
-    auto terminate_handler{
-            [&num_events_decoded, num_events_to_skip](
-                    [[maybe_unused]] ffi::epoch_time_ms_t timestamp,
-                    [[maybe_unused]] std::string_view log_message,
-                    [[maybe_unused]] size_t log_event_idx,
-                    PyObject*& return_value
-            ) -> bool {
-                ++num_events_decoded;
-                if (num_events_to_skip > num_events_decoded) {
-                    return false;
-                }
-                return_value = get_new_ref_to_py_none();
-                return true;
-            }
-    };
-
-    return generic_decode_log_events(
-            decoder_buffer,
-            static_cast<bool>(allow_incomplete_stream),
-            terminate_handler
     );
 }
 }

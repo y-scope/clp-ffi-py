@@ -1,7 +1,6 @@
-import io
 import random
 from pathlib import Path
-from typing import IO, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 from smart_open import open  # type: ignore
 from test_ir.test_utils import get_current_timestamp, LogGenerator, TestCLPBase
@@ -17,116 +16,6 @@ from clp_ffi_py.ir import (
 from clp_ffi_py.wildcard_query import WildcardQuery
 
 LOG_DIR: Path = Path("unittest-logs")
-
-
-class TestCaseDecoderSkip(TestCLPBase):
-    """
-    Class for testing the skip method(s) of clp_ffi_py.ir.Decoder.
-    """
-
-    def _create_simple_encoded_IR_stream(self, num_events: int) -> IO[bytes]:
-        """
-        Creates a simple IR stream that contains `num_events` of log events. The
-        content of each message is set to "Message".
-
-        :param num_events
-        :return: A byte stream that contains the encoded CLP IR stream.
-        """
-        ir_stream: IO[bytes] = io.BytesIO()
-        ir_stream.write(FourByteEncoder.encode_preamble(0, "", "America/New_York"))
-        for _ in range(num_events):
-            ir_stream.write(
-                FourByteEncoder.encode_message_and_timestamp_delta(0, "Message".encode())
-            )
-        ir_stream.write(FourByteEncoder.encode_end_of_ir())
-        ir_stream.seek(0)
-        return ir_stream
-
-    def test_skip_negative_num_events(self) -> None:
-        """
-        Tests skipping with a negative number of events.
-        """
-        ir_stream: IO[bytes] = self._create_simple_encoded_IR_stream(1)
-        decoder_buffer: DecoderBuffer = DecoderBuffer(ir_stream)
-        _ = Decoder.decode_preamble(decoder_buffer)
-        error_captured: bool = False
-        try:
-            Decoder.skip_forward(decoder_buffer, -1)
-        except NotImplementedError:
-            error_captured = True
-        except Exception as e:
-            self.assertTrue(False, f"Unexpected exception captured: {e}")
-        self.assertTrue(error_captured, "Negative input should raise an `NotImplemented` exception")
-
-    def test_skip_zero_event(self) -> None:
-        """
-        Tests skipping with a `0` as the input.
-        """
-        num_events: int = 10
-        ir_stream: IO[bytes] = self._create_simple_encoded_IR_stream(10)
-        decoder_buffer: DecoderBuffer = DecoderBuffer(ir_stream)
-        _ = Decoder.decode_preamble(decoder_buffer)
-        for i in range(num_events):
-            Decoder.skip_forward(decoder_buffer, 0)
-            log_event: Optional[LogEvent] = Decoder.decode_next_log_event(decoder_buffer)
-            if None is log_event:
-                self.assertTrue(False, "EOF shouldn't be reached before all log events are decoded")
-            assert None is not log_event  # Silence mypy check
-            decoded_idx: int = log_event.get_index()
-            self.assertEqual(i, decoded_idx, f"Expected idx: {i}, Decoded idx: {decoded_idx}")
-        eof: Optional[LogEvent] = Decoder.decode_next_log_event(decoder_buffer)
-        self.assertEqual(None, eof, "EOF should be reached since all the log events are decoded")
-
-    def test_skip_to_eof(self) -> None:
-        """
-        Tests skipping with a number larger than the total number of events in
-        the stream.
-        """
-        ir_stream: IO[bytes] = self._create_simple_encoded_IR_stream(1)
-        decoder_buffer: DecoderBuffer = DecoderBuffer(ir_stream)
-        _ = Decoder.decode_preamble(decoder_buffer)
-        Decoder.skip_forward(decoder_buffer, 1000)
-        eof: Optional[LogEvent] = Decoder.decode_next_log_event(decoder_buffer)
-        self.assertEqual(None, eof, "EOF should be reached since all the log events are decoded")
-
-    def test_skip_general(self) -> None:
-        """
-        Tests skipping in general.
-        """
-        num_arithmetic_sequence_term: int = 10
-        arithmetic_sequence_sum: int = 0
-        for i in range(num_arithmetic_sequence_term):
-            arithmetic_sequence_sum += i + 1
-        num_events = arithmetic_sequence_sum * 2
-
-        ir_stream: IO[bytes] = self._create_simple_encoded_IR_stream(num_events)
-        decoder_buffer: DecoderBuffer = DecoderBuffer(ir_stream)
-        _ = Decoder.decode_preamble(decoder_buffer)
-        num_events_skipped: int = 0
-        num_events_decoded: int = 0
-        for i in range(num_arithmetic_sequence_term):
-            term_idx = i + 1
-            Decoder.skip_forward(decoder_buffer, term_idx)
-            num_events_skipped += term_idx
-            for _ in range(term_idx):
-                log_event: Optional[LogEvent] = Decoder.decode_next_log_event(decoder_buffer)
-                if None is log_event:
-                    self.assertTrue(
-                        False, "EOF shouldn't be reached before all log events are decoded"
-                    )
-                assert None is not log_event  # Silence mypy check
-                decoded_idx: int = log_event.get_index()
-                expected_idx: int = num_events_decoded + num_events_skipped
-                self.assertEqual(
-                    expected_idx,
-                    decoded_idx,
-                    f"Expected idx: {expected_idx}, Decoded idx: {decoded_idx}",
-                )
-                num_events_decoded += 1
-        eof: Optional[LogEvent] = Decoder.decode_next_log_event(decoder_buffer)
-        self.assertEqual(None, eof, "EOF should be reached since all the log events are decoded")
-        self.assertTrue(arithmetic_sequence_sum, num_events_decoded)
-        self.assertTrue(arithmetic_sequence_sum, num_events_skipped)
 
 
 class TestCaseDecoderBase(TestCLPBase):
