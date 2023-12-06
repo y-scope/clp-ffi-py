@@ -50,9 +50,10 @@ concept TerminateHandlerSignature = requires(TerminateHandler handler) {
  * @param decoder_buffer IR decoder buffer of the input IR stream.
  * @param allow_incomplete_stream A flag to indicate whether the incomplete
  * stream error should be ignored. If it is set to true, incomplete stream error
- * should be treated as the termination.
+ * should be treated as the IR stream is terminated.
  * @param terminate_handler
  * @return The return value set by `terminate_handler`.
+ * @return PyNone if the IR stream is terminated.
  * @return nullptr on failure with the relevant Python exception and error set.
  */
 template <TerminateHandlerSignature TerminateHandler>
