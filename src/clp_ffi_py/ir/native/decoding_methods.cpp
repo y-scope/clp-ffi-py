@@ -83,17 +83,15 @@ auto generic_decode_log_events(
             if (decoder_buffer->try_read()) {
                 continue;
             }
-            if (false == allow_incomplete_stream) {
-                return nullptr;
+            if (allow_incomplete_stream
+                && static_cast<bool>(
+                        PyErr_ExceptionMatches(PyDecoderBuffer::get_py_incomplete_stream_error())
+                ))
+            {
+                PyErr_Clear();
+                Py_RETURN_NONE;
             }
-            auto const is_incomplete_stream_error{static_cast<bool>(
-                    PyErr_ExceptionMatches(PyDecoderBuffer::get_py_incomplete_stream_error())
-            )};
-            if (false == is_incomplete_stream_error) {
-                return nullptr;
-            }
-            PyErr_Clear();
-            Py_RETURN_NONE;
+            return nullptr;
         }
         if (ffi::ir_stream::IRErrorCode_Eof == err) {
             Py_RETURN_NONE;
