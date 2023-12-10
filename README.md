@@ -29,8 +29,9 @@ version >= 3.6.
 ## Building/Packaging
 
 To manually build a package for distribution, run the following steps. You will
-need a C++ compiler which supports C++20 (e.g. `clang++` >= 7 or g++ >= 10). The
-steps will generate both a `.tar.gz` and `.whl` package under `./dist/`.
+need a C++ compiler which supports `std::span` (e.g. `clang++` >= 7 or
+`g++` >= 10). The steps below will generate both a `.tar.gz` and `.whl` package
+under `./dist/`.
 
 ```bash
 # 1. Create and enter a virtual environment
