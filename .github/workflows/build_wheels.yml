@@ -1,6 +1,34 @@
 name: Build
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - '.clang-format'
+      - '.clang-tidy'
+      - '.github/workflows/build_wheels.yml'
+      - '.gitmodules'
+      - 'clp_ffi_py/**'
+      - 'MANIFEST.in'
+      - 'pyproject.toml'
+      - 'requirements-dev.txt'
+      - 'setup.cfg'
+      - 'setup.py'
+      - 'src/**'
+      - 'tests/**'
+  pull_request:
+    paths:
+      - '.clang-format'
+      - '.clang-tidy'
+      - '.github/workflows/build_wheels.yml'
+      - '.gitmodules'
+      - 'clp_ffi_py/**'
+      - 'MANIFEST.in'
+      - 'pyproject.toml'
+      - 'requirements-dev.txt'
+      - 'setup.cfg'
+      - 'setup.py'
+      - 'src/**'
+      - 'tests/**'
 
 jobs:
   linters:
