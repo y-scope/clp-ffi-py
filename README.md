@@ -4,8 +4,6 @@ This module provides Python packages to interface with [CLP Core Features][1]
 through CLP's FFI (foreign function interface). At present, this library
 supplies built-in functions for encoding/decoding log messages using [CLP][2].
 
-Change to test workflow run.
-
 ## Quick Start
 
 ### Install with `pip`:
