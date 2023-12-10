@@ -3,32 +3,32 @@ name: Build
 on:
   pull_request:
     paths:
-      - '.clang-format'
-      - '.clang-tidy'
-      - '.github/workflows/build_wheels.yml'
-      - '.gitmodules'
-      - 'clp_ffi_py/**'
-      - 'MANIFEST.in'
-      - 'pyproject.toml'
-      - 'requirements-dev.txt'
-      - 'setup.cfg'
-      - 'setup.py'
-      - 'src/**'
-      - 'tests/**'
+      - ".clang-format"
+      - ".clang-tidy"
+      - ".github/workflows/build_wheels.yml"
+      - ".gitmodules"
+      - "clp_ffi_py/**"
+      - "MANIFEST.in"
+      - "pyproject.toml"
+      - "requirements-dev.txt"
+      - "setup.cfg"
+      - "setup.py"
+      - "src/**"
+      - "tests/**"
   push:
     paths:
-      - '.clang-format'
-      - '.clang-tidy'
-      - '.github/workflows/build_wheels.yml'
-      - '.gitmodules'
-      - 'clp_ffi_py/**'
-      - 'MANIFEST.in'
-      - 'pyproject.toml'
-      - 'requirements-dev.txt'
-      - 'setup.cfg'
-      - 'setup.py'
-      - 'src/**'
-      - 'tests/**'
+      - ".clang-format"
+      - ".clang-tidy"
+      - ".github/workflows/build_wheels.yml"
+      - ".gitmodules"
+      - "clp_ffi_py/**"
+      - "MANIFEST.in"
+      - "pyproject.toml"
+      - "requirements-dev.txt"
+      - "setup.cfg"
+      - "setup.py"
+      - "src/**"
+      - "tests/**"
 
 jobs:
   linters:
