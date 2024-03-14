@@ -6,7 +6,7 @@ includes:
 
 vars:
   # Paths
-  BUILD_DIR: "{{.ROOT_DIR}}/../builds/clp-ffi-py"
+  BUILD_DIR: "{{.ROOT_DIR}}/build"
   WHEEL_BUILD_DIR: "{{.BUILD_DIR}}/dist"
   WHEEL_VENV_DIR: "{{.BUILD_DIR}}/wheel-venv"
 
