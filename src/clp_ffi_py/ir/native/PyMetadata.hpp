@@ -45,8 +45,8 @@ public:
      * @return false on failure with the relevant Python exception and error
      * set.
      */
-    [[nodiscard]] auto init(nlohmann::json const& metadata, bool is_four_byte_encoding = true)
-            -> bool;
+    [[nodiscard]] auto
+    init(nlohmann::json const& metadata, bool is_four_byte_encoding = true) -> bool;
 
     /**
      * Releases the memory allocated for underlying metadata field and the

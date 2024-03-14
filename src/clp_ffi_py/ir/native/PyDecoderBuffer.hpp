@@ -38,9 +38,10 @@ public:
      * @return false on failure with the relevant Python exception and error
      * set.
      */
-    [[nodiscard]] auto
-    init(PyObject* input_stream, Py_ssize_t buf_capacity = PyDecoderBuffer::cDefaultInitialCapacity)
-            -> bool;
+    [[nodiscard]] auto init(
+            PyObject* input_stream,
+            Py_ssize_t buf_capacity = PyDecoderBuffer::cDefaultInitialCapacity
+    ) -> bool;
 
     /**
      * Zero-initializes all the data members in PyDecoderBuffer. Should be

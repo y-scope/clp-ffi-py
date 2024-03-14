@@ -102,8 +102,7 @@ class TestCLPBase(unittest.TestCase):
             is_the_same_tz,
             True,
             f"Timezone does not match timezone id. Timezone ID: {timezone_id}, Timezone:"
-            f' {str(timezone)}"\n'
-            + extra_test_info,
+            f' {str(timezone)}"\n' + extra_test_info,
         )
 
     def _check_log_event(
