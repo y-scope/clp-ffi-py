@@ -30,15 +30,22 @@ tasks:
       - |-
         . "{{.WHEEL_VENV_DIR}}/bin/activate"
         python3 -m build --outdir "{{.OUTPUT_DIR}}"
+      # Checksum the generated files (this command must be last)
+      - |-
+        cd "{{.OUTPUT_DIR}}"
+        tar cf - {{.CHECKSUM_TAR_BASE_ARGS}} . | md5sum > "{{.CHECKSUM_FILE}}"
     sources:
       - "{{.BUILD_DIR}}/submodules.md5"
       - "{{.BUILD_DIR}}/wheel-venv.md5"
       - "{{.TASKFILE}}"
       - "clp_ffi_py/**/*"
       - "src/**/*"
-    generates:
-      - "{{.OUTPUT_DIR}}/*.tar.gz"
-      - "{{.OUTPUT_DIR}}/*.whl"
+    status:
+      - "test -f '{{.CHECKSUM_FILE}}'"
+      - >-
+        diff
+        <(cd '{{.OUTPUT_DIR}}' && tar cf - {{.CHECKSUM_TAR_BASE_ARGS}} . | md5sum)
+        "{{.CHECKSUM_FILE}}"
 
   build-venv:
     internal: true
