@@ -28,24 +28,32 @@ version >= 3.6.
 
 ## Building/Packaging
 
-To manually build a package for distribution, run the following steps. You will
-need a C++ compiler which supports `std::span` (e.g. `clang++` >= 7 or
-`g++` >= 10). The steps below will generate both a `.tar.gz` and `.whl` package
-under `./dist/`.
+To manually build a package for distribution, follow the steps below.
 
-```bash
-# 1. Create and enter a virtual environment
-python -m venv venv && . ./venv/bin/activate
+### Requirements
 
-# 2. Install development dependencies
-pip install -r requirements-dev.txt
+* A C++ compiler that supports C++20 and `std::span` (e.g. `clang++` >= 7 or
+  `g++` >= 10).
+* python3
+* python3-dev
+* python3-venv
+* [Task][18]
 
-# 3. Pull all submodules in preparation for building
-git submodule update --init --recursive
+### Build commands
 
-# 4. Build
-python -m build --outdir build/dist
-```
+* Build a Python wheel incrementally:
+
+  ```bash
+  task
+  ```
+  The command above will generate both a `.tar.gz` and `.whl` package under
+  `./build/dist/`.
+
+* Clean up the build:
+
+  ```bash
+  task clean
+  ```
 
 ## CLP IR Readers
 
@@ -302,3 +310,4 @@ other package management tools such as `apt-get`:
 [15]: https://docs.python.org/3/library/pickle.html
 [16]: https://pypi.org/project/clp-ffi-py/
 [17]: https://github.com/RaRe-Technologies/smart_open
+[18]: https://taskfile.dev/installation/
