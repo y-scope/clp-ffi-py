@@ -37,7 +37,7 @@ To manually build a package for distribution, follow the steps below.
 * python3
 * python3-dev
 * python3-venv
-* [Task][18]
+* [Task][18] >= 3.35.1
 
 ### Build commands
 
