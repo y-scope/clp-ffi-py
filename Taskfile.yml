@@ -59,6 +59,12 @@ tasks:
     vars:
       CHECKSUM_FILE: "{{.BUILD_DIR}}/{{.TASK}}.md5"
       OUTPUT_DIR: "src/clp"
+    preconditions:
+      # Ensure there are no uncommitted changes to the submodules since the submodule update
+      # command might undo them. Specifically, the update command will undo any uncommitted changes
+      # to the commits that the submodules point to.
+      - sh: "git diff --quiet src/clp"
+        msg: "There are uncommitted changes to the submodules. Commit or stash them first."
     cmds:
       - "git submodule update --init --recursive"
       # Checksum the generated files (this command must be last)
