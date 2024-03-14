@@ -37,6 +37,7 @@ tasks:
       - "clp_ffi_py/**/*"
       - "src/**/*"
     generates:
+      - "{{.OUTPUT_DIR}}/*.tar.gz"
       - "{{.OUTPUT_DIR}}/*.whl"
 
   build-venv:

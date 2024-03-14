@@ -81,6 +81,7 @@ tasks:
       - "{{.REQUIREMENTS_FILE_PATH}}"
       - "{{.ROOT_DIR}}/Taskfile.yml"
       - "{{.TASKFILE}}"
+      - "{{.WHEEL_BUILD_DIR}}/*.tar.gz"
       - "{{.WHEEL_BUILD_DIR}}/*.whl"
     status:
       - "test -f '{{.CHECKSUM_FILE}}'"
