@@ -34,8 +34,8 @@ documentation website for this package:
   task docs:api-docs
   ```
   
-  * This will regenerate the API docs in `src/api`. You should run this whenever you change what
-    modules or package exist in `clp-ffi-py` and commit the changes.
+  * This will regenerate the API docs in `src/api`. You should run this whenever you change the
+    modules or package that exist in `clp-ffi-py`, and then commit the changes.
   * This will overwrite any existing API doc files. This is only a problem if any of the previously
     generated files were manually customized (e.g., to reformat some docs). You should
     review the changes carefully to make sure any customizations have not been mistakenly deleted.
