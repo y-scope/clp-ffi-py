@@ -51,10 +51,9 @@ test-command = [
   "python -m unittest -fv",
 ]
 test-requires = [
-    "smart_open"
+    "smart_open==6.4.0"
 ]
 test-skip = [
-    "cp37-*",
     "cp39-*",
     "cp310-*",
     "*-*linux_i686",
