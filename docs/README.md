@@ -21,13 +21,28 @@ documentation website for this package:
   ```
   
   * The output of the build will be in `../build/docs/html`.
-  * API reference docs will be written to `src/api`.
 
 * Clean up the build:
 
   ```shell
   task docs:clean
   ```
+
+* Generate API docs:
+
+  ```shell
+  task docs:api-docs
+  ```
+  
+  * This will regenerate the API docs in `src/api`. You should run this whenever you change the
+    modules or package that exist in `clp-ffi-py`, and then commit the changes.
+  * This will overwrite any existing API doc files. This is only a problem if any of the previously
+    generated files were manually customized (e.g., to reformat some docs). You should
+    review the changes carefully to make sure any customizations have not been mistakenly deleted.
+  * This will *not* remove docs for packages/modules that no longer exist. You should make sure to
+    delete those docs from `src/api`. In addition, ensure that:
+    * in the case of a rename, any previous customizations are retained.
+    * no unrelated files (e.g., indexes) are deleted.
 
 ## Viewing the Output
 
