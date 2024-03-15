@@ -4,6 +4,9 @@ This module provides Python packages to interface with [CLP Core Features][1]
 through CLP's FFI (foreign function interface). At present, this library
 supplies built-in functions for encoding/decoding log messages using [CLP][2].
 
+> [!IMPORTANT]
+> This project is no longer built for Python3.6.
+
 ## Quick Start
 
 ### Install with `pip`:
@@ -12,9 +15,6 @@ supplies built-in functions for encoding/decoding log messages using [CLP][2].
 # Install the latest version
 python3 -m pip install --upgrade clp-ffi-py
 ```
-
-> [!IMPORTANT]
-> This project is no longer built for Python3.6.
 
 Note:
 
