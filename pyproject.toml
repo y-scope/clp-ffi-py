@@ -44,8 +44,6 @@ musllinux-ppc64le-image = "musllinux_1_2"
 musllinux-s390x-image = "musllinux_1_2"
 musllinux-x86_64-image = "musllinux_1_2"
 
-skip = "pp*"
-
 test-command = [
   "cd {package}/tests",
   "python -m unittest -fv",
@@ -59,9 +57,6 @@ test-skip = [
     "cp310-*",
     "*-*linux_i686",
 ]
-
-[tool.cibuildwheel.macos]
-archs = ["x86_64", "universal2", "arm64"]
 
 [tool.docformatter]
 make-summary-multi-line = true
