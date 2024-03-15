@@ -41,9 +41,9 @@ jobs:
   linters:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       
@@ -177,28 +177,26 @@ jobs:
           - name: cp39-musllinux_x86_64
             os: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
-
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Set up QEMU
         if: runner.os == 'Linux'
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
         with:
           platforms: all
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.16.2
+        uses: pypa/cibuildwheel@v2.17.0
         env:
-          CIBW_BUILD: ${{ matrix.build.name }}
           CIBW_ARCHS_LINUX: auto aarch64
           CIBW_ARCHS_MACOS: arm64 universal2 x86_64
+          CIBW_BUILD: ${{ matrix.build.name }}
           MACOSX_DEPLOYMENT_TARGET: 10.15
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: wheel-${{ matrix.build.name }}
           path: ./wheelhouse/*.whl
