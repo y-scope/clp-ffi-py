@@ -11,6 +11,7 @@ documentation website for this package:
 * All the [requirements](../README.md#requirements) for building the Python
   package.
 * [Node.js] >= 16 to be able to [view the output](#viewing-the-output)
+* Python 3.10 or later
 
 ## Build Commands
 
