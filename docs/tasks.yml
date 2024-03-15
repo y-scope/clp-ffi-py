@@ -1,0 +1,112 @@
+version: "3"
+
+vars:
+  # Paths
+  DOCS_BUILD_DIR: "{{.BUILD_DIR}}/docs/html"
+  DOCS_VENV_DIR: "{{.BUILD_DIR}}/docs-venv"
+  NODE_DEPS_DIR: "{{.BUILD_DIR}}/node"
+
+  # Other variables
+  PYTHON_VERSION:
+    sh: python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')"
+
+tasks:
+  clean:
+    cmds:
+      - "rm -rf '{{.DOCS_BUILD_DIR}}'"
+
+  serve:
+    deps:
+      - "http-server"
+      - "site"
+    cmds:
+      - "npm --prefix '{{.NODE_DEPS_DIR}}' exec http-server '{{.DOCS_BUILD_DIR}}' -c-1"
+
+  site:
+    dir: "{{.TASKFILE_DIR}}"
+    deps: ["docs-venv"]
+    vars:
+      CHECKSUM_FILE: "{{.BUILD_DIR}}/{{.TASK}}.md5"
+      OUTPUT_DIR: "{{.DOCS_BUILD_DIR}}"
+    cmds:
+      - |-
+        . "{{.DOCS_VENV_DIR}}/bin/activate"
+        
+        sphinx-apidoc \
+        --force \
+        --separate \
+        --no-toc \
+        -o src/api \
+        "{{.DOCS_VENV_DIR}}/lib/python{{.PYTHON_VERSION}}/site-packages/clp_ffi_py/"
+        
+        sphinx-build -a -c conf -b html src "{{.OUTPUT_DIR}}"
+      # Checksum the generated files (this command must be last)
+      - |-
+        cd "{{.OUTPUT_DIR}}"
+        tar cf - {{.CHECKSUM_TAR_BASE_ARGS}} . | md5sum > "{{.CHECKSUM_FILE}}"
+    sources:
+      - "{{.BUILD_DIR}}/docs-venv.md5"
+      - "{{.ROOT_DIR}}/Taskfile.yml"
+      - "{{.TASKFILE}}"
+      - "conf/**/*"
+      - "src/**/*"
+    status:
+      - "test -f '{{.CHECKSUM_FILE}}'"
+      - >-
+        diff
+        <(cd '{{.OUTPUT_DIR}}' && tar cf - {{.CHECKSUM_TAR_BASE_ARGS}} . | md5sum)
+        "{{.CHECKSUM_FILE}}"
+
+  docs-venv:
+    internal: true
+    deps: [":wheel"]
+    vars:
+      CHECKSUM_FILE: "{{.BUILD_DIR}}/{{.TASK}}.md5"
+      REQUIREMENTS_FILE_PATH: "docs/requirements.txt"
+      OUTPUT_DIR: "{{.DOCS_VENV_DIR}}"
+    cmds:
+      - task: ":build-venv"
+        vars:
+          COMPONENT: "docs"
+          OUTPUT_DIR: "{{.OUTPUT_DIR}}"
+          REQUIREMENTS_FILE_PATH: "{{.REQUIREMENTS_FILE_PATH}}"
+      - |-
+        . "{{.OUTPUT_DIR}}/bin/activate"
+        pip3 install --upgrade "{{.WHEEL_BUILD_DIR}}"/*.whl
+      # Checksum the generated files (this command must be last)
+      - |-
+        cd "{{.OUTPUT_DIR}}"
+        tar cf - {{.CHECKSUM_TAR_BASE_ARGS}} . | md5sum > "{{.CHECKSUM_FILE}}"
+    sources:
+      - "{{.BUILD_DIR}}/wheel.md5"
+      - "{{.REQUIREMENTS_FILE_PATH}}"
+      - "{{.ROOT_DIR}}/Taskfile.yml"
+      - "{{.TASKFILE}}"
+    status:
+      - "test -f '{{.CHECKSUM_FILE}}'"
+      - >-
+        diff
+        <(cd '{{.OUTPUT_DIR}}' && tar cf - {{.CHECKSUM_TAR_BASE_ARGS}} . | md5sum)
+        "{{.CHECKSUM_FILE}}"
+
+  http-server:
+    internal: true
+    vars:
+      CHECKSUM_FILE: "{{.BUILD_DIR}}/{{.TASK}}.md5"
+      OUTPUT_DIR: "{{.NODE_DEPS_DIR}}"
+    cmds:
+      - "rm -rf '{{.OUTPUT_DIR}}'"
+      - "npm --prefix '{{.OUTPUT_DIR}}' install http-server"
+      # Checksum the generated files (this command must be last)
+      - |-
+        cd "{{.OUTPUT_DIR}}"
+        tar cf - {{.CHECKSUM_TAR_BASE_ARGS}} . | md5sum > "{{.CHECKSUM_FILE}}"
+    sources:
+      - "{{.ROOT_DIR}}/Taskfile.yml"
+      - "{{.TASKFILE}}"
+    status:
+      - "test -f '{{.CHECKSUM_FILE}}'"
+      - >-
+        diff
+        <(cd '{{.NODE_DEPS_DIR}}' && tar cf - {{.CHECKSUM_TAR_BASE_ARGS}} . | md5sum)
+        "{{.CHECKSUM_FILE}}"

@@ -1,0 +1,115 @@
+version: "3"
+
+includes:
+  docs:
+    taskfile: "docs/tasks.yml"
+
+vars:
+  # Paths
+  BUILD_DIR: "{{.ROOT_DIR}}/build"
+  WHEEL_BUILD_DIR: "{{.BUILD_DIR}}/dist"
+  WHEEL_VENV_DIR: "{{.BUILD_DIR}}/wheel-venv"
+
+tasks:
+  default:
+    deps: ["wheel"]
+
+  clean:
+    cmds:
+      - "rm -rf '{{.BUILD_DIR}}'"
+
+  wheel:
+    vars:
+      CHECKSUM_FILE: "{{.BUILD_DIR}}/{{.TASK}}.md5"
+      OUTPUT_DIR: "{{.WHEEL_BUILD_DIR}}"
+    deps:
+      - "submodules"
+      - "wheel-venv"
+    cmds:
+      - "rm -rf '{{.OUTPUT_DIR}}'"
+      - |-
+        . "{{.WHEEL_VENV_DIR}}/bin/activate"
+        python3 -m build --outdir "{{.OUTPUT_DIR}}"
+      # Checksum the generated files (this command must be last)
+      - |-
+        cd "{{.OUTPUT_DIR}}"
+        tar cf - {{.CHECKSUM_TAR_BASE_ARGS}} . | md5sum > "{{.CHECKSUM_FILE}}"
+    sources:
+      - "{{.BUILD_DIR}}/submodules.md5"
+      - "{{.BUILD_DIR}}/wheel-venv.md5"
+      - "{{.TASKFILE}}"
+      - "clp_ffi_py/**/*"
+      - "src/**/*"
+    status:
+      - "test -f '{{.CHECKSUM_FILE}}'"
+      - >-
+        diff
+        <(cd '{{.OUTPUT_DIR}}' && tar cf - {{.CHECKSUM_TAR_BASE_ARGS}} . | md5sum)
+        "{{.CHECKSUM_FILE}}"
+
+  build-venv:
+    internal: true
+    label: "{{.COMPONENT}}-{{.TASK}}"
+    requires:
+      vars:
+        - "COMPONENT"
+        - "OUTPUT_DIR"
+        - "REQUIREMENTS_FILE_PATH"
+    cmds:
+      - "rm -rf '{{.OUTPUT_DIR}}'"
+      - "python3 -m venv '{{.OUTPUT_DIR}}'"
+      - |-
+        . "{{.OUTPUT_DIR}}/bin/activate"
+        pip3 install -r "{{.REQUIREMENTS_FILE_PATH}}"
+
+  submodules:
+    internal: true
+    vars:
+      CHECKSUM_FILE: "{{.BUILD_DIR}}/{{.TASK}}.md5"
+      OUTPUT_DIR: "src/clp"
+    preconditions:
+      # Ensure there are no uncommitted changes to the submodules since the submodule update
+      # command might undo them. Specifically, the update command will undo any uncommitted changes
+      # to the commits that the submodules point to.
+      - sh: "git diff --quiet src/clp"
+        msg: "There are uncommitted changes to the submodules. Commit or stash them first."
+    cmds:
+      - "git submodule update --init --recursive"
+      # Checksum the generated files (this command must be last)
+      - |-
+        cd "{{.OUTPUT_DIR}}"
+        tar cf - {{.CHECKSUM_TAR_BASE_ARGS}} . | md5sum > "{{.CHECKSUM_FILE}}"
+    sources:
+      - "{{.TASKFILE}}"
+      - ".gitmodules"
+    status:
+      - "test -f '{{.CHECKSUM_FILE}}'"
+      - >-
+        diff
+        <(cd '{{.OUTPUT_DIR}}' && tar cf - {{.CHECKSUM_TAR_BASE_ARGS}} . | md5sum)
+        "{{.CHECKSUM_FILE}}"
+
+  wheel-venv:
+    internal: true
+    vars:
+      CHECKSUM_FILE: "{{.BUILD_DIR}}/{{.TASK}}.md5"
+      OUTPUT_DIR: "{{.WHEEL_VENV_DIR}}"
+    cmds:
+      - task: "build-venv"
+        vars:
+          COMPONENT: "wheel"
+          OUTPUT_DIR: "{{.OUTPUT_DIR}}"
+          REQUIREMENTS_FILE_PATH: "requirements-dev.txt"
+      # Checksum the generated files (this command must be last)
+      - |-
+        cd "{{.OUTPUT_DIR}}"
+        tar cf - {{.CHECKSUM_TAR_BASE_ARGS}} . | md5sum > "{{.CHECKSUM_FILE}}"
+    sources:
+      - "{{.TASKFILE}}"
+      - "requirements-dev.txt"
+    status:
+      - "test -f '{{.CHECKSUM_FILE}}'"
+      - >-
+        diff
+        <(cd '{{.OUTPUT_DIR}}' && tar cf - {{.CHECKSUM_TAR_BASE_ARGS}} . | md5sum)
+        "{{.CHECKSUM_FILE}}"

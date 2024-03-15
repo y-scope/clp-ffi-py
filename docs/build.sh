@@ -4,8 +4,8 @@
 set -eu
 
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-pushd "$script_dir"
+pushd "$script_dir/.."
 
-task clean && task
+task clean && task docs:site
 
 popd

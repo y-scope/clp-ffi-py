@@ -8,49 +8,44 @@ documentation website for this package:
 
 ## Requirements
 
-We use the following tools to build the site:
-
-* python3
-* python3-venv
-* [Task][1]
+* All the [requirements](../README.md#requirements) for building the Python
+  package.
+* [Node.js] >= 16 to be able to [view the output](#viewing-the-output)
 
 ## Build Commands
 
 * Build the site incrementally:
 
   ```shell
-  task
+  task docs:site
   ```
   
   * The output of the build will be in `../build/docs/html`.
   * API reference docs will be written to `src/api`.
 
-* Clean-up the build:
+* Clean up the build:
 
   ```shell
-  task clean
+  task docs:clean
   ```
 
 ## Viewing the Output
 
-You can use [Node.js' npm][2] with [http-server][3] to view the output:
-
 ```shell
-npx http-server ../build/docs/html -c-1
+task docs:serve
 ```
 
-We use `-c-1` to disable caching during development.
+The command above will install [http-server] and serve the built docs site.
 
-# Integration with [yscope-docs][4]
+# Integration with [yscope-docs]
 
-To support hosting on [docs.yscope.com][5], we need:
+To support hosting on [docs.yscope.com], we need:
 
 * `build.sh` which builds a clean version of the site and outputs it to
   `../build/docs/html`.
 * `build.sh` must be runnable from any directory.
 
-[1]: https://taskfile.dev/
-[2]: https://nodejs.org/en/download/current
-[3]: https://www.npmjs.com/package/http-server
-[4]: https://github.com/y-scope/yscope-docs
-[5]: https://docs.yscope.com
+[docs.yscope.com]: https://docs.yscope.com
+[http-server]: https://www.npmjs.com/package/http-server
+[Node.js]: https://nodejs.org/en/download/current
+[yscope-docs]: https://github.com/y-scope/yscope-docs
