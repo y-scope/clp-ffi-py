@@ -191,10 +191,7 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.17.0
         env:
-          CIBW_ARCHS_LINUX: auto aarch64
-          CIBW_ARCHS_MACOS: arm64 universal2 x86_64
           CIBW_BUILD: ${{ matrix.build.name }}
-          MACOSX_DEPLOYMENT_TARGET: 10.15
 
       - uses: actions/upload-artifact@v4
         with:
