@@ -45,14 +45,21 @@ if "__main__" == __name__:
     try:
         if "Darwin" == platform.system():
             target: Optional[str] = os.environ.get("MACOSX_DEPLOYMENT_TARGET")
-            if None is target or float(target) < 10.15:
+            env_setup_needed: bool = False
+            if None is target:
+                env_setup_needed = True
+            else:
+                version_values: List[int] = [int(part) for part in target.split(".")]
+                if 10 >= version_values[0] and 15 >= version_values[1]:
+                    env_setup_needed = True
+            if env_setup_needed:
                 os.environ["MACOSX_DEPLOYMENT_TARGET"] = "10.15"
 
         project_name: str = "clp_ffi_py"
         description: str = "CLP FFI Python Interface"
         extension_modules: List[Extension] = [ir_native]
         if (3, 7) > sys.version_info:
-            sys.exit(f"The minimum Python version required is Python3.7")
+            sys.exit("The minimum Python version required is Python3.7")
         else:
             setup(
                 name=project_name,
