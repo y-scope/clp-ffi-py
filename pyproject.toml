@@ -69,7 +69,6 @@ archs = ["auto", "aarch64"]
 
 [tool.cibuildwheel.macos]
 archs = ["x86_64", "universal2", "arm64"]
-environment = { MACOSX_DEPLOYMENT_TARGET = "10.15" }
 
 [tool.docformatter]
 make-summary-multi-line = true
