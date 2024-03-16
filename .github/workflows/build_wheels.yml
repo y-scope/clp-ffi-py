@@ -200,7 +200,7 @@ jobs:
           retention-days: 1
 
   combine-wheels:
-    needs: [build-wheels]
+    needs: [build_wheels]
     name: Combine wheels
     runs-on: ubuntu-latest
     env:
