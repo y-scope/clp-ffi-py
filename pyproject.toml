@@ -79,7 +79,7 @@ exclude = [
     "clp_ffi_py/ir/__init__.py"
 ]
 line-length = 100
-select = ["E", "I", "F"]
 
-[tool.ruff.isort]
-order-by-type = false
+[tool.ruff.lint]
+select = ["E", "I", "F"]
+isort.order-by-type = false
