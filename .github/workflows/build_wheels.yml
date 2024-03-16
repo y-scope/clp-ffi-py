@@ -197,3 +197,20 @@ jobs:
         with:
           name: wheel-${{ matrix.build.name }}
           path: ./wheelhouse/*.whl
+          retention-days: 1
+
+  combine-wheels:
+    needs: [build-wheels]
+    name: Combine wheels
+    runs-on: ubuntu-latest
+    env:
+      WHEEL_DIR: /tmp/wheels
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: ${{env.WHEEL_DIR}}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: all-wheels
+          path: ${{env.WHEEL_DIR}}
