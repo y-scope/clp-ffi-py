@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from copy import deepcopy
 from typing import List, Optional
 
@@ -49,7 +51,7 @@ class QueryBuilder:
         """
         return deepcopy(self._wildcard_queries)
 
-    def set_search_time_lower_bound(self, ts: int) -> "QueryBuilder":
+    def set_search_time_lower_bound(self, ts: int) -> QueryBuilder:
         """
         :param ts: Start of the search time range (inclusive) as a UNIX epoch
             timestamp in milliseconds.
@@ -58,7 +60,7 @@ class QueryBuilder:
         self._search_time_lower_bound = ts
         return self
 
-    def set_search_time_upper_bound(self, ts: int) -> "QueryBuilder":
+    def set_search_time_upper_bound(self, ts: int) -> QueryBuilder:
         """
         :param ts: End of the search time range (inclusive) as a UNIX epoch
             timestamp in milliseconds.
@@ -67,7 +69,7 @@ class QueryBuilder:
         self._search_time_upper_bound = ts
         return self
 
-    def set_search_time_termination_margin(self, ts: int) -> "QueryBuilder":
+    def set_search_time_termination_margin(self, ts: int) -> QueryBuilder:
         """
         :param ts: The search time termination margin as a UNIX epoch timestamp
             in milliseconds.
@@ -76,9 +78,7 @@ class QueryBuilder:
         self._search_time_termination_margin = ts
         return self
 
-    def add_wildcard_query(
-        self, wildcard_query: str, case_sensitive: bool = False
-    ) -> "QueryBuilder":
+    def add_wildcard_query(self, wildcard_query: str, case_sensitive: bool = False) -> QueryBuilder:
         """
         Constructs and adds a :class:`~clp_ffi_py.wildcard_query.WildcardQuery`
         to the wildcard query list.
@@ -90,7 +90,7 @@ class QueryBuilder:
         self._wildcard_queries.append(WildcardQuery(wildcard_query, case_sensitive))
         return self
 
-    def add_wildcard_queries(self, wildcard_queries: List[WildcardQuery]) -> "QueryBuilder":
+    def add_wildcard_queries(self, wildcard_queries: List[WildcardQuery]) -> QueryBuilder:
         """
         Adds a list of wildcard queries to the wildcard query list.
 
@@ -100,7 +100,7 @@ class QueryBuilder:
         self._wildcard_queries.extend(wildcard_queries)
         return self
 
-    def reset_search_time_lower_bound(self) -> "QueryBuilder":
+    def reset_search_time_lower_bound(self) -> QueryBuilder:
         """
         Resets the search time lower bound to the default value.
 
@@ -109,7 +109,7 @@ class QueryBuilder:
         self._search_time_lower_bound = Query.default_search_time_lower_bound()
         return self
 
-    def reset_search_time_upper_bound(self) -> "QueryBuilder":
+    def reset_search_time_upper_bound(self) -> QueryBuilder:
         """
         Resets the search time upper bound to the default value.
 
@@ -118,7 +118,7 @@ class QueryBuilder:
         self._search_time_upper_bound = Query.default_search_time_upper_bound()
         return self
 
-    def reset_search_time_termination_margin(self) -> "QueryBuilder":
+    def reset_search_time_termination_margin(self) -> QueryBuilder:
         """
         Resets the search time termination margin to the default value.
 
@@ -127,7 +127,7 @@ class QueryBuilder:
         self._search_time_termination_margin = Query.default_search_time_termination_margin()
         return self
 
-    def reset_wildcard_queries(self) -> "QueryBuilder":
+    def reset_wildcard_queries(self) -> QueryBuilder:
         """
         Clears the wildcard query list.
 
@@ -136,7 +136,7 @@ class QueryBuilder:
         self._wildcard_queries.clear()
         return self
 
-    def reset(self) -> "QueryBuilder":
+    def reset(self) -> QueryBuilder:
         """
         Resets all settings to their defaults.
 
