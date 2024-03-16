@@ -2,7 +2,7 @@ import os
 import platform
 import sys
 from setuptools import setup, Extension
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
 ir_native: Extension = Extension(
     name="clp_ffi_py.ir.native",
