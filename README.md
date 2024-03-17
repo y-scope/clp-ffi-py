@@ -4,6 +4,9 @@ This module provides Python packages to interface with [CLP Core Features][1]
 through CLP's FFI (foreign function interface). At present, this library
 supplies built-in functions for encoding/decoding log messages using [CLP][2].
 
+> [!IMPORTANT]
+> This project is no longer built for Python3.6.
+
 ## Quick Start
 
 ### Install with `pip`:
@@ -15,7 +18,7 @@ python3 -m pip install --upgrade clp-ffi-py
 
 Note:
 
-- Python 3.6 or higher is required.
+- Python 3.7 or higher is required.
 - Only Linux and macOS are supported at present.
 
 To install an older version or download the prebuilt `whl` package, check the
@@ -23,8 +26,8 @@ project homepage on PyPI [here][16].
 
 ## Compatibility
 
-Tested on Python 3.8, 3.9 and 3.10, and it should work on any Python
-version >= 3.6.
+Tested on Python 3.7, 3.8, 3.11 and 3.12, and it should work on any Python
+version >= 3.7.
 
 ## Building/Packaging
 

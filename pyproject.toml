@@ -2,7 +2,6 @@
 requires = [
     "setuptools >= 59.0",
     "setuptools_scm",
-    "toml >= 0.10.2",
     "wheel",
 ]
 build-backend = "setuptools.build_meta"
@@ -16,7 +15,7 @@ authors = [
 ]
 description = "Python interface to the CLP Core Features through CLP's FFI"
 readme = "README.md"
-requires-python = ">=3.6"
+requires-python = ">=3.7"
 dependencies = [
     "python-dateutil >= 2.7.0",
     "typing-extensions >= 4.1.1",
@@ -58,7 +57,6 @@ test-requires = [
     "smart_open==6.4.0"
 ]
 test-skip = [
-    "cp37-*",
     "cp39-*",
     "cp310-*",
     "*-*linux_i686",
@@ -88,7 +86,7 @@ exclude = [
     "clp_ffi_py/ir/__init__.py"
 ]
 line-length = 100
-select = ["E", "I", "F"]
 
-[tool.ruff.isort]
-order-by-type = false
+[tool.ruff.lint]
+select = ["E", "I", "F"]
+isort.order-by-type = false

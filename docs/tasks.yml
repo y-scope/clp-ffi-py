@@ -11,6 +11,19 @@ vars:
     sh: python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')"
 
 tasks:
+  api-docs:
+    dir: "{{.TASKFILE_DIR}}"
+    deps: [ "docs-venv" ]
+    cmds:
+      - |-
+        . "{{.DOCS_VENV_DIR}}/bin/activate"
+        sphinx-apidoc \
+          --separate \
+          --no-toc \
+          --force \
+          -o src/api \
+          "{{.DOCS_VENV_DIR}}/lib/python{{.PYTHON_VERSION}}/site-packages/clp_ffi_py/"
+
   clean:
     cmds:
       - "rm -rf '{{.DOCS_BUILD_DIR}}'"
@@ -31,14 +44,6 @@ tasks:
     cmds:
       - |-
         . "{{.DOCS_VENV_DIR}}/bin/activate"
-        
-        sphinx-apidoc \
-        --force \
-        --separate \
-        --no-toc \
-        -o src/api \
-        "{{.DOCS_VENV_DIR}}/lib/python{{.PYTHON_VERSION}}/site-packages/clp_ffi_py/"
-        
         sphinx-build -a -c conf -b html src "{{.OUTPUT_DIR}}"
       # Checksum the generated files (this command must be last)
       - |-

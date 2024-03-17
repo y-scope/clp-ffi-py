@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pathlib import Path
 from sys import stderr
 from types import TracebackType
@@ -103,12 +105,12 @@ class ClpIrStreamReader(Iterator[LogEvent]):
     def close(self) -> None:
         self.__istream.close()
 
-    def __iter__(self) -> "ClpIrStreamReader":
+    def __iter__(self) -> ClpIrStreamReader:
         if False is self.has_metadata():
             self.read_preamble()
         return self
 
-    def __enter__(self) -> "ClpIrStreamReader":
+    def __enter__(self) -> ClpIrStreamReader:
         if False is self.has_metadata():
             self.read_preamble()
         return self
