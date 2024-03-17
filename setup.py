@@ -54,6 +54,10 @@ def _parallel_compile(
     extra_postargs: Optional[List[str]] = None,
     depends: Optional[List[str]] = None,
 ) -> List[str]:
+    """
+    A replacement for distutils.ccompiler.CCompiler.compile that compiles each source file
+    concurrently.
+    """
     macros, objects, extra_postargs, pp_opts, build = self._setup_compile(
         output_dir, macros, include_dirs, sources, depends, extra_postargs
     )
