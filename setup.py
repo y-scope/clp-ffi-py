@@ -45,14 +45,14 @@ if "__main__" == __name__:
     try:
         if "Darwin" == platform.system():
             target_env_var_name: str = "MACOSX_DEPLOYMENT_TARGET"
-            required_target: Tuple[int, int] = (10, 15)
+            min_target_version: Tuple[int, int] = (10, 15)
             
             target_str: Optional[str] = os.environ.get(target_env_var_name)
             target: Tuple[int, ...] = ()
             if target_str is not None:
                 target = tuple(int(part) for part in target_str.split("."))
-            if target < required_target:
-                target = required_target
+            if target < min_target_version:
+                target = min_target_version
             os.environ[target_env_var_name] = ".".join(str(part) for part in target)
 
         project_name: str = "clp_ffi_py"
