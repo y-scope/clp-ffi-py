@@ -2,7 +2,7 @@ import os
 import platform
 import sys
 from setuptools import setup, Extension
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 ir_native: Extension = Extension(
     name="clp_ffi_py.ir.native",
@@ -44,16 +44,16 @@ ir_native: Extension = Extension(
 if "__main__" == __name__:
     try:
         if "Darwin" == platform.system():
-            target: Optional[str] = os.environ.get("MACOSX_DEPLOYMENT_TARGET")
-            env_setup_needed: bool = False
-            if None is target:
-                env_setup_needed = True
-            else:
-                version_values: List[int] = [int(part) for part in target.split(".")]
-                if 10 >= version_values[0] and 15 >= version_values[1]:
-                    env_setup_needed = True
-            if env_setup_needed:
-                os.environ["MACOSX_DEPLOYMENT_TARGET"] = "10.15"
+            target_env_var_name: str = "MACOSX_DEPLOYMENT_TARGET"
+            required_target: Tuple[int, int] = (10, 15)
+            
+            target_str: Optional[str] = os.environ.get(target_env_var_name)
+            target: Tuple[int, ...] = ()
+            if target_str is not None:
+                target = tuple(int(part) for part in target_str.split("."))
+            if target < required_target:
+                target = required_target
+            os.environ[target_env_var_name] = ".".join(str(part) for part in target)
 
         project_name: str = "clp_ffi_py"
         description: str = "CLP FFI Python Interface"
