@@ -67,7 +67,8 @@ def _parallel_compile(
         self._compile(obj, src, ext, cc_args, extra_postargs, pp_opts)
 
     num_cores: int = multiprocessing.cpu_count()
-    multiprocessing.pool.ThreadPool(num_cores).map(_compile_single_file, objects)
+    with multiprocessing.pool.ThreadPool(num_cores) as pool:
+        pool.map(_compile_single_file, objects)
     return objects
 
 if "__main__" == __name__:
