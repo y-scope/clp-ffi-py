@@ -32,8 +32,7 @@ auto PyMetadata_init(PyMetadata* self, PyObject* args, PyObject* keywords) -> in
             static_cast<char*>(keyword_ref_timestamp),
             static_cast<char*>(keyword_timestamp_format),
             static_cast<char*>(keyword_timezone_id),
-            nullptr
-    };
+            nullptr};
 
     ffi::epoch_time_ms_t ref_timestamp{0};
     char const* input_timestamp_format{nullptr};
@@ -175,8 +174,7 @@ PyMethodDef PyMetadata_method_table[]{
          METH_NOARGS,
          static_cast<char const*>(cPyMetadataGetTimezoneDoc)},
 
-        {nullptr}
-};
+        {nullptr}};
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
@@ -206,8 +204,7 @@ PyType_Slot PyMetadata_slots[]{
         {Py_tp_new, reinterpret_cast<void*>(PyType_GenericNew)},
         {Py_tp_methods, static_cast<void*>(PyMetadata_method_table)},
         {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyMetadataDoc))},
-        {0, nullptr}
-};
+        {0, nullptr}};
 // NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
 
 PyType_Spec PyMetadata_type_spec{
@@ -215,8 +212,7 @@ PyType_Spec PyMetadata_type_spec{
         sizeof(PyMetadata),
         0,
         Py_TPFLAGS_DEFAULT,
-        static_cast<PyType_Slot*>(PyMetadata_slots)
-};
+        static_cast<PyType_Slot*>(PyMetadata_slots)};
 }  // namespace
 
 auto PyMetadata::init(

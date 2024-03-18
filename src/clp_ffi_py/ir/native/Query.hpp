@@ -8,25 +8,27 @@
 
 #include <clp/components/core/src/ErrorCode.hpp>
 #include <clp/components/core/src/ffi/encoding_methods.hpp>
+#include <clp/components/core/src/string_utils.hpp>
 
 #include <clp_ffi_py/ExceptionFFI.hpp>
 #include <clp_ffi_py/ir/native/LogEvent.hpp>
 
 namespace clp_ffi_py::ir::native {
 /**
- * This class defines a wildcard query, which includes a wildcard string and a
- * boolean value to indicate if the match is case-sensitive.
+ * This class defines a wildcard query, which includes a wildcard string a
+ * boolean value to indicate if the match is case-sensitive, and a boolean value
+ * to indicate if the query is a partial match.
  */
 class WildcardQuery {
 public:
     /**
-     * Initializes the wildcard query.
+     * Initializes the wildcard query by cleaning the wildcard string.
      * @param wildcard_query Wildcard query.
      * @param case_sensitive Case sensitive indicator.
      */
     WildcardQuery(std::string wildcard_query, bool case_sensitive)
             : m_wildcard_query(std::move(wildcard_query)),
-              m_case_sensitive(case_sensitive){};
+              m_case_sensitive(case_sensitive) {}
 
     [[nodiscard]] auto get_wildcard_query() const -> std::string const& { return m_wildcard_query; }
 
@@ -58,11 +60,9 @@ class Query {
 public:
     static constexpr ffi::epoch_time_ms_t const cTimestampMin{0};
     static constexpr ffi::epoch_time_ms_t const cTimestampMax{
-            std::numeric_limits<ffi::epoch_time_ms_t>::max()
-    };
+            std::numeric_limits<ffi::epoch_time_ms_t>::max()};
     static constexpr ffi::epoch_time_ms_t const cDefaultSearchTimeTerminationMargin{
-            static_cast<ffi::epoch_time_ms_t>(60 * 1000)
-    };
+            static_cast<ffi::epoch_time_ms_t>(60 * 1000)};
 
     /**
      * Constructs an empty query object that will match all logs. The wildcard
@@ -93,8 +93,7 @@ public:
               m_search_termination_ts{
                       (cTimestampMax - search_time_termination_margin > search_time_upper_bound)
                               ? search_time_upper_bound + search_time_termination_margin
-                              : cTimestampMax
-              } {
+                              : cTimestampMax} {
         throw_if_ts_range_invalid();
     }
 
@@ -117,8 +116,7 @@ public:
               m_search_termination_ts{
                       (cTimestampMax - search_time_termination_margin > search_time_upper_bound)
                               ? search_time_upper_bound + search_time_termination_margin
-                              : cTimestampMax
-              },
+                              : cTimestampMax},
               m_wildcard_queries{std::move(wildcard_queries)} {
         throw_if_ts_range_invalid();
     }

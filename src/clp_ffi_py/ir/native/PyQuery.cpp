@@ -3,8 +3,6 @@
 
 #include "PyQuery.hpp"
 
-#include <clp/components/core/src/string_utils.hpp>
-
 #include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ir/native/LogEvent.hpp>
 #include <clp_ffi_py/ir/native/PyLogEvent.hpp>
@@ -50,6 +48,7 @@ auto deserialize_wildcard_queries(
             PyErr_SetString(PyExc_TypeError, clp_ffi_py::cPyTypeError);
             return false;
         }
+
         auto* wildcard_query_py_str{PyObject_GetAttrString(wildcard_query, "wildcard_query")};
         if (nullptr == wildcard_query_py_str) {
             return false;
@@ -58,6 +57,7 @@ auto deserialize_wildcard_queries(
         if (nullptr == case_sensitive_py_bool) {
             return false;
         }
+
         std::string_view wildcard_query_view;
         if (false == parse_py_string_as_string_view(wildcard_query_py_str, wildcard_query_view)) {
             return false;
@@ -66,6 +66,7 @@ auto deserialize_wildcard_queries(
         if (-1 == is_case_sensitive && nullptr != PyErr_Occurred()) {
             return false;
         }
+
         wildcard_queries.emplace_back(
                 clean_up_wildcard_search_string(wildcard_query_view),
                 static_cast<bool>(is_case_sensitive)
@@ -99,20 +100,20 @@ auto serialize_wildcard_queries(std::vector<WildcardQuery> const& wildcard_queri
     Py_ssize_t idx{0};
     for (auto const& wildcard_query : wildcard_queries) {
         PyObjectPtr<PyObject> const wildcard_py_str_ptr{
-                PyUnicode_FromString(wildcard_query.get_wildcard_query().c_str())
-        };
+                PyUnicode_FromString(wildcard_query.get_wildcard_query().c_str())};
         auto* wildcard_py_str{wildcard_py_str_ptr.get()};
         if (nullptr == wildcard_py_str) {
             Py_DECREF(py_wildcard_queries);
             return nullptr;
         }
-        PyObjectPtr<PyObject> const is_case_sensitive{get_py_bool(wildcard_query.is_case_sensitive()
-        )};
+        PyObjectPtr<PyObject> const is_case_sensitive{
+                get_py_bool(wildcard_query.is_case_sensitive())};
         PyObject* py_wildcard_query{PyObject_CallFunction(
                 PyQuery::get_py_wildcard_query_type(),
-                "OO",
+                "OOO",
                 wildcard_py_str,
-                is_case_sensitive.get()
+                is_case_sensitive.get(),
+                get_py_bool(false)
         )};
         if (nullptr == py_wildcard_query) {
             Py_DECREF(py_wildcard_queries);
@@ -155,8 +156,7 @@ auto PyQuery_init(PyQuery* self, PyObject* args, PyObject* keywords) -> int {
             static_cast<char*>(keyword_search_time_upper_bound),
             static_cast<char*>(keyword_wildcard_queries),
             static_cast<char*>(keyword_search_time_termination_margin),
-            nullptr
-    };
+            nullptr};
 
     // If the argument parsing fails, `self` will be deallocated. We must reset
     // all pointers to nullptr in advance, otherwise the deallocator might
@@ -328,8 +328,7 @@ auto PyQuery_setstate(PyQuery* self, PyObject* state) -> PyObject* {
     }
 
     auto* search_time_termination_margin_obj{
-            PyDict_GetItemString(state, cStateSearchTimeTerminationMargin)
-    };
+            PyDict_GetItemString(state, cStateSearchTimeTerminationMargin)};
     if (nullptr == search_time_termination_margin_obj) {
         PyErr_Format(
                 PyExc_KeyError,
@@ -541,8 +540,7 @@ PyMethodDef PyQuery_method_table[]{
          METH_NOARGS | METH_STATIC,
          static_cast<char const*>(cPyQueryDefaultSearchTimeTerminationMargin)},
 
-        {nullptr}
-};
+        {nullptr}};
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
@@ -590,8 +588,7 @@ PyType_Slot PyQuery_slots[]{
         {Py_tp_repr, reinterpret_cast<void*>(PyQuery_repr)},
         {Py_tp_methods, static_cast<void*>(PyQuery_method_table)},
         {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyQueryDoc))},
-        {0, nullptr}
-};
+        {0, nullptr}};
 // NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
 
 /**
@@ -602,8 +599,7 @@ PyType_Spec PyQuery_type_spec{
         sizeof(Query),
         0,
         Py_TPFLAGS_DEFAULT,
-        static_cast<PyType_Slot*>(PyQuery_slots)
-};
+        static_cast<PyType_Slot*>(PyQuery_slots)};
 }  // namespace
 
 auto PyQuery::init(

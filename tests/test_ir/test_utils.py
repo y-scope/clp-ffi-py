@@ -141,7 +141,10 @@ class TestCLPBase(unittest.TestCase):
         )
 
     def _check_wildcard_query(
-        self, wildcard_query: WildcardQuery, ref_wildcard_string: str, ref_is_case_sensitive: bool
+        self,
+        wildcard_query: WildcardQuery,
+        ref_wildcard_string: str,
+        ref_is_case_sensitive: bool,
     ) -> None:
         """
         Given a WildcardQuery object, check if the stored data matches the input
