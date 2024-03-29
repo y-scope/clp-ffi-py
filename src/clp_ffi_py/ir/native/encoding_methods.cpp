@@ -52,7 +52,7 @@ auto encode_four_byte_preamble(PyObject* Py_UNUSED(self), PyObject* args) -> PyO
     }
 
     return PyByteArray_FromStringAndSize(
-           clp::size_checked_pointer_cast<char>(ir_buf.data()),
+            clp::size_checked_pointer_cast<char>(ir_buf.data()),
             static_cast<Py_ssize_t>(ir_buf.size())
     );
 }
@@ -85,7 +85,7 @@ auto encode_four_byte_message_and_timestamp_delta(PyObject* Py_UNUSED(self), PyO
     }
 
     return PyByteArray_FromStringAndSize(
-           clp::size_checked_pointer_cast<char>(ir_buf.data()),
+            clp::size_checked_pointer_cast<char>(ir_buf.data()),
             static_cast<Py_ssize_t>(ir_buf.size())
     );
 }
@@ -104,13 +104,14 @@ auto encode_four_byte_message(PyObject* Py_UNUSED(self), PyObject* args) -> PyOb
     // To avoid frequent resize of ir_buf, allocate sufficient space in advance
     ir_buf.reserve(input_buffer_size * 2);
 
-    if (false == clp::ffi::ir_stream::four_byte_encoding::serialize_message(msg, log_type, ir_buf)) {
+    if (false == clp::ffi::ir_stream::four_byte_encoding::serialize_message(msg, log_type, ir_buf))
+    {
         PyErr_SetString(PyExc_NotImplementedError, clp_ffi_py::ir::native::cEncodeMessageError);
         return nullptr;
     }
 
     return PyByteArray_FromStringAndSize(
-           clp::size_checked_pointer_cast<char>(ir_buf.data()),
+            clp::size_checked_pointer_cast<char>(ir_buf.data()),
             static_cast<Py_ssize_t>(ir_buf.size())
     );
 }
@@ -128,7 +129,7 @@ auto encode_four_byte_timestamp_delta(PyObject* Py_UNUSED(self), PyObject* args)
     }
 
     return PyByteArray_FromStringAndSize(
-           clp::size_checked_pointer_cast<char>(ir_buf.data()),
+            clp::size_checked_pointer_cast<char>(ir_buf.data()),
             static_cast<Py_ssize_t>(ir_buf.size())
     );
 }

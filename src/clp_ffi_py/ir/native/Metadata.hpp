@@ -47,7 +47,9 @@ public:
         return m_is_four_byte_encoding;
     }
 
-    [[nodiscard]] auto get_ref_timestamp() const -> clp::ir::epoch_time_ms_t { return m_ref_timestamp; }
+    [[nodiscard]] auto get_ref_timestamp() const -> clp::ir::epoch_time_ms_t {
+        return m_ref_timestamp;
+    }
 
     [[nodiscard]] auto get_timestamp_format() const -> std::string const& {
         return m_timestamp_format;

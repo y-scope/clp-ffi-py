@@ -296,7 +296,10 @@ auto PyQuery_setstate(PyQuery* self, PyObject* state) -> PyObject* {
     }
     clp::ir::epoch_time_ms_t search_time_lower_bound{0};
     if (false
-        == parse_py_int<clp::ir::epoch_time_ms_t>(search_time_lower_bound_obj, search_time_lower_bound))
+        == parse_py_int<clp::ir::epoch_time_ms_t>(
+                search_time_lower_bound_obj,
+                search_time_lower_bound
+        ))
     {
         return nullptr;
     }
@@ -312,7 +315,10 @@ auto PyQuery_setstate(PyQuery* self, PyObject* state) -> PyObject* {
     }
     clp::ir::epoch_time_ms_t search_time_upper_bound{0};
     if (false
-        == parse_py_int<clp::ir::epoch_time_ms_t>(search_time_upper_bound_obj, search_time_upper_bound))
+        == parse_py_int<clp::ir::epoch_time_ms_t>(
+                search_time_upper_bound_obj,
+                search_time_upper_bound
+        ))
     {
         return nullptr;
     }

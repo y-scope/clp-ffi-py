@@ -90,9 +90,13 @@ public:
         return current_num_decoded_message;
     }
 
-    [[nodiscard]] auto get_ref_timestamp() const -> clp::ir::epoch_time_ms_t { return m_ref_timestamp; }
+    [[nodiscard]] auto get_ref_timestamp() const -> clp::ir::epoch_time_ms_t {
+        return m_ref_timestamp;
+    }
 
-    auto set_ref_timestamp(clp::ir::epoch_time_ms_t timestamp) -> void { m_ref_timestamp = timestamp; }
+    auto set_ref_timestamp(clp::ir::epoch_time_ms_t timestamp) -> void {
+        m_ref_timestamp = timestamp;
+    }
 
     /**
      * @return Number of unconsumed bytes stored in the current read buffer.

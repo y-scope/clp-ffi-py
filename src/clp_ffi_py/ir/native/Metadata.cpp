@@ -30,9 +30,9 @@ Metadata::Metadata(nlohmann::json const& metadata, bool is_four_byte_encoding) {
     }
     m_is_four_byte_encoding = is_four_byte_encoding;
 
-    auto const* ref_timestamp_key{
-            static_cast<char const*>(clp::ffi::ir_stream::cProtocol::Metadata::ReferenceTimestampKey)
-    };
+    auto const* ref_timestamp_key{static_cast<char const*>(
+            clp::ffi::ir_stream::cProtocol::Metadata::ReferenceTimestampKey
+    )};
     if (false == is_valid_json_string_data(metadata, ref_timestamp_key)) {
         throw ExceptionFFI(
                 clp::ErrorCode_MetadataCorrupted,

@@ -111,7 +111,8 @@ public:
     Query(clp::ir::epoch_time_ms_t search_time_lower_bound,
           clp::ir::epoch_time_ms_t search_time_upper_bound,
           std::vector<WildcardQuery> wildcard_queries,
-          clp::ir::epoch_time_ms_t search_time_termination_margin = cDefaultSearchTimeTerminationMargin)
+          clp::ir::epoch_time_ms_t search_time_termination_margin
+          = cDefaultSearchTimeTerminationMargin)
             : m_lower_bound_ts{search_time_lower_bound},
               m_upper_bound_ts{search_time_upper_bound},
               m_search_termination_ts{

@@ -71,7 +71,7 @@ auto generic_decode_log_events(
     while (true) {
         auto const unconsumed_bytes{decoder_buffer->get_unconsumed_bytes()};
         clp::BufferReader ir_buffer{
-               clp::size_checked_pointer_cast<char const>(unconsumed_bytes.data()),
+                clp::size_checked_pointer_cast<char const>(unconsumed_bytes.data()),
                 unconsumed_bytes.size()
         };
         auto const err{clp::ffi::ir_stream::four_byte_encoding::deserialize_log_event(
@@ -139,7 +139,7 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
     while (true) {
         auto const unconsumed_bytes{decoder_buffer->get_unconsumed_bytes()};
         clp::BufferReader ir_buffer{
-               clp::size_checked_pointer_cast<char const>(unconsumed_bytes.data()),
+                clp::size_checked_pointer_cast<char const>(unconsumed_bytes.data()),
                 unconsumed_bytes.size()
         };
         auto const err{clp::ffi::ir_stream::get_encoding_type(ir_buffer, is_four_byte_encoding)};
@@ -167,7 +167,7 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
     while (true) {
         auto const unconsumed_bytes = decoder_buffer->get_unconsumed_bytes();
         clp::BufferReader ir_buffer{
-               clp::size_checked_pointer_cast<char const>(unconsumed_bytes.data()),
+                clp::size_checked_pointer_cast<char const>(unconsumed_bytes.data()),
                 unconsumed_bytes.size()
         };
         auto const err{clp::ffi::ir_stream::deserialize_preamble(
