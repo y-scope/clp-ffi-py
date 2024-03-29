@@ -6,35 +6,40 @@ import sys
 from setuptools import setup, Extension
 from typing import List, Optional, Tuple
 
+clp_src_root: str = "src/clp/components/core/src/clp"
+clp_submodule_root: str = "src/clp/components/core/submodules"
+clp_ffi_py_src_root: str = "src/clp_ffi_py"
+
 ir_native: Extension = Extension(
     name="clp_ffi_py.ir.native",
     language="c++",
     include_dirs=[
         "src",
-        "src/clp/components/core/submodules",
+        clp_src_root,
+        clp_submodule_root,
     ],
     sources=[
-        "src/clp/components/core/src/BufferReader.cpp",
-        "src/clp/components/core/src/ffi/ir_stream/decoding_methods.cpp",
-        "src/clp/components/core/src/ffi/ir_stream/encoding_methods.cpp",
-        "src/clp/components/core/src/ffi/encoding_methods.cpp",
-        "src/clp/components/core/src/ir/parsing.cpp",
-        "src/clp/components/core/src/ReaderInterface.cpp",
-        "src/clp/components/core/src/string_utils.cpp",
-        "src/clp/components/core/src/TraceableException.cpp",
-        "src/clp_ffi_py/ir/native/decoding_methods.cpp",
-        "src/clp_ffi_py/ir/native/encoding_methods.cpp",
-        "src/clp_ffi_py/ir/native/Metadata.cpp",
-        "src/clp_ffi_py/ir/native/PyDecoder.cpp",
-        "src/clp_ffi_py/ir/native/PyDecoderBuffer.cpp",
-        "src/clp_ffi_py/ir/native/PyFourByteEncoder.cpp",
-        "src/clp_ffi_py/ir/native/PyLogEvent.cpp",
-        "src/clp_ffi_py/ir/native/PyMetadata.cpp",
-        "src/clp_ffi_py/ir/native/PyQuery.cpp",
-        "src/clp_ffi_py/ir/native/Query.cpp",
-        "src/clp_ffi_py/modules/ir_native.cpp",
-        "src/clp_ffi_py/Py_utils.cpp",
-        "src/clp_ffi_py/utils.cpp",
+        f"{clp_src_root}/BufferReader.cpp",
+        f"{clp_src_root}/ffi/ir_stream/decoding_methods.cpp",
+        f"{clp_src_root}/ffi/ir_stream/encoding_methods.cpp",
+        f"{clp_src_root}/ffi/encoding_methods.cpp",
+        f"{clp_src_root}/ir/parsing.cpp",
+        f"{clp_src_root}/ReaderInterface.cpp",
+        f"{clp_src_root}/string_utils/string_utils.cpp",
+
+        f"{clp_ffi_py_src_root}/ir/native/decoding_methods.cpp",
+        f"{clp_ffi_py_src_root}/ir/native/encoding_methods.cpp",
+        f"{clp_ffi_py_src_root}/ir/native/Metadata.cpp",
+        f"{clp_ffi_py_src_root}/ir/native/PyDecoder.cpp",
+        f"{clp_ffi_py_src_root}/ir/native/PyDecoderBuffer.cpp",
+        f"{clp_ffi_py_src_root}/ir/native/PyFourByteEncoder.cpp",
+        f"{clp_ffi_py_src_root}/ir/native/PyLogEvent.cpp",
+        f"{clp_ffi_py_src_root}/ir/native/PyMetadata.cpp",
+        f"{clp_ffi_py_src_root}/ir/native/PyQuery.cpp",
+        f"{clp_ffi_py_src_root}/ir/native/Query.cpp",
+        f"{clp_ffi_py_src_root}/modules/ir_native.cpp",
+        f"{clp_ffi_py_src_root}/Py_utils.cpp",
+        f"{clp_ffi_py_src_root}/utils.cpp",
     ],
     extra_compile_args=[
         "-std=c++20",

@@ -3,7 +3,7 @@
 
 #include <optional>
 
-#include <clp/components/core/src/ffi/encoding_methods.hpp>
+#include <clp/components/core/src/clp/ffi/encoding_methods.hpp>
 
 namespace clp_ffi_py::ir::native {
 /**
@@ -24,7 +24,7 @@ public:
      */
     explicit LogEvent(
             std::string_view log_message,
-            ffi::epoch_time_ms_t timestamp,
+            clp::ir::epoch_time_ms_t timestamp,
             size_t index,
             std::optional<std::string_view> formatted_timestamp = std::nullopt
     )
@@ -42,7 +42,7 @@ public:
         return std::string_view{m_log_message};
     }
 
-    [[nodiscard]] auto get_timestamp() const -> ffi::epoch_time_ms_t { return m_timestamp; }
+    [[nodiscard]] auto get_timestamp() const -> clp::ir::epoch_time_ms_t { return m_timestamp; }
 
     [[nodiscard]] auto get_formatted_timestamp() const -> std::string {
         return m_formatted_timestamp;
@@ -59,7 +59,7 @@ public:
 
     auto set_log_message(std::string_view log_message) -> void { m_log_message = log_message; }
 
-    auto set_timestamp(ffi::epoch_time_ms_t timestamp) -> void { m_timestamp = timestamp; }
+    auto set_timestamp(clp::ir::epoch_time_ms_t timestamp) -> void { m_timestamp = timestamp; }
 
     auto set_formatted_timestamp(std::string const& formatted_timestamp) -> void {
         m_formatted_timestamp = formatted_timestamp;
@@ -69,7 +69,7 @@ public:
 
 private:
     std::string m_log_message;
-    ffi::epoch_time_ms_t m_timestamp;
+    clp::ir::epoch_time_ms_t m_timestamp;
     size_t m_index;
     std::string m_formatted_timestamp;
 };

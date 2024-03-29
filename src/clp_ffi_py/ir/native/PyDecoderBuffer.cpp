@@ -359,7 +359,7 @@ auto PyDecoderBuffer::test_streaming(uint32_t seed) -> PyObject* {
         commit_read_buffer_consumption(num_bytes_to_read);
     }
     return PyByteArray_FromStringAndSize(
-            size_checked_pointer_cast<char>(read_bytes.data()),
+           clp::size_checked_pointer_cast<char>(read_bytes.data()),
             static_cast<Py_ssize_t>(read_bytes.size())
     );
 }

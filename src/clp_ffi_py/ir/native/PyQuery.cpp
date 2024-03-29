@@ -3,7 +3,7 @@
 
 #include "PyQuery.hpp"
 
-#include <clp/components/core/src/string_utils.hpp>
+#include <clp/components/core/src/clp/string_utils/string_utils.hpp>
 
 #include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ir/native/LogEvent.hpp>
@@ -67,7 +67,7 @@ auto deserialize_wildcard_queries(
             return false;
         }
         wildcard_queries.emplace_back(
-                clean_up_wildcard_search_string(wildcard_query_view),
+                clp::string_utils::clean_up_wildcard_search_string(wildcard_query_view),
                 static_cast<bool>(is_case_sensitive)
         );
     }
@@ -294,9 +294,9 @@ auto PyQuery_setstate(PyQuery* self, PyObject* state) -> PyObject* {
         );
         return nullptr;
     }
-    ffi::epoch_time_ms_t search_time_lower_bound{0};
+    clp::ir::epoch_time_ms_t search_time_lower_bound{0};
     if (false
-        == parse_py_int<ffi::epoch_time_ms_t>(search_time_lower_bound_obj, search_time_lower_bound))
+        == parse_py_int<clp::ir::epoch_time_ms_t>(search_time_lower_bound_obj, search_time_lower_bound))
     {
         return nullptr;
     }
@@ -310,9 +310,9 @@ auto PyQuery_setstate(PyQuery* self, PyObject* state) -> PyObject* {
         );
         return nullptr;
     }
-    ffi::epoch_time_ms_t search_time_upper_bound{0};
+    clp::ir::epoch_time_ms_t search_time_upper_bound{0};
     if (false
-        == parse_py_int<ffi::epoch_time_ms_t>(search_time_upper_bound_obj, search_time_upper_bound))
+        == parse_py_int<clp::ir::epoch_time_ms_t>(search_time_upper_bound_obj, search_time_upper_bound))
     {
         return nullptr;
     }
@@ -338,9 +338,9 @@ auto PyQuery_setstate(PyQuery* self, PyObject* state) -> PyObject* {
         );
         return nullptr;
     }
-    ffi::epoch_time_ms_t search_time_termination_margin{0};
+    clp::ir::epoch_time_ms_t search_time_termination_margin{0};
     if (false
-        == parse_py_int<ffi::epoch_time_ms_t>(
+        == parse_py_int<clp::ir::epoch_time_ms_t>(
                 search_time_termination_margin_obj,
                 search_time_termination_margin
         ))
@@ -607,10 +607,10 @@ PyType_Spec PyQuery_type_spec{
 }  // namespace
 
 auto PyQuery::init(
-        ffi::epoch_time_ms_t search_time_lower_bound,
-        ffi::epoch_time_ms_t search_time_upper_bound,
+        clp::ir::epoch_time_ms_t search_time_lower_bound,
+        clp::ir::epoch_time_ms_t search_time_upper_bound,
         std::vector<WildcardQuery> const& wildcard_queries,
-        ffi::epoch_time_ms_t search_time_termination_margin
+        clp::ir::epoch_time_ms_t search_time_termination_margin
 ) -> bool {
     try {
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
