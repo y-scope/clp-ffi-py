@@ -37,6 +37,9 @@ ir_native: Extension = Extension(
         "src/clp_ffi_py/utils.cpp",
     ],
     extra_compile_args=[
+        "/std:c++20",
+        "/O2,"
+    ] if "nt" == os.name else [
         "-std=c++20",
         "-O3",
     ],
