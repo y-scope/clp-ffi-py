@@ -50,7 +50,8 @@ musllinux-x86_64-image = "musllinux_1_2"
 skip = "pp*"
 
 test-command = [
-  "cd {package}/tests",
+  "cd {package}",
+  "cd tests",
   "python -m unittest -fv",
 ]
 test-requires = [
