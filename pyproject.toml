@@ -51,7 +51,6 @@ skip = "pp*"
 
 test-command = [
   "cd {package}",
-  "ls",
   "cd tests",
   "python -m unittest -fv",
 ]
@@ -69,6 +68,14 @@ archs = ["auto", "aarch64"]
 
 [tool.cibuildwheel.macos]
 archs = ["x86_64", "universal2", "arm64"]
+
+[tool.cibuildwheel.windows]
+archs = ["AMD64"]
+test-command = [
+  "cd /d {package}",
+  "cd tests",
+  "python -m unittest -fv",
+]
 
 [tool.docformatter]
 make-summary-multi-line = true
