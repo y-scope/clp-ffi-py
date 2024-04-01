@@ -19,7 +19,7 @@ python3 -m pip install --upgrade clp-ffi-py
 Note:
 
 - Python 3.7 or higher is required.
-- Only Linux and macOS are supported at present.
+- Tested only on Linux, macOS and Windows.
 
 To install an older version or download the prebuilt `whl` package, check the
 project homepage on PyPI [here][16].
