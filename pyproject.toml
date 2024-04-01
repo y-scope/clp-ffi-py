@@ -50,7 +50,7 @@ musllinux-x86_64-image = "musllinux_1_2"
 skip = "pp*"
 
 test-command = [
-  "python -m unittest discover {package}/tests -fv"
+  "python -m unittest --failfast --verbose discover --start-directory {package}/tests"
 ]
 test-requires = [
     "smart_open==6.4.0"
