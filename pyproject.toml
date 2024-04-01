@@ -51,6 +51,7 @@ skip = "pp*"
 
 test-command = [
   "cd {package}",
+  "ls",
   "cd tests",
   "python -m unittest -fv",
 ]
