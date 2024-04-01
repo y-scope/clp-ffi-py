@@ -71,7 +71,7 @@ archs = ["x86_64", "universal2", "arm64"]
 [tool.cibuildwheel.windows]
 archs = ["AMD64"]
 test-command = [
-  "cd /d {package}\tests",
+  "cd /d {package}\\tests",
   "python -m unittest -fv",
 ]
 
