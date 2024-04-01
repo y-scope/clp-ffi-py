@@ -50,8 +50,7 @@ musllinux-x86_64-image = "musllinux_1_2"
 skip = "pp*"
 
 test-command = [
-  "cd {package}/tests",
-  "python -m unittest -fv",
+  "python -m unittest discover {package}/tests -fv"
 ]
 test-requires = [
     "smart_open==6.4.0"
@@ -70,10 +69,6 @@ archs = ["x86_64", "universal2", "arm64"]
 
 [tool.cibuildwheel.windows]
 archs = ["AMD64"]
-test-command = [
-  "cd /d {package}\\tests",
-  "python -m unittest -fv",
-]
 
 [tool.docformatter]
 make-summary-multi-line = true
