@@ -50,8 +50,7 @@ musllinux-x86_64-image = "musllinux_1_2"
 skip = "pp*"
 
 test-command = [
-  "cd {package}",
-  "cd tests",
+  "cd {package}/tests",
   "python -m unittest -fv",
 ]
 test-requires = [
@@ -72,8 +71,7 @@ archs = ["x86_64", "universal2", "arm64"]
 [tool.cibuildwheel.windows]
 archs = ["AMD64"]
 test-command = [
-  "cd /d {package}",
-  "cd tests",
+  "cd /d {package}\tests",
   "python -m unittest -fv",
 ]
 
