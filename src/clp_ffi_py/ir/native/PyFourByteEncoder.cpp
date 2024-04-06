@@ -28,7 +28,7 @@ PyDoc_STRVAR(
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cEncodeMessageAndTimestampDeltaDoc,
-        "serialize_message_and_timestamp_delta(timestamp_delta, msg)\n"
+        "encode_message_and_timestamp_delta(timestamp_delta, msg)\n"
         "--\n\n"
         "Encodes the log `msg` along with the timestamp delta using the 4-byte encoding.\n\n"
         ":param timestamp_delta: Timestamp difference in milliseconds between the current log "
@@ -42,7 +42,7 @@ PyDoc_STRVAR(
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cEncodeMessageDoc,
-        "serialize_message(msg)\n"
+        "encode_message(msg)\n"
         "--\n\n"
         "Encodes the log `msg` using the 4-byte encoding.\n\n"
         ":param msg: Log message to encode.\n"
@@ -53,7 +53,7 @@ PyDoc_STRVAR(
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cEncodeTimestampDeltaDoc,
-        "serialize_timestamp_delta(timestamp_delta)\n"
+        "encode_timestamp_delta(timestamp_delta)\n"
         "--\n\n"
         "Encodes the timestamp using the 4-byte encoding.\n\n"
         ":param timestamp_delta: Timestamp difference in milliseconds between the current log "
