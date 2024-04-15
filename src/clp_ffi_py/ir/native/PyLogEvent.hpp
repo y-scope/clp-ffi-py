@@ -39,7 +39,7 @@ public:
      */
     [[nodiscard]] auto init(
             std::string_view log_message,
-            ffi::epoch_time_ms_t timestamp,
+            clp::ir::epoch_time_ms_t timestamp,
             size_t index,
             PyMetadata* metadata,
             std::optional<std::string_view> formatted_timestamp = std::nullopt
@@ -134,7 +134,7 @@ public:
      */
     [[nodiscard]] static auto create_new_log_event(
             std::string_view log_message,
-            ffi::epoch_time_ms_t timestamp,
+            clp::ir::epoch_time_ms_t timestamp,
             size_t index,
             PyMetadata* metadata
     ) -> PyLogEvent*;

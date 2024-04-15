@@ -32,7 +32,7 @@ public:
      * set.
      */
     [[nodiscard]] auto init(
-            ffi::epoch_time_ms_t ref_timestamp,
+            clp::ir::epoch_time_ms_t ref_timestamp,
             char const* input_timestamp_format,
             char const* input_timezone
     ) -> bool;

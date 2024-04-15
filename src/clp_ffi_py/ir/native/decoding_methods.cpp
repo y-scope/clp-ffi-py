@@ -4,10 +4,10 @@
 
 #include <span>
 
-#include <clp/components/core/src/BufferReader.hpp>
-#include <clp/components/core/src/ffi/ir_stream/decoding_methods.hpp>
-#include <clp/components/core/src/ffi/ir_stream/protocol_constants.hpp>
-#include <clp/components/core/src/type_utils.hpp>
+#include <clp/components/core/src/clp/BufferReader.hpp>
+#include <clp/components/core/src/clp/ffi/ir_stream/decoding_methods.hpp>
+#include <clp/components/core/src/clp/ffi/ir_stream/protocol_constants.hpp>
+#include <clp/components/core/src/clp/type_utils.hpp>
 #include <json/single_include/nlohmann/json.hpp>
 
 #include <clp_ffi_py/error_messages.hpp>
@@ -35,7 +35,7 @@ namespace {
 template <typename TerminateHandler>
 concept TerminateHandlerSignature = requires(TerminateHandler handler) {
     {
-        handler(std::declval<ffi::epoch_time_ms_t>(),
+        handler(std::declval<clp::ir::epoch_time_ms_t>(),
                 std::declval<std::string_view>(),
                 std::declval<size_t>(),
                 std::declval<PyObject*&>())
@@ -63,23 +63,23 @@ auto generic_decode_log_events(
         TerminateHandler terminate_handler
 ) -> PyObject* {
     std::string decoded_message;
-    ffi::epoch_time_ms_t timestamp_delta{0};
+    clp::ir::epoch_time_ms_t timestamp_delta{0};
     auto timestamp{decoder_buffer->get_ref_timestamp()};
     size_t current_log_event_idx{0};
     PyObject* return_value{nullptr};
 
     while (true) {
         auto const unconsumed_bytes{decoder_buffer->get_unconsumed_bytes()};
-        BufferReader ir_buffer{
-                size_checked_pointer_cast<char const>(unconsumed_bytes.data()),
+        clp::BufferReader ir_buffer{
+                clp::size_checked_pointer_cast<char const>(unconsumed_bytes.data()),
                 unconsumed_bytes.size()
         };
-        auto const err{ffi::ir_stream::four_byte_encoding::decode_next_message(
+        auto const err{clp::ffi::ir_stream::four_byte_encoding::deserialize_log_event(
                 ir_buffer,
                 decoded_message,
                 timestamp_delta
         )};
-        if (ffi::ir_stream::IRErrorCode_Incomplete_IR == err) {
+        if (clp::ffi::ir_stream::IRErrorCode_Incomplete_IR == err) {
             if (decoder_buffer->try_read()) {
                 continue;
             }
@@ -93,10 +93,10 @@ auto generic_decode_log_events(
             }
             return nullptr;
         }
-        if (ffi::ir_stream::IRErrorCode_Eof == err) {
+        if (clp::ffi::ir_stream::IRErrorCode_Eof == err) {
             Py_RETURN_NONE;
         }
-        if (ffi::ir_stream::IRErrorCode_Success != err) {
+        if (clp::ffi::ir_stream::IRErrorCode_Success != err) {
             PyErr_Format(PyExc_RuntimeError, cDecoderErrorCodeFormatStr, err);
             return nullptr;
         }
@@ -138,16 +138,16 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
     size_t ir_buffer_cursor_pos{0};
     while (true) {
         auto const unconsumed_bytes{decoder_buffer->get_unconsumed_bytes()};
-        BufferReader ir_buffer{
-                size_checked_pointer_cast<char const>(unconsumed_bytes.data()),
+        clp::BufferReader ir_buffer{
+                clp::size_checked_pointer_cast<char const>(unconsumed_bytes.data()),
                 unconsumed_bytes.size()
         };
-        auto const err{ffi::ir_stream::get_encoding_type(ir_buffer, is_four_byte_encoding)};
-        if (ffi::ir_stream::IRErrorCode_Success == err) {
+        auto const err{clp::ffi::ir_stream::get_encoding_type(ir_buffer, is_four_byte_encoding)};
+        if (clp::ffi::ir_stream::IRErrorCode_Success == err) {
             ir_buffer_cursor_pos = ir_buffer.get_pos();
             break;
         }
-        if (ffi::ir_stream::IRErrorCode_Incomplete_IR != err) {
+        if (clp::ffi::ir_stream::IRErrorCode_Incomplete_IR != err) {
             PyErr_Format(PyExc_RuntimeError, cDecoderErrorCodeFormatStr, err);
             return nullptr;
         }
@@ -161,26 +161,26 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
         return nullptr;
     }
 
-    ffi::ir_stream::encoded_tag_t metadata_type_tag{0};
+    clp::ffi::ir_stream::encoded_tag_t metadata_type_tag{0};
     size_t metadata_pos{0};
     uint16_t metadata_size{0};
     while (true) {
         auto const unconsumed_bytes = decoder_buffer->get_unconsumed_bytes();
-        BufferReader ir_buffer{
-                size_checked_pointer_cast<char const>(unconsumed_bytes.data()),
+        clp::BufferReader ir_buffer{
+                clp::size_checked_pointer_cast<char const>(unconsumed_bytes.data()),
                 unconsumed_bytes.size()
         };
-        auto const err{ffi::ir_stream::decode_preamble(
+        auto const err{clp::ffi::ir_stream::deserialize_preamble(
                 ir_buffer,
                 metadata_type_tag,
                 metadata_pos,
                 metadata_size
         )};
-        if (ffi::ir_stream::IRErrorCode_Success == err) {
+        if (clp::ffi::ir_stream::IRErrorCode_Success == err) {
             ir_buffer_cursor_pos = ir_buffer.get_pos();
             break;
         }
-        if (ffi::ir_stream::IRErrorCode_Incomplete_IR != err) {
+        if (clp::ffi::ir_stream::IRErrorCode_Incomplete_IR != err) {
             PyErr_Format(PyExc_RuntimeError, cDecoderErrorCodeFormatStr, err);
             return nullptr;
         }
@@ -202,18 +202,18 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
                 nlohmann::json::parse(metadata_buffer.begin(), metadata_buffer.end())
         );
         std::string const version{metadata_json.at(
-                static_cast<char const*>(ffi::ir_stream::cProtocol::Metadata::VersionKey)
+                static_cast<char const*>(clp::ffi::ir_stream::cProtocol::Metadata::VersionKey)
         )};
-        auto const error_code{ffi::ir_stream::validate_protocol_version(version)};
-        if (ffi::ir_stream::IRProtocolErrorCode_Supported != error_code) {
+        auto const error_code{clp::ffi::ir_stream::validate_protocol_version(version)};
+        if (clp::ffi::ir_stream::IRProtocolErrorCode_Supported != error_code) {
             switch (error_code) {
-                case ffi::ir_stream::IRProtocolErrorCode_Invalid:
+                case clp::ffi::ir_stream::IRProtocolErrorCode_Invalid:
                     PyErr_Format(PyExc_RuntimeError, "Invalid version number: %s", version.c_str());
                     break;
-                case ffi::ir_stream::IRProtocolErrorCode_Too_New:
+                case clp::ffi::ir_stream::IRProtocolErrorCode_Too_New:
                     PyErr_Format(PyExc_RuntimeError, "Version too new: %s", version.c_str());
                     break;
-                case ffi::ir_stream::IRProtocolErrorCode_Too_Old:
+                case clp::ffi::ir_stream::IRProtocolErrorCode_Too_Old:
                     PyErr_Format(PyExc_RuntimeError, "Version too old: %s", version.c_str());
                     break;
                 default:
@@ -289,7 +289,7 @@ auto decode_next_log_event(PyObject* Py_UNUSED(self), PyObject* args, PyObject* 
     if (false == is_query_given) {
         auto terminate_handler{
                 [metadata](
-                        ffi::epoch_time_ms_t timestamp,
+                        clp::ir::epoch_time_ms_t timestamp,
                         std::string_view log_message,
                         size_t log_event_idx,
                         PyObject*& return_value
@@ -314,7 +314,7 @@ auto decode_next_log_event(PyObject* Py_UNUSED(self), PyObject* args, PyObject* 
     auto const* query{py_query->get_query()};
     auto query_terminate_handler{
             [query, metadata](
-                    ffi::epoch_time_ms_t timestamp,
+                    clp::ir::epoch_time_ms_t timestamp,
                     std::string_view log_message,
                     size_t log_event_idx,
                     PyObject*& return_value

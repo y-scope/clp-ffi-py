@@ -5,7 +5,7 @@
 
 #include <type_traits>
 
-#include <clp/components/core/src/ffi/encoding_methods.hpp>
+#include <clp/components/core/src/clp/ffi/encoding_methods.hpp>
 
 namespace clp_ffi_py {
 namespace {
@@ -22,7 +22,7 @@ auto parse_py_int(PyObject* py_int, int_type& val) -> bool {
 
     if constexpr (std::is_same_v<int_type, size_t>) {
         val = PyLong_AsSize_t(py_int);
-    } else if constexpr (std::is_same_v<int_type, ffi::epoch_time_ms_t>) {
+    } else if constexpr (std::is_same_v<int_type, clp::ir::epoch_time_ms_t>) {
         val = PyLong_AsLongLong(py_int);
     } else if constexpr (std::is_same_v<int_type, Py_ssize_t>) {
         val = PyLong_AsSsize_t(py_int);
