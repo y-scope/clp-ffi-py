@@ -1,4 +1,3 @@
 [submodule "src/clp"]
 	path = src/clp
-	url = https://github.com/junhaoliao/clp.git
-    branch = clp-ffi-py-windows
+	url = https://github.com/y-scope/clp.git
