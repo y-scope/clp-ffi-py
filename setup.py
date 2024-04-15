@@ -6,15 +6,16 @@ import sys
 from setuptools import setup, Extension
 from typing import List, Optional, Tuple
 
-clp_src_root: str = "src/clp/components/core/src/clp"
-clp_submodule_root: str = "src/clp/components/core/submodules"
-clp_ffi_py_src_root: str = "src/clp_ffi_py"
+cpp_src_root: str = "src"
+clp_src_root: str = f"{cpp_src_root}/clp/components/core/src/clp"
+clp_submodule_root: str = f"{cpp_src_root}/clp/components/core/submodules"
+clp_ffi_py_src_root: str = f"{cpp_src_root}/clp_ffi_py"
 
 ir_native: Extension = Extension(
     name="clp_ffi_py.ir.native",
     language="c++",
     include_dirs=[
-        "src",
+        cpp_src_root,
         clp_src_root,
         clp_submodule_root,
     ],
