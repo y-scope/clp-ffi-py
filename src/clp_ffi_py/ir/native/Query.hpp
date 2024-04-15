@@ -6,8 +6,8 @@
 #include <string_view>
 #include <vector>
 
-#include <clp/components/core/src/ErrorCode.hpp>
-#include <clp/components/core/src/ffi/encoding_methods.hpp>
+#include <clp/components/core/src/clp/ErrorCode.hpp>
+#include <clp/components/core/src/clp/ffi/encoding_methods.hpp>
 
 #include <clp_ffi_py/ExceptionFFI.hpp>
 #include <clp_ffi_py/ir/native/LogEvent.hpp>
@@ -56,12 +56,12 @@ private:
  */
 class Query {
 public:
-    static constexpr ffi::epoch_time_ms_t const cTimestampMin{0};
-    static constexpr ffi::epoch_time_ms_t const cTimestampMax{
-            std::numeric_limits<ffi::epoch_time_ms_t>::max()
+    static constexpr clp::ir::epoch_time_ms_t const cTimestampMin{0};
+    static constexpr clp::ir::epoch_time_ms_t const cTimestampMax{
+            std::numeric_limits<clp::ir::epoch_time_ms_t>::max()
     };
-    static constexpr ffi::epoch_time_ms_t const cDefaultSearchTimeTerminationMargin{
-            static_cast<ffi::epoch_time_ms_t>(60 * 1000)
+    static constexpr clp::ir::epoch_time_ms_t const cDefaultSearchTimeTerminationMargin{
+            static_cast<clp::ir::epoch_time_ms_t>(60 * 1000)
     };
 
     /**
@@ -83,9 +83,9 @@ public:
      * search termination timestamp (see note in the class' docstring).
      */
     explicit Query(
-            ffi::epoch_time_ms_t search_time_lower_bound,
-            ffi::epoch_time_ms_t search_time_upper_bound,
-            ffi::epoch_time_ms_t search_time_termination_margin
+            clp::ir::epoch_time_ms_t search_time_lower_bound,
+            clp::ir::epoch_time_ms_t search_time_upper_bound,
+            clp::ir::epoch_time_ms_t search_time_termination_margin
             = cDefaultSearchTimeTerminationMargin
     )
             : m_lower_bound_ts{search_time_lower_bound},
@@ -108,10 +108,11 @@ public:
      * @param search_time_termination_margin The margin used to determine the
      * search termination timestamp (see note in the class' docstring).
      */
-    Query(ffi::epoch_time_ms_t search_time_lower_bound,
-          ffi::epoch_time_ms_t search_time_upper_bound,
+    Query(clp::ir::epoch_time_ms_t search_time_lower_bound,
+          clp::ir::epoch_time_ms_t search_time_upper_bound,
           std::vector<WildcardQuery> wildcard_queries,
-          ffi::epoch_time_ms_t search_time_termination_margin = cDefaultSearchTimeTerminationMargin)
+          clp::ir::epoch_time_ms_t search_time_termination_margin
+          = cDefaultSearchTimeTerminationMargin)
             : m_lower_bound_ts{search_time_lower_bound},
               m_upper_bound_ts{search_time_upper_bound},
               m_search_termination_ts{
@@ -123,11 +124,11 @@ public:
         throw_if_ts_range_invalid();
     }
 
-    [[nodiscard]] auto get_lower_bound_ts() const -> ffi::epoch_time_ms_t {
+    [[nodiscard]] auto get_lower_bound_ts() const -> clp::ir::epoch_time_ms_t {
         return m_lower_bound_ts;
     }
 
-    [[nodiscard]] auto get_upper_bound_ts() const -> ffi::epoch_time_ms_t {
+    [[nodiscard]] auto get_upper_bound_ts() const -> clp::ir::epoch_time_ms_t {
         return m_upper_bound_ts;
     }
 
@@ -139,7 +140,7 @@ public:
      * @return The search time termination margin by calculating the difference
      * between m_search_termination_ts and m_upper_bound_ts.
      */
-    [[nodiscard]] auto get_search_time_termination_margin() const -> ffi::epoch_time_ms_t {
+    [[nodiscard]] auto get_search_time_termination_margin() const -> clp::ir::epoch_time_ms_t {
         return m_search_termination_ts - m_upper_bound_ts;
     }
 
@@ -148,7 +149,7 @@ public:
      * @return true if the given timestamp is in the search time range bounded
      * by the lower bound and the upper bound timestamp (inclusive).
      */
-    [[nodiscard]] auto matches_time_range(ffi::epoch_time_ms_t ts) const -> bool {
+    [[nodiscard]] auto matches_time_range(clp::ir::epoch_time_ms_t ts) const -> bool {
         return m_lower_bound_ts <= ts && ts <= m_upper_bound_ts;
     }
 
@@ -157,7 +158,7 @@ public:
      * @return Whether the given timestamp is safely outside this query's time
      * range (see note in the class' docstring).
      */
-    [[nodiscard]] auto ts_safely_outside_time_range(ffi::epoch_time_ms_t ts) const -> bool {
+    [[nodiscard]] auto ts_safely_outside_time_range(clp::ir::epoch_time_ms_t ts) const -> bool {
         return m_search_termination_ts < ts;
     }
 
@@ -190,7 +191,7 @@ private:
     auto throw_if_ts_range_invalid() const -> void {
         if (m_lower_bound_ts > m_upper_bound_ts) {
             throw ExceptionFFI(
-                    ErrorCode_Unsupported,
+                    clp::ErrorCode_Unsupported,
                     __FILE__,
                     __LINE__,
                     "Search query lower bound timestamp exceeds the upper bound timestamp."
@@ -198,9 +199,9 @@ private:
         }
     }
 
-    ffi::epoch_time_ms_t m_lower_bound_ts;
-    ffi::epoch_time_ms_t m_upper_bound_ts;
-    ffi::epoch_time_ms_t m_search_termination_ts;
+    clp::ir::epoch_time_ms_t m_lower_bound_ts;
+    clp::ir::epoch_time_ms_t m_upper_bound_ts;
+    clp::ir::epoch_time_ms_t m_search_termination_ts;
     std::vector<WildcardQuery> m_wildcard_queries;
 };
 }  // namespace clp_ffi_py::ir::native

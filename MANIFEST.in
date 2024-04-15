@@ -1,6 +1,6 @@
-recursive-include src/clp/components/core/src *.h
-recursive-include src/clp/components/core/src *.hpp
-recursive-include src/clp/components/core/src *.inc
+recursive-include src/clp/components/core/src/clp *.h
+recursive-include src/clp/components/core/src/clp *.hpp
+recursive-include src/clp/components/core/src/clp *.inc
 recursive-include src/clp_ffi_py *.hpp
 recursive-include src/clp_ffi_py *.inc
 recursive-include clp_ffi_py *.py

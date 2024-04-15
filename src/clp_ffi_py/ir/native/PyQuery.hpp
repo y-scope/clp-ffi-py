@@ -33,10 +33,10 @@ public:
      * set.
      */
     [[nodiscard]] auto init(
-            ffi::epoch_time_ms_t search_time_lower_bound,
-            ffi::epoch_time_ms_t search_time_upper_bound,
+            clp::ir::epoch_time_ms_t search_time_lower_bound,
+            clp::ir::epoch_time_ms_t search_time_upper_bound,
             std::vector<WildcardQuery> const& wildcard_queries,
-            ffi::epoch_time_ms_t search_time_termination_margin
+            clp::ir::epoch_time_ms_t search_time_termination_margin
     ) -> bool;
 
     /**

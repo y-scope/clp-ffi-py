@@ -3,7 +3,7 @@
 
 #include <utility>
 
-#include <clp/components/core/src/ffi/encoding_methods.hpp>
+#include <clp/components/core/src/clp/ffi/encoding_methods.hpp>
 #include <clp/components/core/submodules/json/single_include/nlohmann/json.hpp>
 
 namespace clp_ffi_py::ir::native {
@@ -34,7 +34,7 @@ public:
      * timestamp from Unix epoch time.
      */
     explicit Metadata(
-            ffi::epoch_time_ms_t ref_timestamp,
+            clp::ir::epoch_time_ms_t ref_timestamp,
             std::string timestamp_format,
             std::string timezone
     )
@@ -47,7 +47,9 @@ public:
         return m_is_four_byte_encoding;
     }
 
-    [[nodiscard]] auto get_ref_timestamp() const -> ffi::epoch_time_ms_t { return m_ref_timestamp; }
+    [[nodiscard]] auto get_ref_timestamp() const -> clp::ir::epoch_time_ms_t {
+        return m_ref_timestamp;
+    }
 
     [[nodiscard]] auto get_timestamp_format() const -> std::string const& {
         return m_timestamp_format;
@@ -57,7 +59,7 @@ public:
 
 private:
     bool m_is_four_byte_encoding;
-    ffi::epoch_time_ms_t m_ref_timestamp;
+    clp::ir::epoch_time_ms_t m_ref_timestamp;
     std::string m_timestamp_format;
     std::string m_timezone_id;
 };

@@ -46,7 +46,7 @@ auto py_utils_init() -> bool {
     return true;
 }
 
-auto py_utils_get_formatted_timestamp(ffi::epoch_time_ms_t timestamp, PyObject* timezone)
+auto py_utils_get_formatted_timestamp(clp::ir::epoch_time_ms_t timestamp, PyObject* timezone)
         -> PyObject* {
     PyObjectPtr<PyObject> const func_args_ptr{Py_BuildValue("LO", timestamp, timezone)};
     auto* func_args{func_args_ptr.get()};

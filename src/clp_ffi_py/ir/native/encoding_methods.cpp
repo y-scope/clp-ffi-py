@@ -2,16 +2,16 @@
 
 #include "encoding_methods.hpp"
 
-#include <clp/components/core/src/ffi/encoding_methods.hpp>
-#include <clp/components/core/src/ffi/ir_stream/encoding_methods.hpp>
-#include <clp/components/core/src/ffi/ir_stream/protocol_constants.hpp>
-#include <clp/components/core/src/type_utils.hpp>
+#include <clp/components/core/src/clp/ffi/encoding_methods.hpp>
+#include <clp/components/core/src/clp/ffi/ir_stream/encoding_methods.hpp>
+#include <clp/components/core/src/clp/ffi/ir_stream/protocol_constants.hpp>
+#include <clp/components/core/src/clp/type_utils.hpp>
 
 #include <clp_ffi_py/ir/native/error_messages.hpp>
 
 namespace clp_ffi_py::ir::native {
 auto encode_four_byte_preamble(PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
-    ffi::epoch_time_ms_t ref_timestamp{};
+    clp::ir::epoch_time_ms_t ref_timestamp{};
     char const* input_timestamp_format{};
     char const* input_timezone{};
     Py_ssize_t input_timestamp_format_size{};
@@ -39,7 +39,7 @@ auto encode_four_byte_preamble(PyObject* Py_UNUSED(self), PyObject* args) -> PyO
     std::vector<int8_t> ir_buf;
 
     if (false
-        == ffi::ir_stream::four_byte_encoding::encode_preamble(
+        == clp::ffi::ir_stream::four_byte_encoding::serialize_preamble(
                 timestamp_format,
                 {},
                 timezone,
@@ -52,14 +52,14 @@ auto encode_four_byte_preamble(PyObject* Py_UNUSED(self), PyObject* args) -> PyO
     }
 
     return PyByteArray_FromStringAndSize(
-            size_checked_pointer_cast<char>(ir_buf.data()),
+            clp::size_checked_pointer_cast<char>(ir_buf.data()),
             static_cast<Py_ssize_t>(ir_buf.size())
     );
 }
 
 auto encode_four_byte_message_and_timestamp_delta(PyObject* Py_UNUSED(self), PyObject* args)
         -> PyObject* {
-    ffi::epoch_time_ms_t delta{};
+    clp::ir::epoch_time_ms_t delta{};
     char const* input_buffer{};
     Py_ssize_t input_buffer_size{};
     if (0 == PyArg_ParseTuple(args, "Ly#", &delta, &input_buffer, &input_buffer_size)) {
@@ -74,18 +74,18 @@ auto encode_four_byte_message_and_timestamp_delta(PyObject* Py_UNUSED(self), PyO
     // allocate sufficient space in advance
     ir_buf.reserve(input_buffer_size * 2);
 
-    if (false == ffi::ir_stream::four_byte_encoding::encode_message(msg, logtype, ir_buf)) {
+    if (false == clp::ffi::ir_stream::four_byte_encoding::serialize_message(msg, logtype, ir_buf)) {
         PyErr_SetString(PyExc_NotImplementedError, clp_ffi_py::ir::native::cEncodeMessageError);
         return nullptr;
     }
 
-    if (false == ffi::ir_stream::four_byte_encoding::encode_timestamp(delta, ir_buf)) {
+    if (false == clp::ffi::ir_stream::four_byte_encoding::serialize_timestamp(delta, ir_buf)) {
         PyErr_SetString(PyExc_NotImplementedError, clp_ffi_py::ir::native::cEncodeTimestampError);
         return nullptr;
     }
 
     return PyByteArray_FromStringAndSize(
-            size_checked_pointer_cast<char>(ir_buf.data()),
+            clp::size_checked_pointer_cast<char>(ir_buf.data()),
             static_cast<Py_ssize_t>(ir_buf.size())
     );
 }
@@ -104,37 +104,38 @@ auto encode_four_byte_message(PyObject* Py_UNUSED(self), PyObject* args) -> PyOb
     // To avoid frequent resize of ir_buf, allocate sufficient space in advance
     ir_buf.reserve(input_buffer_size * 2);
 
-    if (false == ffi::ir_stream::four_byte_encoding::encode_message(msg, log_type, ir_buf)) {
+    if (false == clp::ffi::ir_stream::four_byte_encoding::serialize_message(msg, log_type, ir_buf))
+    {
         PyErr_SetString(PyExc_NotImplementedError, clp_ffi_py::ir::native::cEncodeMessageError);
         return nullptr;
     }
 
     return PyByteArray_FromStringAndSize(
-            size_checked_pointer_cast<char>(ir_buf.data()),
+            clp::size_checked_pointer_cast<char>(ir_buf.data()),
             static_cast<Py_ssize_t>(ir_buf.size())
     );
 }
 
 auto encode_four_byte_timestamp_delta(PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
-    ffi::epoch_time_ms_t delta{};
+    clp::ir::epoch_time_ms_t delta{};
     if (0 == PyArg_ParseTuple(args, "L", &delta)) {
         return nullptr;
     }
 
     std::vector<int8_t> ir_buf;
-    if (false == ffi::ir_stream::four_byte_encoding::encode_timestamp(delta, ir_buf)) {
+    if (false == clp::ffi::ir_stream::four_byte_encoding::serialize_timestamp(delta, ir_buf)) {
         PyErr_SetString(PyExc_NotImplementedError, clp_ffi_py::ir::native::cEncodeTimestampError);
         return nullptr;
     }
 
     return PyByteArray_FromStringAndSize(
-            size_checked_pointer_cast<char>(ir_buf.data()),
+            clp::size_checked_pointer_cast<char>(ir_buf.data()),
             static_cast<Py_ssize_t>(ir_buf.size())
     );
 }
 
 auto encode_end_of_ir(PyObject* Py_UNUSED(self)) -> PyObject* {
-    static constexpr char cEof{ffi::ir_stream::cProtocol::Eof};
+    static constexpr char cEof{clp::ffi::ir_stream::cProtocol::Eof};
     return PyByteArray_FromStringAndSize(&cEof, sizeof(cEof));
 }
 }  // namespace clp_ffi_py::ir::native

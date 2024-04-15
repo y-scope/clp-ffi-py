@@ -35,7 +35,7 @@ auto PyMetadata_init(PyMetadata* self, PyObject* args, PyObject* keywords) -> in
             nullptr
     };
 
-    ffi::epoch_time_ms_t ref_timestamp{0};
+    clp::ir::epoch_time_ms_t ref_timestamp{0};
     char const* input_timestamp_format{nullptr};
     char const* input_timezone{nullptr};
 
@@ -220,7 +220,7 @@ PyType_Spec PyMetadata_type_spec{
 }  // namespace
 
 auto PyMetadata::init(
-        ffi::epoch_time_ms_t ref_timestamp,
+        clp::ir::epoch_time_ms_t ref_timestamp,
         char const* input_timestamp_format,
         char const* input_timezone
 ) -> bool {

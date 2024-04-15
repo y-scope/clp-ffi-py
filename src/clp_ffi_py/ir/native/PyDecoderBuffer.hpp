@@ -5,7 +5,7 @@
 
 #include <span>
 
-#include <clp/components/core/src/ffi/ir_stream/decoding_methods.hpp>
+#include <clp/components/core/src/clp/ffi/ir_stream/decoding_methods.hpp>
 
 #include <clp_ffi_py/ir/native/PyMetadata.hpp>
 #include <clp_ffi_py/PyObjectUtils.hpp>
@@ -90,9 +90,13 @@ public:
         return current_num_decoded_message;
     }
 
-    [[nodiscard]] auto get_ref_timestamp() const -> ffi::epoch_time_ms_t { return m_ref_timestamp; }
+    [[nodiscard]] auto get_ref_timestamp() const -> clp::ir::epoch_time_ms_t {
+        return m_ref_timestamp;
+    }
 
-    auto set_ref_timestamp(ffi::epoch_time_ms_t timestamp) -> void { m_ref_timestamp = timestamp; }
+    auto set_ref_timestamp(clp::ir::epoch_time_ms_t timestamp) -> void {
+        m_ref_timestamp = timestamp;
+    }
 
     /**
      * @return Number of unconsumed bytes stored in the current read buffer.
@@ -217,7 +221,7 @@ private:
     PyMetadata* m_metadata;
     int8_t* m_read_buffer_mem_owner;
     std::span<int8_t> m_read_buffer;
-    ffi::epoch_time_ms_t m_ref_timestamp;
+    clp::ir::epoch_time_ms_t m_ref_timestamp;
     Py_ssize_t m_buffer_size;
     Py_ssize_t m_num_current_bytes_consumed;
     size_t m_num_decoded_message;

@@ -43,7 +43,7 @@ auto PyLogEvent_init(PyLogEvent* self, PyObject* args, PyObject* keywords) -> in
     self->default_init();
 
     char const* log_message{nullptr};
-    ffi::epoch_time_ms_t timestamp{0};
+    clp::ir::epoch_time_ms_t timestamp{0};
     size_t index{0};
     PyObject* metadata{Py_None};
     if (false
@@ -209,8 +209,8 @@ auto PyLogEvent_setstate(PyLogEvent* self, PyObject* state) -> PyObject* {
         PyErr_Format(PyExc_KeyError, clp_ffi_py::cSetstateKeyErrorTemplate, cStateTimestamp);
         return nullptr;
     }
-    ffi::epoch_time_ms_t timestamp{0};
-    if (false == clp_ffi_py::parse_py_int<ffi::epoch_time_ms_t>(timestamp_obj, timestamp)) {
+    clp::ir::epoch_time_ms_t timestamp{0};
+    if (false == clp_ffi_py::parse_py_int<clp::ir::epoch_time_ms_t>(timestamp_obj, timestamp)) {
         return nullptr;
     }
 
@@ -471,7 +471,7 @@ auto PyLogEvent::get_formatted_message(PyObject* timezone) -> PyObject* {
 
 auto PyLogEvent::init(
         std::string_view log_message,
-        ffi::epoch_time_ms_t timestamp,
+        clp::ir::epoch_time_ms_t timestamp,
         size_t index,
         PyMetadata* metadata,
         std::optional<std::string_view> formatted_timestamp
@@ -504,7 +504,7 @@ auto PyLogEvent::module_level_init(PyObject* py_module) -> bool {
 
 auto PyLogEvent::create_new_log_event(
         std::string_view log_message,
-        ffi::epoch_time_ms_t timestamp,
+        clp::ir::epoch_time_ms_t timestamp,
         size_t index,
         PyMetadata* metadata
 ) -> PyLogEvent* {

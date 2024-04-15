@@ -3,7 +3,7 @@
 
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
-#include <clp/components/core/src/ffi/encoding_methods.hpp>
+#include <clp/components/core/src/clp/ffi/encoding_methods.hpp>
 
 namespace clp_ffi_py {
 /**
@@ -22,7 +22,7 @@ auto py_utils_init() -> bool;
  * timestamp.
  * @return nullptr on failure with the relevant Python exception and error set.
  */
-auto py_utils_get_formatted_timestamp(ffi::epoch_time_ms_t timestamp, PyObject* timezone)
+auto py_utils_get_formatted_timestamp(clp::ir::epoch_time_ms_t timestamp, PyObject* timezone)
         -> PyObject*;
 
 /**

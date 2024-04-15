@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include <clp/components/core/src/TraceableException.hpp>
+#include <clp/components/core/src/clp/TraceableException.hpp>
 
 namespace clp_ffi_py {
 /**
@@ -11,10 +11,10 @@ namespace clp_ffi_py {
  * execution. Note: for exceptions of CPython execution, please use CPython
  * interface to set the exception instead.
  */
-class ExceptionFFI : public TraceableException {
+class ExceptionFFI : public clp::TraceableException {
 public:
     ExceptionFFI(
-            ErrorCode error_code,
+            clp::ErrorCode error_code,
             char const* const filename,
             int line_number,
             std::string message
