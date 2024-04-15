@@ -35,8 +35,10 @@ To manually build a package for distribution, follow the steps below.
 
 ### Requirements
 
-* A C++ compiler that supports C++20 and `std::span` (e.g. `clang++` >= 7,
-  `g++` >= 10, or `MSVC` >= 1930 which is included in Visual Studio 2022).
+* A C++ compiler that supports C++20 and `std::span`, e.g:
+  * `clang++` >= 7
+  * `g++` >= 10
+  * `MSVC` >= 1930 (included in Visual Studio 2022)
 * python3
 * python3-dev
 * python3-venv
