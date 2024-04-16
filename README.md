@@ -19,7 +19,7 @@ python3 -m pip install --upgrade clp-ffi-py
 Note:
 
 - Python 3.7 or higher is required.
-- Only Linux and macOS are supported at present.
+- Tested on Linux, macOS and Windows.
 
 To install an older version or download the prebuilt `whl` package, check the
 project homepage on PyPI [here][16].
@@ -35,8 +35,10 @@ To manually build a package for distribution, follow the steps below.
 
 ### Requirements
 
-* A C++ compiler that supports C++20 and `std::span` (e.g. `clang++` >= 7 or
-  `g++` >= 10).
+* A C++ compiler that supports C++20 and `std::span`, e.g:
+  * `clang++` >= 7
+  * `g++` >= 10
+  * `MSVC` >= 1930 (included in Visual Studio 2022)
 * python3
 * python3-dev
 * python3-venv

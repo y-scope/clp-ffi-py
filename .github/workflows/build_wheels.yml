@@ -175,6 +175,20 @@ jobs:
           - name: cp39-musllinux_x86_64
             os: ubuntu-22.04
 
+          # Windows builds
+          - name: cp37-win_amd64
+            os: windows-2022
+          - name: cp38-win_amd64
+            os: windows-2022
+          - name: cp39-win_amd64
+            os: windows-2022
+          - name: cp310-win_amd64
+            os: windows-2022
+          - name: cp311-win_amd64
+            os: windows-2022
+          - name: cp312-win_amd64
+            os: windows-2022
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
