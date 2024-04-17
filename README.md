@@ -31,7 +31,7 @@ version >= 3.7.
 
 ## API Reference
 
-The API reference of this library can be found in [YScope Docs][19].
+The API reference for this library can be found on our [docs hub][19].
 
 ## Building/Packaging
 
