@@ -29,6 +29,10 @@ project homepage on PyPI [here][16].
 Tested on Python 3.7, 3.8, 3.11 and 3.12, and it should work on any Python
 version >= 3.7.
 
+## API Reference
+
+The API reference for this library can be found on our [docs hub][19].
+
 ## Building/Packaging
 
 To manually build a package for distribution, follow the steps below.
@@ -316,3 +320,4 @@ other package management tools such as `apt-get`:
 [16]: https://pypi.org/project/clp-ffi-py/
 [17]: https://github.com/RaRe-Technologies/smart_open
 [18]: https://taskfile.dev/installation/
+[19]: https://docs.yscope.com/clp-ffi-py/main/api/clp_ffi_py.html
