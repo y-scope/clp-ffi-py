@@ -29,9 +29,9 @@ project homepage on PyPI [here][16].
 Tested on Python 3.7, 3.8, 3.11 and 3.12, and it should work on any Python
 version >= 3.7.
 
-## API Documentation
+## API Reference
 
-The documentation of APIs in this library can be found in [YScope Docs][19].
+The API reference of this library can be found in [YScope Docs][19].
 
 ## Building/Packaging
 
