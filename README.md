@@ -203,7 +203,8 @@ session = boto3.Session(
 
 url = 's3://clp-example-s3-bucket/example.clp.zst'
 # Using `smart_open.open` to stream the encoded CLP IR:
-with smart_open.open(url, "rb", transport_params={'client': session.client('s3')}) as istream:
+with smart_open.open(url, mode="rb", compression='disable',
+                     transport_params={'client': session.client('s3')}) as istream:
     with ClpIrStreamReader(istream, allow_incomplete_stream=True) as clp_reader:
         for log_event in clp_reader:
             # Print the log message with its timestamp properly formatted.
@@ -211,7 +212,13 @@ with smart_open.open(url, "rb", transport_params={'client': session.client('s3')
 ```
 
 Note:
-When `allow_incomplete_stream` is set to False (default), the reader will raise
+- Setting `compression='disable'` is necessary because smart_open by default
+infers the compression format from the file extension and decompresses the file
+automatically. However, the ClpIrStreamReader expects the input stream to be in
+the original compressed format. Disabling the automatic decompression ensures
+that the stream passed to ClpIrStreamReader remains compressed, preventing
+decompression errors.
+- When `allow_incomplete_stream` is set to False (default), the reader will raise
 `clp_ffi_py.ir.IncompleteStreamError` if the stream is incomplete (it doesn't end
 with the byte sequence indicating the stream's end). In practice, this can occur
 if you're reading a stream that is still being written or wasn't properly
