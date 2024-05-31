@@ -26,7 +26,7 @@ public:
      */
     WildcardQuery(std::string wildcard_query, bool case_sensitive)
             : m_wildcard_query(std::move(wildcard_query)),
-              m_case_sensitive(case_sensitive){};
+              m_case_sensitive(case_sensitive) {};
 
     [[nodiscard]] auto get_wildcard_query() const -> std::string const& { return m_wildcard_query; }
 
