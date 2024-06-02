@@ -1,3 +1,6 @@
+from deprecated.sphinx import deprecated
+
+
 class WildcardQuery:
     """
     This class defines a wildcard query, which includes a wildcard string and a
@@ -12,6 +15,11 @@ class WildcardQuery:
     Other characters which are escaped are treated as normal characters.
     """
 
+    @deprecated(
+        version="0.0.12",
+        reason="`WildcardQuery` should not be used directly."
+        " Please use `SubstringWildcardQuery` and `FullStringWildcardQuery` instead.",
+    )
     def __init__(self, wildcard_query: str, case_sensitive: bool = False):
         """
         Initializes a wildcard query using the given parameters.
