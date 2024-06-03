@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from copy import deepcopy
 from typing import Any, Dict, List, no_type_check, Optional, overload, Tuple, Union
 
@@ -7,6 +8,10 @@ from deprecated.sphinx import deprecated
 
 from clp_ffi_py.ir.native import Query
 from clp_ffi_py.wildcard_query import FullStringWildcardQuery, WildcardQuery
+
+_add_wildcard_query_deprecation_warning_message: str = "The wildcard query must be explicitly "
+"created and passed as a parameter to this function. QueryBuilder should only accept instances of "
+"`clp_ffi_py.wildcard_query.WildcardQuery`."
 
 
 class QueryBuilderException(Exception):
@@ -83,9 +88,7 @@ class QueryBuilder:
     @overload
     @deprecated(
         version="0.0.12",
-        reason="The wildcard query must be explicitly created and passed as a parameter to this"
-        " function. QueryBuilder should only accept instances of"
-        " `clp_ffi_py.wildcard_query.WildcardQuery`.",
+        reason=_add_wildcard_query_deprecation_warning_message,
     )
     def add_wildcard_query(self, wildcard_query: str, case_sensitive: bool = False) -> QueryBuilder:
         """
@@ -125,6 +128,10 @@ class QueryBuilder:
             if isinstance(wildcard_query, WildcardQuery):
                 self._wildcard_queries.append(wildcard_query)
             elif isinstance(wildcard_query, str):
+                warnings.warn(
+                    _add_wildcard_query_deprecation_warning_message,
+                    DeprecationWarning,
+                )
                 self._wildcard_queries.append(FullStringWildcardQuery(wildcard_query, False))
             else:
                 raise TypeError
@@ -140,6 +147,10 @@ class QueryBuilder:
                 case_sensitive = kwargs["case_sensitive"]
             if not (isinstance(wildcard_query, str) and isinstance(case_sensitive, bool)):
                 raise TypeError
+            warnings.warn(
+                _add_wildcard_query_deprecation_warning_message,
+                DeprecationWarning,
+            )
             self._wildcard_queries.append(FullStringWildcardQuery(wildcard_query, case_sensitive))
             return self
         raise NotImplementedError

@@ -1,3 +1,4 @@
+import warnings
 from typing import List, Optional
 
 from test_ir.test_utils import TestCLPBase
@@ -225,7 +226,8 @@ class TestCaseQueryBuilder(TestCLPBase):
 
     def test_deprecated(self) -> None:
         """
-        Tests deprecated methods to ensure they are still functionally correct.
+        Tests deprecated methods to ensure they are still functionally correct,
+        and the deprecation warnings are properly captured.
         """
         query_builder: QueryBuilder = QueryBuilder()
         wildcard_query_strings: List[str] = ["aaa", "bbb", "ccc", "ddd"]
@@ -233,12 +235,48 @@ class TestCaseQueryBuilder(TestCLPBase):
         for wildcard_query_str in wildcard_query_strings:
             wildcard_queries.append(FullStringWildcardQuery(wildcard_query_str, False))
 
-        query_builder.add_wildcard_query(wildcard_query_strings[0])
-        query_builder.add_wildcard_query(wildcard_query_strings[1], False)
-        query_builder.add_wildcard_query(wildcard_query_strings[2], case_sensitive=False)
-        query_builder.add_wildcard_query(
-            case_sensitive=False, wildcard_query=wildcard_query_strings[3]
-        )
+        deprecation_warn_captured: bool
+
+        deprecation_warn_captured = False
+        with warnings.catch_warnings(record=True) as caught_warnings:
+            query_builder.add_wildcard_query(wildcard_query_strings[0])
+            self.assertNotEqual(None, caught_warnings)
+            for warning in caught_warnings:
+                if issubclass(warning.category, DeprecationWarning):
+                    deprecation_warn_captured = True
+                    break
+            self.assertTrue(deprecation_warn_captured)
+
+        deprecation_warn_captured = False
+        with warnings.catch_warnings(record=True) as caught_warnings:
+            query_builder.add_wildcard_query(wildcard_query_strings[1], False)
+            self.assertNotEqual(None, caught_warnings)
+            for warning in caught_warnings:
+                if issubclass(warning.category, DeprecationWarning):
+                    deprecation_warn_captured = True
+                    break
+            self.assertTrue(deprecation_warn_captured)
+
+        deprecation_warn_captured = False
+        with warnings.catch_warnings(record=True) as caught_warnings:
+            query_builder.add_wildcard_query(wildcard_query_strings[2], case_sensitive=False)
+            self.assertNotEqual(None, caught_warnings)
+            for warning in caught_warnings:
+                if issubclass(warning.category, DeprecationWarning):
+                    deprecation_warn_captured = True
+                    break
+            self.assertTrue(deprecation_warn_captured)
+
+        deprecation_warn_captured = False
+        with warnings.catch_warnings(record=True) as caught_warnings:
+            query_builder.add_wildcard_query(
+                case_sensitive=False, wildcard_query=wildcard_query_strings[3]
+            )
+            for warning in caught_warnings:
+                if issubclass(warning.category, DeprecationWarning):
+                    deprecation_warn_captured = True
+                    break
+            self.assertTrue(deprecation_warn_captured)
 
         self._check_query(
             query_builder.build(),
