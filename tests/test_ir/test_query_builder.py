@@ -7,7 +7,7 @@ from clp_ffi_py.ir import (
     QueryBuilder,
     QueryBuilderException,
 )
-from clp_ffi_py.wildcard_query import WildcardQuery
+from clp_ffi_py.wildcard_query import FullStringWildcardQuery, SubstringWildcardQuery, WildcardQuery
 
 
 class TestCaseQueryBuilder(TestCLPBase):
@@ -64,7 +64,7 @@ class TestCaseQueryBuilder(TestCLPBase):
             attributes_exception_captured, "search time termination margin should be read-only"
         )
 
-        query_builder.wildcard_queries.append(WildcardQuery(""))
+        query_builder.wildcard_queries.append(FullStringWildcardQuery(""))
         self.assertEqual(
             len(query_builder.wildcard_queries), 0, "The query list should be size of 0"
         )
@@ -112,12 +112,16 @@ class TestCaseQueryBuilder(TestCLPBase):
             search_time_termination_margin,
         )
 
-        wildcard_queries = [WildcardQuery("aaa*aaa"), WildcardQuery("bbb*bbb", True)]
+        wildcard_queries = [
+            FullStringWildcardQuery("aaa*aaa"),
+            SubstringWildcardQuery("bbb*bbb", True),
+        ]
         for wildcard_query in wildcard_queries:
-            query_builder.add_wildcard_query(
-                wildcard_query.wildcard_query, wildcard_query.case_sensitive
-            )
-        extra_wildcard_queries = [WildcardQuery("ccc?ccc", True), WildcardQuery("ddd?ddd")]
+            query_builder.add_wildcard_query(wildcard_query)
+        extra_wildcard_queries: List[WildcardQuery] = [
+            FullStringWildcardQuery("ccc?ccc", True),
+            SubstringWildcardQuery("ddd?ddd"),
+        ]
         query_builder.add_wildcard_queries(extra_wildcard_queries)
         wildcard_queries.extend(extra_wildcard_queries)
         self._check_query(
@@ -145,8 +149,8 @@ class TestCaseQueryBuilder(TestCLPBase):
         wildcard_query_string: str = "eee*?*eee"
         query_builder.set_search_time_termination_margin(
             search_time_termination_margin
-        ).add_wildcard_query(wildcard_query_string)
-        wildcard_queries.append(WildcardQuery(wildcard_query_string))
+        ).add_wildcard_query(wildcard_query=SubstringWildcardQuery(wildcard_query_string))
+        wildcard_queries.append(SubstringWildcardQuery(wildcard_query_string))
         self._check_query(
             query_builder.build(),
             search_time_lower_bound,
@@ -175,8 +179,10 @@ class TestCaseQueryBuilder(TestCLPBase):
         )
 
         query_builder.reset_wildcard_queries()
-        query_builder.add_wildcard_query(wildcard_query_string)
-        wildcard_queries = [WildcardQuery(wildcard_query_string)]
+        query_builder.add_wildcard_query(
+            wildcard_query=FullStringWildcardQuery(wildcard_query_string)
+        )
+        wildcard_queries = [FullStringWildcardQuery(wildcard_query_string)]
         self._check_query(
             query_builder.build(),
             search_time_lower_bound,
@@ -215,4 +221,29 @@ class TestCaseQueryBuilder(TestCLPBase):
             query_builder_exception_captured,
             "QueryBuilderException is not triggered when the search time lower bound exceeds the"
             " search time upper bound",
+        )
+
+    def test_deprecated(self) -> None:
+        """
+        Tests deprecated methods to ensure they are still functionally correct.
+        """
+        query_builder: QueryBuilder = QueryBuilder()
+        wildcard_query_strings: List[str] = ["aaa", "bbb", "ccc", "ddd"]
+        wildcard_queries: List[WildcardQuery] = []
+        for wildcard_query_str in wildcard_query_strings:
+            wildcard_queries.append(FullStringWildcardQuery(wildcard_query_str, False))
+
+        query_builder.add_wildcard_query(wildcard_query_strings[0])
+        query_builder.add_wildcard_query(wildcard_query_strings[1], False)
+        query_builder.add_wildcard_query(wildcard_query_strings[2], case_sensitive=False)
+        query_builder.add_wildcard_query(
+            case_sensitive=False, wildcard_query=wildcard_query_strings[3]
+        )
+
+        self._check_query(
+            query_builder.build(),
+            Query.default_search_time_lower_bound(),
+            Query.default_search_time_upper_bound(),
+            wildcard_queries,
+            0,
         )

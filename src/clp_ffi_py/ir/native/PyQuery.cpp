@@ -109,7 +109,7 @@ auto serialize_wildcard_queries(std::vector<WildcardQuery> const& wildcard_queri
         PyObjectPtr<PyObject> const is_case_sensitive{get_py_bool(wildcard_query.is_case_sensitive()
         )};
         PyObject* py_wildcard_query{PyObject_CallFunction(
-                PyQuery::get_py_wildcard_query_type(),
+                PyQuery::get_py_full_string_wildcard_query_type(),
                 "OO",
                 wildcard_py_str,
                 is_case_sensitive.get()
@@ -644,6 +644,7 @@ auto PyQuery::init(
 
 PyObjectStaticPtr<PyTypeObject> PyQuery::m_py_type{nullptr};
 PyObjectStaticPtr<PyObject> PyQuery::m_py_wildcard_query_type{nullptr};
+PyObjectStaticPtr<PyObject> PyQuery::m_py_full_string_wildcard_query_type{nullptr};
 
 auto PyQuery::get_py_type() -> PyTypeObject* {
     return m_py_type.get();
@@ -651,6 +652,10 @@ auto PyQuery::get_py_type() -> PyTypeObject* {
 
 auto PyQuery::get_py_wildcard_query_type() -> PyObject* {
     return m_py_wildcard_query_type.get();
+}
+
+auto PyQuery::get_py_full_string_wildcard_query_type() -> PyObject* {
+    return m_py_full_string_wildcard_query_type.get();
 }
 
 auto PyQuery::module_level_init(PyObject* py_module) -> bool {
@@ -669,11 +674,18 @@ auto PyQuery::module_level_init(PyObject* py_module) -> bool {
     if (nullptr == py_query) {
         return false;
     }
-    auto* py_wildcard_query_type = PyObject_GetAttrString(py_query, "WildcardQuery");
+    auto* py_wildcard_query_type{PyObject_GetAttrString(py_query, "WildcardQuery")};
     if (nullptr == py_wildcard_query_type) {
         return false;
     }
     m_py_wildcard_query_type.reset(py_wildcard_query_type);
+    auto* py_full_string_wildcard_query_type{
+            PyObject_GetAttrString(py_query, "FullStringWildcardQuery")
+    };
+    if (nullptr == py_full_string_wildcard_query_type) {
+        return false;
+    }
+    m_py_full_string_wildcard_query_type.reset(py_full_string_wildcard_query_type);
     return true;
 }
 }  // namespace clp_ffi_py::ir::native

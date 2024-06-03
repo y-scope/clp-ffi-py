@@ -76,12 +76,19 @@ public:
      */
     [[nodiscard]] static auto get_py_wildcard_query_type() -> PyObject*;
 
+    /**
+     * @return PyObject that represents the Python level class
+     * `FullStringWildcardQuery`.
+     */
+    [[nodiscard]] static auto get_py_full_string_wildcard_query_type() -> PyObject*;
+
 private:
     PyObject_HEAD;
     Query* m_query;
 
     static PyObjectStaticPtr<PyTypeObject> m_py_type;
     static PyObjectStaticPtr<PyObject> m_py_wildcard_query_type;
+    static PyObjectStaticPtr<PyObject> m_py_full_string_wildcard_query_type;
 };
 }  // namespace clp_ffi_py::ir::native
 #endif

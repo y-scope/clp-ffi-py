@@ -7,7 +7,7 @@ from clp_ffi_py.ir import (
     LogEvent,
     Query,
 )
-from clp_ffi_py.wildcard_query import WildcardQuery
+from clp_ffi_py.wildcard_query import FullStringWildcardQuery, SubstringWildcardQuery, WildcardQuery
 
 
 class TestCaseWildcardQuery(TestCLPBase):
@@ -20,20 +20,41 @@ class TestCaseWildcardQuery(TestCLPBase):
         Test the initialization of WildcardQuery object.
         """
         wildcard_string: str
+        expected_wildcard_string: str
         wildcard_query: WildcardQuery
 
         wildcard_string = "Are you the lord of *Pleiades*?"
-        wildcard_query = WildcardQuery(wildcard_string)
-        self._check_wildcard_query(wildcard_query, wildcard_string, False)
+        expected_wildcard_string = wildcard_string
 
-        wildcard_query = WildcardQuery(wildcard_string, True)
-        self._check_wildcard_query(wildcard_query, wildcard_string, True)
+        wildcard_query = FullStringWildcardQuery(wildcard_string)
+        self._check_wildcard_query(wildcard_query, expected_wildcard_string, False)
 
-        wildcard_query = WildcardQuery(wildcard_string, case_sensitive=True)
-        self._check_wildcard_query(wildcard_query, wildcard_string, True)
+        wildcard_query = FullStringWildcardQuery(wildcard_string, True)
+        self._check_wildcard_query(wildcard_query, expected_wildcard_string, True)
 
-        wildcard_query = WildcardQuery(case_sensitive=True, wildcard_query=wildcard_string)
-        self._check_wildcard_query(wildcard_query, wildcard_string, True)
+        wildcard_query = FullStringWildcardQuery(wildcard_string, case_sensitive=True)
+        self._check_wildcard_query(wildcard_query, expected_wildcard_string, True)
+
+        wildcard_query = FullStringWildcardQuery(
+            case_sensitive=True, full_string_wildcard_query=wildcard_string
+        )
+        self._check_wildcard_query(wildcard_query, expected_wildcard_string, True)
+
+        expected_wildcard_string = "*" + wildcard_string + "*"
+
+        wildcard_query = SubstringWildcardQuery(wildcard_string)
+        self._check_wildcard_query(wildcard_query, expected_wildcard_string, False)
+
+        wildcard_query = SubstringWildcardQuery(wildcard_string, True)
+        self._check_wildcard_query(wildcard_query, expected_wildcard_string, True)
+
+        wildcard_query = SubstringWildcardQuery(wildcard_string, case_sensitive=True)
+        self._check_wildcard_query(wildcard_query, expected_wildcard_string, True)
+
+        wildcard_query = SubstringWildcardQuery(
+            case_sensitive=True, substring_wildcard_query=wildcard_string
+        )
+        self._check_wildcard_query(wildcard_query, expected_wildcard_string, True)
 
 
 class TestCaseQuery(TestCLPBase):
