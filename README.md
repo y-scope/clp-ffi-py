@@ -141,13 +141,16 @@ from pathlib import Path
 from typing import List, Tuple
 
 from clp_ffi_py.ir import ClpIrFileReader, Query, QueryBuilder
+from clp_ffi_py.wildcard_query import FullStringWildcardQuery, SubstringWildcardQuery
 
 # Create a QueryBuilder object to build the search query.
 query_builder: QueryBuilder = QueryBuilder()
 
 # Add wildcard patterns to filter log messages:
-query_builder.add_wildcard_query("*uid=*,status=failed*")
-query_builder.add_wildcard_query("*UID=*,Status=KILLED*", case_sensitive=True)
+query_builder.add_wildcard_query(SubstringWildcardQuery("uid=*,status=failed"))
+query_builder.add_wildcard_query(
+    FullStringWildcardQuery("*UID=*,Status=KILLED*", case_sensitive=True)
+)
 
 # Initialize a Query object using the builder:
 wildcard_search_query: Query = query_builder.build()
@@ -169,10 +172,12 @@ details, use the following code to access the related docstring.
 
 ```python
 from clp_ffi_py.ir import Query, QueryBuilder
-from clp_ffi_py import WildcardQuery
+from clp_ffi_py import FullStringWildcardQuery, SubstringWildcardQuery, WildcardQuery
 help(Query)
 help(QueryBuilder)
 help(WildcardQuery)
+help(FullStringWildcardQuery)
+help(SubstringWildcardQuery)
 ```
 
 ### Streaming Decode/Search Directly from S3 Remote Storage
