@@ -1,12 +1,12 @@
-black>=23.11.0
+black>=24.4.2
 build>=0.8.0
 cibuildwheel>=2.16.2
-clang-format>=17.0.5
+clang-format>=18.1.5
 docformatter>=1.7.5
-mypy>=1.7.1
+mypy>=1.10.0
 mypy-extensions>=1.0.0
 packaging>=21.3
-ruff>=0.1.6
+ruff>=0.4.6
 smart_open==6.4.0
 types-python-dateutil>=2.8
 zstandard>=0.18.0
