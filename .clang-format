@@ -71,7 +71,7 @@ IncludeBlocks: "Regroup"
 IncludeCategories:
   # NOTE: A header is grouped by first matching regex
   # Python header must be included before any others
-  - Regex: "^<clp_ffi_py/Python\.hpp>$"
+  - Regex: "^<clp_ffi_py/Python\\.hpp>$"
     Priority: -1
   # Project headers
   - Regex: "^<clp_ffi_py"
