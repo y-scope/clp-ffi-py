@@ -117,9 +117,6 @@ class QueryBuilder:
     ) -> QueryBuilder:
         """
         This method is the implementation of `add_wildcard_query`.
-
-        Type check is disabled since it executes runtime checks to ensure
-        passed-in arguments match the defined signatures.
         """
         if isinstance(wildcard_query, WildcardQuery):
             self._wildcard_queries.append(wildcard_query)
