@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from copy import deepcopy
-from typing import Any, Dict, List, no_type_check, Optional, overload, Tuple, Union
+from typing import List, Optional, overload, Union
 
 from deprecated.sphinx import deprecated
 
@@ -112,47 +112,26 @@ class QueryBuilder:
         """
         ...
 
-    @no_type_check
-    def add_wildcard_query(self, *args: Tuple[Any, ...], **kwargs: Dict[str, Any]) -> QueryBuilder:
+    def add_wildcard_query(
+        self, wildcard_query: Union[str, WildcardQuery], case_sensitive: bool = False
+    ) -> QueryBuilder:
         """
         This method is the implementation of `add_wildcard_query`.
 
         Type check is disabled since it executes runtime checks to ensure
         passed-in arguments match the defined signatures.
         """
-        num_param: int = len(args) + len(kwargs)
-        if 1 == num_param:
-            wildcard_query: Union[WildcardQuery, str] = (
-                args[0] if 1 == len(args) else kwargs["wildcard_query"]
-            )
-            if isinstance(wildcard_query, WildcardQuery):
-                self._wildcard_queries.append(wildcard_query)
-            elif isinstance(wildcard_query, str):
-                warnings.warn(
-                    _add_wildcard_query_deprecation_warning_message,
-                    DeprecationWarning,
-                )
-                self._wildcard_queries.append(FullStringWildcardQuery(wildcard_query, False))
-            else:
-                raise TypeError
+        if isinstance(wildcard_query, WildcardQuery):
+            self._wildcard_queries.append(wildcard_query)
             return self
-        if 2 == num_param:
-            wildcard_query: str
-            case_sensitive: bool
-            if 2 == len(args):
-                wildcard_query = args[0]
-                case_sensitive = args[1]
-            else:
-                wildcard_query = args[0] if 1 == len(args) else kwargs["wildcard_query"]
-                case_sensitive = kwargs["case_sensitive"]
-            if not (isinstance(wildcard_query, str) and isinstance(case_sensitive, bool)):
-                raise TypeError
+        elif isinstance(wildcard_query, str):
             warnings.warn(
                 _add_wildcard_query_deprecation_warning_message,
                 DeprecationWarning,
             )
             self._wildcard_queries.append(FullStringWildcardQuery(wildcard_query, case_sensitive))
             return self
+
         raise NotImplementedError
 
     def add_wildcard_queries(self, wildcard_queries: List[WildcardQuery]) -> QueryBuilder:
