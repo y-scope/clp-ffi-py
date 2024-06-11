@@ -8,5 +8,6 @@ mypy-extensions>=1.0.0
 packaging>=21.3
 ruff>=0.4.6
 smart_open==6.4.0
+types-Deprecated>=1.2.9
 types-python-dateutil>=2.8
 zstandard>=0.18.0

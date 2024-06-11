@@ -1,10 +1,17 @@
 from __future__ import annotations
 
+import warnings
 from copy import deepcopy
-from typing import List, Optional
+from typing import List, Optional, overload, Union
+
+from deprecated.sphinx import deprecated
 
 from clp_ffi_py.ir.native import Query
-from clp_ffi_py.wildcard_query import WildcardQuery
+from clp_ffi_py.wildcard_query import FullStringWildcardQuery, WildcardQuery
+
+_add_wildcard_query_deprecation_warning_message: str = "The wildcard query must be explicitly "
+"created and passed as a parameter to this function. QueryBuilder should only accept instances of "
+"`clp_ffi_py.wildcard_query.WildcardQuery`."
 
 
 class QueryBuilderException(Exception):
@@ -78,6 +85,11 @@ class QueryBuilder:
         self._search_time_termination_margin = ts
         return self
 
+    @overload
+    @deprecated(
+        version="0.0.12",
+        reason=_add_wildcard_query_deprecation_warning_message,
+    )
     def add_wildcard_query(self, wildcard_query: str, case_sensitive: bool = False) -> QueryBuilder:
         """
         Constructs and adds a :class:`~clp_ffi_py.wildcard_query.WildcardQuery`
@@ -87,8 +99,37 @@ class QueryBuilder:
         :param case_sensitive: Whether to perform case-sensitive matching.
         :return: self.
         """
-        self._wildcard_queries.append(WildcardQuery(wildcard_query, case_sensitive))
-        return self
+        ...
+
+    @overload
+    def add_wildcard_query(self, wildcard_query: WildcardQuery) -> QueryBuilder:
+        """
+        Adds the given wildcard query to the wildcard query list.
+
+        :param wildcard_query: The wildcard query to add. It can be any derived
+            class of :class:`~clp_ffi_py.wildcard_query.WildcardQuery`.
+        :return: self.
+        """
+        ...
+
+    def add_wildcard_query(
+        self, wildcard_query: Union[str, WildcardQuery], case_sensitive: bool = False
+    ) -> QueryBuilder:
+        """
+        This method is the implementation of `add_wildcard_query`.
+        """
+        if isinstance(wildcard_query, WildcardQuery):
+            self._wildcard_queries.append(wildcard_query)
+            return self
+        elif isinstance(wildcard_query, str):
+            warnings.warn(
+                _add_wildcard_query_deprecation_warning_message,
+                DeprecationWarning,
+            )
+            self._wildcard_queries.append(FullStringWildcardQuery(wildcard_query, case_sensitive))
+            return self
+
+        raise NotImplementedError
 
     def add_wildcard_queries(self, wildcard_queries: List[WildcardQuery]) -> QueryBuilder:
         """
