@@ -92,6 +92,12 @@ class FullStringWildcardQuery(WildcardQuery):
     """
 
     def __init__(self, full_string_wildcard_query: str, case_sensitive: bool = False):
+        """
+        Initializes a full-string wildcard query using the given parameters.
+
+        :param full_string_wildcard_query: Wildcard query string.
+        :param case_sensitive: Case sensitive indicator.
+        """
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", DeprecationWarning)
             super().__init__(full_string_wildcard_query, case_sensitive)
