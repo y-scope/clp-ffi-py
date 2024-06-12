@@ -9,9 +9,9 @@ from deprecated.sphinx import deprecated
 from clp_ffi_py.ir.native import Query
 from clp_ffi_py.wildcard_query import FullStringWildcardQuery, WildcardQuery
 
-_add_wildcard_query_deprecation_warning_message: str = "The wildcard query must be explicitly "
-"created and passed as a parameter to this function. QueryBuilder should only accept instances of "
-"`clp_ffi_py.wildcard_query.WildcardQuery`."
+_add_wildcard_query_deprecation_warning_message: str = "Instead, use :meth:`add_wildcard_query`"
+" with either a :class:`~clp_ffi_py.wildcard_query.FullStringWildcardQuery` or "
+" :class:`~clp_ffi_py.wildcard_query.SubstringWildcardQuery`."
 
 
 class QueryBuilderException(Exception):
@@ -115,39 +115,6 @@ class QueryBuilder:
     def add_wildcard_query(
         self, wildcard_query: Union[str, WildcardQuery], case_sensitive: bool = False
     ) -> QueryBuilder:
-        """
-        This is an overloaded method. The supported signatures are listed below:
-
-        .. method:: add_wildcard_query(wildcard_query: str, case_sensitive: \
-            bool = False) -> QueryBuilder
-            :noindex:
-
-            Constructs and adds a
-            :class:`~clp_ffi_py.wildcard_query.WildcardQuery` to the wildcard
-            query list.
-
-            .. deprecated:: 0.0.12
-                The wildcard query must be explicitly created and passed as a
-                parameter to this function. QueryBuilder should only accept
-                instances of `clp_ffi_py.wildcard_query.WildcardQuery`.
-
-            :param str wildcard_query: The wildcard query string to add.
-            :param bool case_sensitive: Whether to perform case-sensitive
-                matching.
-            :returns: self.
-            :rtype: :class:`~clp_ffi_py.ir.query_builder.QueryBuilder`
-
-        .. method:: add_wildcard_query(wildcard_query: WildcardQuery) -> \
-            QueryBuilder
-            :noindex:
-
-            Adds the given wildcard query to the wildcard query list.
-
-            :param WildcardQuery wildcard_query: The wildcard query object to
-                add.
-            :returns: self.
-            :rtype: :class:`~clp_ffi_py.ir.query_builder.QueryBuilder`
-        """
         if isinstance(wildcard_query, WildcardQuery):
             self._wildcard_queries.append(wildcard_query)
             return self

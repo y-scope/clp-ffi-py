@@ -19,10 +19,10 @@ class WildcardQuery:
 
     @deprecated(
         version="0.0.12",
-        reason="`clp_ffi_py.wildcard_query.WildcardQuery` is supposed to be an abstract class and"
-        " should not be used directly. To create a wildcard query, please explicit instantiate"
-        " `clp_ffi_py.wildcard_query.SubstringWildcardQuery` or"
-        " `clp_ffi_py.wildcard_query.FullStringWildcardQuery`.",
+        reason=":class:`~clp_ffi_py.wildcard_query.WildcardQuery` is supposed to be an abstract"
+        " class and should not be used directly. To create a wildcard query, please explicit"
+        " instantiate :class:`~clp_ffi_py.wildcard_query.SubstringWildcardQuery` or"
+        " :class:`~clp_ffi_py.wildcard_query.FullStringWildcardQuery`.",
     )
     def __init__(self, wildcard_query: str, case_sensitive: bool = False):
         """
