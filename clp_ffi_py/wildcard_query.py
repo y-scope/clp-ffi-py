@@ -23,7 +23,7 @@ class WildcardQuery:
         reason=":class:`WildcardQuery` will soon be made abstract and should"
         " not be used directly. To create a wildcard query, use"
         " :class:`SubstringWildcardQuery` or :class:`FullStringWildcardQuery`"
-        " instead."
+        " instead.",
     )
     def __init__(self, wildcard_query: str, case_sensitive: bool = False):
         """
