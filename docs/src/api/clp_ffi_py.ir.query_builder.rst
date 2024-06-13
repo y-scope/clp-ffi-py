@@ -29,9 +29,10 @@ clp\_ffi\_py.ir.query\_builder module
             query list.
 
             .. deprecated:: 0.0.12
-                Instead, use :meth:`add_wildcard_query` with either a
+                Use :meth:`add_wildcard_query` with either a
                 :class:`~clp_ffi_py.wildcard_query.FullStringWildcardQuery` or
-                :class:`~clp_ffi_py.wildcard_query.SubstringWildcardQuery`.
+                :class:`~clp_ffi_py.wildcard_query.SubstringWildcardQuery`
+                instead.
 
             :param str wildcard_query: The wildcard query string to add.
             :param bool case_sensitive: Whether to perform case-sensitive matching.
