@@ -61,6 +61,10 @@ class WildcardQuery:
 
 class SubstringWildcardQuery(WildcardQuery):
     """
+    A wildcard query that can match a substring in a log event's message, in
+    contrast with :class:`FullStringWildcardQuery` where the needs to match the
+    entire message.
+
     This class is derived from :class:`WildcardQuery` by adding both a prefix
     and a postfix wildcard ("*") to the input wildcard string.
     """
