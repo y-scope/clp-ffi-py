@@ -3,8 +3,8 @@
 
 #include <utility>
 
-#include <clp/components/core/src/clp/ffi/encoding_methods.hpp>
-#include <clp/components/core/submodules/json/single_include/nlohmann/json.hpp>
+#include <clp/ffi/encoding_methods.hpp>
+#include <json/single_include/nlohmann/json.hpp>
 
 namespace clp_ffi_py::ir::native {
 /**

@@ -6,8 +6,8 @@
 #include <string_view>
 #include <vector>
 
-#include <clp/components/core/src/clp/ErrorCode.hpp>
-#include <clp/components/core/src/clp/ffi/encoding_methods.hpp>
+#include <clp/ErrorCode.hpp>
+#include <clp/ffi/encoding_methods.hpp>
 
 #include <clp_ffi_py/ExceptionFFI.hpp>
 #include <clp_ffi_py/ir/native/LogEvent.hpp>

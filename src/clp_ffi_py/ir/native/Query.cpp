@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <string_view>
 
-#include <clp/components/core/src/clp/string_utils/string_utils.hpp>
+#include <clp/string_utils/string_utils.hpp>
 
 namespace clp_ffi_py::ir::native {
 auto Query::matches_wildcard_queries(std::string_view log_message) const -> bool {

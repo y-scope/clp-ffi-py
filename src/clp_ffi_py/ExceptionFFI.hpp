@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include <clp/components/core/src/clp/TraceableException.hpp>
+#include <clp/TraceableException.hpp>
 
 namespace clp_ffi_py {
 /**
