@@ -53,7 +53,7 @@ concept TerminateHandlerSignature = requires(TerminateHandler handler) {
  * to determine whether to swallow the incomplete IR exception.
  * @param decoder_buffer
  * @param allow_incomplete_stream A flag to indicate whether the incomplete stream error should be
- * ignored. If it is set to true, incomplete stream error
+ * ignored. If it is set to true, incomplete stream error.
  * @param std::nullopt if more data is loaded.
  * @param PyNone if the IR stream is incomplete and allowed.
  * @param nullptr if the IR stream is incomplete not allowed, with the relevant Python exceptions
