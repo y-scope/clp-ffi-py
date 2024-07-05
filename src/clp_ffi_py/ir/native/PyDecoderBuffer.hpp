@@ -5,7 +5,7 @@
 
 #include <span>
 
-#include <clp/components/core/src/clp/ffi/ir_stream/decoding_methods.hpp>
+#include <clp/ffi/ir_stream/decoding_methods.hpp>
 
 #include <clp_ffi_py/ir/native/PyMetadata.hpp>
 #include <clp_ffi_py/PyObjectUtils.hpp>

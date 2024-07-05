@@ -1,6 +1,6 @@
 #include "Metadata.hpp"
 
-#include <clp/components/core/src/clp/ffi/ir_stream/protocol_constants.hpp>
+#include <clp/ffi/ir_stream/protocol_constants.hpp>
 
 #include <clp_ffi_py/ExceptionFFI.hpp>
 #include <clp_ffi_py/ir/native/error_messages.hpp>

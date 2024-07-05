@@ -3,7 +3,7 @@
 
 #include "PyQuery.hpp"
 
-#include <clp/components/core/src/clp/string_utils/string_utils.hpp>
+#include <clp/string_utils/string_utils.hpp>
 
 #include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ir/native/LogEvent.hpp>

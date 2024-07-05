@@ -3,7 +3,7 @@
 
 #include <optional>
 
-#include <clp/components/core/src/clp/ffi/encoding_methods.hpp>
+#include <clp/ffi/encoding_methods.hpp>
 
 namespace clp_ffi_py::ir::native {
 /**

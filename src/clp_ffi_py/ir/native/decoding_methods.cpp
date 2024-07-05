@@ -2,12 +2,13 @@
 
 #include "decoding_methods.hpp"
 
+#include <optional>
 #include <span>
 
-#include <clp/components/core/src/clp/BufferReader.hpp>
-#include <clp/components/core/src/clp/ffi/ir_stream/decoding_methods.hpp>
-#include <clp/components/core/src/clp/ffi/ir_stream/protocol_constants.hpp>
-#include <clp/components/core/src/clp/type_utils.hpp>
+#include <clp/BufferReader.hpp>
+#include <clp/ffi/ir_stream/decoding_methods.hpp>
+#include <clp/ffi/ir_stream/protocol_constants.hpp>
+#include <clp/type_utils.hpp>
 #include <json/single_include/nlohmann/json.hpp>
 
 #include <clp_ffi_py/error_messages.hpp>
@@ -21,6 +22,10 @@
 #include <clp_ffi_py/utils.hpp>
 
 namespace clp_ffi_py::ir::native {
+using clp::ffi::ir_stream::encoded_tag_t;
+using clp::ffi::ir_stream::IRErrorCode;
+using clp::ffi::ir_stream::IRProtocolErrorCode;
+
 namespace {
 /**
  * This template defines the function signature of a termination handler
@@ -41,6 +46,35 @@ concept TerminateHandlerSignature = requires(TerminateHandler handler) {
                 std::declval<PyObject*&>())
     } -> std::same_as<bool>;
 };
+
+/**
+ * Handles the error when IRErrorCode::IRErrorCode_Incomplete_IR is seen. The handler will first
+ * try to load more data into `decoder_buffer`. If it fails, `allow_incomplete_stream` will be used
+ * to determine whether to swallow the incomplete IR exception.
+ * @param decoder_buffer
+ * @param allow_incomplete_stream A flag to indicate whether the incomplete stream error should be
+ * ignored. If it is set to true, incomplete stream error.
+ * @param std::nullopt if more data is loaded.
+ * @param PyNone if the IR stream is incomplete and allowed.
+ * @param nullptr if the IR stream is incomplete not allowed, with the relevant Python exceptions
+ * and error set.
+ */
+[[nodiscard]] auto handle_incomplete_ir_error(
+        PyDecoderBuffer* decoder_buffer,
+        bool allow_incomplete_stream
+) -> std::optional<PyObject*> {
+    if (decoder_buffer->try_read()) {
+        return std::nullopt;
+    }
+    if (allow_incomplete_stream
+        && static_cast<bool>(PyErr_ExceptionMatches(PyDecoderBuffer::get_py_incomplete_stream_error(
+        ))))
+    {
+        PyErr_Clear();
+        Py_RETURN_NONE;
+    }
+    return nullptr;
+}
 
 /**
  * Decodes the next log event from the CLP IR buffer `decoder_buffer` until
@@ -67,6 +101,7 @@ auto generic_decode_log_events(
     auto timestamp{decoder_buffer->get_ref_timestamp()};
     size_t current_log_event_idx{0};
     PyObject* return_value{nullptr};
+    clp::ffi::ir_stream::encoded_tag_t tag{};
 
     while (true) {
         auto const unconsumed_bytes{decoder_buffer->get_unconsumed_bytes()};
@@ -74,29 +109,44 @@ auto generic_decode_log_events(
                 clp::size_checked_pointer_cast<char const>(unconsumed_bytes.data()),
                 unconsumed_bytes.size()
         };
+
+        if (auto const err{clp::ffi::ir_stream::deserialize_tag(ir_buffer, tag)};
+            IRErrorCode::IRErrorCode_Success != err)
+        {
+            if (IRErrorCode::IRErrorCode_Incomplete_IR != err) {
+                PyErr_Format(PyExc_RuntimeError, cDecoderErrorCodeFormatStr, err);
+                return nullptr;
+            }
+            if (auto const ret_val{
+                        handle_incomplete_ir_error(decoder_buffer, allow_incomplete_stream)
+                };
+                ret_val.has_value())
+            {
+                return ret_val.value();
+            }
+            continue;
+        }
+        if (clp::ffi::ir_stream::cProtocol::Eof == tag) {
+            Py_RETURN_NONE;
+        }
+
         auto const err{clp::ffi::ir_stream::four_byte_encoding::deserialize_log_event(
                 ir_buffer,
+                tag,
                 decoded_message,
                 timestamp_delta
         )};
-        if (clp::ffi::ir_stream::IRErrorCode_Incomplete_IR == err) {
-            if (decoder_buffer->try_read()) {
-                continue;
-            }
-            if (allow_incomplete_stream
-                && static_cast<bool>(
-                        PyErr_ExceptionMatches(PyDecoderBuffer::get_py_incomplete_stream_error())
-                ))
+        if (IRErrorCode::IRErrorCode_Incomplete_IR == err) {
+            if (auto const ret_val{
+                        handle_incomplete_ir_error(decoder_buffer, allow_incomplete_stream)
+                };
+                ret_val.has_value())
             {
-                PyErr_Clear();
-                Py_RETURN_NONE;
+                return ret_val.value();
             }
-            return nullptr;
+            continue;
         }
-        if (clp::ffi::ir_stream::IRErrorCode_Eof == err) {
-            Py_RETURN_NONE;
-        }
-        if (clp::ffi::ir_stream::IRErrorCode_Success != err) {
+        if (IRErrorCode::IRErrorCode_Success != err) {
             PyErr_Format(PyExc_RuntimeError, cDecoderErrorCodeFormatStr, err);
             return nullptr;
         }
@@ -143,11 +193,11 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
                 unconsumed_bytes.size()
         };
         auto const err{clp::ffi::ir_stream::get_encoding_type(ir_buffer, is_four_byte_encoding)};
-        if (clp::ffi::ir_stream::IRErrorCode_Success == err) {
+        if (IRErrorCode::IRErrorCode_Success == err) {
             ir_buffer_cursor_pos = ir_buffer.get_pos();
             break;
         }
-        if (clp::ffi::ir_stream::IRErrorCode_Incomplete_IR != err) {
+        if (IRErrorCode::IRErrorCode_Incomplete_IR != err) {
             PyErr_Format(PyExc_RuntimeError, cDecoderErrorCodeFormatStr, err);
             return nullptr;
         }
@@ -176,11 +226,11 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
                 metadata_pos,
                 metadata_size
         )};
-        if (clp::ffi::ir_stream::IRErrorCode_Success == err) {
+        if (IRErrorCode::IRErrorCode_Success == err) {
             ir_buffer_cursor_pos = ir_buffer.get_pos();
             break;
         }
-        if (clp::ffi::ir_stream::IRErrorCode_Incomplete_IR != err) {
+        if (IRErrorCode ::IRErrorCode_Incomplete_IR != err) {
             PyErr_Format(PyExc_RuntimeError, cDecoderErrorCodeFormatStr, err);
             return nullptr;
         }
@@ -205,15 +255,15 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
                 static_cast<char const*>(clp::ffi::ir_stream::cProtocol::Metadata::VersionKey)
         )};
         auto const error_code{clp::ffi::ir_stream::validate_protocol_version(version)};
-        if (clp::ffi::ir_stream::IRProtocolErrorCode_Supported != error_code) {
+        if (IRProtocolErrorCode::IRProtocolErrorCode_Supported != error_code) {
             switch (error_code) {
-                case clp::ffi::ir_stream::IRProtocolErrorCode_Invalid:
+                case IRProtocolErrorCode::IRProtocolErrorCode_Invalid:
                     PyErr_Format(PyExc_RuntimeError, "Invalid version number: %s", version.c_str());
                     break;
-                case clp::ffi::ir_stream::IRProtocolErrorCode_Too_New:
+                case IRProtocolErrorCode::IRProtocolErrorCode_Too_New:
                     PyErr_Format(PyExc_RuntimeError, "Version too new: %s", version.c_str());
                     break;
-                case clp::ffi::ir_stream::IRProtocolErrorCode_Too_Old:
+                case IRProtocolErrorCode::IRProtocolErrorCode_Too_Old:
                     PyErr_Format(PyExc_RuntimeError, "Version too old: %s", version.c_str());
                     break;
                 default:

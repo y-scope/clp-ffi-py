@@ -2,10 +2,10 @@
 
 #include "encoding_methods.hpp"
 
-#include <clp/components/core/src/clp/ffi/encoding_methods.hpp>
-#include <clp/components/core/src/clp/ffi/ir_stream/encoding_methods.hpp>
-#include <clp/components/core/src/clp/ffi/ir_stream/protocol_constants.hpp>
-#include <clp/components/core/src/clp/type_utils.hpp>
+#include <clp/ffi/encoding_methods.hpp>
+#include <clp/ffi/ir_stream/encoding_methods.hpp>
+#include <clp/ffi/ir_stream/protocol_constants.hpp>
+#include <clp/type_utils.hpp>
 
 #include <clp_ffi_py/ir/native/error_messages.hpp>
 

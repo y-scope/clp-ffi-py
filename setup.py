@@ -7,7 +7,8 @@ from setuptools import setup, Extension
 from typing import List, Optional, Tuple
 
 cpp_src_root: str = "src"
-clp_src_root: str = f"{cpp_src_root}/clp/components/core/src/clp"
+clp_core_src_root: str = f"{cpp_src_root}/clp/components/core/src"
+clp_src_root: str = f"{clp_core_src_root}/clp"
 clp_submodule_root: str = f"{cpp_src_root}/clp/components/core/submodules"
 clp_ffi_py_src_root: str = f"{cpp_src_root}/clp_ffi_py"
 
@@ -15,14 +16,16 @@ ir_native: Extension = Extension(
     name="clp_ffi_py.ir.native",
     language="c++",
     include_dirs=[
-        cpp_src_root,
+        clp_core_src_root,
         clp_src_root,
         clp_submodule_root,
+        cpp_src_root,
     ],
     sources=[
         f"{clp_src_root}/BufferReader.cpp",
         f"{clp_src_root}/ffi/ir_stream/decoding_methods.cpp",
         f"{clp_src_root}/ffi/ir_stream/encoding_methods.cpp",
+        f"{clp_src_root}/ffi/ir_stream/utils.cpp",
         f"{clp_src_root}/ffi/encoding_methods.cpp",
         f"{clp_src_root}/ir/parsing.cpp",
         f"{clp_src_root}/ReaderInterface.cpp",
