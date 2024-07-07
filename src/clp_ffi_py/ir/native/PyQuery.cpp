@@ -15,16 +15,13 @@
 namespace clp_ffi_py::ir::native {
 namespace {
 /**
- * Deserializes the wildcard queries from a list of Python wildcard queries into
- * a WildcardQuery std::vector.
- * If there is no wildcard queries given, the given py_wildcard_queries will be
- * set to Py_None.
- * @param py_wildcard_queries A Python list that contains Python wildcard
- * queries. Each element inside this list should be an instance of WildcardQuery
- * defined in clp_ffi_py Python module.
- * @param wildcard_queries The output std::vector that contains cleaned wildcard
- * queries from the input. If py_wildcard_queries is Py_None, wildcard_queries
- * will be set to empty.
+ * Deserializes the wildcard queries from a list of Python wildcard queries into a WildcardQuery
+ * std::vector. If there is no wildcard queries given, the given py_wildcard_queries will be set to
+ * Py_None.
+ * @param py_wildcard_queries A Python list that contains Python wildcard queries. Each element
+ * inside this list should be an instance of WildcardQuery defined in clp_ffi_py Python module.
+ * @param wildcard_queries The output std::vector that contains cleaned wildcard queries from the
+ * input. If py_wildcard_queries is Py_None, wildcard_queries will be set to empty.
  * @return true on success.
  * @return false on failure with the relevant Python exception and error set.
  */
@@ -75,9 +72,8 @@ auto deserialize_wildcard_queries(
 }
 
 /**
- * Serializes the std::vector of WildcardQuery into a Python list. Serves as a
- * helper function to serialize the underlying wildcard queries of the PyQuery
- * object.
+ * Serializes the std::vector of WildcardQuery into a Python list. Serves as a helper function to
+ * serialize the underlying wildcard queries of the PyQuery object.
  * @param wildcard_queries A std::vector of WildcardQuery.
  * @return The Python list that consists of Python wildcard query objects.
  * @return Py_None if the wildcard_queries are empty.
@@ -93,9 +89,8 @@ auto serialize_wildcard_queries(std::vector<WildcardQuery> const& wildcard_queri
         return nullptr;
     }
 
-    // In case of failure, we only need to decrement the reference for the
-    // Python list. CPython will decrement the reference count of all the
-    // objects it contains.
+    // In case of failure, we only need to decrement the reference for the Python list. CPython will
+    // decrement the reference count of all the objects it contains.
     Py_ssize_t idx{0};
     for (auto const& wildcard_query : wildcard_queries) {
         PyObjectPtr<PyObject> const wildcard_py_str_ptr{
@@ -137,8 +132,8 @@ extern "C" {
  *              Query.default_search_time_termination_margin()
  * )
  * Keyword argument parsing is supported.
- * Assumes `self` is uninitialized and will allocate the underlying memory. If
- * `self` is already initialized this will result in memory leaks.
+ * Assumes `self` is uninitialized and will allocate the underlying memory. If `self` is already
+ * initialized this will result in memory leaks.
  * @param self
  * @param args
  * @param keywords
@@ -158,9 +153,8 @@ auto PyQuery_init(PyQuery* self, PyObject* args, PyObject* keywords) -> int {
             nullptr
     };
 
-    // If the argument parsing fails, `self` will be deallocated. We must reset
-    // all pointers to nullptr in advance, otherwise the deallocator might
-    // trigger a segmentation fault.
+    // If the argument parsing fails, `self` will be deallocated. We must reset all pointers to
+    // nullptr in advance, otherwise the deallocator might trigger a segmentation fault.
     self->default_init();
 
     auto search_time_lower_bound{Query::cTimestampMin};
@@ -211,8 +205,8 @@ auto PyQuery_dealloc(PyQuery* self) -> void {
 }
 
 /**
- * Constant keys used to serialize/deserialize PyQuery objects through
- * __getstate__ and __setstate__ methods.
+ * Constant keys used to serialize/deserialize PyQuery objects through `__getstate__` and
+ * `__setstate__` methods.
  */
 constexpr char const* const cStateSearchTimeLowerBound = "search_time_lower_bound";
 constexpr char const* const cStateSearchTimeUpperBound = "search_time_upper_bound";
@@ -270,8 +264,8 @@ PyDoc_STRVAR(
 /**
  * Callback of PyQuery `__setstate__` method.
  * Note: should only be used by the Python pickle module.
- * Assumes `self` is uninitialized and will allocate the underlying memory. If
- * `self` is already initialized this will result in memory leaks.
+ * Assumes `self` is uninitialized and will allocate the underlying memory. If `self` is already
+ * initialized this will result in memory leaks.
  * @param self
  * @param state Python dictionary that contains the serialized object info.
  * @return Py_None on success

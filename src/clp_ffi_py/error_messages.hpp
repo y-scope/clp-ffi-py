@@ -1,5 +1,5 @@
-#ifndef CLP_FFI_PY_ERROR_MESSAGES
-#define CLP_FFI_PY_ERROR_MESSAGES
+#ifndef CLP_FFI_PY_IR_ERROR_MESSAGES
+#define CLP_FFI_PY_IR_ERROR_MESSAGES
 
 namespace clp_ffi_py {
 constexpr char const* const cOutofMemoryError = "Failed to allocate memory.";
@@ -11,4 +11,4 @@ constexpr char const* const cTimezoneObjectNotInitialzed
         = "Timezone (tzinfo) object is not yet initialized.";
 }  // namespace clp_ffi_py
 
-#endif  // CLP_FFI_PY_ERROR_MESSAGES
+#endif  // CLP_FFI_PY_IR_ERROR_MESSAGES

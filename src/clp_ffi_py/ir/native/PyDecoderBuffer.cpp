@@ -19,8 +19,8 @@ extern "C" {
  * Callback of PyDecoderBuffer `__init__` method:
  * __init__(self, input_stream: IO[bytes], initial_buffer_capacity: int = 4096)
  * Keyword argument parsing is supported.
- * Assumes `self` is uninitialized and will allocate the underlying memory. If
- * `self` is already initialized this will result in memory leaks.
+ * Assumes `self` is uninitialized and will allocate the underlying memory. If `self` is already
+ * initialized this will result in memory leaks.
  * @param self
  * @param args
  * @param keywords
@@ -36,9 +36,8 @@ auto PyDecoderBuffer_init(PyDecoderBuffer* self, PyObject* args, PyObject* keywo
             nullptr
     };
 
-    // If the argument parsing fails, `self` will be deallocated. We must reset
-    // all pointers to nullptr in advance, otherwise the deallocator might
-    // trigger a segmentation fault.
+    // If the argument parsing fails, `self` will be deallocated. We must reset all pointers to
+    // nullptr in advance, otherwise the deallocator might trigger a segmentation fault.
     self->default_init();
 
     PyObject* input_stream{nullptr};
@@ -101,8 +100,7 @@ auto PyDecoderBuffer_getbuffer(PyDecoderBuffer* self, Py_buffer* view, int flags
 
 /**
  * Callback of Python buffer protocol's `releasebuffer` operation.
- * This callback doesn't do anything, but it is set intentionally to avoid
- * unexpected behaviour.
+ * This callback doesn't do anything, but it is set intentionally to avoid unexpected behaviour.
  * @param self (unused).
  * @param view (unused).
  */
@@ -296,8 +294,8 @@ auto PyDecoderBuffer::metadata_init(PyMetadata* metadata) -> bool {
 }
 
 auto PyDecoderBuffer::py_getbuffer(Py_buffer* view, int flags) -> int {
-    // Don't need to set the exception message during the failure.
-    // The Python level caller will set the exception and thus overwrite it.
+    // Don't need to set the exception message during the failure. The Python level caller will set
+    // the exception and thus overwrite it.
     if (false == is_py_buffer_protocol_enabled()) {
         return -1;
     }

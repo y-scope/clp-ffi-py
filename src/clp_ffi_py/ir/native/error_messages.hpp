@@ -1,5 +1,5 @@
-#ifndef CLP_FFI_PY_IR_ERROR_MESSAGES
-#define CLP_FFI_PY_IR_ERROR_MESSAGES
+#ifndef CLP_FFI_PY_IR_NATIVE_ERROR_MESSAGES
+#define CLP_FFI_PY_IR_NATIVE_ERROR_MESSAGES
 
 namespace clp_ffi_py::ir::native {
 constexpr char const* cDecoderBufferOverflowError = "DecoderBuffer internal read buffer overflows.";
@@ -11,4 +11,4 @@ constexpr char const* cEncodePreambleError = "Native encoder cannot encode the g
 constexpr char const* cEncodeMessageError = "Native encoder cannot encode the given message";
 }  // namespace clp_ffi_py::ir::native
 
-#endif  // CLP_FFI_PY_IR_ERROR_MESSAGES
+#endif  // CLP_FFI_PY_IR_NATIVE_ERROR_MESSAGES

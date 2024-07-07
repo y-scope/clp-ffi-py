@@ -8,8 +8,8 @@
 namespace clp_ffi_py::ir::native {
 namespace {
 /**
- * Validates whether the JSON object contains the given key and has a string
- * data associated to this particular key.
+ * Validates whether the JSON object contains the given key and has a string data associated to this
+ * particular key.
  * @param json_data JSON object to be validated.
  * @param key The key to access the data field.
  * @return true if the data is valid.

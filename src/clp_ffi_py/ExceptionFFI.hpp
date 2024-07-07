@@ -1,5 +1,5 @@
-#ifndef CLP_FFI_PY_EXCEPTION_FFI
-#define CLP_FFI_PY_EXCEPTION_FFI
+#ifndef CLP_FFI_PY_IR_EXCEPTION_FFI
+#define CLP_FFI_PY_IR_EXCEPTION_FFI
 
 #include <string>
 
@@ -7,9 +7,8 @@
 
 namespace clp_ffi_py {
 /**
- * A class that represents a traceable exception during the native code
- * execution. Note: for exceptions of CPython execution, please use CPython
- * interface to set the exception instead.
+ * A class that represents a traceable exception during the native code execution. Note: for
+ * exceptions of CPython execution, please use CPython interface to set the exception instead.
  */
 class ExceptionFFI : public clp::TraceableException {
 public:
@@ -29,4 +28,4 @@ private:
 };
 }  // namespace clp_ffi_py
 
-#endif  // CLP_FFI_PY_EXCEPTION_FFI
+#endif  // CLP_FFI_PY_IR_EXCEPTION_FFI

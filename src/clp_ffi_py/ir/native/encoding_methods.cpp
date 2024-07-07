@@ -70,8 +70,7 @@ auto encode_four_byte_message_and_timestamp_delta(PyObject* Py_UNUSED(self), PyO
     std::vector<int8_t> ir_buf;
     std::string_view const msg{input_buffer, static_cast<size_t>(input_buffer_size)};
 
-    // To avoid the frequent expansion of ir_buf,
-    // allocate sufficient space in advance
+    // To avoid the frequent expansion of ir_buf, allocate sufficient space in advance
     ir_buf.reserve(input_buffer_size * 2);
 
     if (false == clp::ffi::ir_stream::four_byte_encoding::serialize_message(msg, logtype, ir_buf)) {

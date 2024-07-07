@@ -28,8 +28,8 @@ using clp::ffi::ir_stream::IRProtocolErrorCode;
 
 namespace {
 /**
- * This template defines the function signature of a termination handler
- * required by `generic_decode_log_event`. Signature: (
+ * This template defines the function signature of a termination handler required by
+ * `generic_decode_log_event`. Signature: (
  *         ffi::epoch_timestamp_ms timestamp,
  *         std::string_view decoded_log_message,
  *         size_t decoded_log_event_idx,
@@ -77,14 +77,14 @@ concept TerminateHandlerSignature = requires(TerminateHandler handler) {
 }
 
 /**
- * Decodes the next log event from the CLP IR buffer `decoder_buffer` until
- * terminate handler returns true.
- * @tparam TerminateHandler Method to determine if the decoding should
- * terminate, and set the return value for termination.
+ * Decodes the next log event from the CLP IR buffer `decoder_buffer` until terminate handler
+ * returns true.
+ * @tparam TerminateHandler Method to determine if the decoding should terminate, and set the return
+ * value for termination.
  * @param decoder_buffer IR decoder buffer of the input IR stream.
- * @param allow_incomplete_stream A flag to indicate whether the incomplete
- * stream error should be ignored. If it is set to true, incomplete stream error
- * should be treated as the IR stream is terminated.
+ * @param allow_incomplete_stream A flag to indicate whether the incomplete stream error should be
+ * ignored. If it is set to true, incomplete stream error should be treated as the IR stream is
+ * terminated.
  * @param terminate_handler
  * @return The return value set by `terminate_handler`.
  * @return PyNone if the IR stream is terminated.
