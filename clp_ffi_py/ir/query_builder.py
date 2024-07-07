@@ -24,13 +24,11 @@ class QueryBuilderException(Exception):
 
 class QueryBuilder:
     """
-    This class serves as an interface for conveniently constructing Query
-    objects utilized in CLP IR streaming search. It provides methods for
-    configuring and resetting search parameters.
+    This class serves as an interface for conveniently constructing Query objects utilized in CLP IR
+    streaming search. It provides methods for configuring and resetting search parameters.
 
     For more details about the search query CLP IR stream supports, see
-    :class:`~clp_ffi_py.ir.native.Query` and
-    :class:`~clp_ffi_py.wildcard_query.WildcardQuery`.
+    :class:`~clp_ffi_py.ir.native.Query` and :class:`~clp_ffi_py.wildcard_query.WildcardQuery`.
     """
 
     def __init__(self) -> None:
@@ -60,8 +58,8 @@ class QueryBuilder:
 
     def set_search_time_lower_bound(self, ts: int) -> QueryBuilder:
         """
-        :param ts: Start of the search time range (inclusive) as a UNIX epoch
-            timestamp in milliseconds.
+        :param ts: Start of the search time range (inclusive) as a UNIX epoch timestamp in
+            milliseconds.
         :return: self.
         """
         self._search_time_lower_bound = ts
@@ -69,8 +67,8 @@ class QueryBuilder:
 
     def set_search_time_upper_bound(self, ts: int) -> QueryBuilder:
         """
-        :param ts: End of the search time range (inclusive) as a UNIX epoch
-            timestamp in milliseconds.
+        :param ts: End of the search time range (inclusive) as a UNIX epoch timestamp in
+            milliseconds.
         :return: self.
         """
         self._search_time_upper_bound = ts
@@ -78,8 +76,7 @@ class QueryBuilder:
 
     def set_search_time_termination_margin(self, ts: int) -> QueryBuilder:
         """
-        :param ts: The search time termination margin as a UNIX epoch timestamp
-            in milliseconds.
+        :param ts: The search time termination margin as a UNIX epoch timestamp in milliseconds.
         :return: self.
         """
         self._search_time_termination_margin = ts
@@ -92,8 +89,8 @@ class QueryBuilder:
     )
     def add_wildcard_query(self, wildcard_query: str, case_sensitive: bool = False) -> QueryBuilder:
         """
-        Constructs and adds a :class:`~clp_ffi_py.wildcard_query.WildcardQuery`
-        to the wildcard query list.
+        Constructs and adds a :class:`~clp_ffi_py.wildcard_query.WildcardQuery` to the wildcard
+        query list.
 
         :param wildcard_query: The wildcard query string to add.
         :param case_sensitive: Whether to perform case-sensitive matching.
@@ -106,8 +103,8 @@ class QueryBuilder:
         """
         Adds the given wildcard query to the wildcard query list.
 
-        :param wildcard_query: The wildcard query to add. It can be any derived
-            class of :class:`~clp_ffi_py.wildcard_query.WildcardQuery`.
+        :param wildcard_query: The wildcard query to add. It can be any derived class of
+            :class:`~clp_ffi_py.wildcard_query.WildcardQuery`.
         :return: self.
         """
         ...
@@ -189,10 +186,10 @@ class QueryBuilder:
 
     def build(self) -> Query:
         """
-        :raises QueryBuilderException: If the search time range lower bound
-            exceeds the search time range upper bound.
-        :return: A :class:`~clp_ffi_py.ir.native.Query` object initialized
-            with the parameters set by the builder.
+        :raises QueryBuilderException: If the search time range lower bound exceeds the search time
+            range upper bound.
+        :return: A :class:`~clp_ffi_py.ir.native.Query` object initialized with the parameters set
+            by the builder.
         """
         if self._search_time_lower_bound > self._search_time_upper_bound:
             raise QueryBuilderException(

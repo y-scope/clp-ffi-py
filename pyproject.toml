@@ -75,8 +75,8 @@ archs = ["AMD64"]
 make-summary-multi-line = true
 pre-summary-newline = true
 recursive = true
-wrap-summaries = 80
-wrap-descriptions = 80
+wrap-summaries = 100
+wrap-descriptions = 100
 
 [tool.mypy]
 explicit_package_bases = true

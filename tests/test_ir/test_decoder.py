@@ -104,8 +104,8 @@ class TestCaseDecoderBase(TestCLPBase):
         self, ref_log_events: List[LogEvent]
     ) -> Tuple[Query, List[LogEvent]]:
         """
-        Generates a random query and return all the log events in the given
-        `log_events` that matches this random query.
+        Generates a random query and return all the log events in the given `log_events` that
+        matches this random query.
 
         The derived class might overwrite this method to generate a random query
         using customized algorithm. By default, this function returns an empty
@@ -120,13 +120,13 @@ class TestCaseDecoderBase(TestCLPBase):
         self, log_path: Path, query: Optional[Query]
     ) -> Tuple[Metadata, List[LogEvent]]:
         """
-        Decodes the log stream specified by `log_path`, using decoding methods
-        provided in clp_ffi_py.ir.Decoder.
+        Decodes the log stream specified by `log_path`, using decoding methods provided in
+        clp_ffi_py.ir.Decoder.
 
         :param log_path: The path to the log stream.
         :param query: Optional search query.
-        :return: A tuple that contains the decoded metadata and log events
-            returned from decoding methods.
+        :return: A tuple that contains the decoded metadata and log events returned from decoding
+            methods.
         """
         with open(str(log_path), "rb") as istream:
             decoder_buffer: DecoderBuffer = DecoderBuffer(istream)
@@ -152,11 +152,9 @@ class TestCaseDecoderBase(TestCLPBase):
         Validates decoded logs from the IR stream specified by `log_path`.
 
         :param ref_metadata: Reference metadata.
-        :param ref_log_events: A list of reference log events sequence (order
-            sensitive).
+        :param ref_log_events: A list of reference log events sequence (order sensitive).
         :param decoded_metadata: Metadata decoded from the IR stream.
-        :param decoded_log_events: A list of log events decoded from the IR
-            stream in sequence.
+        :param decoded_log_events: A list of log events decoded from the IR stream in sequence.
         :param log_path: Local path of the IR stream.
         :param seed: Random seed used to generate the log events sequence.
         """
@@ -249,8 +247,7 @@ class TestCaseDecoderDecompressZstd(TestCaseDecoderBase):
 
 class TestCaseDecoderDecompressDefaultQuery(TestCaseDecoderBase):
     """
-    Tests encoding/decoding methods against uncompressed IR stream with the
-    default empty query.
+    Tests encoding/decoding methods against uncompressed IR stream with the default empty query.
     """
 
     # override
@@ -263,8 +260,7 @@ class TestCaseDecoderDecompressDefaultQuery(TestCaseDecoderBase):
 
 class TestCaseDecoderDecompressZstdDefaultQuery(TestCaseDecoderBase):
     """
-    Tests encoding/decoding methods against zstd compressed IR stream with the
-    default empty query.
+    Tests encoding/decoding methods against zstd compressed IR stream with the default empty query.
     """
 
     # override
@@ -300,8 +296,8 @@ class TestCaseDecoderTimeRangeQueryBase(TestCaseDecoderBase):
 
 class TestCaseDecoderTimeRangeQuery(TestCaseDecoderTimeRangeQueryBase):
     """
-    Tests encoding/decoding methods against uncompressed IR stream with the
-    query that specifies a search timestamp.
+    Tests encoding/decoding methods against uncompressed IR stream with the query that specifies a
+    search timestamp.
     """
 
     # override
@@ -314,8 +310,8 @@ class TestCaseDecoderTimeRangeQuery(TestCaseDecoderTimeRangeQueryBase):
 
 class TestCaseDecoderTimeRangeQueryZstd(TestCaseDecoderTimeRangeQueryBase):
     """
-    Tests encoding/decoding methods against zstd compressed IR stream with the
-    query that specifies a search timestamp.
+    Tests encoding/decoding methods against zstd compressed IR stream with the query that specifies
+    a search timestamp.
     """
 
     # override
@@ -345,8 +341,8 @@ class TestCaseDecoderWildcardQueryBase(TestCaseDecoderBase):
 
 class TestCaseDecoderWildcardQuery(TestCaseDecoderWildcardQueryBase):
     """
-    Tests encoding/decoding methods against uncompressed IR stream with the
-    query that specifies wildcard queries.
+    Tests encoding/decoding methods against uncompressed IR stream with the query that specifies
+    wildcard queries.
     """
 
     # override
@@ -359,8 +355,8 @@ class TestCaseDecoderWildcardQuery(TestCaseDecoderWildcardQueryBase):
 
 class TestCaseDecoderWildcardQueryZstd(TestCaseDecoderWildcardQueryBase):
     """
-    Tests encoding/decoding methods against zstd compressed IR stream with the
-    query that specifies a wildcard queries.
+    Tests encoding/decoding methods against zstd compressed IR stream with the query that specifies
+    a wildcard queries.
     """
 
     # override
@@ -400,8 +396,8 @@ class TestCaseDecoderTimeRangeWildcardQueryBase(TestCaseDecoderBase):
 
 class TestCaseDecoderTimeRangeWildcardQuery(TestCaseDecoderTimeRangeWildcardQueryBase):
     """
-    Tests encoding/decoding methods against uncompressed IR stream with the
-    query that specifies both search time range and wildcard queries.
+    Tests encoding/decoding methods against uncompressed IR stream with the query that specifies
+    both search time range and wildcard queries.
     """
 
     # override
@@ -414,8 +410,8 @@ class TestCaseDecoderTimeRangeWildcardQuery(TestCaseDecoderTimeRangeWildcardQuer
 
 class TestCaseDecoderTimeRangeWildcardQueryZstd(TestCaseDecoderTimeRangeWildcardQueryBase):
     """
-    Tests encoding/decoding methods against zstd compressed IR stream with the
-    query that specifies both search time range and wildcard queries.
+    Tests encoding/decoding methods against zstd compressed IR stream with the query that specifies
+    both search time range and wildcard queries.
     """
 
     # override

@@ -26,9 +26,8 @@ class TestCaseFourByteEncoder(TestCLPBase):
 
     def test_encoding_methods_consistency(self) -> None:
         """
-        This test checks if the result of encode_message_and_timestamp_delta is
-        consistent with the combination of encode_message and
-        encode_timestamp_delta.
+        This test checks if the result of encode_message_and_timestamp_delta is consistent with the
+        combination of encode_message and encode_timestamp_delta.
         """
         timestamp_delta: int = -3190
         log_message: str = "This is a test message: Do NOT Reply!"

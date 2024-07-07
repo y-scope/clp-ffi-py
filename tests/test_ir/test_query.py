@@ -64,8 +64,7 @@ class TestCaseQuery(TestCLPBase):
 
     def test_init_search_time(self) -> None:
         """
-        Test the construction of Query object with the different search time
-        range.
+        Test the construction of Query object with the different search time range.
         """
         query: Query
         search_time_lower_bound: int

@@ -226,8 +226,8 @@ class TestCaseQueryBuilder(TestCLPBase):
 
     def test_deprecated(self) -> None:
         """
-        Tests deprecated methods to ensure they are still functionally correct,
-        and the deprecation warnings are properly captured.
+        Tests deprecated methods to ensure they are still functionally correct, and the deprecation
+        warnings are properly captured.
         """
         query_builder: QueryBuilder = QueryBuilder()
         wildcard_query_strings: List[str] = ["aaa", "bbb", "ccc", "ddd"]

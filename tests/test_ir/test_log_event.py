@@ -59,8 +59,7 @@ class TestCaseLogEvent(TestCLPBase):
         """
         Test the reconstruction of the raw message.
 
-        In particular, it checks if the timestamp is properly formatted with the
-        expected tzinfo
+        In particular, it checks if the timestamp is properly formatted with the expected tzinfo
         """
         log_message: str = " This is a test log message"
         timestamp: int = 932724000000
@@ -112,9 +111,8 @@ class TestCaseLogEvent(TestCLPBase):
         """
         Test the reconstruction of LogEvent object from pickling data.
 
-        For unpickled LogEvent object, even though the metadata is set to None,
-        it should still format the timestamp with the original tz before
-        pickling
+        For unpickled LogEvent object, even though the metadata is set to None, it should still
+        format the timestamp with the original tz before pickling
         """
         log_message: str = " This is a test log message"
         timestamp: int = 932724000000
