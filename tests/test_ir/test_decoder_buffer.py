@@ -57,8 +57,7 @@ class TestCaseDecoderBuffer(TestCLPBase):
         Tests the DecoderBuffer by streaming the files inside `test_src_dir`.
 
         :param self
-        :param buffer_capacity: The buffer capacity used to initialize the
-            decoder buffer.
+        :param buffer_capacity: The buffer capacity used to initialize the decoder buffer.
         """
         current_dir: Path = Path(__file__).resolve().parent
         test_src_dir: Path = current_dir / TestCaseDecoderBuffer.input_src_dir

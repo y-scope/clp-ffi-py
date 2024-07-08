@@ -16,8 +16,8 @@ extern "C" {
  * Callback of PyMetadata `__init__` method:
  * __init__(self, ref_timestamp, timestamp_format, timezone_id)
  * Keyword argument parsing is supported.
- * Assumes `self` is uninitialized and will allocate the underlying memory. If
- * `self` is already initialized this will result in memory leaks.
+ * Assumes `self` is uninitialized and will allocate the underlying memory. If `self` is already
+ * initialized this will result in memory leaks.
  * @param self
  * @param args
  * @param keywords
@@ -39,9 +39,8 @@ auto PyMetadata_init(PyMetadata* self, PyObject* args, PyObject* keywords) -> in
     char const* input_timestamp_format{nullptr};
     char const* input_timezone{nullptr};
 
-    // If the argument parsing fails, `self` will be deallocated. We must reset
-    // all pointers to nullptr in advance, otherwise the deallocator might
-    // trigger segmentation fault
+    // If the argument parsing fails, `self` will be deallocated. We must reset all pointers to
+    // nullptr in advance, otherwise the deallocator might trigger segmentation fault
     self->default_init();
 
     if (false

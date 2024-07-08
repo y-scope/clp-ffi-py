@@ -7,9 +7,8 @@
 
 namespace clp_ffi_py {
 /**
- * A class that represents a traceable exception during the native code
- * execution. Note: for exceptions of CPython execution, please use CPython
- * interface to set the exception instead.
+ * A class that represents a traceable exception during the native code execution. Note: for
+ * exceptions of CPython execution, please use CPython interface to set the exception instead.
  */
 class ExceptionFFI : public clp::TraceableException {
 public:

@@ -69,8 +69,7 @@ class TestCLPBase(unittest.TestCase):
         :param expected_ref_timestamp: Expected reference timestamp.
         :param expected_timestamp_format: Expected timestamp format.
         :param expected_timezone_id: Expected timezone ID.
-        :param extra_test_info: Extra test information appended to the assert
-            message.
+        :param extra_test_info: Extra test information appended to the assert message.
         """
         ref_timestamp: int = metadata.get_ref_timestamp()
         timestamp_format: str = metadata.get_timestamp_format()
@@ -120,8 +119,7 @@ class TestCLPBase(unittest.TestCase):
         :param expected_log_message: Expected log message.
         :param expected_timestamp: Expected timestamp.
         :param expected_idx: Expected log event index.
-        :param extra_test_info: Extra test information appended to the assert
-            message.
+        :param extra_test_info: Extra test information appended to the assert message.
         """
         log_message: str = log_event.get_log_message()
         timestamp: int = log_event.get_timestamp()
@@ -144,8 +142,7 @@ class TestCLPBase(unittest.TestCase):
         self, wildcard_query: WildcardQuery, ref_wildcard_string: str, ref_is_case_sensitive: bool
     ) -> None:
         """
-        Given a WildcardQuery object, check if the stored data matches the input
-        reference.
+        Given a WildcardQuery object, check if the stored data matches the input reference.
 
         :param wildcard_query: Input WildcardQuery object.
         :param ref_wildcard_string: Reference wildcard string.
@@ -173,15 +170,13 @@ class TestCLPBase(unittest.TestCase):
         ref_search_time_termination_margin: int,
     ) -> None:
         """
-        Given a Query object, check if the stored data matches the input
-        references.
+        Given a Query object, check if the stored data matches the input references.
 
         :param query: Input Query object to validate.
         :param ref_search_time_lower_bound: Reference search time lower bound.
         :param ref_search_time_upper_bound: Reference search time upper bound.
         :param ref_wildcard_queries: Reference wildcard query list.
-        :param ref_search_time_termination_margin: Reference search time
-            termination margin.
+        :param ref_search_time_termination_margin: Reference search time termination margin.
         """
         search_time_lower_bound: int = query.get_search_time_lower_bound()
         search_time_upper_bound: int = query.get_search_time_upper_bound()
@@ -228,8 +223,7 @@ class TestCLPBase(unittest.TestCase):
 
 class LogGenerator:
     """
-    Generates random logs or wildcard queries from a list of log types and
-    dictionary words.
+    Generates random logs or wildcard queries from a list of log types and dictionary words.
     """
 
     log_type_list: List[str] = [
@@ -303,11 +297,10 @@ class LogGenerator:
     @staticmethod
     def generate_random_logs(num_log_events: int) -> Tuple[Metadata, List[LogEvent]]:
         """
-        Generates logs randomly by using log types specified in `log_type_list`.
-        Each log type contains placeholders, and each placeholder will be
-        randomly replaced by randomly generated integers, randomly generated
-        floating point numbers, and randomly selected dictionary words according
-        to the type.
+        Generates logs randomly by using log types specified in `log_type_list`. Each log type
+        contains placeholders, and each placeholder will be randomly replaced by randomly generated
+        integers, randomly generated floating point numbers, and randomly selected dictionary words
+        according to the type.
 
         :param num_log_events: Number of log events to generate.
         :return: A tuple containing the generated log events and the metadata.

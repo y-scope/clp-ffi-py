@@ -12,17 +12,16 @@ from clp_ffi_py.ir.native import Decoder, DecoderBuffer, LogEvent, Metadata, Que
 
 class ClpIrStreamReader(Iterator[LogEvent]):
     """
-    This class represents a stream reader used to read/decode encoded log events
-    from a CLP IR stream. It also provides method(s) to instantiate a log event
-    generator with a customized search query.
+    This class represents a stream reader used to read/decode encoded log events from a CLP IR
+    stream. It also provides method(s) to instantiate a log event generator with a customized search
+    query.
 
     :param istream: Input stream that contains encoded CLP IR.
     :param decoder_buffer_size: Initial size of the decoder buffer.
-    :param enable_compression: A flag indicating whether the istream is
-        compressed using `zstd`.
-    :param allow_incomplete_stream: If set to `True`, an incomplete CLP IR
-        stream is not treated as an error. Instead, encountering such a stream
-        is seen as reaching its end without raising any exceptions.
+    :param enable_compression: A flag indicating whether the istream is compressed using `zstd`.
+    :param allow_incomplete_stream: If set to `True`, an incomplete CLP IR stream is not treated as
+        an error. Instead, encountering such a stream is seen as reaching its end without raising
+        any exceptions.
     """
 
     DEFAULT_DECODER_BUFFER_SIZE: int = 65536
@@ -52,8 +51,7 @@ class ClpIrStreamReader(Iterator[LogEvent]):
             - Next unread log event represented as an instance of LogEvent.
             - None if the end of IR stream is reached.
         :raise Exception:
-            If :meth:`~clp_ffi_py.ir.native.Decoder.decode_next_log_event`
-            fails.
+            If :meth:`~clp_ffi_py.ir.native.Decoder.decode_next_log_event` fails.
         """
         return Decoder.decode_next_log_event(
             self._decoder_buffer, allow_incomplete_stream=self._allow_incomplete_stream
@@ -61,10 +59,9 @@ class ClpIrStreamReader(Iterator[LogEvent]):
 
     def read_preamble(self) -> None:
         """
-        Try to decode the preamble and set `metadata`. If `metadata` has been
-        set already, it will instantly return. It is separated from `__init__`
-        so that the input stream does not need to be readable on a reader's
-        construction, but until the user starts to iterate logs.
+        Try to decode the preamble and set `metadata`. If `metadata` has been set already, it will
+        instantly return. It is separated from `__init__` so that the input stream does not need to
+        be readable on a reader's construction, but until the user starts to iterate logs.
 
         :raise Exception:
             If :meth:`~clp_ffi_py.ir.native.Decoder.decode_preamble` fails.
@@ -85,10 +82,10 @@ class ClpIrStreamReader(Iterator[LogEvent]):
         """
         Searches and yields log events that match a specific search query.
 
-        :param query: The input query object used to match log events. Check the
-            document of :class:`~clp_ffi_py.ir.Query` for more details.
-        :yield: The next unread encoded log event that matches the given search
-            query from the IR stream.
+        :param query: The input query object used to match log events. Check the document of
+            :class:`~clp_ffi_py.ir.Query` for more details.
+        :yield: The next unread encoded log event that matches the given search query from the IR
+            stream.
         """
         if False is self.has_metadata():
             self.read_preamble()

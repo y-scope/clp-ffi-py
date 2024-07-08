@@ -16,8 +16,8 @@ extern "C" {
  * Callback of PyLogEvent `__init__` method:
  * __init__(log_message, timestamp, index=0, metadata=None)
  * Keyword argument parsing is supported.
- * Assumes `self` is uninitialized and will allocate the underlying memory. If
- * `self` is already initialized this will result in memory leaks.
+ * Assumes `self` is uninitialized and will allocate the underlying memory. If `self` is already
+ * initialized this will result in memory leaks.
  * @param self
  * @param args
  * @param keywords
@@ -37,9 +37,8 @@ auto PyLogEvent_init(PyLogEvent* self, PyObject* args, PyObject* keywords) -> in
             nullptr
     };
 
-    // If the argument parsing fails, `self` will be deallocated. We must reset
-    // all pointers to nullptr in advance, otherwise the deallocator might
-    // trigger segmentation fault
+    // If the argument parsing fails, `self` will be deallocated. We must reset all pointers to
+    // nullptr in advance, otherwise the deallocator might trigger segmentation fault.
     self->default_init();
 
     char const* log_message{nullptr};
@@ -92,8 +91,8 @@ auto PyLogEvent_dealloc(PyLogEvent* self) -> void {
 }
 
 /**
- * Constant keys used to serialize/deserialize PyLogEvent objects through
- * __getstate__ and __setstate__ methods.
+ * Constant keys used to serialize/deserialize PyLogEvent objects through `__getstate__` and
+ * `__setstate__` methods.
  */
 constexpr char const* const cStateLogMessage = "log_message";
 constexpr char const* const cStateTimestamp = "timestamp";
@@ -165,8 +164,8 @@ PyDoc_STRVAR(
 /**
  * Callback of PyLogEvent `__setstate__` method.
  * Note: should only be used by the Python pickle module.
- * Assumes `self` is uninitialized and will allocate the underlying memory. If
- * `self` is already initialized this will result in memory leaks.
+ * Assumes `self` is uninitialized and will allocate the underlying memory. If `self` is already
+ * initialized this will result in memory leaks.
  * @param self
  * @param state Python dictionary that contains the serialized object info.
  * @return Py_None on success

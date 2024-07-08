@@ -6,12 +6,11 @@ import dateutil.tz
 
 def get_formatted_timestamp(timestamp: int, timezone: Optional[tzinfo]) -> str:
     """
-    Gets the formatted timestamp string from the provided timestamp with the
-    provided timezone using isoformat.
+    Gets the formatted timestamp string from the provided timestamp with the provided timezone using
+    isoformat.
 
     :param timestamp: Timestamp to format.
-    :param timezone: Timezone of timestamp parameter. If None is given, UTC is
-        used by default.
+    :param timezone: Timezone of timestamp parameter. If None is given, UTC is used by default.
     :return: String of formatted timestamp.
     """
     if timezone is None:

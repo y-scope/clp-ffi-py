@@ -5,17 +5,16 @@ from deprecated.sphinx import deprecated
 
 class WildcardQuery:
     """
-    An abstract class defining a wildcard query. Users should instantiate a
-    wildcard query through :class:`SubstringWildcardQuery` or
-    :class:`FullStringWildcardQuery`.
+    An abstract class defining a wildcard query. Users should instantiate a wildcard query through
+    :class:`SubstringWildcardQuery` or :class:`FullStringWildcardQuery`.
 
     A wildcard string may contain the following types of wildcards:
 
     1. '*': match 0 or more characters.
     2. '?': match any single character.
 
-    Each wildcard can be escaped using a preceding '\\\\' (a single backslash).
-    Other characters that are escaped are treated as normal characters.
+    Each wildcard can be escaped using a preceding '\\\\' (a single backslash). Other characters
+    that are escaped are treated as normal characters.
     """
 
     @deprecated(
@@ -61,12 +60,11 @@ class WildcardQuery:
 
 class SubstringWildcardQuery(WildcardQuery):
     """
-    A wildcard query that can match a substring in a log event's message, in
-    contrast with :class:`FullStringWildcardQuery` where the query needs to
-    match the entire message.
+    A wildcard query that can match a substring in a log event's message, in contrast with
+    :class:`FullStringWildcardQuery` where the query needs to match the entire message.
 
-    This class is derived from :class:`WildcardQuery` by adding both a prefix
-    and a postfix wildcard ("*") to the input wildcard string.
+    This class is derived from :class:`WildcardQuery` by adding both a prefix and a postfix wildcard
+    ("*") to the input wildcard string.
     """
 
     def __init__(self, substring_wildcard_query: str, case_sensitive: bool = False):
@@ -84,15 +82,14 @@ class SubstringWildcardQuery(WildcardQuery):
 
 class FullStringWildcardQuery(WildcardQuery):
     """
-    A wildcard query where the query must match the entirety of the log event's
-    message, in contrast with :class:`SubstringWildcardQuery` where the query
-    only needs to match a substring.
+    A wildcard query where the query must match the entirety of the log event's message, in contrast
+    with :class:`SubstringWildcardQuery` where the query only needs to match a substring.
 
-    This class is derived from :class:`WildcardQuery` as a more explicit
-    interface for full-string matches.
+    This class is derived from :class:`WildcardQuery` as a more explicit interface for full-string
+    matches.
 
-    Users can create a match that's anchored to only one end of the message by
-    adding a prefix OR postfix wildcard ("*").
+    Users can create a match that's anchored to only one end of the message by adding a prefix OR
+    postfix wildcard ("*").
     """
 
     def __init__(self, full_string_wildcard_query: str, case_sensitive: bool = False):

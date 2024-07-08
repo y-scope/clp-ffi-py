@@ -97,8 +97,8 @@ class TestCaseReaderDecompressZstd(TestCaseReaderBase):
 
 class TestCaseReaderTimeRangeQuery(TestCaseReaderTimeRangeQueryBase):
     """
-    Tests stream reader against uncompressed IR stream with the query that
-    specifies a search timestamp.
+    Tests stream reader against uncompressed IR stream with the query that specifies a search
+    timestamp.
     """
 
     # override
@@ -111,8 +111,8 @@ class TestCaseReaderTimeRangeQuery(TestCaseReaderTimeRangeQueryBase):
 
 class TestCaseReaderTimeRangeQueryZstd(TestCaseReaderTimeRangeQueryBase):
     """
-    Tests stream reader against zstd compressed IR stream with the query that
-    specifies a search timestamp.
+    Tests stream reader against zstd compressed IR stream with the query that specifies a search
+    timestamp.
     """
 
     # override
@@ -125,8 +125,8 @@ class TestCaseReaderTimeRangeQueryZstd(TestCaseReaderTimeRangeQueryBase):
 
 class TestCaseReaderWildcardQuery(TestCaseReaderWildcardQueryBase):
     """
-    Tests stream reader against uncompressed IR stream with the query that
-    specifies wildcard queries.
+    Tests stream reader against uncompressed IR stream with the query that specifies wildcard
+    queries.
     """
 
     # override
@@ -139,8 +139,8 @@ class TestCaseReaderWildcardQuery(TestCaseReaderWildcardQueryBase):
 
 class TestCaseReaderWildcardQueryZstd(TestCaseReaderWildcardQueryBase):
     """
-    Tests stream reader against zstd compressed IR stream with the query that
-    specifies a wildcard queries.
+    Tests stream reader against zstd compressed IR stream with the query that specifies a wildcard
+    queries.
     """
 
     # override
@@ -153,8 +153,8 @@ class TestCaseReaderWildcardQueryZstd(TestCaseReaderWildcardQueryBase):
 
 class TestCaseReaderTimeRangeWildcardQuery(TestCaseReaderTimeRangeWildcardQueryBase):
     """
-    Tests stream reader against uncompressed IR stream with the query that
-    specifies both search time range and wildcard queries.
+    Tests stream reader against uncompressed IR stream with the query that specifies both search
+    time range and wildcard queries.
     """
 
     # override
@@ -167,8 +167,8 @@ class TestCaseReaderTimeRangeWildcardQuery(TestCaseReaderTimeRangeWildcardQueryB
 
 class TestCaseReaderTimeRangeWildcardQueryZstd(TestCaseReaderTimeRangeWildcardQueryBase):
     """
-    Tests stream reader against zstd compressed IR stream with the query that
-    specifies both search time range and wildcard queries.
+    Tests stream reader against zstd compressed IR stream with the query that specifies both search
+    time range and wildcard queries.
     """
 
     # override
@@ -188,8 +188,7 @@ class TestIncompleteIRStream(TestCLPBase):
 
     def test_incomplete_ir_stream_error(self) -> None:
         """
-        Tests the reader against an incomplete IR file with
-        `allow_incomplete_stream` disabled.
+        Tests the reader against an incomplete IR file with `allow_incomplete_stream` disabled.
         """
         incomplete_stream_error_captured: bool = False
         other_exception_captured: bool = False
@@ -210,8 +209,7 @@ class TestIncompleteIRStream(TestCLPBase):
 
     def test_allow_incomplete_ir_stream_error(self) -> None:
         """
-        Tests the reader against an incomplete IR file with
-        `allow_incomplete_stream` enabled.
+        Tests the reader against an incomplete IR file with `allow_incomplete_stream` enabled.
         """
         incomplete_stream_error_captured: bool = False
         other_exception_captured: bool = False

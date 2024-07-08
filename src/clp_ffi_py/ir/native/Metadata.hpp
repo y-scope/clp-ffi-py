@@ -1,5 +1,5 @@
-#ifndef CLP_FFI_PY_METADATA_HPP
-#define CLP_FFI_PY_METADATA_HPP
+#ifndef CLP_FFI_PY_IR_NATIVE_METADATA_HPP
+#define CLP_FFI_PY_IR_NATIVE_METADATA_HPP
 
 #include <utility>
 
@@ -8,15 +8,15 @@
 
 namespace clp_ffi_py::ir::native {
 /**
- * A class that represents a decoded IR preamble. Contains ways to access (get)
- * metadata such as the timestamp format. After construction, the metadata is
- * readonly. */
+ * A class that represents a decoded IR preamble. Contains ways to access (get) metadata such as the
+ * timestamp format. After construction, the metadata is readonly.
+ */
 class Metadata {
 public:
     /**
-     * Constructs a new Metadata object by reading values from a JSON object
-     * decoded from the preamble. This constructor will validate the JSON data
-     * and throw exceptions when failing to extract required values.
+     * Constructs a new Metadata object by reading values from a JSON object decoded from the
+     * preamble. This constructor will validate the JSON data and throw exceptions when failing to
+     * extract required values.
      * @param metadata JSON data that contains the metadata.
      * @param is_four_byte_encoding
      */
@@ -24,14 +24,12 @@ public:
 
     /**
      * Constructs a new Metadata object from the provided fields. Currently,
-     * `m_is_four_byte_encoding` is set to true by default since it is the only
-     * format supported.
-     * @param ref_timestamp The reference timestamp used to calculate the
-     * timestamp of the first log message in the IR stream.
-     * @param timestamp_format Timestamp format to use when generating the logs
-     * with a reader.
-     * @param timezone Timezone in TZID format to use when generating the
-     * timestamp from Unix epoch time.
+     * `m_is_four_byte_encoding` is set to true by default since it is the only format supported.
+     * @param ref_timestamp The reference timestamp used to calculate the timestamp of the first log
+     * message in the IR stream.
+     * @param timestamp_format Timestamp format to use when generating the logs with a reader.
+     * @param timezone Timezone in TZID format to use when generating the timestamp from Unix epoch
+     * time.
      */
     explicit Metadata(
             clp::ir::epoch_time_ms_t ref_timestamp,
@@ -64,4 +62,5 @@ private:
     std::string m_timezone_id;
 };
 }  // namespace clp_ffi_py::ir::native
-#endif  // CLP_FFI_PY_METADATA_HPP
+
+#endif  // CLP_FFI_PY_IR_NATIVE_METADATA_HPP

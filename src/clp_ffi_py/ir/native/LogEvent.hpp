@@ -1,5 +1,5 @@
-#ifndef CLP_FFI_PY_LOG_EVENT_HPP
-#define CLP_FFI_PY_LOG_EVENT_HPP
+#ifndef CLP_FFI_PY_IR_NATIVE_LOG_EVENT_HPP
+#define CLP_FFI_PY_IR_NATIVE_LOG_EVENT_HPP
 
 #include <optional>
 
@@ -7,16 +7,15 @@
 
 namespace clp_ffi_py::ir::native {
 /**
- * A class that represents a decoded IR log event. Contains ways to access (get
- * or set) the log message, the timestamp, and the log event index.
+ * A class that represents a decoded IR log event. Contains ways to access (get or set) the log
+ * message, the timestamp, and the log event index.
  */
 class LogEvent {
 public:
     LogEvent() = delete;
 
     /**
-     * Constructs a new log event and leaves the formatted timestamp empty by
-     * default.
+     * Constructs a new log event and leaves the formatted timestamp empty by default.
      * @param log_message
      * @param timestamp
      * @param index
@@ -75,4 +74,4 @@ private:
 };
 }  // namespace clp_ffi_py::ir::native
 
-#endif  // CLP_FFI_PY_LOG_EVENT_HPP
+#endif  // CLP_FFI_PY_IR_NATIVE_LOG_EVENT_HPP

@@ -4,16 +4,14 @@
 
 #include <iostream>
 
-#include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
 
 namespace clp_ffi_py {
 namespace {
 /**
  * Gets the underlying py_string byte data.
- * @param py_string PyObject that represents a Python level string. Only Python
- * Unicode object or an instance of a Python Unicode subtype will be considered
- * as valid input.
+ * @param py_string PyObject that represents a Python level string. Only Python Unicode object or an
+ * instance of a Python Unicode subtype will be considered as valid input.
  * @return pointer to the byte data on success.
  * @return nullptr on failure with the relevant Python exception and error set.
  */
