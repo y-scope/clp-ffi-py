@@ -1,5 +1,5 @@
-#ifndef CLP_FFI_PY_IR_UTILS_HPP
-#define CLP_FFI_PY_IR_UTILS_HPP
+#ifndef CLP_FFI_PY_UTILS_HPP
+#define CLP_FFI_PY_UTILS_HPP
 
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
@@ -101,4 +101,4 @@ auto parse_py_int(PyObject* py_int, int_type& val) -> bool {
 }
 }  // namespace clp_ffi_py
 
-#endif  // CLP_FFI_PY_IR_UTILS_HPP
+#endif  // CLP_FFI_PY_UTILS_HPP

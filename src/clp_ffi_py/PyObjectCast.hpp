@@ -1,5 +1,5 @@
-#ifndef CLP_FFI_PY_IR_PY_OBJECT_CAST_HPP
-#define CLP_FFI_PY_IR_PY_OBJECT_CAST_HPP
+#ifndef CLP_FFI_PY_PY_OBJECT_CAST_HPP
+#define CLP_FFI_PY_PY_OBJECT_CAST_HPP
 
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
@@ -127,4 +127,4 @@ CLP_FFI_PY_MARK_AS_PYOBJECT(ir::native::PyQuery);
 CLP_FFI_PY_MARK_AS_PYOBJECT(PyTypeObject);
 }  // namespace clp_ffi_py
 
-#endif  // CLP_FFI_PY_IR_PY_OBJECT_CAST_HPP
+#endif  // CLP_FFI_PY_PY_OBJECT_CAST_HPP

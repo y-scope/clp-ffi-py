@@ -1,5 +1,5 @@
-#ifndef CLP_FFI_PY_IR_PY_OBJECT_UTILS_HPP
-#define CLP_FFI_PY_IR_PY_OBJECT_UTILS_HPP
+#ifndef CLP_FFI_PY_PY_OBJECT_UTILS_HPP
+#define CLP_FFI_PY_PY_OBJECT_UTILS_HPP
 
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
@@ -49,4 +49,4 @@ template <typename PyObjectType>
 using PyObjectStaticPtr = std::unique_ptr<PyObjectType, PyObjectTrivialDeleter<PyObjectType>>;
 }  // namespace clp_ffi_py
 
-#endif  // CLP_FFI_PY_IR_PY_OBJECT_UTILS_HPP
+#endif  // CLP_FFI_PY_PY_OBJECT_UTILS_HPP

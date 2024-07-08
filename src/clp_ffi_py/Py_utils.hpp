@@ -1,5 +1,5 @@
-#ifndef CLP_FFI_PY_IR_PY_UTILS_HPP
-#define CLP_FFI_PY_IR_PY_UTILS_HPP
+#ifndef CLP_FFI_PY_PY_UTILS_HPP
+#define CLP_FFI_PY_PY_UTILS_HPP
 
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
@@ -33,4 +33,4 @@ auto py_utils_get_formatted_timestamp(clp::ir::epoch_time_ms_t timestamp, PyObje
 auto py_utils_get_timezone_from_timezone_id(std::string const& timezone_id) -> PyObject*;
 }  // namespace clp_ffi_py
 
-#endif  // CLP_FFI_PY_IR_PY_UTILS_HPP
+#endif  // CLP_FFI_PY_PY_UTILS_HPP
