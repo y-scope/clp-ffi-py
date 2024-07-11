@@ -6,12 +6,12 @@ from typing import Optional
 from smart_open import open  # type: ignore
 from test_ir.test_utils import TestCLPBase
 
-from clp_ffi_py.ir import DecoderBuffer
+from clp_ffi_py.ir import DeserializerBuffer
 
 
-class TestCaseDecoderBuffer(TestCLPBase):
+class TestCaseDeserializerBuffer(TestCLPBase):
     """
-    Class for testing clp_ffi_py.ir.DecoderBuffer.
+    Class for testing clp_ffi_py.ir.Deserializer.
     """
 
     input_src_dir: str = "test_data"
@@ -22,10 +22,10 @@ class TestCaseDecoderBuffer(TestCLPBase):
         """
         byte_array: bytearray = bytearray(b"Hello, world!")
         byte_stream: io.BytesIO = io.BytesIO(byte_array)
-        decoder_buffer: DecoderBuffer = DecoderBuffer(byte_stream)
+        deserializer_buffer: DeserializerBuffer = DeserializerBuffer(byte_stream)
         exception_captured: bool = False
         try:
-            byte_stream.readinto(decoder_buffer)  # type: ignore
+            byte_stream.readinto(deserializer_buffer)  # type: ignore
         except TypeError:
             exception_captured = True
         self.assertTrue(
@@ -34,38 +34,38 @@ class TestCaseDecoderBuffer(TestCLPBase):
 
     def test_streaming_small_buffer(self) -> None:
         """
-        Tests DecoderBuffer's functionality using the small buffer capacity.
+        Tests DeserializerBuffer's functionality using the small buffer capacity.
         """
         buffer_capacity: int = 1024
         self.__launch_test(buffer_capacity)
 
     def test_streaming_default_buffer(self) -> None:
         """
-        Tests DecoderBuffer's functionality using the default buffer capacity.
+        Tests DeserializerBuffer's functionality using the default buffer capacity.
         """
         self.__launch_test(None)
 
     def test_streaming_large_buffer(self) -> None:
         """
-        Tests DecoderBuffer's functionality using the large buffer capacity.
+        Tests DeserializerBuffer's functionality using the large buffer capacity.
         """
         buffer_capacity: int = 16384
         self.__launch_test(buffer_capacity)
 
     def __launch_test(self, buffer_capacity: Optional[int]) -> None:
         """
-        Tests the DecoderBuffer by streaming the files inside `test_src_dir`.
+        Tests the DeserializerBuffer by streaming the files inside `test_src_dir`.
 
         :param self
-        :param buffer_capacity: The buffer capacity used to initialize the decoder buffer.
+        :param buffer_capacity: The buffer capacity used to initialize the deserializer buffer.
         """
         current_dir: Path = Path(__file__).resolve().parent
-        test_src_dir: Path = current_dir / TestCaseDecoderBuffer.input_src_dir
+        test_src_dir: Path = current_dir / TestCaseDeserializerBuffer.input_src_dir
         for file_path in test_src_dir.rglob("*"):
             if not file_path.is_file():
                 continue
             streaming_result: bytearray
-            decoder_buffer: DecoderBuffer
+            deserializer_buffer: DeserializerBuffer
             random_seed: int
             # Run against 10 different seeds:
             for _ in range(10):
@@ -73,12 +73,12 @@ class TestCaseDecoderBuffer(TestCLPBase):
                 with open(str(file_path), "rb") as istream:
                     try:
                         if None is buffer_capacity:
-                            decoder_buffer = DecoderBuffer(istream)
+                            deserializer_buffer = DeserializerBuffer(istream)
                         else:
-                            decoder_buffer = DecoderBuffer(
+                            deserializer_buffer = DeserializerBuffer(
                                 initial_buffer_capacity=buffer_capacity, input_stream=istream
                             )
-                        streaming_result = decoder_buffer._test_streaming(random_seed)
+                        streaming_result = deserializer_buffer._test_streaming(random_seed)
                     except Exception as e:
                         self.assertFalse(
                             True, f"Error on file {file_path} using seed {random_seed}: {e}"
@@ -89,10 +89,10 @@ class TestCaseDecoderBuffer(TestCLPBase):
         self, file_path: Path, streaming_result: bytearray, random_seed: int
     ) -> None:
         """
-        Validates the streaming result read by the decoder buffer.
+        Validates the streaming result read by the deserializer buffer.
 
         :param file_path: Input stream file Path.
-        :param streaming_result: Result of DecoderBuffer `_test_streaming` method.
+        :param streaming_result: Result of DeserializerBuffer `_test_streaming` method.
         """
         with open(str(file_path), "rb") as istream:
             ref_result: bytearray = bytearray(istream.read())

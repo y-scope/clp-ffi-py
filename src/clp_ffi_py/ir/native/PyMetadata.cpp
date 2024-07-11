@@ -181,7 +181,8 @@ PyMethodDef PyMetadata_method_table[]{
 PyDoc_STRVAR(
         cPyMetadataDoc,
         "This class represents the IR stream preamble and provides ways to access the underlying "
-        "metadata. Normally, this class will be instantiated by the FFI IR decoding methods.\n"
+        "metadata. Normally, this class will be instantiated by the FFI IR deserialization "
+        "methods.\n"
         "However, with the `__init__` method provided below, direct instantiation is also "
         "possible.\n\n"
         "The signature of `__init__` method is shown as following:\n\n"
@@ -239,7 +240,7 @@ auto PyMetadata::init(nlohmann::json const& metadata, bool is_four_byte_encoding
     } catch (ExceptionFFI const& ex) {
         PyErr_Format(
                 PyExc_RuntimeError,
-                "Failed to initialize metadata from decoded JSON format preamble. "
+                "Failed to initialize metadata from deserialized JSON format preamble. "
                 "Error message: %s",
                 ex.what()
         );

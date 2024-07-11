@@ -1,14 +1,14 @@
 import unittest
 from typing import Iterable, Optional, Union
 
-from test_ir.test_decoder import *  # noqa
-from test_ir.test_decoder_buffer import *  # noqa
-from test_ir.test_encoder import *  # noqa
+from test_ir.test_deserializer import *  # noqa
+from test_ir.test_deserializer_buffer import *  # noqa
 from test_ir.test_log_event import *  # noqa
 from test_ir.test_metadata import *  # noqa
 from test_ir.test_query import *  # noqa
 from test_ir.test_query_builder import *  # noqa
 from test_ir.test_readers import *  # noqa
+from test_ir.test_serializer import *  # noqa
 from test_ir.test_utils import TestCLPBase
 
 
