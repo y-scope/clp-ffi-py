@@ -10,7 +10,10 @@
 
 namespace {
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
-PyDoc_STRVAR(cModuleDoc, "Python interface to the CLP IR encoding and decoding methods.");
+PyDoc_STRVAR(
+        cModuleDoc,
+        "Python interface to the CLP IR serialization and deserialization methods."
+);
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyMethodDef Py_native_method_table[]{{nullptr, nullptr, 0, nullptr}};
