@@ -13,7 +13,7 @@ PyDoc_STRVAR(
         cSerializePreambleDoc,
         "serialize_preamble(ref_timestamp, timestamp_format, timezone)\n"
         "--\n\n"
-        "Serializes CLP preamble for a 4-byte encoded CLP IR stream.\n\n"
+        "Serializes the preamble for a 4-byte encoded CLP IR stream.\n\n"
         ":param ref_timestamp: Reference timestamp used to calculate deltas emitted with each "
         "message.\n"
         ":param timestamp_format: Timestamp format to be use when generating the logs with a "
