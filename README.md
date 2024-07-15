@@ -71,7 +71,7 @@ methods.
 
 ### ClpIrStreamReader
 
-- Read/deserialize any arbitrary CLP IR stream (as an instance of `IO[bytes]`).
+- Read+deserialize any arbitrary CLP IR stream (as an instance of `IO[bytes]`).
 - Can be used as an iterator that returns each log event as a `LogEvent` object.
 - Can search target log events by giving a search query:
   - Searching log events within a certain time range.
