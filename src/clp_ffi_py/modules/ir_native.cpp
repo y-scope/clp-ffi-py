@@ -1,8 +1,8 @@
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
-#include <clp_ffi_py/ir/native/PyDecoder.hpp>
-#include <clp_ffi_py/ir/native/PyDecoderBuffer.hpp>
-#include <clp_ffi_py/ir/native/PyFourByteEncoder.hpp>
+#include <clp_ffi_py/ir/native/PyDeserializer.hpp>
+#include <clp_ffi_py/ir/native/PyDeserializerBuffer.hpp>
+#include <clp_ffi_py/ir/native/PyFourByteSerializer.hpp>
 #include <clp_ffi_py/ir/native/PyLogEvent.hpp>
 #include <clp_ffi_py/ir/native/PyMetadata.hpp>
 #include <clp_ffi_py/ir/native/PyQuery.hpp>
@@ -10,7 +10,10 @@
 
 namespace {
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
-PyDoc_STRVAR(cModuleDoc, "Python interface to the CLP IR encoding and decoding methods.");
+PyDoc_STRVAR(
+        cModuleDoc,
+        "Python interface to the CLP IR serialization and deserialization methods."
+);
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyMethodDef Py_native_method_table[]{{nullptr, nullptr, 0, nullptr}};
@@ -36,7 +39,7 @@ PyMODINIT_FUNC PyInit_native() {
         return nullptr;
     }
 
-    if (false == clp_ffi_py::ir::native::PyDecoderBuffer::module_level_init(new_module)) {
+    if (false == clp_ffi_py::ir::native::PyDeserializerBuffer::module_level_init(new_module)) {
         Py_DECREF(new_module);
         return nullptr;
     }
@@ -56,12 +59,12 @@ PyMODINIT_FUNC PyInit_native() {
         return nullptr;
     }
 
-    if (false == clp_ffi_py::ir::native::PyDecoder::module_level_init(new_module)) {
+    if (false == clp_ffi_py::ir::native::PyDeserializer::module_level_init(new_module)) {
         Py_DECREF(new_module);
         return nullptr;
     }
 
-    if (false == clp_ffi_py::ir::native::PyFourByteEncoder::module_level_init(new_module)) {
+    if (false == clp_ffi_py::ir::native::PyFourByteSerializer::module_level_init(new_module)) {
         Py_DECREF(new_module);
         return nullptr;
     }

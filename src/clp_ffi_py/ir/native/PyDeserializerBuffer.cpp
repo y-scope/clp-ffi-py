@@ -1,6 +1,6 @@
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
-#include "PyDecoderBuffer.hpp"
+#include "PyDeserializerBuffer.hpp"
 
 #include <algorithm>
 #include <random>
@@ -16,7 +16,7 @@ namespace clp_ffi_py::ir::native {
 namespace {
 extern "C" {
 /**
- * Callback of PyDecoderBuffer `__init__` method:
+ * Callback of PyDeserializerBuffer `__init__` method:
  * __init__(self, input_stream: IO[bytes], initial_buffer_capacity: int = 4096)
  * Keyword argument parsing is supported.
  * Assumes `self` is uninitialized and will allocate the underlying memory. If `self` is already
@@ -27,7 +27,8 @@ extern "C" {
  * @return 0 on success.
  * @return -1 on failure with the relevant Python exception and error set.
  */
-auto PyDecoderBuffer_init(PyDecoderBuffer* self, PyObject* args, PyObject* keywords) -> int {
+auto PyDeserializerBuffer_init(PyDeserializerBuffer* self, PyObject* args, PyObject* keywords)
+        -> int {
     static char keyword_input_stream[]{"input_stream"};
     static char keyword_initial_buffer_capacity[]{"initial_buffer_capacity"};
     static char* keyword_table[]{
@@ -41,7 +42,7 @@ auto PyDecoderBuffer_init(PyDecoderBuffer* self, PyObject* args, PyObject* keywo
     self->default_init();
 
     PyObject* input_stream{nullptr};
-    Py_ssize_t initial_buffer_capacity{PyDecoderBuffer::cDefaultInitialCapacity};
+    Py_ssize_t initial_buffer_capacity{PyDeserializerBuffer::cDefaultInitialCapacity};
     if (false
         == static_cast<bool>(PyArg_ParseTupleAndKeywords(
                 args,
@@ -78,10 +79,10 @@ auto PyDecoderBuffer_init(PyDecoderBuffer* self, PyObject* args, PyObject* keywo
 }
 
 /**
- * Callback of PyDecoderBuffer deallocator.
+ * Callback of PyDeserializerBuffer deallocator.
  * @param self
  */
-auto PyDecoderBuffer_dealloc(PyDecoderBuffer* self) -> void {
+auto PyDeserializerBuffer_dealloc(PyDeserializerBuffer* self) -> void {
     self->clean();
     PyObject_Del(self);
 }
@@ -94,7 +95,7 @@ auto PyDecoderBuffer_dealloc(PyDecoderBuffer* self) -> void {
  * @return 0 on success.
  * @return -1 on failure with the relevant Python exception and error set.
  */
-auto PyDecoderBuffer_getbuffer(PyDecoderBuffer* self, Py_buffer* view, int flags) -> int {
+auto PyDeserializerBuffer_getbuffer(PyDeserializerBuffer* self, Py_buffer* view, int flags) -> int {
     return self->py_getbuffer(view, flags);
 }
 
@@ -104,35 +105,39 @@ auto PyDecoderBuffer_getbuffer(PyDecoderBuffer* self, Py_buffer* view, int flags
  * @param self (unused).
  * @param view (unused).
  */
-auto PyDecoderBuffer_releasebuffer(PyDecoderBuffer* Py_UNUSED(self), Py_buffer* Py_UNUSED(view))
-        -> void {}
+auto PyDeserializerBuffer_releasebuffer(
+        PyDeserializerBuffer* Py_UNUSED(self),
+        Py_buffer* Py_UNUSED(view)
+) -> void {}
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
-        cPyDecoderBufferGetNumDecodedLogMessages,
-        "get_num_decoded_log_messages(self)\n"
+        cPyDeserializerBufferGetNumDeserializedLogMessages,
+        "get_num_deserialized_log_messages(self)\n"
         "--\n\n"
-        ":return: Total number of messages decoded so far.\n"
+        ":return: Total number of messages deserialized so far.\n"
 );
 
-auto PyDecoderBuffer_get_num_decoded_log_messages(PyDecoderBuffer* self) -> PyObject* {
-    return PyLong_FromLongLong(static_cast<long long>(self->get_num_decoded_message()));
+auto PyDeserializerBuffer_get_num_deserialized_log_messages(PyDeserializerBuffer* self
+) -> PyObject* {
+    return PyLong_FromLongLong(static_cast<long long>(self->get_num_deserialized_message()));
 }
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
-        cPyDecoderBufferTestStreamingDoc,
+        cPyDeserializerBufferTestStreamingDoc,
         "_test_streaming(self, seed)\n"
         "--\n\n"
-        "Tests the functionality of the DecoderBuffer by streaming the entire input stream into "
-        "a Python bytearray. The stepping size from the read buffer is randomly generated, "
+        "Tests the functionality of the DeserializerBuffer by streaming the entire input stream "
+        "into a Python bytearray. The stepping size from the read buffer is randomly generated, "
         "initialized by the given seed.\n\n"
         "Note: this function should only be used for testing purpose.\n\n"
         ":param seed_obj: Random seed.\n"
         ":return: The entire input stream stored in a Python bytearray.\n"
 );
 
-auto PyDecoderBuffer_test_streaming(PyDecoderBuffer* self, PyObject* seed_obj) -> PyObject* {
+auto PyDeserializerBuffer_test_streaming(PyDeserializerBuffer* self, PyObject* seed_obj)
+        -> PyObject* {
     unsigned seed{0};
     if (false == parse_py_int<uint32_t>(seed_obj, seed)) {
         return nullptr;
@@ -142,16 +147,16 @@ auto PyDecoderBuffer_test_streaming(PyDecoderBuffer* self, PyObject* seed_obj) -
 }
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
-PyMethodDef PyDecoderBuffer_method_table[]{
-        {"get_num_decoded_log_messages",
-         py_c_function_cast(PyDecoderBuffer_get_num_decoded_log_messages),
+PyMethodDef PyDeserializerBuffer_method_table[]{
+        {"get_num_deserialized_log_messages",
+         py_c_function_cast(PyDeserializerBuffer_get_num_deserialized_log_messages),
          METH_NOARGS,
-         static_cast<char const*>(cPyDecoderBufferGetNumDecodedLogMessages)},
+         static_cast<char const*>(cPyDeserializerBufferGetNumDeserializedLogMessages)},
 
         {"_test_streaming",
-         py_c_function_cast(PyDecoderBuffer_test_streaming),
+         py_c_function_cast(PyDeserializerBuffer_test_streaming),
          METH_O,
-         static_cast<char const*>(cPyDecoderBufferTestStreamingDoc)},
+         static_cast<char const*>(cPyDeserializerBufferTestStreamingDoc)},
 
         {nullptr}
 };
@@ -160,60 +165,60 @@ PyMethodDef PyDecoderBuffer_method_table[]{
  * Declaration of Python buffer protocol.
  */
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
-PyBufferProcs PyDecoderBuffer_as_buffer{
-        .bf_getbuffer = py_getbufferproc_cast(PyDecoderBuffer_getbuffer),
-        .bf_releasebuffer = py_releasebufferproc_cast(PyDecoderBuffer_releasebuffer),
+PyBufferProcs PyDeserializerBuffer_as_buffer{
+        .bf_getbuffer = py_getbufferproc_cast(PyDeserializerBuffer_getbuffer),
+        .bf_releasebuffer = py_releasebufferproc_cast(PyDeserializerBuffer_releasebuffer),
 };
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
-        cPyDecoderBufferDoc,
-        "This class represents a CLP IR Decoder Buffer corresponding to a CLP IR stream. "
-        "It buffers encoded CLP IR data read from the input stream, which can be consumed by the "
-        "CLP IR decoding methods to recover encoded log events. An instance of this class is "
-        "expected to be passed across different calls of CLP IR decoding methods when decoding "
-        "from the same IR stream.\n\n"
+        cPyDeserializerBufferDoc,
+        "This class represents a CLP IR Deserializer Buffer corresponding to a CLP IR stream. "
+        "It buffers serialized CLP IR data read from the input stream, which can be consumed by "
+        "the CLP IR deserialization methods to recover serialized log events. An instance of this "
+        "class is expected to be passed across different calls of CLP IR deserialization methods "
+        "when deserializing from the same IR stream.\n\n"
         "The signature of `__init__` method is shown as following:\n\n"
         "__init__(self, input_stream, initial_buffer_capacity=4096)\n\n"
-        "Initializes a DecoderBuffer object for the given input IR stream.\n\n"
-        ":param input_stream: Input stream that contains encoded CLP IR. It should be an instance "
-        "of type `IO[bytes]` with the method `readinto` supported.\n"
+        "Initializes a DeserializerBuffer object for the given input IR stream.\n\n"
+        ":param input_stream: Input stream that contains serialized CLP IR. It should be an "
+        "instance of type `IO[bytes]` with the method `readinto` supported.\n"
         ":param initial_buffer_capacity: The initial capacity of the underlying byte buffer.\n"
 );
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
-PyType_Slot PyDecoderBuffer_slots[]{
+PyType_Slot PyDeserializerBuffer_slots[]{
         {Py_tp_alloc, reinterpret_cast<void*>(PyType_GenericAlloc)},
-        {Py_tp_dealloc, reinterpret_cast<void*>(PyDecoderBuffer_dealloc)},
+        {Py_tp_dealloc, reinterpret_cast<void*>(PyDeserializerBuffer_dealloc)},
         {Py_tp_new, reinterpret_cast<void*>(PyType_GenericNew)},
-        {Py_tp_init, reinterpret_cast<void*>(PyDecoderBuffer_init)},
-        {Py_tp_methods, static_cast<void*>(PyDecoderBuffer_method_table)},
-        {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyDecoderBufferDoc))},
+        {Py_tp_init, reinterpret_cast<void*>(PyDeserializerBuffer_init)},
+        {Py_tp_methods, static_cast<void*>(PyDeserializerBuffer_method_table)},
+        {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyDeserializerBufferDoc))},
         {0, nullptr}
 };
 // NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
 
 /**
- * PyDecoderBuffer Python type specifications.
+ * PyDeserializerBuffer Python type specifications.
  */
-PyType_Spec PyDecoderBuffer_type_spec{
-        "clp_ffi_py.ir.native.DecoderBuffer",
-        sizeof(PyDecoderBuffer),
+PyType_Spec PyDeserializerBuffer_type_spec{
+        "clp_ffi_py.ir.native.DeserializerBuffer",
+        sizeof(PyDeserializerBuffer),
         0,
         Py_TPFLAGS_DEFAULT,
-        static_cast<PyType_Slot*>(PyDecoderBuffer_slots)
+        static_cast<PyType_Slot*>(PyDeserializerBuffer_slots)
 };
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cPyIncompleteStreamErrorDoc,
-        "This exception will be raised if the decoder buffer cannot read more data from the "
-        "input stream while the decoding method expects more bytes.\n"
+        "This exception will be raised if the deserializer buffer cannot read more data from the "
+        "input stream while the deserialization method expects more bytes.\n"
         "Typically, this error indicates the input stream has been truncated.\n"
 );
 }  // namespace
 
-auto PyDecoderBuffer::init(PyObject* input_stream, Py_ssize_t buf_capacity) -> bool {
+auto PyDeserializerBuffer::init(PyObject* input_stream, Py_ssize_t buf_capacity) -> bool {
     m_read_buffer_mem_owner = static_cast<int8_t*>(PyMem_Malloc(buf_capacity));
     if (nullptr == m_read_buffer_mem_owner) {
         PyErr_NoMemory();
@@ -225,7 +230,7 @@ auto PyDecoderBuffer::init(PyObject* input_stream, Py_ssize_t buf_capacity) -> b
     return true;
 }
 
-auto PyDecoderBuffer::populate_read_buffer(Py_ssize_t& num_bytes_read) -> bool {
+auto PyDeserializerBuffer::populate_read_buffer(Py_ssize_t& num_bytes_read) -> bool {
     auto const unconsumed_bytes_in_curr_read_buffer{get_unconsumed_bytes()};
     auto const num_unconsumed_bytes{
             static_cast<Py_ssize_t>(unconsumed_bytes_in_curr_read_buffer.size())
@@ -279,7 +284,7 @@ auto PyDecoderBuffer::populate_read_buffer(Py_ssize_t& num_bytes_read) -> bool {
     return true;
 }
 
-auto PyDecoderBuffer::metadata_init(PyMetadata* metadata) -> bool {
+auto PyDeserializerBuffer::metadata_init(PyMetadata* metadata) -> bool {
     if (has_metadata()) {
         PyErr_SetString(PyExc_RuntimeError, "Metadata has already been initialized.");
         return false;
@@ -293,7 +298,7 @@ auto PyDecoderBuffer::metadata_init(PyMetadata* metadata) -> bool {
     return true;
 }
 
-auto PyDecoderBuffer::py_getbuffer(Py_buffer* view, int flags) -> int {
+auto PyDeserializerBuffer::py_getbuffer(Py_buffer* view, int flags) -> int {
     // Don't need to set the exception message during the failure. The Python level caller will set
     // the exception and thus overwrite it.
     if (false == is_py_buffer_protocol_enabled()) {
@@ -310,28 +315,28 @@ auto PyDecoderBuffer::py_getbuffer(Py_buffer* view, int flags) -> int {
     );
 }
 
-auto PyDecoderBuffer::commit_read_buffer_consumption(Py_ssize_t num_bytes_consumed) -> bool {
+auto PyDeserializerBuffer::commit_read_buffer_consumption(Py_ssize_t num_bytes_consumed) -> bool {
     if (get_num_unconsumed_bytes() < num_bytes_consumed) {
-        PyErr_SetString(PyExc_OverflowError, cDecoderBufferOverflowError);
+        PyErr_SetString(PyExc_OverflowError, cDeserializerBufferOverflowError);
         return false;
     }
     m_num_current_bytes_consumed += num_bytes_consumed;
     return true;
 }
 
-auto PyDecoderBuffer::try_read() -> bool {
+auto PyDeserializerBuffer::try_read() -> bool {
     Py_ssize_t num_bytes_read{0};
     if (false == populate_read_buffer(num_bytes_read)) {
         return false;
     }
     if (0 == num_bytes_read) {
-        PyErr_SetString(get_py_incomplete_stream_error(), cDecoderIncompleteIRError);
+        PyErr_SetString(get_py_incomplete_stream_error(), cDeserializerIncompleteIRError);
         return false;
     }
     return true;
 }
 
-auto PyDecoderBuffer::test_streaming(uint32_t seed) -> PyObject* {
+auto PyDeserializerBuffer::test_streaming(uint32_t seed) -> PyObject* {
     std::default_random_engine rand_generator(seed);
     std::vector<uint8_t> read_bytes;
     bool reach_istream_end{false};
@@ -362,19 +367,19 @@ auto PyDecoderBuffer::test_streaming(uint32_t seed) -> PyObject* {
     );
 }
 
-PyObjectStaticPtr<PyTypeObject> PyDecoderBuffer::m_py_type{nullptr};
-PyObjectStaticPtr<PyObject> PyDecoderBuffer::m_py_incomplete_stream_error{nullptr};
+PyObjectStaticPtr<PyTypeObject> PyDeserializerBuffer::m_py_type{nullptr};
+PyObjectStaticPtr<PyObject> PyDeserializerBuffer::m_py_incomplete_stream_error{nullptr};
 
-auto PyDecoderBuffer::get_py_type() -> PyTypeObject* {
+auto PyDeserializerBuffer::get_py_type() -> PyTypeObject* {
     return m_py_type.get();
 }
 
-auto PyDecoderBuffer::get_py_incomplete_stream_error() -> PyObject* {
+auto PyDeserializerBuffer::get_py_incomplete_stream_error() -> PyObject* {
     return m_py_incomplete_stream_error.get();
 }
 
-auto PyDecoderBuffer::module_level_init(PyObject* py_module) -> bool {
-    static_assert(std::is_trivially_destructible<PyDecoderBuffer>());
+auto PyDeserializerBuffer::module_level_init(PyObject* py_module) -> bool {
+    static_assert(std::is_trivially_destructible<PyDeserializerBuffer>());
     auto* py_incomplete_stream_error{PyErr_NewExceptionWithDoc(
             "clp_ffi_py.native.IncompleteStreamError",
             static_cast<char const*>(cPyIncompleteStreamErrorDoc),
@@ -389,12 +394,12 @@ auto PyDecoderBuffer::module_level_init(PyObject* py_module) -> bool {
         return false;
     }
 
-    auto* type{py_reinterpret_cast<PyTypeObject>(PyType_FromSpec(&PyDecoderBuffer_type_spec))};
+    auto* type{py_reinterpret_cast<PyTypeObject>(PyType_FromSpec(&PyDeserializerBuffer_type_spec))};
     m_py_type.reset(type);
     if (nullptr == type) {
         return false;
     }
-    type->tp_as_buffer = &PyDecoderBuffer_as_buffer;
-    return add_python_type(get_py_type(), "DecoderBuffer", py_module);
+    type->tp_as_buffer = &PyDeserializerBuffer_as_buffer;
+    return add_python_type(get_py_type(), "DeserializerBuffer", py_module);
 }
 }  // namespace clp_ffi_py::ir::native

@@ -1,11 +1,11 @@
 from pathlib import Path
 from typing import List, Optional, Tuple
 
-from test_ir.test_decoder import (
-    TestCaseDecoderBase,
-    TestCaseDecoderTimeRangeQueryBase,
-    TestCaseDecoderTimeRangeWildcardQueryBase,
-    TestCaseDecoderWildcardQueryBase,
+from test_ir.test_deserializer import (
+    TestCaseDeserializerBase,
+    TestCaseDeserializerTimeRangeQueryBase,
+    TestCaseDeserializerTimeRangeWildcardQueryBase,
+    TestCaseDeserializerWildcardQueryBase,
 )
 from test_ir.test_utils import TestCLPBase
 
@@ -37,33 +37,33 @@ def read_log_stream(
     return metadata, log_events
 
 
-class TestCaseReaderBase(TestCaseDecoderBase):
+class TestCaseReaderBase(TestCaseDeserializerBase):
     # override
-    def _decode_log_stream(
+    def _deserialize_log_stream(
         self, log_path: Path, query: Optional[Query]
     ) -> Tuple[Metadata, List[LogEvent]]:
         return read_log_stream(log_path, query, self.enable_compression)
 
 
-class TestCaseReaderTimeRangeQueryBase(TestCaseDecoderTimeRangeQueryBase):
+class TestCaseReaderTimeRangeQueryBase(TestCaseDeserializerTimeRangeQueryBase):
     # override
-    def _decode_log_stream(
+    def _deserialize_log_stream(
         self, log_path: Path, query: Optional[Query]
     ) -> Tuple[Metadata, List[LogEvent]]:
         return read_log_stream(log_path, query, self.enable_compression)
 
 
-class TestCaseReaderWildcardQueryBase(TestCaseDecoderWildcardQueryBase):
+class TestCaseReaderWildcardQueryBase(TestCaseDeserializerWildcardQueryBase):
     # override
-    def _decode_log_stream(
+    def _deserialize_log_stream(
         self, log_path: Path, query: Optional[Query]
     ) -> Tuple[Metadata, List[LogEvent]]:
         return read_log_stream(log_path, query, self.enable_compression)
 
 
-class TestCaseReaderTimeRangeWildcardQueryBase(TestCaseDecoderTimeRangeWildcardQueryBase):
+class TestCaseReaderTimeRangeWildcardQueryBase(TestCaseDeserializerTimeRangeWildcardQueryBase):
     # override
-    def _decode_log_stream(
+    def _deserialize_log_stream(
         self, log_path: Path, query: Optional[Query]
     ) -> Tuple[Metadata, List[LogEvent]]:
         return read_log_stream(log_path, query, self.enable_compression)
@@ -205,7 +205,7 @@ class TestIncompleteIRStream(TestCLPBase):
             incomplete_stream_error_captured, "Incomplete Stream Error is not properly set."
         )
         self.assertFalse(other_exception_captured, "No other exception should be set.")
-        self.assertTrue(0 != log_counter, "No logs are decoded.")
+        self.assertTrue(0 != log_counter, "No logs are deserialized.")
 
     def test_allow_incomplete_ir_stream_error(self) -> None:
         """

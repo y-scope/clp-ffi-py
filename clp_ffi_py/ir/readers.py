@@ -7,29 +7,28 @@ from typing import Generator, IO, Iterator, Optional, Type, Union
 
 from zstandard import ZstdDecompressionReader, ZstdDecompressor
 
-from clp_ffi_py.ir.native import Decoder, DecoderBuffer, LogEvent, Metadata, Query
+from clp_ffi_py.ir.native import Deserializer, DeserializerBuffer, LogEvent, Metadata, Query
 
 
 class ClpIrStreamReader(Iterator[LogEvent]):
     """
-    This class represents a stream reader used to read/decode encoded log events from a CLP IR
-    stream. It also provides method(s) to instantiate a log event generator with a customized search
-    query.
+    This class represents a stream reader used to read/deserialize log events from a CLP IR stream.
+    It also provides method(s) to instantiate a log event generator with a customized search query.
 
-    :param istream: Input stream that contains encoded CLP IR.
-    :param decoder_buffer_size: Initial size of the decoder buffer.
+    :param istream: Input stream that contains CLP IR byte sequence.
+    :param deserializer_buffer_size: Initial size of the deserializer buffer.
     :param enable_compression: A flag indicating whether the istream is compressed using `zstd`.
     :param allow_incomplete_stream: If set to `True`, an incomplete CLP IR stream is not treated as
         an error. Instead, encountering such a stream is seen as reaching its end without raising
         any exceptions.
     """
 
-    DEFAULT_DECODER_BUFFER_SIZE: int = 65536
+    DEFAULT_DESERIALIZER_BUFFER_SIZE: int = 65536
 
     def __init__(
         self,
         istream: IO[bytes],
-        decoder_buffer_size: int = DEFAULT_DECODER_BUFFER_SIZE,
+        deserializer_buffer_size: int = DEFAULT_DESERIALIZER_BUFFER_SIZE,
         enable_compression: bool = True,
         allow_incomplete_stream: bool = False,
     ):
@@ -39,40 +38,42 @@ class ClpIrStreamReader(Iterator[LogEvent]):
             self.__istream = dctx.stream_reader(istream, read_across_frames=True)
         else:
             self.__istream = istream
-        self._decoder_buffer: DecoderBuffer = DecoderBuffer(self.__istream, decoder_buffer_size)
+        self._deserializer_buffer: DeserializerBuffer = DeserializerBuffer(
+            self.__istream, deserializer_buffer_size
+        )
         self._metadata: Optional[Metadata] = None
         self._allow_incomplete_stream: bool = allow_incomplete_stream
 
     def read_next_log_event(self) -> Optional[LogEvent]:
         """
-        Reads and decodes the next encoded log event from the IR stream.
+        Reads and deserializes the next log event from the IR stream.
 
         :return:
             - Next unread log event represented as an instance of LogEvent.
             - None if the end of IR stream is reached.
         :raise Exception:
-            If :meth:`~clp_ffi_py.ir.native.Decoder.decode_next_log_event` fails.
+            If :meth:`~clp_ffi_py.ir.native.Deserializer.deserialize_next_log_event` fails.
         """
-        return Decoder.decode_next_log_event(
-            self._decoder_buffer, allow_incomplete_stream=self._allow_incomplete_stream
+        return Deserializer.deserialize_next_log_event(
+            self._deserializer_buffer, allow_incomplete_stream=self._allow_incomplete_stream
         )
 
     def read_preamble(self) -> None:
         """
-        Try to decode the preamble and set `metadata`. If `metadata` has been set already, it will
-        instantly return. It is separated from `__init__` so that the input stream does not need to
-        be readable on a reader's construction, but until the user starts to iterate logs.
+        Try to deserialize the preamble and set `metadata`. If `metadata` has been set already, it
+        will instantly return. It is separated from `__init__` so that the input stream does not
+        need to be readable on a reader's construction, but until the user starts to iterate logs.
 
         :raise Exception:
-            If :meth:`~clp_ffi_py.ir.native.Decoder.decode_preamble` fails.
+            If :meth:`~clp_ffi_py.ir.native.Deserializer.deserialize_preamble` fails.
         """
         if self.has_metadata():
             return
-        self._metadata = Decoder.decode_preamble(self._decoder_buffer)
+        self._metadata = Deserializer.deserialize_preamble(self._deserializer_buffer)
 
     def get_metadata(self) -> Metadata:
         if None is self._metadata:
-            raise RuntimeError("The metadata has not been successfully decoded yet.")
+            raise RuntimeError("The metadata has not been successfully deserialized yet.")
         return self._metadata
 
     def has_metadata(self) -> bool:
@@ -84,14 +85,13 @@ class ClpIrStreamReader(Iterator[LogEvent]):
 
         :param query: The input query object used to match log events. Check the document of
             :class:`~clp_ffi_py.ir.Query` for more details.
-        :yield: The next unread encoded log event that matches the given search query from the IR
-            stream.
+        :yield: The next unread log event that matches the given search query from the IR stream.
         """
         if False is self.has_metadata():
             self.read_preamble()
         while True:
-            log_event: Optional[LogEvent] = Decoder.decode_next_log_event(
-                self._decoder_buffer,
+            log_event: Optional[LogEvent] = Deserializer.deserialize_next_log_event(
+                self._deserializer_buffer,
                 query=query,
                 allow_incomplete_stream=self._allow_incomplete_stream,
             )
@@ -135,14 +135,14 @@ class ClpIrFileReader(ClpIrStreamReader):
     def __init__(
         self,
         fpath: Path,
-        decoder_buffer_size: int = ClpIrStreamReader.DEFAULT_DECODER_BUFFER_SIZE,
+        deserializer_buffer_size: int = ClpIrStreamReader.DEFAULT_DESERIALIZER_BUFFER_SIZE,
         enable_compression: bool = True,
         allow_incomplete_stream: bool = False,
     ):
         self._path: Path = fpath
         super().__init__(
             open(fpath, "rb"),
-            decoder_buffer_size=decoder_buffer_size,
+            deserializer_buffer_size=deserializer_buffer_size,
             enable_compression=enable_compression,
             allow_incomplete_stream=allow_incomplete_stream,
         )

@@ -8,13 +8,13 @@
 
 namespace clp_ffi_py::ir::native {
 /**
- * A class that represents a decoded IR preamble. Contains ways to access (get) metadata such as the
- * timestamp format. After construction, the metadata is readonly.
+ * A class that represents a deserialized IR preamble. Contains ways to access (get) metadata such
+ * as the timestamp format. After construction, the metadata is readonly.
  */
 class Metadata {
 public:
     /**
-     * Constructs a new Metadata object by reading values from a JSON object decoded from the
+     * Constructs a new Metadata object by reading values from a JSON object deserialized from the
      * preamble. This constructor will validate the JSON data and throw exceptions when failing to
      * extract required values.
      * @param metadata JSON data that contains the metadata.

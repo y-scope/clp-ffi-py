@@ -5,9 +5,9 @@ from clp_ffi_py.ir.readers import *
 from typing import List
 
 __all__: List[str] = [
-    "Decoder",  # native
-    "DecoderBuffer",  # native
-    "FourByteEncoder",  # native
+    "Deserializer",  # native
+    "DeserializerBuffer",  # native
+    "FourByteSerializer",  # native
     "IncompleteStreamError",  # native
     "LogEvent",  # native
     "Metadata",  # native

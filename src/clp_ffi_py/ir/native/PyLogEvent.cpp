@@ -386,9 +386,9 @@ PyMethodDef PyLogEvent_method_table[]{
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cPyLogEventDoc,
-        "This class represents a decoded log event and provides ways to access the underlying "
+        "This class represents a deserialzied log event and provides ways to access the underlying "
         "log data, including the log message, the timestamp, and the log event index. "
-        "Normally, this class will be instantiated by the FFI IR decoding methods.\n"
+        "Normally, this class will be instantiated by the FFI IR deserialization methods.\n"
         "However, with the `__init__` method provided below, direct instantiation is also "
         "possible.\n\n"
         "The signature of `__init__` method is shown as following:\n\n"

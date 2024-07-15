@@ -1,5 +1,5 @@
-#ifndef CLP_FFI_PY_IR_NATIVE_PYDECODERBUFFER_HPP
-#define CLP_FFI_PY_IR_NATIVE_PYDECODERBUFFER_HPP
+#ifndef CLP_FFI_PY_IR_NATIVE_PYDESERIALIZERBUFFER_HPP
+#define CLP_FFI_PY_IR_NATIVE_PYDESERIALIZERBUFFER_HPP
 
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
@@ -12,44 +12,44 @@
 
 namespace clp_ffi_py::ir::native {
 /**
- * This Python class is designed to buffer encoded CLP IR bytes that are read from an input stream.
- * This object serves a dual purpose:
- * - It enables CLP IR decoding methods to access the buffered bytes for the purpose of decoding log
- *   events.
+ * This Python class is designed to buffer serialized CLP IR bytes that are read from an input
+ * stream. This object serves a dual purpose:
+ * - It enables CLP IR deserialization methods to access the buffered bytes for the purpose of
+ *   deserializing and decoding log events.
  * - It adheres to the Python buffer protocol, allowing for direct reading from an `IO[bytes]`-like
  *   input stream.
  * This class encompasses all essential attributes to hold the buffered bytes and monitor the state
- * of the buffer. It's meant to be utilized across various CLP IR decoding method calls when
- * decoding from the same IR stream.
+ * of the buffer. It's meant to be utilized across various CLP IR deserialization method calls when
+ * deserializing from the same IR stream.
  */
-class PyDecoderBuffer {
+class PyDeserializerBuffer {
 public:
     static constexpr Py_ssize_t cDefaultInitialCapacity{4096};
 
     /**
-     * Since the memory allocation of PyDecoderBuffer is handled by CPython's allocator, cpp
+     * Since the memory allocation of PyDeserializerBuffer is handled by CPython's allocator, cpp
      * constructors will not be explicitly called. This function serves as the default constructor
      * to initialize the underlying input IR stream and read buffer. Other data members are assumed
      * to be zero-initialized by `default-init` method. It has to be manually called whenever
-     * creating a new PyDecoderBuffer object through CPython APIs.
+     * creating a new PyDeserializerBuffer object through CPython APIs.
      * @return true on success.
      * @return false on failure with the relevant Python exception and error set.
      */
     [[nodiscard]] auto init(
             PyObject* input_stream,
-            Py_ssize_t buf_capacity = PyDecoderBuffer::cDefaultInitialCapacity
+            Py_ssize_t buf_capacity = PyDeserializerBuffer::cDefaultInitialCapacity
     ) -> bool;
 
     /**
-     * Zero-initializes all the data members in PyDecoderBuffer. Should be called once the object is
-     * allocated.
+     * Zero-initializes all the data members in PyDeserializerBuffer. Should be called once the
+     * object is allocated.
      */
     auto default_init() -> void {
         m_read_buffer_mem_owner = nullptr;
         m_buffer_size = 0;
         m_num_current_bytes_consumed = 0;
         m_ref_timestamp = 0;
-        m_num_decoded_message = 0;
+        m_num_deserialized_message = 0;
         m_py_buffer_protocol_enabled = false;
         m_input_ir_stream = nullptr;
         m_metadata = nullptr;
@@ -73,15 +73,18 @@ public:
      */
     auto commit_read_buffer_consumption(Py_ssize_t num_bytes_consumed) -> bool;
 
-    [[nodiscard]] auto get_num_decoded_message() const -> size_t { return m_num_decoded_message; }
+    [[nodiscard]] auto get_num_deserialized_message() const -> size_t {
+        return m_num_deserialized_message;
+    }
 
     /**
-     * Increments the number of decoded message counter, and returns the value before increment.
+     * Increments the number of deserialized message counter, and returns the value before
+     * increment.
      */
-    [[maybe_unused]] auto get_and_increment_decoded_message_count() -> size_t {
-        auto current_num_decoded_message{m_num_decoded_message};
-        ++m_num_decoded_message;
-        return current_num_decoded_message;
+    [[maybe_unused]] auto get_and_increment_deserialized_message_count() -> size_t {
+        auto current_num_deserialized_message{m_num_deserialized_message};
+        ++m_num_deserialized_message;
+        return current_num_deserialized_message;
     }
 
     [[nodiscard]] auto get_ref_timestamp() const -> clp::ir::epoch_time_ms_t {
@@ -140,17 +143,17 @@ public:
     }
 
     /**
-     * Attempts to populate the decoder buffer. When this function is called, it is expected to have
-     * more bytes to read from the IR stream.
+     * Attempts to populate the deserializer buffer. When this function is called, it is expected to
+     * have more bytes to read from the IR stream.
      * @return true on success.
      * @return false on failure. The Python exception and error will be properly set if the error.
      */
     [[nodiscard]] auto try_read() -> bool;
 
     /**
-     * Tests the functionality of the DecoderBuffer by sequentially reading through the input stream
-     * with randomly sized reads. It will grow the read buffer when necessary until the the entire
-     * input stream is consumed. All the read bytes will be returned as a Python bytearray.
+     * Tests the functionality of PyDeserializerBuffer by sequentially reading through the input
+     * stream with randomly sized reads. It will grow the read buffer when necessary until the the
+     * entire input stream is consumed. All the read bytes will be returned as a Python bytearray.
      * @param seed Random seed passing from the tester.
      * @return Python bytearray that contains all the read bytes read from the input stream in
      * sequence.
@@ -159,9 +162,10 @@ public:
     [[nodiscard]] auto test_streaming(uint32_t seed) -> PyObject*;
 
     /**
-     * Gets the PyTypeObject that represents PyDecoderBuffer's Python type. This type is dynamically
-     * created and initialized during the execution of `PyDecoderBuffer::module_level_init`.
-     * @return Python type object associated with PyDecoderBuffer.
+     * Gets the PyTypeObject that represents PyDeserializerBuffer's Python type. This type is
+     * dynamically created and initialized during the execution of
+     * `PyDeserializerBuffer::module_level_init`.
+     * @return Python type object associated with PyDeserializerBuffer.
      */
     [[nodiscard]] static auto get_py_type() -> PyTypeObject*;
 
@@ -171,9 +175,9 @@ public:
     [[nodiscard]] static auto get_py_incomplete_stream_error() -> PyObject*;
 
     /**
-     * Creates and initializes PyDecoderBuffer as a Python type, and then incorporates this type as
-     * a Python object into the py_module module.
-     * @param py_module This is the Python module where the initialized PyDecoderBuffer will be
+     * Creates and initializes PyDeserializerBuffer as a Python type, and then incorporates this
+     * type as a Python object into the py_module module.
+     * @param py_module This is the Python module where the initialized PyDeserializerBuffer will be
      * incorporated.
      * @return true on success.
      * @return false on failure with the relevant Python exception and error set.
@@ -210,7 +214,7 @@ private:
     clp::ir::epoch_time_ms_t m_ref_timestamp;
     Py_ssize_t m_buffer_size;
     Py_ssize_t m_num_current_bytes_consumed;
-    size_t m_num_decoded_message;
+    size_t m_num_deserialized_message;
     bool m_py_buffer_protocol_enabled;
 
     static PyObjectStaticPtr<PyTypeObject> m_py_type;
@@ -218,4 +222,4 @@ private:
 };
 }  // namespace clp_ffi_py::ir::native
 
-#endif  // CLP_FFI_PY_IR_NATIVE_PYDECODERBUFFER_HPP
+#endif  // CLP_FFI_PY_IR_NATIVE_PYDESERIALIZERBUFFER_HPP

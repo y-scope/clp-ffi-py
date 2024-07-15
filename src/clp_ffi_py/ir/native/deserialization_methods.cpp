@@ -1,6 +1,6 @@
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
-#include "decoding_methods.hpp"
+#include "deserialization_methods.hpp"
 
 #include <optional>
 #include <span>
@@ -13,7 +13,7 @@
 
 #include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ir/native/error_messages.hpp>
-#include <clp_ffi_py/ir/native/PyDecoderBuffer.hpp>
+#include <clp_ffi_py/ir/native/PyDeserializerBuffer.hpp>
 #include <clp_ffi_py/ir/native/PyLogEvent.hpp>
 #include <clp_ffi_py/ir/native/PyMetadata.hpp>
 #include <clp_ffi_py/ir/native/PyQuery.hpp>
@@ -29,10 +29,10 @@ using clp::ffi::ir_stream::IRProtocolErrorCode;
 namespace {
 /**
  * This template defines the function signature of a termination handler required by
- * `generic_decode_log_event`. Signature: (
+ * `deserialize_log_events`. Signature: (
  *         ffi::epoch_timestamp_ms timestamp,
- *         std::string_view decoded_log_message,
- *         size_t decoded_log_event_idx,
+ *         std::string_view deserialized_log_msg,
+ *         size_t deserialized_log_event_idx,
  *         PyObject*& return_value
  * ) -> bool;
  * @tparam TerminateHandler
@@ -49,9 +49,9 @@ concept TerminateHandlerSignature = requires(TerminateHandler handler) {
 
 /**
  * Handles the error when IRErrorCode::IRErrorCode_Incomplete_IR is seen. The handler will first
- * try to load more data into `decoder_buffer`. If it fails, `allow_incomplete_stream` will be used
- * to determine whether to swallow the incomplete IR exception.
- * @param decoder_buffer
+ * try to load more data into `deserializer_buffer`. If it fails, `allow_incomplete_stream` will be
+ * used to determine whether to swallow the incomplete IR exception.
+ * @param deserializer_buffer
  * @param allow_incomplete_stream A flag to indicate whether the incomplete stream error should be
  * ignored. If it is set to true, incomplete stream error.
  * @param std::nullopt if more data is loaded.
@@ -60,15 +60,16 @@ concept TerminateHandlerSignature = requires(TerminateHandler handler) {
  * and error set.
  */
 [[nodiscard]] auto handle_incomplete_ir_error(
-        PyDecoderBuffer* decoder_buffer,
+        PyDeserializerBuffer* deserializer_buffer,
         bool allow_incomplete_stream
 ) -> std::optional<PyObject*> {
-    if (decoder_buffer->try_read()) {
+    if (deserializer_buffer->try_read()) {
         return std::nullopt;
     }
     if (allow_incomplete_stream
-        && static_cast<bool>(PyErr_ExceptionMatches(PyDecoderBuffer::get_py_incomplete_stream_error(
-        ))))
+        && static_cast<bool>(
+                PyErr_ExceptionMatches(PyDeserializerBuffer::get_py_incomplete_stream_error())
+        ))
     {
         PyErr_Clear();
         Py_RETURN_NONE;
@@ -77,11 +78,11 @@ concept TerminateHandlerSignature = requires(TerminateHandler handler) {
 }
 
 /**
- * Decodes the next log event from the CLP IR buffer `decoder_buffer` until terminate handler
- * returns true.
- * @tparam TerminateHandler Method to determine if the decoding should terminate, and set the return
- * value for termination.
- * @param decoder_buffer IR decoder buffer of the input IR stream.
+ * Deserializes the next log event from the CLP IR buffer `deserializer_buffer` until terminate
+ * handler returns true.
+ * @tparam TerminateHandler Method to determine if the deserialization should terminate, and set the
+ * return value for termination.
+ * @param deserializer_buffer IR deserializer buffer of the input IR stream.
  * @param allow_incomplete_stream A flag to indicate whether the incomplete stream error should be
  * ignored. If it is set to true, incomplete stream error should be treated as the IR stream is
  * terminated.
@@ -91,20 +92,20 @@ concept TerminateHandlerSignature = requires(TerminateHandler handler) {
  * @return nullptr on failure with the relevant Python exception and error set.
  */
 template <TerminateHandlerSignature TerminateHandler>
-auto generic_decode_log_events(
-        PyDecoderBuffer* decoder_buffer,
+auto deserialize_log_events(
+        PyDeserializerBuffer* deserializer_buffer,
         bool allow_incomplete_stream,
         TerminateHandler terminate_handler
 ) -> PyObject* {
-    std::string decoded_message;
+    std::string deserialized_message;
     clp::ir::epoch_time_ms_t timestamp_delta{0};
-    auto timestamp{decoder_buffer->get_ref_timestamp()};
+    auto timestamp{deserializer_buffer->get_ref_timestamp()};
     size_t current_log_event_idx{0};
     PyObject* return_value{nullptr};
     clp::ffi::ir_stream::encoded_tag_t tag{};
 
     while (true) {
-        auto const unconsumed_bytes{decoder_buffer->get_unconsumed_bytes()};
+        auto const unconsumed_bytes{deserializer_buffer->get_unconsumed_bytes()};
         clp::BufferReader ir_buffer{
                 clp::size_checked_pointer_cast<char const>(unconsumed_bytes.data()),
                 unconsumed_bytes.size()
@@ -114,11 +115,11 @@ auto generic_decode_log_events(
             IRErrorCode::IRErrorCode_Success != err)
         {
             if (IRErrorCode::IRErrorCode_Incomplete_IR != err) {
-                PyErr_Format(PyExc_RuntimeError, cDecoderErrorCodeFormatStr, err);
+                PyErr_Format(PyExc_RuntimeError, cDeserializerErrorCodeFormatStr, err);
                 return nullptr;
             }
             if (auto const ret_val{
-                        handle_incomplete_ir_error(decoder_buffer, allow_incomplete_stream)
+                        handle_incomplete_ir_error(deserializer_buffer, allow_incomplete_stream)
                 };
                 ret_val.has_value())
             {
@@ -133,12 +134,12 @@ auto generic_decode_log_events(
         auto const err{clp::ffi::ir_stream::four_byte_encoding::deserialize_log_event(
                 ir_buffer,
                 tag,
-                decoded_message,
+                deserialized_message,
                 timestamp_delta
         )};
         if (IRErrorCode::IRErrorCode_Incomplete_IR == err) {
             if (auto const ret_val{
-                        handle_incomplete_ir_error(decoder_buffer, allow_incomplete_stream)
+                        handle_incomplete_ir_error(deserializer_buffer, allow_incomplete_stream)
                 };
                 ret_val.has_value())
             {
@@ -147,17 +148,18 @@ auto generic_decode_log_events(
             continue;
         }
         if (IRErrorCode::IRErrorCode_Success != err) {
-            PyErr_Format(PyExc_RuntimeError, cDecoderErrorCodeFormatStr, err);
+            PyErr_Format(PyExc_RuntimeError, cDeserializerErrorCodeFormatStr, err);
             return nullptr;
         }
 
         timestamp += timestamp_delta;
-        current_log_event_idx = decoder_buffer->get_and_increment_decoded_message_count();
+        current_log_event_idx = deserializer_buffer->get_and_increment_deserialized_message_count();
         auto const num_bytes_consumed{static_cast<Py_ssize_t>(ir_buffer.get_pos())};
-        decoder_buffer->commit_read_buffer_consumption(num_bytes_consumed);
+        deserializer_buffer->commit_read_buffer_consumption(num_bytes_consumed);
 
-        if (terminate_handler(timestamp, decoded_message, current_log_event_idx, return_value)) {
-            decoder_buffer->set_ref_timestamp(timestamp);
+        if (terminate_handler(timestamp, deserialized_message, current_log_event_idx, return_value))
+        {
+            deserializer_buffer->set_ref_timestamp(timestamp);
             break;
         }
     }
@@ -175,19 +177,22 @@ auto generic_decode_log_events(
 }  // namespace
 
 extern "C" {
-auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> PyObject* {
+auto deserialize_preamble(PyObject* Py_UNUSED(self), PyObject* py_deserializer_buffer)
+        -> PyObject* {
     if (false
-        == static_cast<bool>(PyObject_TypeCheck(py_decoder_buffer, PyDecoderBuffer::get_py_type())))
+        == static_cast<bool>(
+                PyObject_TypeCheck(py_deserializer_buffer, PyDeserializerBuffer::get_py_type())
+        ))
     {
         PyErr_SetString(PyExc_TypeError, cPyTypeError);
         return nullptr;
     }
 
-    auto* decoder_buffer{py_reinterpret_cast<PyDecoderBuffer>(py_decoder_buffer)};
+    auto* deserializer_buffer{py_reinterpret_cast<PyDeserializerBuffer>(py_deserializer_buffer)};
     bool is_four_byte_encoding{false};
     size_t ir_buffer_cursor_pos{0};
     while (true) {
-        auto const unconsumed_bytes{decoder_buffer->get_unconsumed_bytes()};
+        auto const unconsumed_bytes{deserializer_buffer->get_unconsumed_bytes()};
         clp::BufferReader ir_buffer{
                 clp::size_checked_pointer_cast<char const>(unconsumed_bytes.data()),
                 unconsumed_bytes.size()
@@ -198,16 +203,17 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
             break;
         }
         if (IRErrorCode::IRErrorCode_Incomplete_IR != err) {
-            PyErr_Format(PyExc_RuntimeError, cDecoderErrorCodeFormatStr, err);
+            PyErr_Format(PyExc_RuntimeError, cDeserializerErrorCodeFormatStr, err);
             return nullptr;
         }
-        if (false == decoder_buffer->try_read()) {
+        if (false == deserializer_buffer->try_read()) {
             return nullptr;
         }
     }
-    decoder_buffer->commit_read_buffer_consumption(static_cast<Py_ssize_t>(ir_buffer_cursor_pos));
+    deserializer_buffer->commit_read_buffer_consumption(static_cast<Py_ssize_t>(ir_buffer_cursor_pos
+    ));
     if (false == is_four_byte_encoding) {
-        PyErr_SetString(PyExc_NotImplementedError, "8-byte IR decoding is not supported yet.");
+        PyErr_SetString(PyExc_NotImplementedError, "8-byte IR encoding is not supported yet.");
         return nullptr;
     }
 
@@ -215,7 +221,7 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
     size_t metadata_pos{0};
     uint16_t metadata_size{0};
     while (true) {
-        auto const unconsumed_bytes = decoder_buffer->get_unconsumed_bytes();
+        auto const unconsumed_bytes = deserializer_buffer->get_unconsumed_bytes();
         clp::BufferReader ir_buffer{
                 clp::size_checked_pointer_cast<char const>(unconsumed_bytes.data()),
                 unconsumed_bytes.size()
@@ -231,19 +237,20 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
             break;
         }
         if (IRErrorCode ::IRErrorCode_Incomplete_IR != err) {
-            PyErr_Format(PyExc_RuntimeError, cDecoderErrorCodeFormatStr, err);
+            PyErr_Format(PyExc_RuntimeError, cDeserializerErrorCodeFormatStr, err);
             return nullptr;
         }
-        if (false == decoder_buffer->try_read()) {
+        if (false == deserializer_buffer->try_read()) {
             return nullptr;
         }
     }
 
-    auto const unconsumed_bytes = decoder_buffer->get_unconsumed_bytes();
+    auto const unconsumed_bytes = deserializer_buffer->get_unconsumed_bytes();
     auto const metadata_buffer{
             unconsumed_bytes.subspan(metadata_pos, static_cast<size_t>(metadata_size))
     };
-    decoder_buffer->commit_read_buffer_consumption(static_cast<Py_ssize_t>(ir_buffer_cursor_pos));
+    deserializer_buffer->commit_read_buffer_consumption(static_cast<Py_ssize_t>(ir_buffer_cursor_pos
+    ));
     PyMetadata* metadata{nullptr};
     try {
         // Initialization list should not be used in this case:
@@ -282,25 +289,25 @@ auto decode_preamble(PyObject* Py_UNUSED(self), PyObject* py_decoder_buffer) -> 
         PyErr_Format(PyExc_RuntimeError, "Json Parsing Error: %s", ex.what());
         return nullptr;
     }
-    if (false == decoder_buffer->metadata_init(metadata)) {
+    if (false == deserializer_buffer->metadata_init(metadata)) {
         return nullptr;
     }
     return py_reinterpret_cast<PyObject>(metadata);
 }
 
-auto decode_next_log_event(PyObject* Py_UNUSED(self), PyObject* args, PyObject* keywords)
+auto deserialize_next_log_event(PyObject* Py_UNUSED(self), PyObject* args, PyObject* keywords)
         -> PyObject* {
-    static char keyword_decoder_buffer[]{"decoder_buffer"};
+    static char keyword_deserializer_buffer[]{"deserializer_buffer"};
     static char keyword_query[]{"query"};
     static char keyword_allow_incomplete_stream[]{"allow_incomplete_stream"};
     static char* keyword_table[]{
-            static_cast<char*>(keyword_decoder_buffer),
+            static_cast<char*>(keyword_deserializer_buffer),
             static_cast<char*>(keyword_query),
             static_cast<char*>(keyword_allow_incomplete_stream),
             nullptr
     };
 
-    PyDecoderBuffer* decoder_buffer{nullptr};
+    PyDeserializerBuffer* deserializer_buffer{nullptr};
     PyObject* query_obj{Py_None};
     int allow_incomplete_stream{0};
 
@@ -310,8 +317,8 @@ auto decode_next_log_event(PyObject* Py_UNUSED(self), PyObject* args, PyObject* 
                 keywords,
                 "O!|Op",
                 static_cast<char**>(keyword_table),
-                PyDecoderBuffer::get_py_type(),
-                &decoder_buffer,
+                PyDeserializerBuffer::get_py_type(),
+                &deserializer_buffer,
                 &query_obj,
                 &allow_incomplete_stream
         )))
@@ -327,14 +334,14 @@ auto decode_next_log_event(PyObject* Py_UNUSED(self), PyObject* args, PyObject* 
         return nullptr;
     }
 
-    if (false == decoder_buffer->has_metadata()) {
+    if (false == deserializer_buffer->has_metadata()) {
         PyErr_SetString(
                 PyExc_RuntimeError,
-                "The given DecoderBuffer does not have a valid CLP IR metadata decoded."
+                "The given deserializerBuffer does not have a valid CLP IR metadata deserialized."
         );
         return nullptr;
     }
-    auto* metadata{decoder_buffer->get_metadata()};
+    auto* metadata{deserializer_buffer->get_metadata()};
 
     if (false == is_query_given) {
         auto terminate_handler{
@@ -353,8 +360,8 @@ auto decode_next_log_event(PyObject* Py_UNUSED(self), PyObject* args, PyObject* 
                     return true;
                 }
         };
-        return generic_decode_log_events(
-                decoder_buffer,
+        return deserialize_log_events(
+                deserializer_buffer,
                 static_cast<bool>(allow_incomplete_stream),
                 terminate_handler
         );
@@ -387,8 +394,8 @@ auto decode_next_log_event(PyObject* Py_UNUSED(self), PyObject* args, PyObject* 
                 return true;
             }
     };
-    return generic_decode_log_events(
-            decoder_buffer,
+    return deserialize_log_events(
+            deserializer_buffer,
             static_cast<bool>(allow_incomplete_stream),
             query_terminate_handler
     );

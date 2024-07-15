@@ -2,7 +2,7 @@
 
 This module provides Python packages to interface with [CLP Core Features][1]
 through CLP's FFI (foreign function interface). At present, this library
-supplies built-in functions for encoding/decoding log messages using [CLP][2].
+supplies built-in functions for serializing/deserializing log messages using [CLP][2].
 
 > [!IMPORTANT]
 > This project is no longer built for Python3.6.
@@ -66,12 +66,12 @@ To manually build a package for distribution, follow the steps below.
 
 ## CLP IR Readers
 
-CLP IR Readers provide a convenient interface for CLP IR decoding and search
+CLP IR Readers provide a convenient interface for CLP IR deserialization and search
 methods.
 
 ### ClpIrStreamReader
 
-- Read/decode any arbitrary CLP IR stream (as an instance of `IO[bytes]`).
+- Read+deserialize any arbitrary CLP IR stream (as an instance of `IO[bytes]`).
 - Can be used as an iterator that returns each log event as a `LogEvent` object.
 - Can search target log events by giving a search query:
   - Searching log events within a certain time range.
@@ -159,7 +159,7 @@ wildcard_search_query: Query = query_builder.build()
 matched_log_messages: List[Tuple[int, str]] = []
 
 # A convenience file reader class is also available to interact with a file that
-# represents an encoded CLP IR stream directly.
+# represents a CLP IR stream directly.
 with ClpIrFileReader(Path("example.clp.zst")) as clp_reader:
     for log_event in clp_reader.search(wildcard_search_query):
         matched_log_messages.append((log_event.get_timestamp(), log_event.get_log_message()))
@@ -180,7 +180,7 @@ help(FullStringWildcardQuery)
 help(SubstringWildcardQuery)
 ```
 
-### Streaming Decode/Search Directly from S3 Remote Storage
+### Streaming Deserialize/Search Directly from S3 Remote Storage
 
 When working with CLP IR files stored on S3-compatible storage systems,
 [smart_open][17] can be used to open and read the IR stream for the following
@@ -207,7 +207,7 @@ session = boto3.Session(
 )
 
 url = 's3://clp-example-s3-bucket/example.clp.zst'
-# Using `smart_open.open` to stream the encoded CLP IR:
+# Using `smart_open.open` to stream the CLP IR byte sequence:
 with smart_open.open(
     url, mode="rb", compression="disable", transport_params={"client": session.client("s3")}
 ) as istream:
@@ -231,7 +231,7 @@ closed.
 ### Parallel Processing
 
 The `Query` and `LogEvent` classes can be serialized by [pickle][15]. Therefore,
-decoding and search can be parallelized across streams/files using libraries
+deserializing and searching can be parallelized across streams/files using libraries
 such as [multiprocessing][13] and [tqlm][14].
 
 ## Testing

@@ -7,7 +7,7 @@
 
 namespace clp_ffi_py::ir::native {
 /**
- * A class that represents a decoded IR log event. Contains ways to access (get or set) the log
+ * A class that represents a deserialized IR log event. Contains ways to access (get or set) the log
  * message, the timestamp, and the log event index.
  */
 class LogEvent {
