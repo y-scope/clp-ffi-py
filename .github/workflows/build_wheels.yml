@@ -30,8 +30,8 @@ on:
       - "src/**"
       - "tests/**"
   schedule:
-    # Run at midnight UTC every day with 15 minutes delay added to avoid high load periods
-    - cron: "15 0 * * *"
+    # Run every Tuesday at 00:15 UTC (the 15 is to avoid periods of high load)
+    - cron: "15 0 * * 2"
 
 concurrency:
   group: "${{github.workflow}}-${{github.ref}}"
@@ -47,7 +47,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      
+
       - run: |
           pip install --upgrade pip
           pip install -r requirements-dev.txt
