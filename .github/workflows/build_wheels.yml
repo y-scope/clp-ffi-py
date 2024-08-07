@@ -30,7 +30,7 @@ on:
       - "src/**"
       - "tests/**"
   schedule:
-    # Run at midnight UTC every Tuesday with 15 minutes delay added to avoid high load periods
+    # Run every Tuesday at 00:15 UTC (the 15 is to avoid periods of high load)
     - cron: "15 0 * * 2"
 
 concurrency:
