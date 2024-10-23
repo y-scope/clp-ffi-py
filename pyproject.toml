@@ -1,10 +1,6 @@
 [build-system]
-requires = [
-    "setuptools >= 59.0",
-    "setuptools_scm",
-    "wheel",
-]
-build-backend = "setuptools.build_meta"
+requires = ["scikit-build-core"]
+build-backend = "scikit_build_core.build"
 
 [project]
 name = "clp_ffi_py"
@@ -93,3 +89,7 @@ line-length = 100
 [tool.ruff.lint]
 select = ["E", "I", "F"]
 isort.order-by-type = false
+
+[tool.scikit-build]
+cmake.build-type = "Release"
+cmake.version = ">=3.17"
