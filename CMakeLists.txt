@@ -24,6 +24,20 @@ else()
     endif()
 endif()
 
+if (APPLE)
+    if (NOT DEFINED ENV{MACOSX_DEPLOYMENT_TARGET})
+        set(ENV{MACOSX_DEPLOYMENT_TARGET} "10.15")
+        message(STATUS "MACOSX_DEPLOYMENT_TARGET not set, defaulting to 10.15")
+    else()
+        if ("$ENV{MACOSX_DEPLOYMENT_TARGET}" VERSION_LESS "10.15")
+            set(ENV{MACOSX_DEPLOYMENT_TARGET} "10.15")
+            message(STATUS "MACOSX_DEPLOYMENT_TARGET was lower than 10.15, updating to 10.15")
+        else()
+            message(STATUS "MACOSX_DEPLOYMENT_TARGET already set: $ENV{MACOSX_DEPLOYMENT_TARGET}")
+        endif()
+    endif()
+endif()
+
 project(${CLP_FFI_PY}
     LANGUAGES CXX C
     VERSION ${CLP_FFI_PY_VERSION}
