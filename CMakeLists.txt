@@ -32,14 +32,6 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "Compile libraries using PIC."
 # Find Python interpreter, compiler and development environment.
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
 
-set(CPP_SRC_ROOT "src" CACHE STRING "Path to the root of all C++ source code")
-set(CLP_FFI_PY_SRC_ROOT "${CPP_SRC_ROOT}/clp_ffi_py" CACHE STRING
-        "Path to the root of clp-ffi-py's C++ source code")
-set(CLP_CORE_ROOT "src/clp/components/core" CACHE STRING "Path to CLP core's root")
-set(CLP_SRC_ROOT "${CLP_CORE_ROOT}/src/clp" CACHE STRING "Path to clp's source code")
-
-add_subdirectory(${CLP_SRC_ROOT}/string_utils)
-
 set(CLP_FFI_PY_LIB_IR "native" CACHE STRING "The name of IR native library")
 python_add_library(${CLP_FFI_PY_LIB_IR} MODULE WITH_SOABI)
 
@@ -48,35 +40,72 @@ target_compile_features(${CLP_FFI_PY_LIB_IR}
         cxx_std_20
 )
 
-target_sources(${CLP_FFI_PY_LIB_IR}
-    PRIVATE
+set(SRC_ROOT "src" CACHE STRING "Root path of C++ source code")
+set(CLP_FFI_PY_SRC_ROOT "${SRC_ROOT}/clp_ffi_py" CACHE STRING
+        "Root path of clp-ffi-py's C++ source code")
+set(CLP_CORE_ROOT "${SRC_ROOT}/clp/components/core" CACHE STRING "Root path of CLP core")
+
+add_subdirectory(${CLP_CORE_ROOT}/src/clp/string_utils)
+
+# Source files of clp-ffi-core
+# Note: we don't add headers hear since they are not considered to be a part of the project.
+set(SOURCE_FILES_CLP_FFI_CORE
+    ${CLP_CORE_ROOT}/src/clp/BufferReader.cpp
+    ${CLP_CORE_ROOT}/src/clp/ffi/ir_stream/decoding_methods.cpp
+    ${CLP_CORE_ROOT}/src/clp/ffi/ir_stream/encoding_methods.cpp
+    ${CLP_CORE_ROOT}/src/clp/ffi/ir_stream/utils.cpp
+    ${CLP_CORE_ROOT}/src/clp/ffi/encoding_methods.cpp
+    ${CLP_CORE_ROOT}/src/clp/ir/parsing.cpp
+    ${CLP_CORE_ROOT}/src/clp/ReaderInterface.cpp
+)
+
+# Header files and source files of clp-ffi-py
+# Note: headers should be included to allow CLion loads the project properly.
+set(SOURCE_FILES_CLP_FFI_PY_LIB_IR
+    ${CLP_FFI_PY_SRC_ROOT}/error_messages.hpp
+    ${CLP_FFI_PY_SRC_ROOT}/ExceptionFFI.hpp
     ${CLP_FFI_PY_SRC_ROOT}/ir/native/deserialization_methods.cpp
+    ${CLP_FFI_PY_SRC_ROOT}/ir/native/deserialization_methods.hpp
+    ${CLP_FFI_PY_SRC_ROOT}/ir/native/LogEvent.hpp
     ${CLP_FFI_PY_SRC_ROOT}/ir/native/Metadata.cpp
+    ${CLP_FFI_PY_SRC_ROOT}/ir/native/Metadata.hpp
     ${CLP_FFI_PY_SRC_ROOT}/ir/native/PyDeserializer.cpp
+    ${CLP_FFI_PY_SRC_ROOT}/ir/native/PyDeserializer.hpp
     ${CLP_FFI_PY_SRC_ROOT}/ir/native/PyDeserializerBuffer.cpp
+    ${CLP_FFI_PY_SRC_ROOT}/ir/native/PyDeserializerBuffer.hpp
     ${CLP_FFI_PY_SRC_ROOT}/ir/native/PyFourByteSerializer.cpp
+    ${CLP_FFI_PY_SRC_ROOT}/ir/native/PyFourByteSerializer.hpp
     ${CLP_FFI_PY_SRC_ROOT}/ir/native/PyLogEvent.cpp
+    ${CLP_FFI_PY_SRC_ROOT}/ir/native/PyLogEvent.hpp
     ${CLP_FFI_PY_SRC_ROOT}/ir/native/PyMetadata.cpp
+    ${CLP_FFI_PY_SRC_ROOT}/ir/native/PyMetadata.hpp
     ${CLP_FFI_PY_SRC_ROOT}/ir/native/PyQuery.cpp
+    ${CLP_FFI_PY_SRC_ROOT}/ir/native/PyQuery.hpp
     ${CLP_FFI_PY_SRC_ROOT}/ir/native/Query.cpp
+    ${CLP_FFI_PY_SRC_ROOT}/ir/native/Query.hpp
     ${CLP_FFI_PY_SRC_ROOT}/ir/native/serialization_methods.cpp
+    ${CLP_FFI_PY_SRC_ROOT}/ir/native/serialization_methods.hpp
     ${CLP_FFI_PY_SRC_ROOT}/modules/ir_native.cpp
     ${CLP_FFI_PY_SRC_ROOT}/Py_utils.cpp
+    ${CLP_FFI_PY_SRC_ROOT}/Py_utils.hpp
+    ${CLP_FFI_PY_SRC_ROOT}/PyObjectCast.hpp
+    ${CLP_FFI_PY_SRC_ROOT}/PyObjectUtils.hpp
+    ${CLP_FFI_PY_SRC_ROOT}/Python.hpp
     ${CLP_FFI_PY_SRC_ROOT}/utils.cpp
-    ${CLP_SRC_ROOT}/BufferReader.cpp
-    ${CLP_SRC_ROOT}/ffi/ir_stream/decoding_methods.cpp
-    ${CLP_SRC_ROOT}/ffi/ir_stream/encoding_methods.cpp
-    ${CLP_SRC_ROOT}/ffi/ir_stream/utils.cpp
-    ${CLP_SRC_ROOT}/ffi/encoding_methods.cpp
-    ${CLP_SRC_ROOT}/ir/parsing.cpp
-    ${CLP_SRC_ROOT}/ReaderInterface.cpp
+    ${CLP_FFI_PY_SRC_ROOT}/utils.hpp
+)
+
+target_sources(${CLP_FFI_PY_LIB_IR}
+    PRIVATE
+    ${SOURCE_FILES_CLP_FFI_CORE}
+    ${SOURCE_FILES_CLP_FFI_PY_LIB_IR}
 )
 
 target_include_directories(${CLP_FFI_PY_LIB_IR}
-    PRIVATE
+    SYSTEM PRIVATE
     ${CLP_CORE_ROOT}/src
     ${CLP_CORE_ROOT}/submodules
-    ${CPP_SRC_ROOT}
+    ${SRC_ROOT}
 )
 
 target_link_libraries(${CLP_FFI_PY_LIB_IR}
