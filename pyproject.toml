@@ -1,6 +1,6 @@
 [build-system]
-requires = ["scikit-build-core"]
 build-backend = "scikit_build_core.build"
+requires = ["scikit-build-core >= 0.10.7"]
 
 [project]
 name = "clp_ffi_py"

@@ -1,6 +1,5 @@
 # Minimum cmake version required by scikit-build-core: 3.15
-# Minimum cmake version required by `Python_SOABI`: 3.17
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.15)
 
 set(CLP_FFI_PY_INSTALL_LIBS ON CACHE BOOL "Whether to install the built libraries." FORCE)
 
@@ -16,12 +15,9 @@ else()
     set(CLP_FFI_PY_INSTALL_LIBS OFF CACHE BOOL
             "Disable library installation when building outside of scikit-build-core." FORCE)
     set(CLP_FFI_PY "clp-ffi-py-local-build" CACHE STRING "Use local build name." FORCE)
-    set(CLP_FFI_PY_VERSION "0.0.12" CACHE STRING "Use local build version." FORCE)
-    # Enable compile commands by default if the generator supports it.
-    if (NOT CMAKE_EXPORT_COMPILE_COMMANDS AND CMAKE_GENERATOR MATCHES "Ninja|Unix Makefiles")
-        set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL
-                "Enable/Disable output of compile commands during generation." FORCE)
-    endif()
+    set(CLP_FFI_PY_VERSION "0.0.0" CACHE STRING "Version info is unused for local build." FORCE)
+    set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL
+            "Enable/Disable output of compile commands during generation." FORCE)
 endif()
 
 project(${CLP_FFI_PY}
@@ -34,7 +30,7 @@ project(${CLP_FFI_PY}
 set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "Compile libraries using PIC.")
 
 # Find Python interpreter, compiler and development environment.
-find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
+find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
 
 set(CPP_SRC_ROOT "src" CACHE STRING "Path to the root of all C++ source code")
 set(CLP_FFI_PY_SRC_ROOT "${CPP_SRC_ROOT}/clp_ffi_py" CACHE STRING
@@ -46,6 +42,11 @@ add_subdirectory(${CLP_SRC_ROOT}/string_utils)
 
 set(CLP_FFI_PY_LIB_IR "native" CACHE STRING "The name of IR native library")
 python_add_library(${CLP_FFI_PY_LIB_IR} MODULE WITH_SOABI)
+
+target_compile_features(${CLP_FFI_PY_LIB_IR}
+        PRIVATE
+        cxx_std_20
+)
 
 target_sources(${CLP_FFI_PY_LIB_IR}
     PRIVATE
@@ -69,11 +70,6 @@ target_sources(${CLP_FFI_PY_LIB_IR}
     ${CLP_SRC_ROOT}/ffi/encoding_methods.cpp
     ${CLP_SRC_ROOT}/ir/parsing.cpp
     ${CLP_SRC_ROOT}/ReaderInterface.cpp
-)
-
-target_compile_features(${CLP_FFI_PY_LIB_IR}
-    PRIVATE
-    cxx_std_20
 )
 
 target_include_directories(${CLP_FFI_PY_LIB_IR}
