@@ -102,6 +102,5 @@ sdist.exclude = [
     ".*",
     "cmake-build-*",
     "docs",
-    "src/clp",
     "Taskfile.yml",
 ]
