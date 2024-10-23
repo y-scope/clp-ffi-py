@@ -205,7 +205,7 @@ jobs:
           platforms: all
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.21.3
+        uses: pypa/cibuildwheel@v2
         env:
           CIBW_BUILD: ${{ matrix.build.name }}
 
