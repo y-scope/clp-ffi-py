@@ -66,7 +66,7 @@ python_add_library(
 
 target_compile_features(${CLP_FFI_PY_LIB_IR} PRIVATE cxx_std_20)
 
-set(SRC_ROOT "src" CACHE STRING "Root path of C++ source code")
+set(SRC_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src" CACHE STRING "Root path of C++ source code")
 set(CLP_FFI_PY_SRC_ROOT
     "${SRC_ROOT}/clp_ffi_py"
     CACHE STRING
