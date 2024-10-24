@@ -294,7 +294,7 @@ formatting tools (found in [pyproject.toml]):
 * [ruff][10]: `ruff check --fix clp_ffi_py tests`
   * This performs linting according to PEPs. You should review and add any
     changes to your PR.
-* [gersemi][20]: `gersemi -i -l 100 --list-expansion favour-expansion CMakeLists.txt`
+* [gersemi][9]: `gersemi -i -l 100 --list-expansion favour-expansion CMakeLists.txt`
   * This formats the cmake config. You should review and add any changes to your PR.
 
 Note that `docformatter` should be run before `black` to give Black the
@@ -318,6 +318,7 @@ other package management tools such as `apt-get`:
 [6]: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 [7]: https://cibuildwheel.readthedocs.io/en/stable/
 [8]: https://clang.llvm.org/extra/clang-tidy/
+[9]: https://github.com/BlankSpruce/gersemi
 [10]: https://beta.ruff.rs/docs/
 [11]: https://docformatter.readthedocs.io/en/latest/
 [12]: https://docformatter.readthedocs.io/en/latest/faq.html#interaction-with-black

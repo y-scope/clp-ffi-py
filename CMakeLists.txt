@@ -39,8 +39,8 @@ endif()
 project(
     ${CLP_FFI_PY}
     LANGUAGES
-        CXX
         C
+        CXX
     VERSION ${CLP_FFI_PY_VERSION}
 )
 
