@@ -3,25 +3,44 @@ cmake_minimum_required(VERSION 3.15)
 
 set(CLP_FFI_PY_INSTALL_LIBS ON CACHE BOOL "Whether to install the built libraries." FORCE)
 
-if (DEFINED SKBUILD_PROJECT_NAME)
-    set(CLP_FFI_PY ${SKBUILD_PROJECT_NAME} CACHE STRING
-            "Use scikit-build-core's project name." FORCE)
-    set(CLP_FFI_PY_VERSION ${SKBUILD_PROJECT_VERSION} CACHE STRING
-            "Use scikit-build-core's project version." FORCE)
+if(DEFINED SKBUILD_PROJECT_NAME)
+    set(CLP_FFI_PY
+        ${SKBUILD_PROJECT_NAME}
+        CACHE STRING
+        "Use scikit-build-core's project name."
+        FORCE
+    )
+    set(CLP_FFI_PY_VERSION
+        ${SKBUILD_PROJECT_VERSION}
+        CACHE STRING
+        "Use scikit-build-core's project version."
+        FORCE
+    )
 else()
     # The project is configured outside of scikit-build-core. Normally this is for build testing
     # purpose, or loading the project into CLion. We don't install the built library in this config.
     message(WARNING "Configured outside of scikit-build-core. Library installation is disabled.")
-    set(CLP_FFI_PY_INSTALL_LIBS OFF CACHE BOOL
-            "Disable library installation when building outside of scikit-build-core." FORCE)
+    set(CLP_FFI_PY_INSTALL_LIBS
+        OFF
+        CACHE BOOL
+        "Disable library installation when building outside of scikit-build-core."
+        FORCE
+    )
     set(CLP_FFI_PY "clp-ffi-py-local-build" CACHE STRING "Use local build name." FORCE)
     set(CLP_FFI_PY_VERSION "0.0.0" CACHE STRING "Version info is unused for local build." FORCE)
-    set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL
-            "Enable/Disable output of compile commands during generation." FORCE)
+    set(CMAKE_EXPORT_COMPILE_COMMANDS
+        ON
+        CACHE BOOL
+        "Enable/Disable output of compile commands during generation."
+        FORCE
+    )
 endif()
 
-project(${CLP_FFI_PY}
-    LANGUAGES CXX C
+project(
+    ${CLP_FFI_PY}
+    LANGUAGES
+        CXX
+        C
     VERSION ${CLP_FFI_PY_VERSION}
 )
 
@@ -30,19 +49,29 @@ project(${CLP_FFI_PY}
 set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "Compile libraries using PIC.")
 
 # Find Python interpreter, compiler and development environment.
-find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
-
-set(CLP_FFI_PY_LIB_IR "native" CACHE STRING "The name of IR native library")
-python_add_library(${CLP_FFI_PY_LIB_IR} MODULE WITH_SOABI)
-
-target_compile_features(${CLP_FFI_PY_LIB_IR}
-    PRIVATE
-    cxx_std_20
+find_package(
+    Python
+    REQUIRED
+    COMPONENTS
+        Interpreter
+        Development.Module
 )
 
+set(CLP_FFI_PY_LIB_IR "native" CACHE STRING "The name of IR native library")
+python_add_library(
+    ${CLP_FFI_PY_LIB_IR}
+    MODULE
+    WITH_SOABI
+)
+
+target_compile_features(${CLP_FFI_PY_LIB_IR} PRIVATE cxx_std_20)
+
 set(SRC_ROOT "src" CACHE STRING "Root path of C++ source code")
-set(CLP_FFI_PY_SRC_ROOT "${SRC_ROOT}/clp_ffi_py" CACHE STRING
-        "Root path of clp-ffi-py's C++ source code")
+set(CLP_FFI_PY_SRC_ROOT
+    "${SRC_ROOT}/clp_ffi_py"
+    CACHE STRING
+    "Root path of clp-ffi-py's C++ source code"
+)
 set(CLP_CORE_ROOT "${SRC_ROOT}/clp/components/core" CACHE STRING "Root path of CLP core")
 
 add_subdirectory(${CLP_CORE_ROOT}/src/clp/string_utils)
@@ -95,27 +124,31 @@ set(SOURCE_FILES_CLP_FFI_PY_LIB_IR
     ${CLP_FFI_PY_SRC_ROOT}/utils.hpp
 )
 
-target_sources(${CLP_FFI_PY_LIB_IR}
+target_sources(
+    ${CLP_FFI_PY_LIB_IR}
     PRIVATE
-    ${SOURCE_FILES_CLP_FFI_CORE}
-    ${SOURCE_FILES_CLP_FFI_PY_LIB_IR}
+        ${SOURCE_FILES_CLP_FFI_CORE}
+        ${SOURCE_FILES_CLP_FFI_PY_LIB_IR}
 )
 
-target_include_directories(${CLP_FFI_PY_LIB_IR}
-    SYSTEM PRIVATE
-    ${CLP_CORE_ROOT}/src
-    ${CLP_CORE_ROOT}/submodules
-    ${SRC_ROOT}
-)
-
-target_link_libraries(${CLP_FFI_PY_LIB_IR}
+target_include_directories(
+    ${CLP_FFI_PY_LIB_IR}
+    SYSTEM
     PRIVATE
-    clp::string_utils
+        ${CLP_CORE_ROOT}/src
+        ${CLP_CORE_ROOT}/submodules
+        ${SRC_ROOT}
 )
 
-if (CLP_FFI_PY_INSTALL_LIBS)
-    install(TARGETS ${CLP_FFI_PY_LIB_IR}
-        DESTINATION ${CLP_FFI_PY}/ir
-        COMPONENT PythonModule
+target_link_libraries(${CLP_FFI_PY_LIB_IR} PRIVATE clp::string_utils)
+
+if(CLP_FFI_PY_INSTALL_LIBS)
+    install(
+        TARGETS
+            ${CLP_FFI_PY_LIB_IR}
+            DESTINATION
+            ${CLP_FFI_PY}/ir
+            COMPONENT
+            PythonModule
     )
 endif()
