@@ -1,7 +1,7 @@
 # clp-ffi-py
 
-[![Downloads](https://static.pepy.tech/badge/clp-ffi-py)][pypy/clp-ffi-py]
-[![Downloads](https://static.pepy.tech/badge/clp-ffi-py/month)][pypy/clp-ffi-py]
+[![Downloads](https://static.pepy.tech/badge/clp-ffi-py)][pepy/clp-ffi-py]
+[![Downloads](https://static.pepy.tech/badge/clp-ffi-py/month)][pepy/clp-ffi-py]
 
 This module provides Python packages to interface with [CLP Core Features][1]
 through CLP's FFI (foreign function interface). At present, this library
