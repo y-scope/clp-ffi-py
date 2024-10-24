@@ -36,8 +36,8 @@ set(CLP_FFI_PY_LIB_IR "native" CACHE STRING "The name of IR native library")
 python_add_library(${CLP_FFI_PY_LIB_IR} MODULE WITH_SOABI)
 
 target_compile_features(${CLP_FFI_PY_LIB_IR}
-        PRIVATE
-        cxx_std_20
+    PRIVATE
+    cxx_std_20
 )
 
 set(SRC_ROOT "src" CACHE STRING "Root path of C++ source code")
