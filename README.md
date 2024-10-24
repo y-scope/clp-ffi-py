@@ -1,5 +1,8 @@
 # clp-ffi-py
 
+[![Downloads](https://static.pepy.tech/badge/clp-ffi-py)](https://pepy.tech/project/clp-ffi-py)
+[![Downloads](https://static.pepy.tech/badge/clp-ffi-py/month)](https://pepy.tech/project/clp-ffi-py)
+
 This module provides Python packages to interface with [CLP Core Features][1]
 through CLP's FFI (foreign function interface). At present, this library
 supplies built-in functions for serializing/deserializing log messages using [CLP][2].
