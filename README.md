@@ -341,6 +341,6 @@ other package management tools such as `apt-get`:
 [badge_monthly_downloads]: https://static.pepy.tech/badge/clp-ffi-py/month 
 [badge_total_downloads]: https://static.pepy.tech/badge/clp-ffi-py
 [badge_pypi]: https://badge.fury.io/py/clp-ffi-py.svg
-[badge_build-status]: https://github.com/y-scope/clp-ffi-py/workflows/Build/badge.svg
+[badge_build_status]: https://github.com/y-scope/clp-ffi-py/workflows/Build/badge.svg
 [clp_ffi_py_gh_actions]: https://github.com/y-scope/clp-ffi-py/actions
-[pepy/clp-ffi_py]: https://pepy.tech/project/clp-ffi-py
+[pepy/clp_ffi_py]: https://pepy.tech/project/clp-ffi-py
