@@ -1,9 +1,0 @@
-recursive-include src/clp/components/core/src/clp *.h
-recursive-include src/clp/components/core/src/clp *.hpp
-recursive-include src/clp/components/core/src/clp *.inc
-recursive-include src/clp_ffi_py *.hpp
-recursive-include clp_ffi_py *.py
-recursive-include clp_ffi_py *.pyi
-recursive-include clp_ffi_py py.typed
-include src/clp/components/core/submodules/json/single_include/nlohmann/json.hpp
-recursive-include tests *

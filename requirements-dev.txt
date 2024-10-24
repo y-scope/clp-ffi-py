@@ -4,6 +4,7 @@ cibuildwheel>=2.16.2
 # Lock to v18.x until we can upgrade our code to meet v19's formatting standards.
 clang-format~=18.1
 docformatter>=1.7.5
+gersemi>=0.16.2
 mypy>=1.10.0
 mypy-extensions>=1.0.0
 packaging>=21.3

@@ -63,6 +63,9 @@ jobs:
       - run: |
           find src/clp_ffi_py/ -type f | xargs clang-format --dry-run --Werror
 
+      - run: |
+          gersemi -c -l 100 --list-expansion favour-expansion CMakeLists.txt
+
   build_wheels:
     needs: [linters]
     name: Build ${{ matrix.build.name }}
