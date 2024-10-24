@@ -65,6 +65,7 @@ archs = ["auto", "aarch64"]
 archs = ["x86_64", "universal2", "arm64"]
 
 [tool.cibuildwheel.macos.environment]
+# This should be kept in sync with the environment variable in setup.py.
 MACOSX_DEPLOYMENT_TARGET = "10.15"
 
 [tool.cibuildwheel.windows]

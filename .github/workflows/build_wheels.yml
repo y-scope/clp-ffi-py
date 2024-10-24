@@ -75,37 +75,37 @@ jobs:
         build:
           # macOS builds
           - name: cp37-macosx_x86_64
-            os: macos-12
+            os: macos-14
           - name: cp38-macosx_arm64
-            os: macos-12
+            os: macos-14
           - name: cp38-macosx_universal2
-            os: macos-12
+            os: macos-14
           - name: cp38-macosx_x86_64
-            os: macos-12
+            os: macos-14
           - name: cp39-macosx_arm64
-            os: macos-12
+            os: macos-14
           - name: cp39-macosx_universal2
-            os: macos-12
+            os: macos-14
           - name: cp39-macosx_x86_64
-            os: macos-12
+            os: macos-14
           - name: cp310-macosx_arm64
-            os: macos-12
+            os: macos-14
           - name: cp310-macosx_universal2
-            os: macos-12
+            os: macos-14
           - name: cp310-macosx_x86_64
-            os: macos-12
+            os: macos-14
           - name: cp311-macosx_arm64
-            os: macos-12
+            os: macos-14
           - name: cp311-macosx_universal2
-            os: macos-12
+            os: macos-14
           - name: cp311-macosx_x86_64
-            os: macos-12
+            os: macos-14
           - name: cp312-macosx_arm64
-            os: macos-12
+            os: macos-14
           - name: cp312-macosx_universal2
-            os: macos-12
+            os: macos-14
           - name: cp312-macosx_x86_64
-            os: macos-12
+            os: macos-14
 
           # Linux builds
           - name: cp310-manylinux_aarch64
@@ -208,7 +208,7 @@ jobs:
           platforms: all
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.21.3
+        uses: pypa/cibuildwheel@v2.21
         env:
           CIBW_BUILD: ${{ matrix.build.name }}
 
