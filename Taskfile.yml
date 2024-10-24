@@ -3,6 +3,8 @@ version: "3"
 includes:
   docs:
     taskfile: "docs/tasks.yml"
+  lint: "lint-tasks.yml"
+  utils: "tools/yscope-dev-utils/taskfiles/utils.yml"
 
 vars:
   # Paths
@@ -113,3 +115,8 @@ tasks:
         diff
         <(cd '{{.OUTPUT_DIR}}' && tar cf - {{.CHECKSUM_TAR_BASE_ARGS}} . | md5sum)
         "{{.CHECKSUM_FILE}}"
+  init:
+    internal: true
+    silent: true
+    run: "once"
+    cmd: "mkdir -p '{{.BUILD_DIR}}'"
