@@ -1,8 +1,9 @@
 # clp-ffi-py
 
-[![PyPI platforms][badge-pypi]][16]
-[![Downloads][badge-total-downloads]][pepy/clp-ffi-py]
-[![Downloads][badge-monthly-downloads]][pepy/clp-ffi-py]
+[![PyPI platforms][badge_pypi]][16]
+[![Build Status][badge_build_status]][clp_ffi_py_gh_actions]
+[![Downloads][badge_total_downloads]][pepy/clp_ffi_py]
+[![Downloads][badge_monthly_downloads]][pepy/clp_ffi_py]
 
 This module provides Python packages to interface with [CLP Core Features][1]
 through CLP's FFI (foreign function interface). At present, this library
@@ -337,7 +338,9 @@ other package management tools such as `apt-get`:
 [18]: https://taskfile.dev/installation/
 [19]: https://docs.yscope.com/clp-ffi-py/main/api/clp_ffi_py.html
 
-[badge-monthly-downloads]: https://static.pepy.tech/badge/clp-ffi-py/month 
-[badge-total-downloads]: https://static.pepy.tech/badge/clp-ffi-py
-[badge-pypi]: https://badge.fury.io/py/clp-ffi-py.svg
-[pepy/clp-ffi-py]: https://pepy.tech/project/clp-ffi-py
+[badge_monthly_downloads]: https://static.pepy.tech/badge/clp-ffi-py/month 
+[badge_total_downloads]: https://static.pepy.tech/badge/clp-ffi-py
+[badge_pypi]: https://badge.fury.io/py/clp-ffi-py.svg
+[badge_build-status]: https://github.com/y-scope/clp-ffi-py/workflows/Build/badge.svg
+[clp_ffi_py_gh_actions]: https://github.com/y-scope/clp-ffi-py/actions
+[pepy/clp-ffi_py]: https://pepy.tech/project/clp-ffi-py
