@@ -1,0 +1,137 @@
+version: "3"
+
+vars:
+  G_LINT_VENV_DIR: "{{.BUILD_DIR}}/lint-venv"
+
+tasks:
+  check:
+    cmds:
+      - task: "cpp-check"
+      - task: "py-check"
+      - task: "yml-check"
+
+  fix:
+    cmds:
+      - task: "cpp-fix"
+      - task: "py-fix"
+      - task: "yml-fix"
+
+  cpp-check:
+    sources: &cpp_source_files
+      - "{{.ROOT_DIR}}/.clang-format"
+      - "{{.ROOT_DIR}}/.clang-tidy"
+      - "{{.TASKFILE}}"
+      - "clp_ffi_py/**/*.cpp"
+      - "clp_ffi_py/**/*.h"
+      - "clp_ffi_py/**/*.hpp"
+      - "clp_ffi_py/**/*.inc"
+      - "tests/**/*.cpp"
+      - "tests/**/*.h"
+      - "tests/**/*.hpp"
+      - "tests/**/*.inc"
+    dir: "{{.ROOT_DIR}}"
+    cmds:
+      - task: "cpp"
+        vars:
+          FLAGS: "--dry-run"
+
+  cpp-fix:
+    sources: *cpp_source_files
+    dir: "{{.ROOT_DIR}}"
+    cmds:
+      - task: "cpp"
+        vars:
+          FLAGS: "-i"
+
+  py-check:
+    cmds:
+      - task: "py"
+        vars:
+          BLACK_FLAGS: "--check"
+          RUFF_FLAGS: ""
+
+  py-fix:
+    cmds:
+      - task: "py"
+        vars:
+          BLACK_FLAGS: ""
+          RUFF_FLAGS: "--fix"
+
+  yml:
+    aliases:
+      - "yml-check"
+      - "yml-fix"
+    deps: ["venv"]
+    cmds:
+      - |-
+        . "{{.G_LINT_VENV_DIR}}/bin/activate"
+        yamllint --strict \
+          .github \
+          .yamllint.yml \
+          .clang-format \
+          docs \
+          lint-tasks.yml \
+          Taskfile.yml
+
+  cpp:
+    internal: true
+    requires:
+      vars: ["FLAGS"]
+    dir: "src"
+    deps: ["cpp-lint-configs", "venv"]
+    cmds:
+      - |-
+        . "{{.G_LINT_VENV_DIR}}/bin/activate"
+        find clp_ffi_py \
+          -type f \
+          \( -iname "*.cpp" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.inc" \) \
+          -print0 | \
+            xargs -0 clang-format {{.FLAGS}} -Werror
+
+  cpp-lint-configs:
+    internal: true
+    cmd: "{{.ROOT_DIR}}/tools/yscope-dev-utils/lint-configs/symlink-cpp-lint-configs.sh"
+
+  py:
+    internal: true
+    requires:
+      vars: ["BLACK_FLAGS", "RUFF_FLAGS"]
+    deps: ["venv"]
+    cmds:
+      - for:
+          - "clp_ffi_py"
+          - "docs/conf"
+          - "tools/scripts"
+        cmd: |-
+          . "{{.G_LINT_VENV_DIR}}/bin/activate"
+          cd "{{.ITEM}}"
+          black --color --line-length 100 {{.BLACK_FLAGS}} .
+          ruff check {{.RUFF_FLAGS}} .
+
+  venv:
+    internal: true
+    vars:
+      CHECKSUM_FILE: "{{.BUILD_DIR}}/{{.TASK | replace \":\" \"#\"}}.md5"
+      OUTPUT_DIR: "{{.G_LINT_VENV_DIR}}"
+    sources:
+      - "{{.ROOT_DIR}}/Taskfile.yml"
+      - "{{.TASKFILE}}"
+      - "lint-requirements.txt"
+    generates: ["{{.CHECKSUM_FILE}}"]
+    deps:
+      - ":init"
+      - task: ":utils:validate-checksum"
+        vars:
+          CHECKSUM_FILE: "{{.CHECKSUM_FILE}}"
+          DATA_DIR: "{{.OUTPUT_DIR}}"
+    cmds:
+      - task: ":utils:create-venv"
+        vars:
+          LABEL: "lint"
+          OUTPUT_DIR: "{{.OUTPUT_DIR}}"
+          REQUIREMENTS_FILE: "lint-requirements.txt"
+      # This command must be last
+      - task: ":utils:compute-checksum"
+        vars:
+          DATA_DIR: "{{.OUTPUT_DIR}}"
+          OUTPUT_FILE: "{{.CHECKSUM_FILE}}"
