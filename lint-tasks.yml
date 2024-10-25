@@ -1,7 +1,7 @@
 version: "3"
 
 vars:
-  G_LINT_VENV_DIR: "{{.BUILD_DIR}}/lint-venv"
+  G_LINT_VENV_DIR: "{{.G_BUILD_DIR}}/lint-venv"
 
 tasks:
   check:
@@ -26,10 +26,6 @@ tasks:
       - "src/clp_ffi_py/**/*.hpp"
       - "src/clp_ffi_py/**/*.inc"
       - "src/.clang-format"
-      - "tests/**/*.cpp"
-      - "tests/**/*.h"
-      - "tests/**/*.hpp"
-      - "tests/**/*.inc"
     dir: "{{.ROOT_DIR}}"
     cmds:
       - task: "cpp"
@@ -69,9 +65,9 @@ tasks:
         yamllint --strict \
           .github \
           .yamllint.yml \
-          .clang-format \
           docs \
           lint-tasks.yml \
+          src/.clang-format \
           Taskfile.yml
 
   cpp:
@@ -112,7 +108,7 @@ tasks:
   venv:
     internal: true
     vars:
-      CHECKSUM_FILE: "{{.BUILD_DIR}}/{{.TASK | replace \":\" \"#\"}}.md5"
+      CHECKSUM_FILE: "{{.G_BUILD_DIR}}/{{.TASK | replace \":\" \"#\"}}.md5"
       OUTPUT_DIR: "{{.G_LINT_VENV_DIR}}"
     sources:
       - "{{.ROOT_DIR}}/Taskfile.yml"
