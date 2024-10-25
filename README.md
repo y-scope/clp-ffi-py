@@ -1,7 +1,7 @@
 # clp-ffi-py
 
 [![PyPI platforms][badge_pypi]][16]
-[![Build Status][badge_build_status]][clp_ffi_py_gh_actions]
+[![Build status][badge_build_status]][clp_ffi_py_gh_actions]
 [![Downloads][badge_total_downloads]][pepy/clp_ffi_py]
 [![Downloads][badge_monthly_downloads]][pepy/clp_ffi_py]
 
@@ -338,9 +338,9 @@ other package management tools such as `apt-get`:
 [18]: https://taskfile.dev/installation/
 [19]: https://docs.yscope.com/clp-ffi-py/main/api/clp_ffi_py.html
 
-[badge_monthly_downloads]: https://static.pepy.tech/badge/clp-ffi-py/month 
-[badge_total_downloads]: https://static.pepy.tech/badge/clp-ffi-py
-[badge_pypi]: https://badge.fury.io/py/clp-ffi-py.svg
 [badge_build_status]: https://github.com/y-scope/clp-ffi-py/workflows/Build/badge.svg
+[badge_monthly_downloads]: https://static.pepy.tech/badge/clp-ffi-py/month 
+[badge_pypi]: https://badge.fury.io/py/clp-ffi-py.svg
+[badge_total_downloads]: https://static.pepy.tech/badge/clp-ffi-py
 [clp_ffi_py_gh_actions]: https://github.com/y-scope/clp-ffi-py/actions
 [pepy/clp_ffi_py]: https://pepy.tech/project/clp-ffi-py
