@@ -3,17 +3,21 @@ cmake_minimum_required(VERSION 3.15)
 
 set(CLP_FFI_PY_INSTALL_LIBS ON CACHE BOOL "Whether to install the built libraries." FORCE)
 
+# Define the variables necessary to build and install the project differently depending on whether
+# the project is being configured from scikit-build-core. If configured from outside
+# scikit-build-core, we need to use placeholder values for the variables that are usually defined
+# by scikit-build-core.
 if(DEFINED SKBUILD_PROJECT_NAME)
     set(CLP_FFI_PY
         ${SKBUILD_PROJECT_NAME}
         CACHE STRING
-        "Use scikit-build-core's project name."
+        "The name of the project parsed by scikit-build-core."
         FORCE
     )
     set(CLP_FFI_PY_VERSION
         ${SKBUILD_PROJECT_VERSION}
         CACHE STRING
-        "Use scikit-build-core's project version."
+        "The version of the project parsed by scikit-build-core."
         FORCE
     )
 else()
@@ -23,11 +27,11 @@ else()
     set(CLP_FFI_PY_INSTALL_LIBS
         OFF
         CACHE BOOL
-        "Disable library installation when building outside of scikit-build-core."
+        "Disable installing the built library."
         FORCE
     )
-    set(CLP_FFI_PY "clp-ffi-py-local-build" CACHE STRING "Use local build name." FORCE)
-    set(CLP_FFI_PY_VERSION "0.0.0" CACHE STRING "Version info is unused for local build." FORCE)
+    set(CLP_FFI_PY "clp-ffi-py" CACHE STRING "Use a placeholder project name." FORCE)
+    set(CLP_FFI_PY_VERSION "0.0.0" CACHE STRING "Use a placeholder version." FORCE)
     set(CMAKE_EXPORT_COMPILE_COMMANDS
         ON
         CACHE BOOL
@@ -39,16 +43,14 @@ endif()
 project(
     ${CLP_FFI_PY}
     LANGUAGES
-        C
         CXX
     VERSION ${CLP_FFI_PY_VERSION}
 )
 
 # C-extension modules will be compiled as shared libraries. To enable dynamic linking, all libraries
-# (including the static ones) must be compiled with position-independent-code option.
+# (including the static ones) must be compiled with the position-independent-code option.
 set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "Compile libraries using PIC.")
 
-# Find Python interpreter, compiler and development environment.
 find_package(
     Python
     REQUIRED
@@ -57,7 +59,7 @@ find_package(
         Development.Module
 )
 
-set(CLP_FFI_PY_LIB_IR "native" CACHE STRING "The name of IR native library")
+set(CLP_FFI_PY_LIB_IR "native")
 python_add_library(
     ${CLP_FFI_PY_LIB_IR}
     MODULE
@@ -66,17 +68,14 @@ python_add_library(
 
 target_compile_features(${CLP_FFI_PY_LIB_IR} PRIVATE cxx_std_20)
 
-set(SRC_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src" CACHE STRING "Root path of C++ source code")
+set(SRC_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(CLP_FFI_PY_SRC_ROOT
     "${SRC_ROOT}/clp_ffi_py"
-    CACHE STRING
-    "Root path of clp-ffi-py's C++ source code"
 )
-set(CLP_CORE_ROOT "${SRC_ROOT}/clp/components/core" CACHE STRING "Root path of CLP core")
+set(CLP_CORE_ROOT "${SRC_ROOT}/clp/components/core")
 
 add_subdirectory(${CLP_CORE_ROOT}/src/clp/string_utils)
 
-# Source files of clp-ffi-core
 # Note: we don't add headers hear since they are not considered to be a part of the project.
 set(SOURCE_FILES_CLP_FFI_CORE
     ${CLP_CORE_ROOT}/src/clp/BufferReader.cpp
@@ -88,7 +87,6 @@ set(SOURCE_FILES_CLP_FFI_CORE
     ${CLP_CORE_ROOT}/src/clp/ReaderInterface.cpp
 )
 
-# Header files and source files of clp-ffi-py
 # Note: headers should be included to allow CLion loads the project properly.
 set(SOURCE_FILES_CLP_FFI_PY_LIB_IR
     ${CLP_FFI_PY_SRC_ROOT}/error_messages.hpp
@@ -131,12 +129,19 @@ target_sources(
         ${SOURCE_FILES_CLP_FFI_PY_LIB_IR}
 )
 
+# NOTE: We mark the include directories below as system headers so that the compiler (including
+# `clang-tidy`) doesn't generate warnings from them.
 target_include_directories(
     ${CLP_FFI_PY_LIB_IR}
     SYSTEM
     PRIVATE
         ${CLP_CORE_ROOT}/src
         ${CLP_CORE_ROOT}/submodules
+)
+
+target_include_directories(
+    ${CLP_FFI_PY_LIB_IR}
+    PRIVATE
         ${SRC_ROOT}
 )
 

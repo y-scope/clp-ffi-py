@@ -65,6 +65,7 @@ archs = ["auto", "aarch64"]
 archs = ["x86_64", "universal2", "arm64"]
 
 [tool.cibuildwheel.macos.environment]
+# We need 10.15 since CLP core uses std::from_chars.
 MACOSX_DEPLOYMENT_TARGET = "10.15"
 
 [tool.cibuildwheel.windows]
@@ -97,7 +98,7 @@ isort.order-by-type = false
 cmake.build-type = "Release"
 cmake.version = ">=3.15"
 # By default, sdist-build-core uses `.gitignore` to select what to exclude from the source
-# distribution. This list is to explict exclude files not specified in `.gitignore`.
+# distribution. This list is to explictly exclude files not specified in `.gitignore`.
 sdist.exclude = [
     ".*",
     "cmake-build-*",

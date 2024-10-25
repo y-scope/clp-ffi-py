@@ -295,7 +295,7 @@ formatting tools (found in [pyproject.toml]):
   * This performs linting according to PEPs. You should review and add any
     changes to your PR.
 * [gersemi][9]: `gersemi -i -l 100 --list-expansion favour-expansion CMakeLists.txt`
-  * This formats the cmake config. You should review and add any changes to your PR.
+  * This formats CMakeLists.txt. You should review and add any changes to your PR.
 
 Note that `docformatter` should be run before `black` to give Black the
 [last][12].
