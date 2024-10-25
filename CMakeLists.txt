@@ -59,7 +59,7 @@ set(CLP_CORE_ROOT "${SRC_ROOT}/clp/components/core")
 
 add_subdirectory(${CLP_CORE_ROOT}/src/clp/string_utils)
 
-# Note: we don't add headers hear since they are not considered to be a part of the project.
+# Note: we don't add headers here since they are not considered to be a part of the project.
 set(CLP_FFI_PY_CLP_CORE_SOURCES
     ${CLP_CORE_ROOT}/src/clp/BufferReader.cpp
     ${CLP_CORE_ROOT}/src/clp/ffi/ir_stream/decoding_methods.cpp
