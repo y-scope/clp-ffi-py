@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.26..3.30)
+cmake_minimum_required(VERSION 3.26...3.30)
 
 # Define the variables necessary to build and install the project differently depending on whether
 # the project is being configured from scikit-build-core. If configured from outside
