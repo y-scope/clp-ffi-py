@@ -43,6 +43,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
 
       - uses: actions/setup-python@v5
         with:
@@ -60,8 +62,13 @@ jobs:
 
       - run: mypy clp_ffi_py tests
 
-      - run: |
-          find src/clp_ffi_py/ -type f | xargs clang-format --dry-run --Werror
+      - name: "Install task"
+        shell: "bash"
+        run: "npm install -g @go-task/cli"
+
+      - name: "Run lint task"
+        shell: "bash"
+        run: "task lint:check"
 
   build_wheels:
     needs: [linters]
