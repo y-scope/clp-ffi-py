@@ -1,5 +1,6 @@
 BasedOnStyle: "InheritParentConfig"
 
+IndentExternBlock: "NoIndent"
 IncludeCategories:
   # NOTE: A header is grouped by first matching regex
   # Python header must be included before any others
