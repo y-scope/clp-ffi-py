@@ -98,7 +98,6 @@ tasks:
       - for:
           - "clp_ffi_py"
           - "docs/conf"
-          - "tools/scripts"
         cmd: |-
           . "{{.G_LINT_VENV_DIR}}/bin/activate"
           cd "{{.ITEM}}"
