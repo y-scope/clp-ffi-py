@@ -1,7 +1,7 @@
 version: "3"
 
 vars:
-  G_LINT_VENV_DIR: "{{.G_BUILD_DIR}}/lint-venv"
+  LINT_VENV_DIR: "{{.BUILD_DIR}}/lint-venv"
 
 tasks:
   check:
@@ -61,7 +61,7 @@ tasks:
     deps: ["venv"]
     cmds:
       - |-
-        . "{{.G_LINT_VENV_DIR}}/bin/activate"
+        . "{{.LINT_VENV_DIR}}/bin/activate"
         yamllint --strict \
           .github \
           .yamllint.yml \
@@ -78,7 +78,7 @@ tasks:
     deps: ["cpp-lint-configs", "venv"]
     cmds:
       - |-
-        . "{{.G_LINT_VENV_DIR}}/bin/activate"
+        . "{{.LINT_VENV_DIR}}/bin/activate"
         find clp_ffi_py \
           -type f \
           \( -iname "*.cpp" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.inc" \) \
@@ -99,7 +99,7 @@ tasks:
           - "clp_ffi_py"
           - "docs/conf"
         cmd: |-
-          . "{{.G_LINT_VENV_DIR}}/bin/activate"
+          . "{{.LINT_VENV_DIR}}/bin/activate"
           cd "{{.ITEM}}"
           black --color --line-length 100 {{.BLACK_FLAGS}} .
           ruff check {{.RUFF_FLAGS}} .
@@ -108,7 +108,7 @@ tasks:
     internal: true
     vars:
       CHECKSUM_FILE: "{{.G_BUILD_DIR}}/{{.TASK | replace \":\" \"#\"}}.md5"
-      OUTPUT_DIR: "{{.G_LINT_VENV_DIR}}"
+      OUTPUT_DIR: "{{.LINT_VENV_DIR}}"
     sources:
       - "{{.ROOT_DIR}}/Taskfile.yml"
       - "{{.TASKFILE}}"
