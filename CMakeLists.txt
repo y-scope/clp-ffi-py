@@ -19,7 +19,7 @@ if(DEFINED SKBUILD_PROJECT_NAME)
         FORCE
     )
 else()
-    set(CLP_FFI_PY_INSTALL_LIBS OFF CACHE BOOL "Disable installing the built library." FORCE)
+    set(CLP_FFI_PY_INSTALL_LIBS OFF CACHE BOOL "Disable installing the built libraries." FORCE)
     set(CLP_FFI_PY_PROJECT_NAME "clp-ffi-py" CACHE STRING "Use a placeholder project name." FORCE)
     set(CLP_FFI_PY_VERSION "0.0.0" CACHE STRING "Use a placeholder version." FORCE)
     set(CMAKE_EXPORT_COMPILE_COMMANDS
@@ -59,7 +59,8 @@ set(CLP_CORE_ROOT "${SRC_ROOT}/clp/components/core")
 
 add_subdirectory(${CLP_CORE_ROOT}/src/clp/string_utils)
 
-# Note: we don't add headers here since they are not considered to be a part of the project.
+# NOTE: We don't add headers here since CLP core is technically a library we're using, not a part of
+# this project.
 set(CLP_FFI_PY_CLP_CORE_SOURCES
     ${CLP_CORE_ROOT}/src/clp/BufferReader.cpp
     ${CLP_CORE_ROOT}/src/clp/ffi/ir_stream/decoding_methods.cpp
@@ -70,7 +71,7 @@ set(CLP_FFI_PY_CLP_CORE_SOURCES
     ${CLP_CORE_ROOT}/src/clp/ReaderInterface.cpp
 )
 
-# Note: headers should be included to allow CLion loads the project properly.
+# NOTE: We include headers to ensure IDEs like CLion load the project properly.
 set(CLP_FFI_PY_LIB_IR_SOURCES
     ${CLP_FFI_PY_LIB_SRC_DIR}/error_messages.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ExceptionFFI.hpp

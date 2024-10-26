@@ -98,7 +98,7 @@ isort.order-by-type = false
 cmake.build-type = "Release"
 logging.level = "INFO"
 # By default, sdist-build-core uses `.gitignore` to select what to exclude from the source
-# distribution. This list is to explictly exclude files not specified in `.gitignore`.
+# distribution. This list is to explicitly exclude files not specified in `.gitignore`.
 sdist.exclude = [
     ".*",
     "cmake-build-*",
