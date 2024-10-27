@@ -13,5 +13,6 @@ wheelhouse/
 unittest-logs/
 
 # Dev
+cmake-build-*
 compile_commands.json
 .mypy_cache

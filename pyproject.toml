@@ -1,10 +1,6 @@
 [build-system]
-requires = [
-    "setuptools >= 59.0",
-    "setuptools_scm",
-    "wheel",
-]
-build-backend = "setuptools.build_meta"
+build-backend = "scikit_build_core.build"
+requires = ["scikit-build-core >= 0.10.7"]
 
 [project]
 name = "clp_ffi_py"
@@ -69,7 +65,7 @@ archs = ["auto", "aarch64"]
 archs = ["x86_64", "universal2", "arm64"]
 
 [tool.cibuildwheel.macos.environment]
-# This should be kept in sync with the environment variable in setup.py.
+# We need 10.15 since CLP core uses std::from_chars.
 MACOSX_DEPLOYMENT_TARGET = "10.15"
 
 [tool.cibuildwheel.windows]
@@ -97,3 +93,14 @@ line-length = 100
 [tool.ruff.lint]
 select = ["E", "I", "F"]
 isort.order-by-type = false
+
+[tool.scikit-build]
+cmake.build-type = "Release"
+logging.level = "INFO"
+# By default, sdist-build-core uses `.gitignore` to select what to exclude from the source
+# distribution. This list is to explicitly exclude files not specified in `.gitignore`.
+sdist.exclude = [
+    ".*",
+    "docs",
+    "Taskfile.yml",
+]
