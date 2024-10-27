@@ -101,7 +101,6 @@ logging.level = "INFO"
 # distribution. This list is to explicitly exclude files not specified in `.gitignore`.
 sdist.exclude = [
     ".*",
-    "cmake-build-*",
     "docs",
     "Taskfile.yml",
 ]
