@@ -55,20 +55,20 @@ target_compile_features(${CLP_FFI_PY_LIB_IR} PRIVATE cxx_std_20)
 
 set(CLP_FFI_PY_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(CLP_FFI_PY_LIB_SRC_DIR "${CLP_FFI_PY_SRC_DIR}/clp_ffi_py")
-set(CLP_CORE_ROOT "${CLP_FFI_PY_SRC_DIR}/clp/components/core")
+set(CLP_FFI_PY_CLP_CORE_DIR "${CLP_FFI_PY_SRC_DIR}/clp/components/core")
 
-add_subdirectory(${CLP_CORE_ROOT}/src/clp/string_utils)
+add_subdirectory(${CLP_FFI_PY_CLP_CORE_DIR}/src/clp/string_utils)
 
 # NOTE: We don't add headers here since CLP core is technically a library we're using, not a part of
 # this project.
 set(CLP_FFI_PY_CLP_CORE_SOURCES
-    ${CLP_CORE_ROOT}/src/clp/BufferReader.cpp
-    ${CLP_CORE_ROOT}/src/clp/ffi/ir_stream/decoding_methods.cpp
-    ${CLP_CORE_ROOT}/src/clp/ffi/ir_stream/encoding_methods.cpp
-    ${CLP_CORE_ROOT}/src/clp/ffi/ir_stream/utils.cpp
-    ${CLP_CORE_ROOT}/src/clp/ffi/encoding_methods.cpp
-    ${CLP_CORE_ROOT}/src/clp/ir/parsing.cpp
-    ${CLP_CORE_ROOT}/src/clp/ReaderInterface.cpp
+    ${CLP_FFI_PY_CLP_CORE_DIR}/src/clp/BufferReader.cpp
+    ${CLP_FFI_PY_CLP_CORE_DIR}/src/clp/ffi/ir_stream/decoding_methods.cpp
+    ${CLP_FFI_PY_CLP_CORE_DIR}/src/clp/ffi/ir_stream/encoding_methods.cpp
+    ${CLP_FFI_PY_CLP_CORE_DIR}/src/clp/ffi/ir_stream/utils.cpp
+    ${CLP_FFI_PY_CLP_CORE_DIR}/src/clp/ffi/encoding_methods.cpp
+    ${CLP_FFI_PY_CLP_CORE_DIR}/src/clp/ir/parsing.cpp
+    ${CLP_FFI_PY_CLP_CORE_DIR}/src/clp/ReaderInterface.cpp
 )
 
 # NOTE: We include headers to ensure IDEs like CLion load the project properly.
@@ -119,8 +119,8 @@ target_include_directories(
     ${CLP_FFI_PY_LIB_IR}
     SYSTEM
     PRIVATE
-        ${CLP_CORE_ROOT}/src
-        ${CLP_CORE_ROOT}/submodules
+        ${CLP_FFI_PY_CLP_CORE_DIR}/src
+        ${CLP_FFI_PY_CLP_CORE_DIR}/submodules
 )
 
 target_include_directories(${CLP_FFI_PY_LIB_IR} PRIVATE ${CLP_FFI_PY_SRC_DIR})
