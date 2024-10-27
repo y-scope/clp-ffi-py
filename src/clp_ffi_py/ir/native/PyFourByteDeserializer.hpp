@@ -14,8 +14,8 @@ public:
     /**
      * Creates and initializes PyFourByteDeserializer as a Python type, and then incorporates this
      * type as a Python object into py_module.
-     * @param py_module This is the Python module where the initialized PyDeserializer will be
-     * incorporated.
+     * @param py_module This is the Python module where the initialized PyFourByteDeserializer will
+     * be incorporated.
      * @return true on success.
      * @return false on failure with the relevant Python exception and error set.
      */
