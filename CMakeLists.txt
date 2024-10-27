@@ -53,9 +53,9 @@ python_add_library(
 
 target_compile_features(${CLP_FFI_PY_LIB_IR} PRIVATE cxx_std_20)
 
-set(CLP_FFI_PY_SRC_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src")
-set(CLP_FFI_PY_LIB_SRC_DIR "${CLP_FFI_PY_SRC_ROOT}/clp_ffi_py")
-set(CLP_CORE_ROOT "${CLP_FFI_PY_SRC_ROOT}/clp/components/core")
+set(CLP_FFI_PY_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(CLP_FFI_PY_LIB_SRC_DIR "${CLP_FFI_PY_SRC_DIR}/clp_ffi_py")
+set(CLP_CORE_ROOT "${CLP_FFI_PY_SRC_DIR}/clp/components/core")
 
 add_subdirectory(${CLP_CORE_ROOT}/src/clp/string_utils)
 
@@ -123,7 +123,7 @@ target_include_directories(
         ${CLP_CORE_ROOT}/submodules
 )
 
-target_include_directories(${CLP_FFI_PY_LIB_IR} PRIVATE ${CLP_FFI_PY_SRC_ROOT})
+target_include_directories(${CLP_FFI_PY_LIB_IR} PRIVATE ${CLP_FFI_PY_SRC_DIR})
 
 target_link_libraries(${CLP_FFI_PY_LIB_IR} PRIVATE clp::string_utils)
 
