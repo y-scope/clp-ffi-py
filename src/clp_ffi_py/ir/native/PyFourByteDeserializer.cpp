@@ -45,7 +45,7 @@ PyDoc_STRVAR(
 );
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
-PyMethodDef PyDeserializer_method_table[]{
+PyMethodDef PyFourByteDeserializer_method_table[]{
         {"deserialize_preamble",
          deserialize_preamble,
          METH_O | METH_STATIC,
@@ -69,7 +69,7 @@ PyDoc_STRVAR(
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-const-cast)
 PyType_Slot PyFourByteDeserializer_slots[]{
-        {Py_tp_methods, static_cast<void*>(PyDeserializer_method_table)},
+        {Py_tp_methods, static_cast<void*>(PyFourByteDeserializer_method_table)},
         {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyFourByteDeserializerDoc))},
         {0, nullptr}
 };
@@ -78,7 +78,7 @@ PyType_Slot PyFourByteDeserializer_slots[]{
 /**
  * PyFourByteDeserializer Python type specifications.
  */
-PyType_Spec PyDeserializer_type_spec{
+PyType_Spec PyFourByteDeserializer_type_spec{
         "clp_ffi_py.ir.native.FourByteDeserializer",
         sizeof(PyFourByteDeserializer),
         0,
@@ -91,7 +91,8 @@ PyObjectStaticPtr<PyTypeObject> PyFourByteDeserializer::m_py_type{nullptr};
 
 auto PyFourByteDeserializer::module_level_init(PyObject* py_module) -> bool {
     static_assert(std::is_trivially_destructible<PyFourByteDeserializer>());
-    auto* type{py_reinterpret_cast<PyTypeObject>(PyType_FromSpec(&PyDeserializer_type_spec))};
+    auto* type{py_reinterpret_cast<PyTypeObject>(PyType_FromSpec(&PyFourByteDeserializer_type_spec))
+    };
     m_py_type.reset(type);
     if (nullptr == type) {
         return false;
