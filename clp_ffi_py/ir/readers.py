@@ -7,7 +7,7 @@ from typing import Generator, IO, Iterator, Optional, Type, Union
 
 from zstandard import ZstdDecompressionReader, ZstdDecompressor
 
-from clp_ffi_py.ir.native import Deserializer, DeserializerBuffer, LogEvent, Metadata, Query
+from clp_ffi_py.ir.native import DeserializerBuffer, FourByteDeserializer, LogEvent, Metadata, Query
 
 
 class ClpIrStreamReader(Iterator[LogEvent]):
@@ -52,9 +52,9 @@ class ClpIrStreamReader(Iterator[LogEvent]):
             - Next unread log event represented as an instance of LogEvent.
             - None if the end of IR stream is reached.
         :raise Exception:
-            If :meth:`~clp_ffi_py.ir.native.Deserializer.deserialize_next_log_event` fails.
+            If :meth:`~clp_ffi_py.ir.native.FourByteDeserializer.deserialize_next_log_event` fails.
         """
-        return Deserializer.deserialize_next_log_event(
+        return FourByteDeserializer.deserialize_next_log_event(
             self._deserializer_buffer, allow_incomplete_stream=self._allow_incomplete_stream
         )
 
@@ -65,11 +65,11 @@ class ClpIrStreamReader(Iterator[LogEvent]):
         need to be readable on a reader's construction, but until the user starts to iterate logs.
 
         :raise Exception:
-            If :meth:`~clp_ffi_py.ir.native.Deserializer.deserialize_preamble` fails.
+            If :meth:`~clp_ffi_py.ir.native.FourByteDeserializer.deserialize_preamble` fails.
         """
         if self.has_metadata():
             return
-        self._metadata = Deserializer.deserialize_preamble(self._deserializer_buffer)
+        self._metadata = FourByteDeserializer.deserialize_preamble(self._deserializer_buffer)
 
     def get_metadata(self) -> Metadata:
         if None is self._metadata:
@@ -90,7 +90,7 @@ class ClpIrStreamReader(Iterator[LogEvent]):
         if False is self.has_metadata():
             self.read_preamble()
         while True:
-            log_event: Optional[LogEvent] = Deserializer.deserialize_next_log_event(
+            log_event: Optional[LogEvent] = FourByteDeserializer.deserialize_next_log_event(
                 self._deserializer_buffer,
                 query=query,
                 allow_incomplete_stream=self._allow_incomplete_stream,

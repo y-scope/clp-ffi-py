@@ -1,5 +1,5 @@
-#ifndef CLP_FFI_PY_IR_NATIVE_PYDESERIALIZER_HPP
-#define CLP_FFI_PY_IR_NATIVE_PYDESERIALIZER_HPP
+#ifndef CLP_FFI_PY_IR_NATIVE_PYFOURBYTEDESERIALIZER_HPP
+#define CLP_FFI_PY_IR_NATIVE_PYFOURBYTEDESERIALIZER_HPP
 
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
@@ -7,13 +7,13 @@
 
 namespace clp_ffi_py::ir::native {
 /**
- * This class provides a Python-level namespace for IR deserialization methods.
+ * This class provides a Python-level namespace for four-byte encoded IR deserialization methods.
  */
-class PyDeserializer {
+class PyFourByteDeserializer {
 public:
     /**
-     * Creates and initializes PyDeserializer as a Python type, and then incorporates this type as a
-     * Python object into py_module.
+     * Creates and initializes PyFourByteDeserializer as a Python type, and then incorporates this
+     * type as a Python object into py_module.
      * @param py_module This is the Python module where the initialized PyDeserializer will be
      * incorporated.
      * @return true on success.
@@ -28,4 +28,4 @@ private:
 };
 }  // namespace clp_ffi_py::ir::native
 
-#endif  // CLP_FFI_PY_IR_NATIVE_PYDESERIALIZER_HPP
+#endif  // CLP_FFI_PY_IR_NATIVE_PYFOURBYTEDESERIALIZER_HPP

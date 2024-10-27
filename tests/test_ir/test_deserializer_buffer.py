@@ -11,7 +11,7 @@ from clp_ffi_py.ir import DeserializerBuffer
 
 class TestCaseDeserializerBuffer(TestCLPBase):
     """
-    Class for testing clp_ffi_py.ir.Deserializer.
+    Class for testing clp_ffi_py.ir.DeserializerBuffer.
     """
 
     input_src_dir: str = "test_data"
