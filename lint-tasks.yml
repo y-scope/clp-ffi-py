@@ -2,41 +2,70 @@ version: "3"
 
 vars:
   LINT_VENV_DIR: "{{.BUILD_DIR}}/lint-venv"
+  LINT_VENV_CHECKSUM_FILE: "{{.G_BUILD_DIR}}/lint#venv.md5"
 
 tasks:
   check:
     cmds:
+      - task: "cmake-check"
       - task: "cpp-check"
       - task: "py-check"
       - task: "yml-check"
 
   fix:
     cmds:
+      - task: "cmake-fix"
       - task: "cpp-fix"
       - task: "py-fix"
       - task: "yml-fix"
 
+  cmake-check:
+    deps: ["venv"]
+    cmds:
+      - task: "cmake"
+        vars:
+          FLAGS: "--check"
+
+  cmake-fix:
+    deps: ["venv"]
+    cmds:
+      - task: "cmake"
+        vars:
+          FLAGS: "--in-place"
+
+  cpp-configs: "tools/yscope-dev-utils/lint-configs/symlink-cpp-lint-configs.sh"
+
   cpp-check:
-    sources: &cpp_source_files
-      - "{{.ROOT_DIR}}/.clang-format"
-      - "{{.ROOT_DIR}}/.clang-tidy"
-      - "{{.TASKFILE}}"
+      cmds:
+        - task: "cpp-format-check"
+        - task: "cpp-static-check"
+
+  cpp-fix:
+    cmds:
+      - task: "cpp-format-fix"
+      - task: "cpp-static-fix"
+
+  cpp-format-check:
+    sources: &cpp_format_src_files
+      - "{{.LINT_VENV_CHECKSUM_FILE}}"
       - "src/clp_ffi_py/**/*.cpp"
       - "src/clp_ffi_py/**/*.h"
       - "src/clp_ffi_py/**/*.hpp"
       - "src/clp_ffi_py/**/*.inc"
       - "src/.clang-format"
-    dir: "{{.ROOT_DIR}}"
+      - "{{.TASKFILE}}"
+      - ".clang-format"
+    deps: ["cpp-configs", "venv"]
     cmds:
-      - task: "cpp"
+      - task: "clang-format"
         vars:
           FLAGS: "--dry-run"
 
-  cpp-fix:
-    sources: *cpp_source_files
-    dir: "{{.ROOT_DIR}}"
+  cpp-format-fix:
+    sources: *cpp_format_src_files
+    deps: ["cpp-configs", "venv"]
     cmds:
-      - task: "cpp"
+      - task: "clang-format"
         vars:
           FLAGS: "-i"
 
@@ -75,7 +104,7 @@ tasks:
     requires:
       vars: ["FLAGS"]
     dir: "src"
-    deps: ["cpp-lint-configs", "venv"]
+    deps: ["cpp-configs", "venv"]
     cmds:
       - |-
         . "{{.LINT_VENV_DIR}}/bin/activate"
@@ -84,10 +113,6 @@ tasks:
           \( -iname "*.cpp" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.inc" \) \
           -print0 | \
             xargs -0 clang-format {{.FLAGS}} -Werror
-
-  cpp-lint-configs:
-    internal: true
-    cmd: "{{.ROOT_DIR}}/tools/yscope-dev-utils/lint-configs/symlink-cpp-lint-configs.sh"
 
   py:
     internal: true
