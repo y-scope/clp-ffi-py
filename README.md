@@ -1,6 +1,6 @@
 # clp-ffi-py
 
-[![PyPI platforms][badge_pypi]][11]
+[![PyPI platforms][badge_pypi]][7]
 [![Build status][badge_build_status]][clp_ffi_py_gh_actions]
 [![Downloads][badge_total_downloads]][pepy/clp_ffi_py]
 [![Downloads][badge_monthly_downloads]][pepy/clp_ffi_py]
@@ -27,7 +27,7 @@ Note:
 - Tested on Linux, macOS and Windows.
 
 To install an older version or download the prebuilt `whl` package, check the
-project homepage on PyPI [here][11].
+project homepage on PyPI [here][7].
 
 ## Compatibility
 
@@ -36,7 +36,7 @@ version >= 3.7.
 
 ## API Reference
 
-The API reference for this library can be found on our [docs hub][14].
+The API reference for this library can be found on our [docs hub][10].
 
 ## Building/Packaging
 
@@ -51,7 +51,7 @@ To manually build a package for distribution, follow the steps below.
 * python3
 * python3-dev
 * python3-venv
-* [Task][13] >= 3.38.0
+* [Task][9] >= 3.38.0
 
 ### Set up
 * Initialize and update yscope-dev-utils submodules:
@@ -194,7 +194,7 @@ help(SubstringWildcardQuery)
 ### Streaming Deserialize/Search Directly from S3 Remote Storage
 
 When working with CLP IR files stored on S3-compatible storage systems,
-[smart_open][12] can be used to open and read the IR stream for the following
+[smart_open][8] can be used to open and read the IR stream for the following
 benefits:
 
 - It only performs stream operation and does not download the file to the disk.
@@ -241,9 +241,9 @@ closed.
 
 ### Parallel Processing
 
-The `Query` and `LogEvent` classes can be serialized by [pickle][10]. Therefore,
+The `Query` and `LogEvent` classes can be serialized by [pickle][6]. Therefore,
 deserializing and searching can be parallelized across streams/files using libraries
-such as [multiprocessing][8] and [tqlm][9].
+such as [multiprocessing][4] and [tqlm][5].
 
 ## Testing
 
@@ -277,7 +277,7 @@ python -m unittest -bv
 
 ## Build and Test with cibuildwheel
 
-This project utilizes [cibuildwheel][5] configuration. Whenever modifications
+This project utilizes [cibuildwheel][3] configuration. Whenever modifications
 are made and committed to GitHub, the cibuildwheel Action will automatically
 initiate, building this library for several Python environments across diverse
 OS and architectures. You can access the build outcomes (wheel files) via the
@@ -326,32 +326,16 @@ in the table below.
 | `lint:yml-check`        | Runs the YAML linters.                                   |
 | `lint:yml-fix`          | Runs the YAML linters and fixes some violations.         |
 
-Additionally, the following tools can be useful during development.
-
-- [mypy][3]: `mypy clp_ffi_py`
-  * mypy checks for typing errors. You should resolve all typing errors or if an
-    error cannot be resolved (e.g., it's due to a third-party library), you
-    should add a comment `# type: ignore` to [silence][4] the error.
-- [docformatter][6]: `docformatter -i clp_ffi_py tests`
-  * This formats docstrings. You should review and add any changes to your PR.
-
-Note that `docformatter` should be run before `linter` to give Black the
-[last][7].
-
 [1]: https://github.com/y-scope/clp/tree/main/components/core
 [2]: https://github.com/y-scope/clp
-[3]: https://mypy.readthedocs.io/en/stable/index.html
-[4]: https://mypy.readthedocs.io/en/stable/common_issues.html#spurious-errors-and-locally-silencing-the-checker
-[5]: https://cibuildwheel.readthedocs.io/en/stable/
-[6]: https://docformatter.readthedocs.io/en/latest/
-[7]: https://docformatter.readthedocs.io/en/latest/faq.html#interaction-with-black
-[8]: https://docs.python.org/3/library/multiprocessing.html
-[9]: https://tqdm.github.io/
-[10]: https://docs.python.org/3/library/pickle.html
-[11]: https://pypi.org/project/clp-ffi-py/
-[12]: https://github.com/RaRe-Technologies/smart_open
-[13]: https://taskfile.dev/installation/
-[14]: https://docs.yscope.com/clp-ffi-py/main/api/clp_ffi_py.html
+[3]: https://cibuildwheel.readthedocs.io/en/stable/
+[4]: https://docs.python.org/3/library/multiprocessing.html
+[5]: https://tqdm.github.io/
+[6]: https://docs.python.org/3/library/pickle.html
+[7]: https://pypi.org/project/clp-ffi-py/
+[8]: https://github.com/RaRe-Technologies/smart_open
+[9]: https://taskfile.dev/installation/
+[10]: https://docs.yscope.com/clp-ffi-py/main/api/clp_ffi_py.html
 
 [badge_build_status]: https://github.com/y-scope/clp-ffi-py/workflows/Build/badge.svg
 [badge_monthly_downloads]: https://static.pepy.tech/badge/clp-ffi-py/month 
