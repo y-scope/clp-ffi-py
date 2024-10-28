@@ -1,6 +1,6 @@
 # clp-ffi-py
 
-[![PyPI platforms][badge_pypi]][10]
+[![PyPI platforms][badge_pypi]][11]
 [![Build status][badge_build_status]][clp_ffi_py_gh_actions]
 [![Downloads][badge_total_downloads]][pepy/clp_ffi_py]
 [![Downloads][badge_monthly_downloads]][pepy/clp_ffi_py]
@@ -288,10 +288,10 @@ cibuildwheel.
 ## Adding files
 Certain file types need to be added to our linting rules manually:
 
-* **CMake**. If adding a CMake file, add it (or its parent directory) as an argument to the
+- **CMake**. If adding a CMake file, add it (or its parent directory) as an argument to the
   `gersemi` command in [lint-tasks.yaml](lint-tasks.yaml).
   * If adding a directory, the file must be named `CMakeLists.txt` or use the `.cmake` extension.
-* **YAML**. If adding a YAML file (regardless of its extension), add it as an argument to the
+- **YAML**. If adding a YAML file (regardless of its extension), add it as an argument to the
   `yamllint` command in [lint-tasks.yaml](lint-tasks.yaml).
 
 ## Linting
@@ -328,11 +328,11 @@ in the table below.
 
 Additionally, the following tools can be useful during development.
 
-* [mypy][3]: `mypy clp_ffi_py`
+- [mypy][3]: `mypy clp_ffi_py`
   * mypy checks for typing errors. You should resolve all typing errors or if an
     error cannot be resolved (e.g., it's due to a third-party library), you
     should add a comment `# type: ignore` to [silence][4] the error.
-* [docformatter][6]: `docformatter -i clp_ffi_py tests`
+- [docformatter][6]: `docformatter -i clp_ffi_py tests`
   * This formats docstrings. You should review and add any changes to your PR.
 
 Note that `docformatter` should be run before `linter` to give Black the
@@ -351,7 +351,7 @@ Note that `docformatter` should be run before `linter` to give Black the
 [11]: https://pypi.org/project/clp-ffi-py/
 [12]: https://github.com/RaRe-Technologies/smart_open
 [13]: https://taskfile.dev/installation/
-[19]: https://docs.yscope.com/clp-ffi-py/main/api/clp_ffi_py.html
+[14]: https://docs.yscope.com/clp-ffi-py/main/api/clp_ffi_py.html
 
 [badge_build_status]: https://github.com/y-scope/clp-ffi-py/workflows/Build/badge.svg
 [badge_monthly_downloads]: https://static.pepy.tech/badge/clp-ffi-py/month 
