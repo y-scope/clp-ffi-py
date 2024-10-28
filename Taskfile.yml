@@ -26,6 +26,7 @@ tasks:
     internal: true
     deps:
       - "init"
+      - "submodules"
     sources:
       - "{{.TASKFILE}}"
       - "CMakeLists.txt"
