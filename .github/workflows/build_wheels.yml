@@ -48,21 +48,13 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements-dev.txt
 
+      - run: "npm install -g @go-task/cli"
+
+      - run: "task lint:check"
+
       - run: "docformatter --check --diff clp_ffi_py tests"
 
-      - run: "black --diff --check clp_ffi_py tests"
-
-      - run: "ruff check --output-format=github clp_ffi_py tests"
-
       - run: "mypy clp_ffi_py tests"
-
-      - name: "Install task"
-        shell: "bash"
-        run: "npm install -g @go-task/cli"
-
-      - name: "Run lint task"
-        shell: "bash"
-        run: "task lint:check"
 
       - run: |
           gersemi --check --line-length 100 --list-expansion favour-expansion CMakeLists.txt
