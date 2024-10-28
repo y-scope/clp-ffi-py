@@ -8,6 +8,10 @@ includes:
 vars:
   # Paths
   BUILD_DIR: "{{.ROOT_DIR}}/build"
+  CLP_FFI_PY_SRC_DIR: "{{.ROOT_DIR}}/src/clp_ffi_py"
+  CLP_FFI_PY_BUILD_DIR: "{{.BUILD_DIR}}/clp_ffi_py"
+  CLP_FFI_PY_CMAKE_CACHE: "{{.CLP_FFI_PY_BUILD_DIR}}/CMakeCache.txt"
+  CLP_FFI_PY_COMPILE_COMMANDS_DB: "{{.CLP_FFI_PY_BUILD_DIR}}/compile_commands.json"
   WHEEL_BUILD_DIR: "{{.BUILD_DIR}}/dist"
   WHEEL_VENV_DIR: "{{.BUILD_DIR}}/wheel-venv"
 
@@ -18,6 +22,24 @@ tasks:
   clean:
     cmds:
       - "rm -rf '{{.BUILD_DIR}}'"
+
+  config-cmake-project:
+    internal: true
+    deps:
+      - "init"
+    sources:
+      - "{{.TASKFILE}}"
+      - "CMakeLists.txt"
+    generates:
+      - "{{.CLP_FFI_PY_CMAKE_CACHE}}"
+      - "{{.CLP_FFI_PY_COMPILE_COMMANDS_DB}}"
+    cmd: "cmake -S '{{.ROOT_DIR}}' -B '{{.CLP_FFI_PY_BUILD_DIR}}'"
+
+  init:
+    internal: true
+    silent: true
+    run: "once"
+    cmds: ["mkdir -p '{{.BUILD_DIR}}'"]
 
   wheel:
     vars:
@@ -117,9 +139,3 @@ tasks:
         diff
         <(cd '{{.OUTPUT_DIR}}' && tar cf - {{.CHECKSUM_TAR_BASE_ARGS}} . | md5sum)
         "{{.CHECKSUM_FILE}}"
-
-  init:
-    internal: true
-    silent: true
-    run: "once"
-    cmd: "mkdir -p '{{.BUILD_DIR}}'"

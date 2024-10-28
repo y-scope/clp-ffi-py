@@ -1,5 +1,0 @@
-extends: "tools/yscope-dev-utils/lint-configs/.yamllint.yml"
-
-ignore: |
-  build/
-  tools/yscope-dev-utils/

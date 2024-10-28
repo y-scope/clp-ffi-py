@@ -2,7 +2,7 @@ version: "3"
 
 vars:
   LINT_VENV_DIR: "{{.BUILD_DIR}}/lint-venv"
-  LINT_VENV_CHECKSUM_FILE: "{{.G_BUILD_DIR}}/lint#venv.md5"
+  LINT_VENV_CHECKSUM_FILE: "{{.BUILD_DIR}}/lint#venv.md5"
 
 tasks:
   check:
@@ -36,9 +36,9 @@ tasks:
   cpp-configs: "tools/yscope-dev-utils/lint-configs/symlink-cpp-lint-configs.sh"
 
   cpp-check:
-      cmds:
-        - task: "cpp-format-check"
-        - task: "cpp-static-check"
+    cmds:
+      - task: "cpp-format-check"
+      - task: "cpp-static-check"
 
   cpp-fix:
     cmds:
@@ -48,10 +48,10 @@ tasks:
   cpp-format-check:
     sources: &cpp_format_src_files
       - "{{.LINT_VENV_CHECKSUM_FILE}}"
-      - "src/clp_ffi_py/**/*.cpp"
-      - "src/clp_ffi_py/**/*.h"
-      - "src/clp_ffi_py/**/*.hpp"
-      - "src/clp_ffi_py/**/*.inc"
+      - "{{.CLP_FFI_PY_SRC_DIR}}/**/*.cpp"
+      - "{{.CLP_FFI_PY_SRC_DIR}}/**/*.h"
+      - "{{.CLP_FFI_PY_SRC_DIR}}/**/*.hpp"
+      - "{{.CLP_FFI_PY_SRC_DIR}}/**/*.inc"
       - "src/.clang-format"
       - "{{.TASKFILE}}"
       - ".clang-format"
@@ -68,6 +68,29 @@ tasks:
       - task: "clang-format"
         vars:
           FLAGS: "-i"
+
+  cpp-static-check:
+    # Alias task to `cpp-static-fix` since we don't currently support automatic fixes.
+    # NOTE: clang-tidy does have the ability to fix some errors, but the fixes can be inaccurate.
+    # When we eventually determine which errors can be safely fixed, we'll allow clang-tidy to
+    # fix them.
+    aliases: ["cpp-static-fix"]
+    sources:
+      - "{{.LINT_VENV_CHECKSUM_FILE}}"
+      - "{{.CLP_FFI_PY_SRC_DIR}}/**/*.cpp"
+      - "{{.CLP_FFI_PY_SRC_DIR}}/**/*.h"
+      - "{{.CLP_FFI_PY_SRC_DIR}}/**/*.hpp"
+      - "{{.CLP_FFI_PY_CMAKE_CACHE}}"
+      - "{{.CLP_FFI_PY_COMPILE_COMMANDS_DB}}"
+      - "{{.TASKFILE}}"
+      - "Taskfile.yml"
+      - ".clang-tidy"
+    deps: [":config-cmake-project", "cpp-configs", "venv"]
+    cmds:
+      - task: "clang-tidy"
+        vars:
+          FLAGS: "--config-file=.clang-tidy -p {{.CLP_FFI_PY_COMPILE_COMMANDS_DB}}"
+          SRC_DIR: "{{.CLP_FFI_PY_SRC_DIR}}"
 
   py-check:
     cmds:
@@ -91,15 +114,17 @@ tasks:
     cmds:
       - |-
         . "{{.LINT_VENV_DIR}}/bin/activate"
-        yamllint --strict \
+        yamllint \
+          --config-file "tools/yscope-dev-utils/lint-configs/.yamllint.yml" \
+          --strict \
+          .gersemirc \
           .github \
-          .yamllint.yml \
           docs \
           lint-tasks.yml \
           src/.clang-format \
           Taskfile.yml
 
-  cpp:
+  clang-format:
     internal: true
     requires:
       vars: ["FLAGS"]
@@ -112,7 +137,27 @@ tasks:
           -type f \
           \( -iname "*.cpp" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.inc" \) \
           -print0 | \
-            xargs -0 clang-format {{.FLAGS}} -Werror
+            xargs -0 --no-run-if-empty clang-format {{.FLAGS}} -Werror
+
+  clang-tidy:
+    internal: true
+    requires:
+      vars: ["FLAGS", "SRC_DIR"]
+    cmd: |-
+      . "{{.LINT_VENV_DIR}}/bin/activate"
+      find "{{.SRC_DIR}}" \
+        -type f \
+        \( -iname "*.cpp" -o -iname "*.h" -o -iname "*.hpp" \) \
+        -print0 | \
+          xargs -0 --no-run-if-empty clang-tidy {{.FLAGS}}
+
+  cmake:
+    internal: true
+    requires:
+      vars: ["FLAGS"]
+    cmd: |-
+      . "{{.LINT_VENV_DIR}}/bin/activate"
+      gersemi {{.FLAGS}} CMakeLists.txt {{.CLP_FFI_PY_SRC_DIR}}
 
   py:
     internal: true
@@ -132,7 +177,7 @@ tasks:
   venv:
     internal: true
     vars:
-      CHECKSUM_FILE: "{{.G_BUILD_DIR}}/{{.TASK | replace \":\" \"#\"}}.md5"
+      CHECKSUM_FILE: "{{.LINT_VENV_CHECKSUM_FILE}}"
       OUTPUT_DIR: "{{.LINT_VENV_DIR}}"
     sources:
       - "{{.ROOT_DIR}}/Taskfile.yml"
