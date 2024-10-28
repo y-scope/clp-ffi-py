@@ -46,18 +46,10 @@ jobs:
 
       - run: |
           pip install --upgrade pip
-          pip install -r requirements-dev.txt
 
       - run: "npm install -g @go-task/cli"
 
       - run: "task lint:check"
-
-      - run: "docformatter --check --diff clp_ffi_py tests"
-
-      - run: "mypy clp_ffi_py tests"
-
-      - run: |
-          gersemi --check --line-length 100 --list-expansion favour-expansion CMakeLists.txt
 
   build_wheels:
     needs: ["linters"]

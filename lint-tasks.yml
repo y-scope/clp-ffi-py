@@ -4,7 +4,7 @@ vars:
   LINT_VENV_DIR: "{{.BUILD_DIR}}/lint-venv"
   LINT_VENV_CHECKSUM_FILE: "{{.BUILD_DIR}}/lint#venv.md5"
   # Linter target dirs
-  PYTHON_LINT_DIRS: ["{{.ROOT_DIR}}/clp_ffi_py", "{{.ROOT_DIR}}/docs/conf", "{{.ROOT_DIR}}/tests"]
+  PYTHON_LINT_DIRS: ["{{.ROOT_DIR}}/clp_ffi_py", "{{.ROOT_DIR}}/tests"]
   CPP_LINT_DIRS: ["{{.ROOT_DIR}}/src/clp_ffi_py"]
 
 tasks:
@@ -104,8 +104,13 @@ tasks:
 
   py-check:
     cmds:
+      - task: "mypy"
+        vars:
+          SRC_DIRS:
+            ref: ".PYTHON_LINT_DIRS"
       - task: "py"
         vars:
+          DOCFORMATTER_FLAGS: "--check --diff"
           BLACK_FLAGS: "--check"
           RUFF_FLAGS: ""
           SRC_DIRS:
@@ -115,6 +120,7 @@ tasks:
     cmds:
       - task: "py"
         vars:
+          DOCFORMATTER_FLAGS: "-i"
           BLACK_FLAGS: ""
           RUFF_FLAGS: "--fix"
           SRC_DIRS:
@@ -177,19 +183,32 @@ tasks:
       . "{{.LINT_VENV_DIR}}/bin/activate"
       gersemi {{.FLAGS}} CMakeLists.txt {{.CLP_FFI_PY_SRC_DIR}}
 
-  py:
+  mypy:
     internal: true
     requires:
-      vars: ["BLACK_FLAGS", "RUFF_FLAGS", "SRC_DIRS"]
+      vars: ["SRC_DIRS"]
     deps: ["venv"]
     cmds:
       - for:
           var: "SRC_DIRS"
         cmd: |-
           . "{{.LINT_VENV_DIR}}/bin/activate"
-          cd "{{.ITEM}}"
-          black --color --line-length 100 {{.BLACK_FLAGS}} .
-          ruff check {{.RUFF_FLAGS}} .
+          mypy {{.ITEM}}
+
+  py:
+    internal: true
+    requires:
+      vars: ["DOCFORMATTER_FLAGS", "BLACK_FLAGS", "RUFF_FLAGS", "SRC_DIRS"]
+    deps: ["venv"]
+    cmds:
+      - for:
+          var: "SRC_DIRS"
+        cmd: |-
+          . "{{.LINT_VENV_DIR}}/bin/activate"
+          docformatter {{.DOCFORMATTER_FLAGS}} --recursive {{.ITEM}}
+          black --color --line-length 100 {{.BLACK_FLAGS}} {{.ITEM}}
+          ruff check {{.RUFF_FLAGS}} {{.ITEM}}
+
   venv:
     internal: true
     vars:
@@ -211,7 +230,10 @@ tasks:
         vars:
           LABEL: "lint"
           OUTPUT_DIR: "{{.OUTPUT_DIR}}"
-          REQUIREMENTS_FILE: "lint-requirements.txt"
+          # TODO: Separate the current requirements-dev.txt into linter & dev requirements.
+          # Let linter venv install both linter requirements, and let build_wheel install only
+          # dev requirements.
+          REQUIREMENTS_FILE: "requirements-dev.txt"
       # This command must be last
       - task: ":utils:compute-checksum"
         vars:
