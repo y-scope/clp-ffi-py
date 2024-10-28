@@ -8,7 +8,6 @@ includes:
 vars:
   # Paths
   BUILD_DIR: "{{.ROOT_DIR}}/build"
-  CLP_FFI_PY_SRC_DIR: "{{.ROOT_DIR}}/src/clp_ffi_py"
   CLP_FFI_PY_BUILD_DIR: "{{.BUILD_DIR}}/clp_ffi_py"
   CLP_FFI_PY_CMAKE_CACHE: "{{.CLP_FFI_PY_BUILD_DIR}}/CMakeCache.txt"
   CLP_FFI_PY_COMPILE_COMMANDS_DB: "{{.CLP_FFI_PY_BUILD_DIR}}/compile_commands.json"
