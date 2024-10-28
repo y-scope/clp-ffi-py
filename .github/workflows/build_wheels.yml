@@ -5,24 +5,22 @@ on:
     paths:
       - ".github/workflows/build_wheels.yml"
       - ".gitmodules"
+      - "CMakeLists.txt"
       - "clp_ffi_py/**"
-      - "MANIFEST.in"
       - "pyproject.toml"
       - "README.md"
       - "requirements-dev.txt"
-      - "setup.py"
       - "src/**"
       - "tests/**"
   push:
     paths:
       - ".github/workflows/build_wheels.yml"
       - ".gitmodules"
+      - "CMakeLists.txt"
       - "clp_ffi_py/**"
-      - "MANIFEST.in"
       - "pyproject.toml"
       - "README.md"
       - "requirements-dev.txt"
-      - "setup.py"
       - "src/**"
       - "tests/**"
   schedule:
@@ -65,6 +63,9 @@ jobs:
       - name: "Run lint task"
         shell: "bash"
         run: "task lint:check"
+
+      - run: |
+          gersemi --check --line-length 100 --list-expansion favour-expansion CMakeLists.txt
 
   build_wheels:
     needs: ["linters"]

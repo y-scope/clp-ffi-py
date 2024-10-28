@@ -1,5 +1,10 @@
 # clp-ffi-py
 
+[![PyPI platforms][badge_pypi]][16]
+[![Build status][badge_build_status]][clp_ffi_py_gh_actions]
+[![Downloads][badge_total_downloads]][pepy/clp_ffi_py]
+[![Downloads][badge_monthly_downloads]][pepy/clp_ffi_py]
+
 This module provides Python packages to interface with [CLP Core Features][1]
 through CLP's FFI (foreign function interface). At present, this library
 supplies built-in functions for serializing/deserializing log messages using [CLP][2].
@@ -294,6 +299,8 @@ formatting tools (found in [pyproject.toml]):
 * [ruff][10]: `ruff check --fix clp_ffi_py tests`
   * This performs linting according to PEPs. You should review and add any
     changes to your PR.
+* [gersemi][9]: `gersemi -i -l 100 --list-expansion favour-expansion CMakeLists.txt`
+  * This formats CMakeLists.txt. You should review and add any changes to your PR.
 
 Note that `docformatter` should be run before `black` to give Black the
 [last][12].
@@ -307,11 +314,6 @@ other package management tools such as `apt-get`:
     rules specified in `.clang-tidy`, and sends suggestions corresponding to
     each warning. Developers should manually review all the warnings and try
     with their best effort to fix the reasonable ones.
-* [bear][9]: `bear python setup.py build`
-  * This tool generates a JSON compilation database on the project's root
-    directory named `compile_commands.json`. This file will be used by
-    clang-tidy to execute the static analysis. It also helps IDEs to configure
-    code completion (such as VSCode).
 
 [1]: https://github.com/y-scope/clp/tree/main/components/core
 [2]: https://github.com/y-scope/clp
@@ -321,7 +323,7 @@ other package management tools such as `apt-get`:
 [6]: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 [7]: https://cibuildwheel.readthedocs.io/en/stable/
 [8]: https://clang.llvm.org/extra/clang-tidy/
-[9]: https://github.com/rizsotto/Bear
+[9]: https://github.com/BlankSpruce/gersemi
 [10]: https://beta.ruff.rs/docs/
 [11]: https://docformatter.readthedocs.io/en/latest/
 [12]: https://docformatter.readthedocs.io/en/latest/faq.html#interaction-with-black
@@ -332,3 +334,10 @@ other package management tools such as `apt-get`:
 [17]: https://github.com/RaRe-Technologies/smart_open
 [18]: https://taskfile.dev/installation/
 [19]: https://docs.yscope.com/clp-ffi-py/main/api/clp_ffi_py.html
+
+[badge_build_status]: https://github.com/y-scope/clp-ffi-py/workflows/Build/badge.svg
+[badge_monthly_downloads]: https://static.pepy.tech/badge/clp-ffi-py/month 
+[badge_pypi]: https://badge.fury.io/py/clp-ffi-py.svg
+[badge_total_downloads]: https://static.pepy.tech/badge/clp-ffi-py
+[clp_ffi_py_gh_actions]: https://github.com/y-scope/clp-ffi-py/actions
+[pepy/clp_ffi_py]: https://pepy.tech/project/clp-ffi-py

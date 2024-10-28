@@ -30,6 +30,7 @@ tasks:
       - "rm -rf '{{.OUTPUT_DIR}}'"
       - |-
         . "{{.WHEEL_VENV_DIR}}/bin/activate"
+        export SKBUILD_BUILD_DIR="{{.WHEEL_BUILD_DIR}}"
         python3 -m build --outdir "{{.OUTPUT_DIR}}"
       # Checksum the generated files (this command must be last)
       - |-
@@ -39,7 +40,9 @@ tasks:
       - "{{.BUILD_DIR}}/submodules.md5"
       - "{{.BUILD_DIR}}/wheel-venv.md5"
       - "{{.TASKFILE}}"
+      - "CMakeLists.txt"
       - "clp_ffi_py/**/*"
+      - "pyproject.toml"
       - "src/**/*"
     status:
       - "test -f '{{.CHECKSUM_FILE}}'"
