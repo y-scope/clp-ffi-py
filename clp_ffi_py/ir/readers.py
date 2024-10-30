@@ -23,7 +23,7 @@ class ClpIrStreamReader(Iterator[LogEvent]):
         an error. Instead, encountering such a stream is seen as reaching its end without raising
         any exceptions.
     :param decoder_buffer_size: Deprecated in 0.0.13. The purpose of this argument is to provide
-        backward compatibility. If not None, `deserializer_buffer_size`'s value will be ignored.
+        backward compatibility. It overwrites `deserializer_buffer_size`'s value if not None.
     """
 
     DEFAULT_DESERIALIZER_BUFFER_SIZE: int = 65536
