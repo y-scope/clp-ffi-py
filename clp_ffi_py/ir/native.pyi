@@ -77,7 +77,7 @@ class FourByteDeserializer:
     def deserialize_preamble(decoder_buffer: DeserializerBuffer) -> Metadata: ...
     @staticmethod
     def deserialize_next_log_event(
-        decoder_buffer: DeserializerBuffer,
+        deserializer_buffer: DeserializerBuffer,
         query: Optional[Query] = None,
         allow_incomplete_stream: bool = False,
     ) -> Optional[LogEvent]: ...

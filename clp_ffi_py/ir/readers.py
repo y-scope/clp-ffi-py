@@ -4,6 +4,7 @@ from pathlib import Path
 from sys import stderr
 from types import TracebackType
 from typing import Generator, IO, Iterator, Optional, Type, Union
+from warnings import warn
 
 from zstandard import ZstdDecompressionReader, ZstdDecompressor
 
@@ -21,9 +22,12 @@ class ClpIrStreamReader(Iterator[LogEvent]):
     :param allow_incomplete_stream: If set to `True`, an incomplete CLP IR stream is not treated as
         an error. Instead, encountering such a stream is seen as reaching its end without raising
         any exceptions.
+    :param decoder_buffer_size: Deprecated in 0.0.13. The purpose of this argument is to provide
+        backward compatibility. If not None, `deserializer_buffer_size`'s value will be ignored.
     """
 
     DEFAULT_DESERIALIZER_BUFFER_SIZE: int = 65536
+    DEFAULT_DECODER_BUFFER_SIZE: int = DEFAULT_DESERIALIZER_BUFFER_SIZE
 
     def __init__(
         self,
@@ -31,7 +35,17 @@ class ClpIrStreamReader(Iterator[LogEvent]):
         deserializer_buffer_size: int = DEFAULT_DESERIALIZER_BUFFER_SIZE,
         enable_compression: bool = True,
         allow_incomplete_stream: bool = False,
+        decoder_buffer_size: Optional[int] = None,
     ):
+        if decoder_buffer_size is not None:
+            deserializer_buffer_size = decoder_buffer_size
+            warn(
+                "Argument `decoder_buffer_size` has been renamed to `deserializer_buffer_size` "
+                "since 0.0.13",
+                category=DeprecationWarning,
+                stacklevel=2,
+            )
+
         self.__istream: Union[IO[bytes], ZstdDecompressionReader]
         if enable_compression:
             dctx: ZstdDecompressor = ZstdDecompressor()
@@ -138,7 +152,16 @@ class ClpIrFileReader(ClpIrStreamReader):
         deserializer_buffer_size: int = ClpIrStreamReader.DEFAULT_DESERIALIZER_BUFFER_SIZE,
         enable_compression: bool = True,
         allow_incomplete_stream: bool = False,
+        decoder_buffer_size: Optional[int] = None,
     ):
+        if decoder_buffer_size is not None:
+            deserializer_buffer_size = decoder_buffer_size
+            warn(
+                "Argument `decoder_buffer_size` has been renamed to `deserializer_buffer_size` "
+                "since 0.0.13",
+                category=DeprecationWarning,
+                stacklevel=2,
+            )
         self._path: Path = fpath
         super().__init__(
             open(fpath, "rb"),
