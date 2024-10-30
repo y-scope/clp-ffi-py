@@ -62,7 +62,7 @@ PyMethodDef PyFourByteDeserializer_method_table[]{
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cPyFourByteDeserializerDoc,
-        "Namespace for all CLP four byte IR deserialization methods.\n\n"
+        "Namespace for all CLP four-byte encoded IR deserialization methods.\n\n"
         "Methods deserialize log events from serialized CLP IR streams. This class should never be "
         "instantiated since it only contains static methods.\n"
 );
