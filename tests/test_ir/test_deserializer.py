@@ -6,8 +6,8 @@ from smart_open import open  # type: ignore
 from test_ir.test_utils import get_current_timestamp, LogGenerator, TestCLPBase
 
 from clp_ffi_py.ir import (
-    Deserializer,
     DeserializerBuffer,
+    FourByteDeserializer,
     FourByteSerializer,
     LogEvent,
     Metadata,
@@ -18,9 +18,9 @@ from clp_ffi_py.wildcard_query import WildcardQuery
 LOG_DIR: Path = Path("unittest-logs")
 
 
-class TestCaseDeserializerBase(TestCLPBase):
+class TestCaseFourByteDeserializerBase(TestCLPBase):
     """
-    Class for testing clp_ffi_py.ir.Deserializer.
+    Class for testing clp_ffi_py.ir.FourByteDeserializer.
     """
 
     serialized_log_path_prefix: str
@@ -123,7 +123,7 @@ class TestCaseDeserializerBase(TestCLPBase):
     ) -> Tuple[Metadata, List[LogEvent]]:
         """
         Decodes the log stream specified by `log_path`, using deserialization methods provided in
-        clp_ffi_py.ir.Deserializer.
+        clp_ffi_py.ir.FourByteDeserializer.
 
         :param log_path: The path to the log stream.
         :param query: Optional search query.
@@ -132,10 +132,10 @@ class TestCaseDeserializerBase(TestCLPBase):
         """
         with open(str(log_path), "rb") as istream:
             deserializer_buffer: DeserializerBuffer = DeserializerBuffer(istream)
-            metadata: Metadata = Deserializer.deserialize_preamble(deserializer_buffer)
+            metadata: Metadata = FourByteDeserializer.deserialize_preamble(deserializer_buffer)
             log_events: List[LogEvent] = []
             while True:
-                log_event: Optional[LogEvent] = Deserializer.deserialize_next_log_event(
+                log_event: Optional[LogEvent] = FourByteDeserializer.deserialize_next_log_event(
                     deserializer_buffer, query
                 )
                 if None is log_event:
@@ -225,7 +225,7 @@ class TestCaseDeserializerBase(TestCLPBase):
             )
 
 
-class TestCaseDeserializerDecompress(TestCaseDeserializerBase):
+class TestCaseFourByteDeserializerDecompress(TestCaseFourByteDeserializerBase):
     """
     Tests serialization/deserialization methods against uncompressed IR stream.
     """
@@ -238,7 +238,7 @@ class TestCaseDeserializerDecompress(TestCaseDeserializerBase):
         super().setUp()
 
 
-class TestCaseDeserializerDecompressZstd(TestCaseDeserializerBase):
+class TestCaseFourByteDeserializerDecompressZstd(TestCaseFourByteDeserializerBase):
     """
     Tests serialization/deserialization methods against zstd compressed IR stream.
     """
@@ -251,7 +251,7 @@ class TestCaseDeserializerDecompressZstd(TestCaseDeserializerBase):
         super().setUp()
 
 
-class TestCaseDeserializerDecompressDefaultQuery(TestCaseDeserializerBase):
+class TestCaseFourByteDeserializerDecompressDefaultQuery(TestCaseFourByteDeserializerBase):
     """
     Tests serialization/deserialization methods against uncompressed IR stream with the default
     empty query.
@@ -265,7 +265,7 @@ class TestCaseDeserializerDecompressDefaultQuery(TestCaseDeserializerBase):
         super().setUp()
 
 
-class TestCaseDeserializerDecompressZstdDefaultQuery(TestCaseDeserializerBase):
+class TestCaseFourByteDeserializerDecompressZstdDefaultQuery(TestCaseFourByteDeserializerBase):
     """
     Tests serialization/deserialization methods against zstd compressed IR stream with the default
     empty query.
@@ -279,7 +279,7 @@ class TestCaseDeserializerDecompressZstdDefaultQuery(TestCaseDeserializerBase):
         super().setUp()
 
 
-class TestCaseDeserializerTimeRangeQueryBase(TestCaseDeserializerBase):
+class TestCaseFourByteDeserializerTimeRangeQueryBase(TestCaseFourByteDeserializerBase):
     # override
     def _generate_random_query(
         self, ref_log_events: List[LogEvent]
@@ -302,7 +302,7 @@ class TestCaseDeserializerTimeRangeQueryBase(TestCaseDeserializerBase):
         return query, matched_log_events
 
 
-class TestCaseDeserializerTimeRangeQuery(TestCaseDeserializerTimeRangeQueryBase):
+class TestCaseFourByteDeserializerTimeRangeQuery(TestCaseFourByteDeserializerTimeRangeQueryBase):
     """
     Tests serialization/deserialization methods against uncompressed IR stream with the query that
     specifies a search timestamp.
@@ -316,7 +316,9 @@ class TestCaseDeserializerTimeRangeQuery(TestCaseDeserializerTimeRangeQueryBase)
         super().setUp()
 
 
-class TestCaseDeserializerTimeRangeQueryZstd(TestCaseDeserializerTimeRangeQueryBase):
+class TestCaseFourByteDeserializerTimeRangeQueryZstd(
+    TestCaseFourByteDeserializerTimeRangeQueryBase
+):
     """
     Tests serialization/deserialization methods against zstd compressed IR stream with the query
     that specifies a search timestamp.
@@ -330,7 +332,7 @@ class TestCaseDeserializerTimeRangeQueryZstd(TestCaseDeserializerTimeRangeQueryB
         super().setUp()
 
 
-class TestCaseDeserializerWildcardQueryBase(TestCaseDeserializerBase):
+class TestCaseFourByteDeserializerWildcardQueryBase(TestCaseFourByteDeserializerBase):
     # override
     def _generate_random_query(
         self, ref_log_events: List[LogEvent]
@@ -347,7 +349,7 @@ class TestCaseDeserializerWildcardQueryBase(TestCaseDeserializerBase):
         return query, matched_log_events
 
 
-class TestCaseDeserializerWildcardQuery(TestCaseDeserializerWildcardQueryBase):
+class TestCaseFourByteDeserializerWildcardQuery(TestCaseFourByteDeserializerWildcardQueryBase):
     """
     Tests serialization/deserialization methods against uncompressed IR stream with the query that
     specifies wildcard queries.
@@ -361,7 +363,7 @@ class TestCaseDeserializerWildcardQuery(TestCaseDeserializerWildcardQueryBase):
         super().setUp()
 
 
-class TestCaseDeserializerWildcardQueryZstd(TestCaseDeserializerWildcardQueryBase):
+class TestCaseFourByteDeserializerWildcardQueryZstd(TestCaseFourByteDeserializerWildcardQueryBase):
     """
     Tests serialization/deserialization methods against zstd compressed IR stream with the query
     that specifies a wildcard queries.
@@ -375,7 +377,7 @@ class TestCaseDeserializerWildcardQueryZstd(TestCaseDeserializerWildcardQueryBas
         super().setUp()
 
 
-class TestCaseDeserializerTimeRangeWildcardQueryBase(TestCaseDeserializerBase):
+class TestCaseFourByteDeserializerTimeRangeWildcardQueryBase(TestCaseFourByteDeserializerBase):
     # override
     def _generate_random_query(
         self, ref_log_events: List[LogEvent]
@@ -402,7 +404,9 @@ class TestCaseDeserializerTimeRangeWildcardQueryBase(TestCaseDeserializerBase):
         return query, matched_log_events
 
 
-class TestCaseDeserializerTimeRangeWildcardQuery(TestCaseDeserializerTimeRangeWildcardQueryBase):
+class TestCaseFourByteDeserializerTimeRangeWildcardQuery(
+    TestCaseFourByteDeserializerTimeRangeWildcardQueryBase
+):
     """
     Tests serialization/deserialization methods against uncompressed IR stream with the query that
     specifies both search time range and wildcard queries.
@@ -416,8 +420,8 @@ class TestCaseDeserializerTimeRangeWildcardQuery(TestCaseDeserializerTimeRangeWi
         super().setUp()
 
 
-class TestCaseDeserializerTimeRangeWildcardQueryZstd(
-    TestCaseDeserializerTimeRangeWildcardQueryBase
+class TestCaseFourByteDeserializerTimeRangeWildcardQueryZstd(
+    TestCaseFourByteDeserializerTimeRangeWildcardQueryBase
 ):
     """
     Tests serialization/deserialization methods against zstd compressed IR stream with the query

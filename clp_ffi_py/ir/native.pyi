@@ -72,7 +72,7 @@ class FourByteSerializer:
     @staticmethod
     def serialize_end_of_ir() -> bytearray: ...
 
-class Deserializer:
+class FourByteDeserializer:
     @staticmethod
     def deserialize_preamble(decoder_buffer: DeserializerBuffer) -> Metadata: ...
     @staticmethod
