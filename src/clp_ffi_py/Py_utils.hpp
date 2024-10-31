@@ -38,7 +38,7 @@ namespace clp_ffi_py {
 /**
  * CPython wrapper of `clp_ffi_py.utils.serialize_dict_to_msgpack`.
  * @param dictionary
- * @return a new reference of a Python tzinfo object that matches the input timezone id.
+ * @return a new reference of a Python `bytes` object containing msgpack-serialized dictionary.
  * @return nullptr on failure with the relevant Python exception and error set.
  */
 [[nodiscard]] auto py_utils_serialize_dict_to_msgpack(PyObject* dictionary) -> PyObject*;

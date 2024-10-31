@@ -40,6 +40,7 @@ def serialize_dict_to_msgpack(dictionary: Dict[Any, Any]) -> bytes:
 
     :param dictionary: The dictionary to serialize.
     :return: msgpack byte sequence.
+    :raises: TypeError The given input is not a dictionary.
     """
     if not isinstance(dictionary, dict):
         raise TypeError("The type of the input object must be a dictionary.")
