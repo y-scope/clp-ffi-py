@@ -14,7 +14,8 @@ readme = "README.md"
 requires-python = ">=3.7"
 dependencies = [
     "Deprecated >= 1.2.14",
-    "msgpack >= 1.1.0",
+    # We lock msgpack to 1.0.5 to support Python3.7
+    "msgpack == 1.0.5",
     "python-dateutil >= 2.7.0",
     "typing-extensions >= 4.1.1",
     "zstandard >= 0.18.0",
