@@ -34,14 +34,13 @@ def get_timezone_from_timezone_id(timezone_id: str) -> tzinfo:
     return timezone
 
 
-def serialize_dict_to_msgpack(dictionary: Dict[str, Any]) -> bytes:
+def serialize_dict_to_msgpack(dictionary: Dict[Any, Any]) -> bytes:
     """
     Serializes the given dictionary into msgpack.
 
-    :param dictionary: The dictionary to serialize. NOTE: All keys, including those in nested
-        dictionaries, must be strings.
-    :return: Serialized msgpack byte sequence.
+    :param dictionary: The dictionary to serialize.
+    :return: msgpack byte sequence.
     """
-    if not isinstance(dictionary, Dict):
+    if not isinstance(dictionary, dict):
         raise TypeError("The type of the input object must be a dictionary.")
     return msgpack.packb(dictionary)

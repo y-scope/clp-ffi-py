@@ -18,10 +18,22 @@ class TestUtils(unittest.TestCase):
             "Bool": True,
             "String": "This is a string",
             "Array": [1, 1.3, True, "String"],
+            "None": None,
             "Dict": {"Int": 1, "Dict": {"String": "This is a string"}},
         }
-        serialized_dict: bytes = clp_ffi_py.utils.serialize_dict_to_msgpack(expected)
-        actual: Dict[Any, Any] = msgpack.unpackb(serialized_dict)
+        actual: Dict[Any, Any] = msgpack.unpackb(
+            clp_ffi_py.utils.serialize_dict_to_msgpack(expected)
+        )
         self.assertEqual(expected, actual)
 
-        # TODO: add more testing
+        with self.assertRaises(TypeError):
+            clp_ffi_py.utils.serialize_dict_to_msgpack(1)  # type: ignore
+
+        with self.assertRaises(TypeError):
+            clp_ffi_py.utils.serialize_dict_to_msgpack(1.1)  # type: ignore
+
+        with self.assertRaises(TypeError):
+            clp_ffi_py.utils.serialize_dict_to_msgpack(True)  # type: ignore
+
+        with self.assertRaises(TypeError):
+            clp_ffi_py.utils.serialize_dict_to_msgpack(None)  # type: ignore
