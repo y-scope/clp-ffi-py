@@ -75,7 +75,8 @@ class DecoderBuffer:
 
     def get_num_decoded_log_messages(self) -> int:
         """
-        See :meth:`~clp_ffi_py.ir.native.DeserializerBuffer.get_num_deserialized_log_messages`.
+        This method is deprecated and has been renamed to
+        :meth:`~clp_ffi_py.ir.native.DeserializerBuffer.get_num_deserialized_log_messages`.
         """
         return self._deserializer_buffer.get_num_deserialized_log_messages()
 
