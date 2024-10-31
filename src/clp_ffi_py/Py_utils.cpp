@@ -2,8 +2,9 @@
 
 #include "Py_utils.hpp"
 
-#include <clp_ffi_py/PyObjectUtils.hpp>
 #include <string_view>
+
+#include <clp_ffi_py/PyObjectUtils.hpp>
 
 namespace clp_ffi_py {
 namespace {
