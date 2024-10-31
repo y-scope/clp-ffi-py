@@ -22,8 +22,9 @@ class ClpIrStreamReader(Iterator[LogEvent]):
     :param allow_incomplete_stream: If set to `True`, an incomplete CLP IR stream is not treated as
         an error. Instead, encountering such a stream is seen as reaching its end without raising
         any exceptions.
-    :param decoder_buffer_size: Deprecated in 0.0.13. The purpose of this argument is to provide
-        backward compatibility. It overwrites `deserializer_buffer_size`'s value if not None.
+    :param decoder_buffer_size: Deprecated since 0.0.13. Use `deserializer_buffer_size` instead.
+        This argument is provided for backward compatibility and if set, will overwrite
+        `deserializer_buffer_size`'s value.
     """
 
     DEFAULT_DESERIALIZER_BUFFER_SIZE: int = 65536
@@ -40,8 +41,8 @@ class ClpIrStreamReader(Iterator[LogEvent]):
         if decoder_buffer_size is not None:
             deserializer_buffer_size = decoder_buffer_size
             warn(
-                "Argument `decoder_buffer_size` has been renamed to `deserializer_buffer_size` "
-                "since 0.0.13",
+                "Argument `decoder_buffer_size` has been renamed to `deserializer_buffer_size`"
+                " since 0.0.13",
                 category=DeprecationWarning,
                 stacklevel=2,
             )
@@ -157,8 +158,8 @@ class ClpIrFileReader(ClpIrStreamReader):
         if decoder_buffer_size is not None:
             deserializer_buffer_size = decoder_buffer_size
             warn(
-                "Argument `decoder_buffer_size` has been renamed to `deserializer_buffer_size` "
-                "since 0.0.13",
+                "Argument `decoder_buffer_size` has been renamed to `deserializer_buffer_size`"
+                " since 0.0.13",
                 category=DeprecationWarning,
                 stacklevel=2,
             )
