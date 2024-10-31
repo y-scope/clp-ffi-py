@@ -86,8 +86,6 @@ set(CLP_FFI_PY_LIB_IR_SOURCES
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PyFourByteDeserializer.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PyFourByteSerializer.cpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PyFourByteSerializer.hpp
-    ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PyKeyValuePairLogEvent.cpp
-    ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PyKeyValuePairLogEvent.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PyLogEvent.cpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PyLogEvent.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PyMetadata.cpp
