@@ -5,7 +5,7 @@ vars:
   LINT_VENV_CHECKSUM_FILE: "{{.BUILD_DIR}}/lint#venv.md5"
   # Linter target dirs
   PYTHON_LINT_DIRS: ["{{.ROOT_DIR}}/clp_ffi_py", "{{.ROOT_DIR}}/tests"]
-  CPP_LINT_DIRS: ["{{.ROOT_DIR}}/src/clp_ffi_py"]
+  CPP_LINT_DIRS: ["{{.CLP_FFI_PY_SRC_DIR}}"]
 
 tasks:
   check:
@@ -62,21 +62,23 @@ tasks:
       - ".clang-format"
     deps: ["cpp-configs", "venv"]
     cmds:
-      - task: "clang-format"
+      - task: ":utils:clang-format"
         vars:
           FLAGS: "--dry-run"
-          SRC_DIRS:
+          SRC_PATHS:
             ref: ".CPP_LINT_DIRS"
+          VENV_DIR: "{{.LINT_VENV_DIR}}"
 
   cpp-format-fix:
     sources: *cpp_format_src_files
     deps: ["cpp-configs", "venv"]
     cmds:
-      - task: "clang-format"
+      - task: ":utils:clang-format"
         vars:
           FLAGS: "-i"
-          SRC_DIRS:
+          SRC_PATHS:
             ref: ".CPP_LINT_DIRS"
+          VENV_DIR: "{{.LINT_VENV_DIR}}"
 
   cpp-static-check:
     # Alias task to `cpp-static-fix` since we don't currently support automatic fixes.
@@ -96,11 +98,12 @@ tasks:
       - ".clang-tidy"
     deps: [":config-cmake-project", "cpp-configs", "venv"]
     cmds:
-      - task: "clang-tidy"
+      - task: ":utils:clang-tidy"
         vars:
           FLAGS: "--config-file=.clang-tidy -p {{.CLP_FFI_PY_COMPILE_COMMANDS_DB}}"
-          SRC_DIRS:
+          SRC_PATHS:
             ref: ".CPP_LINT_DIRS"
+          VENV_DIR: "{{.LINT_VENV_DIR}}"
 
   py-check:
     cmds:
@@ -143,37 +146,6 @@ tasks:
           lint-tasks.yml \
           src/.clang-format \
           Taskfile.yml
-
-  clang-format:
-    internal: true
-    requires:
-      vars: ["FLAGS", "SRC_DIRS"]
-    deps: ["cpp-configs", "venv"]
-    cmds:
-      - for:
-          var: "SRC_DIRS"
-        cmd: |-
-          . "{{.LINT_VENV_DIR}}/bin/activate"
-          find {{.ITEM}} \
-            -type f \
-            \( -iname "*.cpp" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.inc" \) \
-            -print0 | \
-              xargs -0 --no-run-if-empty clang-format {{.FLAGS}} -Werror
-
-  clang-tidy:
-    internal: true
-    requires:
-      vars: ["FLAGS", "SRC_DIRS"]
-    cmds:
-      - for:
-          var: "SRC_DIRS"
-        cmd: |-
-          . "{{.LINT_VENV_DIR}}/bin/activate"
-          find "{{.ITEM}}" \
-            -type f \
-            \( -iname "*.cpp" -o -iname "*.h" -o -iname "*.hpp" \) \
-            -print0 | \
-              xargs -0 --no-run-if-empty clang-tidy {{.FLAGS}}
 
   cmake:
     internal: true
