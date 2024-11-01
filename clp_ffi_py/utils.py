@@ -1,7 +1,8 @@
 from datetime import datetime, tzinfo
-from typing import Optional
+from typing import Any, Dict, Optional
 
 import dateutil.tz
+import msgpack
 
 
 def get_formatted_timestamp(timestamp: int, timezone: Optional[tzinfo]) -> str:
@@ -31,3 +32,16 @@ def get_timezone_from_timezone_id(timezone_id: str) -> tzinfo:
     if timezone is None:
         raise RuntimeError(f"Invalid timezone id: {timezone_id}")
     return timezone
+
+
+def serialize_dict_to_msgpack(dictionary: Dict[Any, Any]) -> bytes:
+    """
+    Serializes the given dictionary into msgpack.
+
+    :param dictionary: The dictionary to serialize.
+    :return: msgpack byte sequence.
+    :raises: TypeError The given input is not a dictionary.
+    """
+    if not isinstance(dictionary, dict):
+        raise TypeError("The type of the input object must be a dictionary.")
+    return msgpack.packb(dictionary)
