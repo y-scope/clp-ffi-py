@@ -59,14 +59,23 @@ set(CLP_FFI_PY_CLP_CORE_DIR "${CLP_FFI_PY_SRC_DIR}/clp/components/core")
 
 add_subdirectory(${CLP_FFI_PY_CLP_CORE_DIR}/src/clp/string_utils)
 
+set(MSGPACK_CXX20 ON)
+set(MSGPACK_USE_BOOST OFF)
+add_subdirectory(${CLP_FFI_PY_SRC_DIR}/msgpack EXCLUDE_FROM_ALL)
+
 # NOTE: We don't add headers here since CLP core is technically a library we're using, not a part of
 # this project.
 set(CLP_FFI_PY_CLP_CORE_SOURCES
     ${CLP_FFI_PY_CLP_CORE_DIR}/src/clp/BufferReader.cpp
     ${CLP_FFI_PY_CLP_CORE_DIR}/src/clp/ffi/ir_stream/decoding_methods.cpp
     ${CLP_FFI_PY_CLP_CORE_DIR}/src/clp/ffi/ir_stream/encoding_methods.cpp
+    ${CLP_FFI_PY_CLP_CORE_DIR}/src/clp/ffi/ir_stream/ir_unit_deserialization_methods.cpp
+    ${CLP_FFI_PY_CLP_CORE_DIR}/src/clp/ffi/ir_stream/Serializer.cpp
     ${CLP_FFI_PY_CLP_CORE_DIR}/src/clp/ffi/ir_stream/utils.cpp
     ${CLP_FFI_PY_CLP_CORE_DIR}/src/clp/ffi/encoding_methods.cpp
+    ${CLP_FFI_PY_CLP_CORE_DIR}/src/clp/ffi/SchemaTree.cpp
+    ${CLP_FFI_PY_CLP_CORE_DIR}/src/clp/ffi/KeyValuePairLogEvent.cpp
+    ${CLP_FFI_PY_CLP_CORE_DIR}/src/clp/ir/EncodedTextAst.cpp
     ${CLP_FFI_PY_CLP_CORE_DIR}/src/clp/ir/parsing.cpp
     ${CLP_FFI_PY_CLP_CORE_DIR}/src/clp/ReaderInterface.cpp
 )
@@ -127,7 +136,7 @@ target_include_directories(
 
 target_include_directories(${CLP_FFI_PY_LIB_IR} PRIVATE ${CLP_FFI_PY_SRC_DIR})
 
-target_link_libraries(${CLP_FFI_PY_LIB_IR} PRIVATE clp::string_utils)
+target_link_libraries(${CLP_FFI_PY_LIB_IR} PRIVATE clp::string_utils msgpack-cxx)
 
 if(CLP_FFI_PY_INSTALL_LIBS)
     install(
