@@ -136,7 +136,12 @@ target_include_directories(
 
 target_include_directories(${CLP_FFI_PY_LIB_IR} PRIVATE ${CLP_FFI_PY_SRC_DIR})
 
-target_link_libraries(${CLP_FFI_PY_LIB_IR} PRIVATE clp::string_utils msgpack-cxx)
+target_link_libraries(
+    ${CLP_FFI_PY_LIB_IR}
+    PRIVATE
+        clp::string_utils
+        msgpack-cxx
+)
 
 if(CLP_FFI_PY_INSTALL_LIBS)
     install(
