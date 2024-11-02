@@ -2,6 +2,8 @@
 
 #include "Py_utils.hpp"
 
+#include <string_view>
+
 #include <clp_ffi_py/PyObjectUtils.hpp>
 
 namespace clp_ffi_py {
@@ -11,6 +13,9 @@ PyObjectStaticPtr<PyObject> Py_func_get_formatted_timestamp{nullptr};
 
 constexpr char const* const cPyFuncNameGetTimezoneFromTimezoneId{"get_timezone_from_timezone_id"};
 PyObjectStaticPtr<PyObject> Py_func_get_timezone_from_timezone_id{nullptr};
+
+constexpr std::string_view cPyFuncNameSerializeDictToMsgpack{"serialize_dict_to_msgpack"};
+PyObjectStaticPtr<PyObject> Py_func_serialize_dict_to_msgpack{nullptr};
 
 /**
  * Wrapper of PyObject_CallObject.
@@ -43,6 +48,13 @@ auto py_utils_init() -> bool {
     if (nullptr == Py_func_get_formatted_timestamp.get()) {
         return false;
     }
+
+    Py_func_serialize_dict_to_msgpack.reset(
+            PyObject_GetAttrString(py_utils, cPyFuncNameSerializeDictToMsgpack.data())
+    );
+    if (nullptr == Py_func_serialize_dict_to_msgpack.get()) {
+        return false;
+    }
     return true;
 }
 
@@ -63,5 +75,14 @@ auto py_utils_get_timezone_from_timezone_id(std::string const& timezone_id) -> P
         return nullptr;
     }
     return py_utils_function_call_wrapper(Py_func_get_timezone_from_timezone_id.get(), func_args);
+}
+
+auto py_utils_serialize_dict_to_msgpack(PyObject* dictionary) -> PyObject* {
+    PyObjectPtr<PyObject> const func_args_ptr{Py_BuildValue("O", dictionary)};
+    auto* func_args{func_args_ptr.get()};
+    if (nullptr == func_args) {
+        return nullptr;
+    }
+    return py_utils_function_call_wrapper(Py_func_serialize_dict_to_msgpack.get(), func_args);
 }
 }  // namespace clp_ffi_py

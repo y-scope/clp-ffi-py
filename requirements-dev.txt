@@ -5,6 +5,8 @@ cibuildwheel>=2.16.2
 clang-format~=18.1
 docformatter>=1.7.5
 gersemi>=0.16.2
+# Lock to v0.3.0 to support Python3.7
+msgpack-types==0.3.0
 mypy>=1.10.0
 mypy-extensions>=1.0.0
 packaging>=21.3
