@@ -1,9 +1,8 @@
 import unittest
 from typing import Any, Dict
 
-import msgpack
-
 import clp_ffi_py.utils
+import msgpack
 
 
 class TestUtils(unittest.TestCase):
