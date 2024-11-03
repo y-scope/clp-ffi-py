@@ -61,8 +61,8 @@ set(CLP_FFI_PY_CLP_CORE_DIR "${CLP_FFI_PY_SRC_DIR}/clp/components/core")
 
 add_subdirectory(${CLP_FFI_PY_CLP_CORE_DIR}/src/clp/string_utils)
 
-set(MSGPACK_CXX20 ON)
-set(MSGPACK_USE_BOOST OFF)
+set(MSGPACK_CXX20 ON CACHE BOOL "Enable C++20 in msgpack")
+set(MSGPACK_USE_BOOST OFF CACHE BOOL "Disable Boost in msgpack")
 add_subdirectory(${CLP_FFI_PY_SRC_DIR}/msgpack EXCLUDE_FROM_ALL)
 
 add_subdirectory(${CLP_FFI_PY_SRC_DIR}/GSL)
