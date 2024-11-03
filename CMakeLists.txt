@@ -18,6 +18,7 @@ if(DEFINED SKBUILD_PROJECT_NAME)
         "The version of the project parsed by scikit-build-core."
         FORCE
     )
+    set(CLP_FFI_PY_LINT OFF CACHE BOOL "Disable linting." FORCE)
 else()
     set(CLP_FFI_PY_INSTALL_LIBS OFF CACHE BOOL "Disable installing the built libraries." FORCE)
     set(CLP_FFI_PY_PROJECT_NAME "clp-ffi-py" CACHE STRING "Use a placeholder project name." FORCE)
@@ -28,6 +29,7 @@ else()
         "Enable/Disable output of compile commands during generation."
         FORCE
     )
+    set(CLP_FFI_PY_LINT ON CACHE BOOL "Enable linting." FORCE)
 endif()
 
 project(${CLP_FFI_PY_PROJECT_NAME} LANGUAGES CXX VERSION ${CLP_FFI_PY_VERSION})
@@ -63,6 +65,8 @@ set(MSGPACK_CXX20 ON)
 set(MSGPACK_USE_BOOST OFF)
 add_subdirectory(${CLP_FFI_PY_SRC_DIR}/msgpack EXCLUDE_FROM_ALL)
 
+add_subdirectory(${CLP_FFI_PY_SRC_DIR}/GSL)
+
 # NOTE: We don't add headers here since CLP core is technically a library we're using, not a part of
 # this project.
 set(CLP_FFI_PY_CLP_CORE_SOURCES
@@ -82,6 +86,7 @@ set(CLP_FFI_PY_CLP_CORE_SOURCES
 
 # NOTE: We include headers to ensure IDEs like CLion load the project properly.
 set(CLP_FFI_PY_LIB_IR_SOURCES
+    ${CLP_FFI_PY_LIB_SRC_DIR}/api_decoration.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/error_messages.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ExceptionFFI.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/deserialization_methods.cpp
@@ -136,10 +141,15 @@ target_include_directories(
 
 target_include_directories(${CLP_FFI_PY_LIB_IR} PRIVATE ${CLP_FFI_PY_SRC_DIR})
 
+if(CLP_FFI_PY_LINT)
+    target_compile_definitions(${CLP_FFI_PY_LIB_IR} PRIVATE CLP_FFI_PY_ENABLE_LINTING)
+endif()
+
 target_link_libraries(
     ${CLP_FFI_PY_LIB_IR}
     PRIVATE
         clp::string_utils
+        Microsoft.GSL::GSL
         msgpack-cxx
 )
 

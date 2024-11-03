@@ -3,6 +3,11 @@
 #include "utils.hpp"
 
 #include <iostream>
+#include <span>
+#include <string>
+
+#include <msgpack.hpp>
+#include <outcome/single-header/outcome.hpp>
 
 #include <clp_ffi_py/PyObjectCast.hpp>
 
@@ -58,5 +63,16 @@ auto get_py_bool(bool is_true) -> PyObject* {
         Py_RETURN_TRUE;
     }
     Py_RETURN_FALSE;
+}
+
+auto unpack_msgpack(std::span<char const> msgpack_byte_sequence
+) -> outcome_v2::std_result<msgpack::object_handle, std::string> {
+    msgpack::object_handle handle;
+    try {
+        msgpack::unpack(handle, msgpack_byte_sequence.data(), msgpack_byte_sequence.size());
+    } catch (msgpack::unpack_error const& error) {
+        return std::string{error.what()};
+    }
+    return handle;
 }
 }  // namespace clp_ffi_py
