@@ -207,8 +207,8 @@ CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_dealloc(PyKeyValuePairLogEvent* se
 
 CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_to_dict(PyKeyValuePairLogEvent* self) -> PyObject* {
     // TODO: use an efficient algorithm to turn the underlying log event to a Python dictionary
-    auto const& kv_pair_log_event{self->get_kv_pair_log_event()};
-    auto const serialized_json_result{kv_pair_log_event.serialize_to_json()};
+    auto const* kv_pair_log_event{self->get_kv_pair_log_event()};
+    auto const serialized_json_result{kv_pair_log_event->serialize_to_json()};
     if (serialized_json_result.has_error()) {
         PyErr_Format(
                 PyExc_RuntimeError,
@@ -224,6 +224,7 @@ CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_to_dict(PyKeyValuePairLogEvent* se
     }
     if (false == static_cast<bool>(PyDict_Check(parsed_json))) {
         PyErr_SetString(PyExc_TypeError, "Serialized JSON object is not a dictionary");
+        return nullptr;
     }
     return parsed_json;
 }
@@ -329,7 +330,6 @@ auto PyKeyValuePairLogEvent::get_py_type() -> PyTypeObject* {
 }
 
 auto PyKeyValuePairLogEvent::module_level_init(PyObject* py_module) -> bool {
-    // TODO: complete this function
     static_assert(std::is_trivially_destructible<PyKeyValuePairLogEvent>());
     auto* type{py_reinterpret_cast<PyTypeObject>(PyType_FromSpec(&PyKeyValuePairLogEvent_type_spec))
     };

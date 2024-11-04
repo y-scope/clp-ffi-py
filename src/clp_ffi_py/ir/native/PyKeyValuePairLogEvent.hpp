@@ -37,10 +37,13 @@ public:
     /**
      * Releases the memory allocated for underlying data fields.
      */
-    auto clean() -> void { delete m_kv_pair_log_event; }
+    auto clean() -> void {
+        delete m_kv_pair_log_event;
+        m_kv_pair_log_event = nullptr;
+    }
 
-    [[nodiscard]] auto get_kv_pair_log_event() const -> clp::ffi::KeyValuePairLogEvent const& {
-        return *m_kv_pair_log_event;
+    [[nodiscard]] auto get_kv_pair_log_event() const -> clp::ffi::KeyValuePairLogEvent const* {
+        return m_kv_pair_log_event;
     }
 
     /**
