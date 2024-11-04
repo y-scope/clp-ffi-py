@@ -107,6 +107,12 @@ PyDoc_STRVAR(
         ":return: Serialized log event in a Python dictionary.\n"
 );
 
+/**
+ * Callback of `PyKeyValuePairLogEvent`'s `to_dict` method:
+ * @param self
+ * @return Serialized log event in a Python dictionary on success.
+ * @return nullptr on failure with the relevant Python exception and error set.
+ */
 CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_to_dict(PyKeyValuePairLogEvent* self) -> PyObject*;
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
