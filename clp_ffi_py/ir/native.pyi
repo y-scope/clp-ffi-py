@@ -43,10 +43,10 @@ class Query:
     def default_search_time_termination_margin() -> int: ...
     def __init__(
         self,
-        search_time_lower_bound: int = default_search_time_lower_bound(),
-        search_time_upper_bound: int = default_search_time_upper_bound(),
+        search_time_lower_bound: int = Query.default_search_time_lower_bound(),
+        search_time_upper_bound: int = Query.default_search_time_upper_bound(),
         wildcard_queries: Optional[List[WildcardQuery]] = None,
-        search_time_termination_margin: int = default_search_time_termination_margin(),
+        search_time_termination_margin: int = Query.default_search_time_termination_margin(),
     ): ...
     def __str__(self) -> str: ...
     def __repr__(self) -> str: ...
