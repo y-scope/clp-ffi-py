@@ -20,6 +20,7 @@
 #include <clp/type_utils.hpp>
 
 #include <clp_ffi_py/api_decoration.hpp>
+#include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ir/native/error_messages.hpp>
 #include <clp_ffi_py/Py_utils.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
@@ -188,11 +189,7 @@ CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_init(
         return -1;
     }
 
-    if (false == self->init(std::move(optional_kv_pair_log_event.value()))) {
-        return -1;
-    }
-
-    return 0;
+    return self->init(std::move(optional_kv_pair_log_event.value())) ? 0 : -1;
 }
 
 CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_to_dict(PyKeyValuePairLogEvent* self) -> PyObject* {
@@ -317,7 +314,11 @@ CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_dealloc(PyKeyValuePairLogEvent* se
 
 auto PyKeyValuePairLogEvent::init(clp::ffi::KeyValuePairLogEvent kv_pair_log_event) -> bool {
     m_kv_pair_log_event = new clp::ffi::KeyValuePairLogEvent{std::move(kv_pair_log_event)};
-    return nullptr != m_kv_pair_log_event;
+    if (nullptr == m_kv_pair_log_event) {
+        PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::cOutofMemoryError);
+        return false;
+    }
+    return true;
 }
 
 auto PyKeyValuePairLogEvent::get_py_type() -> PyTypeObject* {
