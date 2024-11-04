@@ -160,6 +160,10 @@ CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_init(
     static char keyword_dictionary[]{"dictionary"};
     static char* keyword_table[]{static_cast<char*>(keyword_dictionary), nullptr};
 
+    // If the argument parsing fails, `self` will be deallocated. We must reset all pointers to
+    // nullptr in advance, otherwise the deallocator might trigger segmentation fault.
+    self->default_init();
+
     PyObject* dictionary{Py_None};
     if (false
         == static_cast<bool>(PyArg_ParseTupleAndKeywords(
@@ -172,10 +176,6 @@ CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_init(
     {
         return -1;
     }
-
-    // If the argument parsing fails, `self` will be deallocated. We must reset all pointers to
-    // nullptr in advance, otherwise the deallocator might trigger segmentation fault.
-    self->default_init();
 
     if (false == static_cast<bool>(PyDict_Check(dictionary))) {
         PyErr_SetString(PyExc_TypeError, "`dictionary` must be a Python dictionary object");
