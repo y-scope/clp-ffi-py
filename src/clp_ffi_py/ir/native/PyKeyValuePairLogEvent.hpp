@@ -12,7 +12,7 @@
 namespace clp_ffi_py::ir::native {
 /**
  * A PyObject structure functioning as a Python-compatible interface to retrieve a key-value pair
- * log event. The underlying data is pointed to by `m_kv_pair_log_event`.
+ * log event. The underlying data is pointed by `m_kv_pair_log_event`.
  */
 class PyKeyValuePairLogEvent {
 public:
