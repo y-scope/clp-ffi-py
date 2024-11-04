@@ -47,6 +47,34 @@ using PyObjectPtr = std::unique_ptr<PyObjectType, PyObjectDeleter<PyObjectType>>
  */
 template <typename PyObjectType>
 using PyObjectStaticPtr = std::unique_ptr<PyObjectType, PyObjectTrivialDeleter<PyObjectType>>;
+
+/**
+ * A guard class for Python exceptions. In certain CPython methods, such as `tp_finalize`,
+ * the exception state must remain unchanged throughout execution. This class saves the current
+ * exception state upon initialization and restores it upon destruction, ensuring the exception
+ * status is preserved.
+ * Docs: https://docs.python.org/3/c-api/typeobj.html#c.PyTypeObject.tp_finalize
+ */
+class PyErrGuard {
+public:
+    // Constructor
+    PyErrGuard() { PyErr_Fetch(&m_error_type, &m_error_value, &m_error_traceback); }
+
+    // Destructor
+    ~PyErrGuard() { PyErr_Restore(m_error_type, m_error_value, m_error_traceback); }
+
+    // Delete copy/move constructor and assignment
+    PyErrGuard(PyErrGuard const&) = delete;
+    PyErrGuard(PyErrGuard&&) = delete;
+    auto operator=(PyErrGuard const&) -> PyErrGuard& = delete;
+    auto operator=(PyErrGuard&&) -> PyErrGuard& = delete;
+
+private:
+    // Variables
+    PyObject* m_error_type{nullptr};
+    PyObject* m_error_value{nullptr};
+    PyObject* m_error_traceback{nullptr};
+};
 }  // namespace clp_ffi_py
 
 #endif  // CLP_FFI_PY_PY_OBJECT_UTILS_HPP

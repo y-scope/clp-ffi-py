@@ -125,6 +125,11 @@ PySerializer_close(PySerializer* self, PyObject* args, PyObject* keywords) -> Py
  */
 CLP_FFI_PY_METHOD auto PySerializer_dealloc(PySerializer* self) -> void;
 
+/**
+ * Callback of `PySerializer`'s finalization (destructor).
+ */
+CLP_FFI_PY_METHOD auto PySerializer_finalize(PySerializer* self) -> void;
+
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyMethodDef PySerializer_method_table[]{
         {"serialize_msgpack",
@@ -161,6 +166,7 @@ PyType_Slot PySerializer_slots[]{
         {Py_tp_dealloc, reinterpret_cast<void*>(PySerializer_dealloc)},
         {Py_tp_new, reinterpret_cast<void*>(PyType_GenericNew)},
         {Py_tp_init, reinterpret_cast<void*>(PySerializer_init)},
+        {Py_tp_finalize, reinterpret_cast<void*>(PySerializer_finalize)},
         {Py_tp_methods, static_cast<void*>(PySerializer_method_table)},
         {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPySerializerDoc))},
         {0, nullptr}
@@ -313,6 +319,23 @@ PySerializer_close(PySerializer* self, PyObject* args, PyObject* keywords) -> Py
 
 CLP_FFI_PY_METHOD auto PySerializer_dealloc(PySerializer* self) -> void {
     self->clean();
+}
+
+CLP_FFI_PY_METHOD auto PySerializer_finalize(PySerializer* self) -> void {
+    PyErrGuard const err_guard;
+    if (self->is_closed()) {
+        return;
+    }
+
+    if (0
+        != PyErr_WarnEx(
+                PyExc_RuntimeWarning,
+                "`Serializer.close()` is not called before object destruction",
+                1
+        ))
+    {
+        PyErr_Clear();
+    }
 }
 }  // namespace
 
