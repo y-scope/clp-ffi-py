@@ -62,6 +62,9 @@ public:
     std::optional<clp::ffi::KeyValuePairLogEvent> m_log_event;
 };
 
+/**
+ * Callback of `PyKeyValuePairLogEvent`'s `__init__` method.
+ */
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cPyKeyValuePairLogEventDoc,
@@ -77,15 +80,6 @@ PyDoc_STRVAR(
         ":param dictionary: A dictionary representing the key-value log event, where all keys are"
         " expected to be of string type, including keys inside any sub-dictionaries.\n"
 );
-
-/**
- * Callback of `PyKeyValuePairLogEvent`'s `__init__` method:
- * @param self
- * @param args
- * @param keywords
- * @return 0 on success.
- * @return -1 on failure with the relevant Python exception and error set.
- */
 CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_init(
         PyKeyValuePairLogEvent* self,
         PyObject* args,
@@ -93,11 +87,8 @@ CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_init(
 ) -> int;
 
 /**
- * Callback of `PyKeyValuePairLogEvent`'s deallocator.
- * @param self
+ * Callback of `PyKeyValuePairLogEvent`'s `to_dict` method.
  */
-CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_dealloc(PyKeyValuePairLogEvent* self) -> void;
-
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cPyKeyValuePairLogEventToDictDoc,
@@ -106,14 +97,12 @@ PyDoc_STRVAR(
         "Converts the underlying key-value pair log event into a Python dictionary.\n\n"
         ":return: Serialized log event in a Python dictionary.\n"
 );
+CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_to_dict(PyKeyValuePairLogEvent* self) -> PyObject*;
 
 /**
- * Callback of `PyKeyValuePairLogEvent`'s `to_dict` method:
- * @param self
- * @return Serialized log event in a Python dictionary on success.
- * @return nullptr on failure with the relevant Python exception and error set.
+ * Callback of `PyKeyValuePairLogEvent`'s deallocator.
  */
-CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_to_dict(PyKeyValuePairLogEvent* self) -> PyObject*;
+CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_dealloc(PyKeyValuePairLogEvent* self) -> void;
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyMethodDef PyKeyValuePairLogEvent_method_table[]{
@@ -132,7 +121,7 @@ PyType_Slot PyKeyValuePairLogEvent_slots[]{
         {Py_tp_new, reinterpret_cast<void*>(PyType_GenericNew)},
         {Py_tp_init, reinterpret_cast<void*>(PyKeyValuePairLogEvent_init)},
         {Py_tp_methods, static_cast<void*>(PyKeyValuePairLogEvent_method_table)},
-        {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyKeyValuePairLogEventToDictDoc))},
+        {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyKeyValuePairLogEventDoc))},
         {0, nullptr}
 };
 // NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
@@ -204,11 +193,6 @@ CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_init(
     }
 
     return 0;
-}
-
-CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_dealloc(PyKeyValuePairLogEvent* self) -> void {
-    self->clean();
-    PyObject_Del(self);
 }
 
 CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_to_dict(PyKeyValuePairLogEvent* self) -> PyObject* {
@@ -323,6 +307,11 @@ auto convert_py_dict_to_key_value_pair_log_event(PyDictObject* py_dict
     }
 
     return std::move(ir_unit_handler.m_log_event);
+}
+
+CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_dealloc(PyKeyValuePairLogEvent* self) -> void {
+    self->clean();
+    PyObject_Del(self);
 }
 }  // namespace
 
