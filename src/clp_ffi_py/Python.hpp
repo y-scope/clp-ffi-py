@@ -13,14 +13,18 @@
 #ifdef CLP_FFI_PY_ENABLE_LINTING
 // The following headers are added to export Python headers to get rid of clang-tidy warnings.
 // IWYU pragma: begin_exports
+#include <abstract.h>
 #include <bytesobject.h>
 #include <dictobject.h>
+#include <longobject.h>
+#include <memoryobject.h>
 #include <methodobject.h>
 #include <modsupport.h>
 #include <object.h>
 #include <objimpl.h>
 #include <pyerrors.h>
 #include <pymacro.h>
+#include <pyport.h>
 #include <typeslots.h>
 // IWYU pragma: end_exports
 #endif

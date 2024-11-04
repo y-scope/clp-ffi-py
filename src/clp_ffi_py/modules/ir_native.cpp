@@ -7,6 +7,7 @@
 #include <clp_ffi_py/ir/native/PyLogEvent.hpp>
 #include <clp_ffi_py/ir/native/PyMetadata.hpp>
 #include <clp_ffi_py/ir/native/PyQuery.hpp>
+#include <clp_ffi_py/ir/native/PySerializer.hpp>
 #include <clp_ffi_py/Py_utils.hpp>
 
 namespace {
@@ -71,6 +72,11 @@ PyMODINIT_FUNC PyInit_native() {
     }
 
     if (false == clp_ffi_py::ir::native::PyKeyValuePairLogEvent::module_level_init(new_module)) {
+        Py_DECREF(new_module);
+        return nullptr;
+    }
+
+    if (false == clp_ffi_py::ir::native::PySerializer::module_level_init(new_module)) {
         Py_DECREF(new_module);
         return nullptr;
     }
