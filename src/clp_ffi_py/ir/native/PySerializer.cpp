@@ -121,6 +121,35 @@ CLP_FFI_PY_METHOD auto
 PySerializer_close(PySerializer* self, PyObject* args, PyObject* keywords) -> PyObject*;
 
 /**
+ * Callback of `PySerializer`'s `__enter__` method.
+ */
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
+PyDoc_STRVAR(
+        cPySerializerEnterDoc,
+        "__enter__(self)\n"
+        "--\n\n"
+        "Enters the runtime context.\n\n"
+        ":return: self.\n"
+);
+CLP_FFI_PY_METHOD auto PySerializer_enter(PySerializer* self) -> PyObject*;
+
+/**
+ * Callback of `PySerializer`'s `__exit__` method.
+ */
+PyDoc_STRVAR(
+        cPySerializerExitDoc,
+        "__exit__(self, exc_type, exc_value, traceback)\n"
+        "--\n\n"
+        "Exits the runtime context, automatically calling :meth:`close` to flush all buffered data"
+        " into the output stream."
+        ":param exc_type: The type of the exception caused the context to be exited. Unused.\n"
+        ":param exc_value: The value of the exception caused the context to be exited. Unused.\n"
+        ":param exc_traceable: The traceback. Unused.\n"
+);
+CLP_FFI_PY_METHOD auto
+PySerializer_exit(PySerializer* self, PyObject* args, PyObject* keywords) -> PyObject*;
+
+/**
  * Callback of `PySerializer`'s deallocator.
  */
 CLP_FFI_PY_METHOD auto PySerializer_dealloc(PySerializer* self) -> void;
@@ -156,6 +185,16 @@ PyMethodDef PySerializer_method_table[]{
          py_c_function_cast(PySerializer_close),
          METH_VARARGS | METH_KEYWORDS,
          static_cast<char const*>(cPySerializerCloseDoc)},
+
+        {"__enter__",
+         py_c_function_cast(PySerializer_enter),
+         METH_NOARGS,
+         static_cast<char const*>(cPySerializerEnterDoc)},
+
+        {"__exit__",
+         py_c_function_cast(PySerializer_exit),
+         METH_VARARGS | METH_KEYWORDS,
+         static_cast<char const*>(cPySerializerExitDoc)},
 
         {nullptr}
 };
@@ -315,6 +354,48 @@ PySerializer_close(PySerializer* self, PyObject* args, PyObject* keywords) -> Py
     }
 
     return PyLong_FromSsize_t(optional_num_bytes_written.value());
+}
+
+CLP_FFI_PY_METHOD auto PySerializer_enter(PySerializer* self) -> PyObject* {
+    return py_reinterpret_cast<PyObject>(self);
+}
+
+CLP_FFI_PY_METHOD auto
+PySerializer_exit(PySerializer* self, PyObject* args, PyObject* keywords) -> PyObject* {
+    static char keyword_exc_type[]{"exc_type"};
+    static char keyword_exc_value[]{"exc_value"};
+    static char keyword_traceback[]{"traceback"};
+    static char* keyword_table[]{
+            static_cast<char*>(keyword_exc_type),
+            static_cast<char*>(keyword_exc_value),
+            static_cast<char*>(keyword_traceback),
+            nullptr
+    };
+
+    PyObject* py_exc_type{};
+    PyObject* py_exc_value{};
+    PyObject* py_traceback{};
+    if (false
+        == static_cast<bool>(PyArg_ParseTupleAndKeywords(
+                args,
+                keywords,
+                "|OOO",
+                static_cast<char**>(keyword_table),
+                &py_exc_type,
+                &py_exc_value,
+                &py_traceback
+        )))
+    {
+        return nullptr;
+    }
+
+    // We don't do anything with the given exception. It is the caller's responsibility to raise
+    // the exceptions
+    if (false == self->close(true).has_value()) {
+        return nullptr;
+    }
+
+    Py_RETURN_NONE;
 }
 
 CLP_FFI_PY_METHOD auto PySerializer_dealloc(PySerializer* self) -> void {

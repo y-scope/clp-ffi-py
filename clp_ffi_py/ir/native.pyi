@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from datetime import tzinfo
-from typing import Any, Dict, IO, List, Optional
+from types import TracebackType
+from typing import Any, Dict, IO, List, Optional, Type
 
 from clp_ffi_py.wildcard_query import WildcardQuery
 
@@ -88,6 +91,13 @@ class KeyValuePairLogEvent:
 
 class Serializer:
     def __init__(self, output_stream: IO[bytes]): ...
+    def __enter__(self) -> Serializer: ...
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_value: Optional[BaseException],
+        traceback: Optional[TracebackType],
+    ) -> None: ...
     def serialize_msgpack(self, msgpack_byte_sequence: bytes) -> None: ...
     def write_to_stream(self) -> int: ...
     def get_buffer_size(self) -> int: ...
