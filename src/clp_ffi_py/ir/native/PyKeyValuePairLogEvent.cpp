@@ -218,15 +218,17 @@ CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_to_dict(PyKeyValuePairLogEvent* se
 
 auto convert_py_dict_to_key_value_pair_log_event(PyDictObject* py_dict
 ) -> std::optional<clp::ffi::KeyValuePairLogEvent> {
-    auto* serialized_msgpack_byte_sequence{py_utils_serialize_dict_to_msgpack(py_dict)};
+    PyObjectPtr<PyBytesObject> const serialized_msgpack_byte_sequence{
+            py_utils_serialize_dict_to_msgpack(py_dict)
+    };
     if (nullptr == serialized_msgpack_byte_sequence) {
         return std::nullopt;
     }
 
     // Since the type is already checked, we can use the macro to avoid duplicated type checking.
     std::span<char const> const data_view{
-            PyBytes_AS_STRING(serialized_msgpack_byte_sequence),
-            static_cast<size_t>(PyBytes_GET_SIZE(serialized_msgpack_byte_sequence))
+            PyBytes_AS_STRING(serialized_msgpack_byte_sequence.get()),
+            static_cast<size_t>(PyBytes_GET_SIZE(serialized_msgpack_byte_sequence.get()))
     };
     auto const unpack_result{unpack_msgpack(data_view)};
     if (unpack_result.has_error()) {
