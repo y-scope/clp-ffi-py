@@ -390,7 +390,7 @@ PySerializer_exit(PySerializer* self, PyObject* args, PyObject* keywords) -> PyO
     }
 
     // We don't do anything with the given exception. It is the caller's responsibility to raise
-    // the exceptions
+    // the exceptions: https://docs.python.org/3/reference/datamodel.html#object.__exit__
     if (false == self->close(true).has_value()) {
         return nullptr;
     }
