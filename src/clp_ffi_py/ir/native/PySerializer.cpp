@@ -382,6 +382,7 @@ CLP_FFI_PY_METHOD auto PySerializer_dealloc(PySerializer* self) -> void {
     }
 
     self->clean();
+    Py_TYPE(self)->tp_free(py_reinterpret_cast<PyObject>(self));
 }
 }  // namespace
 
