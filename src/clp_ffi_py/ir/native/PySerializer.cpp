@@ -5,7 +5,6 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
-#include <iostream>
 #include <optional>
 #include <span>
 #include <type_traits>
@@ -319,18 +318,15 @@ PySerializer_close(PySerializer* self, PyObject* args, PyObject* keywords) -> Py
 }
 
 CLP_FFI_PY_METHOD auto PySerializer_dealloc(PySerializer* self) -> void {
-    std::cerr << "Dealloc...\n";
     self->clean();
 }
 
 CLP_FFI_PY_METHOD auto PySerializer_finalize(PySerializer* self) -> void {
-    std::cerr << "Finalizing...\n";
     PyErrGuard const err_guard;
     if (self->is_closed()) {
         return;
     }
 
-    std::cerr << "Not closed!\n";
     if (0
         != PyErr_WarnEx(
                 PyExc_RuntimeWarning,
@@ -338,7 +334,6 @@ CLP_FFI_PY_METHOD auto PySerializer_finalize(PySerializer* self) -> void {
                 1
         ))
     {
-        std::cerr << "Exception captured!\n";
         PyErr_Clear();
     }
 }
