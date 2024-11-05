@@ -310,7 +310,7 @@ auto convert_py_dict_to_key_value_pair_log_event(PyDictObject* py_dict
 
 CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_dealloc(PyKeyValuePairLogEvent* self) -> void {
     self->clean();
-    PyObject_Del(self);
+    Py_TYPE(self)->tp_free(py_reinterpret_cast<PyObject>(self));
 }
 }  // namespace
 
