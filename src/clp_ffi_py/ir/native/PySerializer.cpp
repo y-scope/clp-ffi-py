@@ -101,9 +101,9 @@ PyDoc_STRVAR(
         "Closes the serializer, writing any remaining data to the output stream and appending a"
         " byte sequence to mark the end of a CLP IR stream. The output stream is then flushed and"
         " closed.\n"
-        "NOTE: This method must be called to properly terminate an IR stream. Failing to call it"
-        " may leave the stream incomplete, potentially resulting in data loss due to data"
-        " buffering\n\n"
+        "NOTE: This method must be called to properly terminate an IR stream. Forgetting/failing"
+        " to call it will leave the stream incomplete, and potentially resulting in data loss due"
+        " to data buffering.\n\n"
         ":raise IOError: If the serializer has already been closed.\n"
 );
 CLP_FFI_PY_METHOD auto PySerializer_close(PySerializer* self) -> PyObject*;
@@ -370,8 +370,10 @@ CLP_FFI_PY_METHOD auto PySerializer_dealloc(PySerializer* self) -> void {
     if (false == self->is_closed()) {
         if (0
             != PyErr_WarnEx(
-                    PyExc_RuntimeWarning,
-                    "`Serializer.close()` is not called before object destruction",
+                    PyExc_ResourceWarning,
+                    "`Serializer.close()` is not called before object destruction. Forget to call "
+                    "`close` will leave the stream incomplete, and potentially resulting in data "
+                    "loss due to data buffering",
                     1
             ))
         {

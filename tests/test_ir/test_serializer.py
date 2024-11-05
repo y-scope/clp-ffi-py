@@ -1,5 +1,6 @@
 from io import BytesIO
 from pathlib import Path
+from typing import Optional
 
 from test_ir.test_utils import JsonFileReader, TestCLPBase
 
@@ -157,3 +158,8 @@ class TestCaseSerializer(TestCLPBase):
             preamble_size + 1,
             "End-of-stream byte is missing",
         )
+
+    def test_not_closed(self) -> None:
+        serializer: Optional[Serializer] = Serializer(BytesIO())
+        with self.assertWarns(ResourceWarning) as not_closed_warning:
+            serializer = None
