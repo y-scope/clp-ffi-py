@@ -29,13 +29,17 @@ PyDoc_STRVAR(
         cPySerializerDoc,
         "Serializer for CLP key-value pair IR stream.\n"
         "This class serializes log events into CLP IR format (using four-byte-encoding) and writes"
-        " the serialized data to a specified byte stream.\n\n"
-        "__init__(self, output_stream)\n\n"
-        "Initializes a `Serializer` instance with the given output stream. Notice that each object"
-        " should be strictly initialized only once. Double initialization will result in memory"
-        " leak.\n\n"
+        " the serialized data to a specified byte stream object.\n\n"
+        "__init__(self, output_stream, buffer_size_limit)\n\n"
+        "Initializes a :class:`Serializer` instance with the given output stream. Notice that each"
+        " object should be strictly initialized only once. Double initialization will result in"
+        " memory leak.\n\n"
         ":param output_stream: A writable byte stream to which the serializer will write serialized"
         " IR byte sequence.\n"
+        ":param buffer_size_limit: The buffer size in bytes that will trigger the internal buffer"
+        " flush, defaults to 65536. The serialized log events will be first buffered inside the"
+        " internal buffer. When the size of the buffer exceeds this limit, the internal buffer will"
+        " be written to the output stream.\n"
 );
 CLP_FFI_PY_METHOD auto
 PySerializer_init(PySerializer* self, PyObject* args, PyObject* keywords) -> int;
@@ -45,62 +49,46 @@ PySerializer_init(PySerializer* self, PyObject* args, PyObject* keywords) -> int
  */
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
-        cPySerializerSerializeMsgpackDoc,
-        "serialize_msgpack(self, msgpack_byte_sequence)\n"
+        cPySerializerSerializeMsgpackMapDoc,
+        "serialize_msgpack_map(self, msgpack_map)\n"
         "--\n\n"
-        "Serializes the given msgpack byte sequence into as a log event.\n"
-        "NOTE: the serialization results will be buffered inside the serializer. `write_to_stream`"
-        " must be called to write buffered bytes into the output stream.\n\n"
-        ":param msgpack_byte_sequence: A byte sequence encoded in msgpack as the input log event."
+        "Serializes the given msgpack byte sequence into as a log event into CLP IR format.\n\n"
+        ":param msgpack_map: A byte sequence encoded in msgpack as the input log event."
         " The unpacked result must be a msgpack map with all keys as strings.\n"
+        ":return: The number of bytes serialized.\n"
         ":raise IOError: If the serializer has already been closed.\n"
         ":raise TypeError: If the unpacked result is not a msgpack map.\n"
         ":raise RuntimeError: If it fails to unpack the given msgpack byte sequence, or the"
         " serialization method returns failure.\n"
 );
 CLP_FFI_PY_METHOD auto
-PySerializer_serialize_msgpack(PySerializer* self, PyObject* msgpack_byte_sequence) -> PyObject*;
+PySerializer_serialize_msgpack_map(PySerializer* self, PyObject* msgpack_map) -> PyObject*;
 
 /**
- * Callback of `PySerializer`'s `write_to_stream` method.
+ * Callback of `PySerializer`'s `get_num_bytes_serialized` method.
  */
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
-        cPySerializerWriteToStreamDoc,
-        "write_to_stream(self)\n"
+        cPySerializerGetNumBytesSerializedDoc,
+        "get_num_bytes_serialized(self)\n"
         "--\n\n"
-        "Writes the buffered results to the output stream and clears the buffer.\n\n"
-        ":return: Number of bytes written.\n"
+        ":return: The total number of bytes serialized.\n"
         ":raise IOError: If the serializer has already been closed.\n"
 );
-CLP_FFI_PY_METHOD auto PySerializer_write_to_stream(PySerializer* self) -> PyObject*;
+CLP_FFI_PY_METHOD auto PySerializer_get_num_bytes_serialized(PySerializer* self) -> PyObject*;
 
 /**
- * Callback of `PySerializer`'s `get_buffer_size` method.
+ * Callback of `PySerializer`'s `flush` method.
  */
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
-        cPySerializerGetBufferSizeDoc,
-        "get_buffer_size(self)\n"
+        cPySerializerFlushDoc,
+        "flush(self)\n"
         "--\n\n"
-        "Gets the size of the result buffer.\n\n"
-        ":return: The buffer size in bytes.\n"
+        "Flushes the internal buffer and the output stream.\n\n"
         ":raise IOError: If the serializer has already been closed.\n"
 );
-CLP_FFI_PY_METHOD auto PySerializer_get_buffer_size(PySerializer* self) -> PyObject*;
-
-/**
- * Callback of `PySerializer`'s `flush_stream` method.
- */
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
-PyDoc_STRVAR(
-        cPySerializerFlushStreamDoc,
-        "flush_stream(self)\n"
-        "--\n\n"
-        "Flushes the output stream.\n\n"
-        ":raise IOError: If the serializer has already been closed.\n"
-);
-CLP_FFI_PY_METHOD auto PySerializer_flush_stream(PySerializer* self) -> PyObject*;
+CLP_FFI_PY_METHOD auto PySerializer_flush(PySerializer* self) -> PyObject*;
 
 /**
  * Callback of `PySerializer`'s `close` method.
@@ -108,17 +96,17 @@ CLP_FFI_PY_METHOD auto PySerializer_flush_stream(PySerializer* self) -> PyObject
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cPySerializerCloseDoc,
-        "close(self, flush_stream=True)\n"
+        "close(self)\n"
         "--\n\n"
-        "Closes the serializer by writing the results into the output stream with the byte sequence"
-        " in the end that indicates the end of a CLP IR stream. This method must be called to"
-        " terminate an IR stream. Otherwise, the stream will be considered incomplete.\n\n"
-        ":param flush_stream: Whether to flush the output stream.\n"
-        ":return: Forwards :meth:`write_to_stream`'s return value.\n"
+        "Closes the serializer, writing any remaining data to the output stream and appending a"
+        " byte sequence to mark the end of a CLP IR stream. The output stream is then flushed and"
+        " closed.\n"
+        "NOTE: This method must be called to properly terminate an IR stream. Failing to call it"
+        " may leave the stream incomplete, potentially resulting in data loss due to data"
+        " buffering\n\n"
         ":raise IOError: If the serializer has already been closed.\n"
 );
-CLP_FFI_PY_METHOD auto
-PySerializer_close(PySerializer* self, PyObject* args, PyObject* keywords) -> PyObject*;
+CLP_FFI_PY_METHOD auto PySerializer_close(PySerializer* self) -> PyObject*;
 
 /**
  * Callback of `PySerializer`'s `__enter__` method.
@@ -154,36 +142,26 @@ PySerializer_exit(PySerializer* self, PyObject* args, PyObject* keywords) -> PyO
  */
 CLP_FFI_PY_METHOD auto PySerializer_dealloc(PySerializer* self) -> void;
 
-/**
- * Callback of `PySerializer`'s finalization (destructor).
- */
-CLP_FFI_PY_METHOD auto PySerializer_finalize(PySerializer* self) -> void;
-
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyMethodDef PySerializer_method_table[]{
-        {"serialize_msgpack",
-         py_c_function_cast(PySerializer_serialize_msgpack),
+        {"serialize_msgpack_map",
+         py_c_function_cast(PySerializer_serialize_msgpack_map),
          METH_O,
-         static_cast<char const*>(cPySerializerSerializeMsgpackDoc)},
+         static_cast<char const*>(cPySerializerSerializeMsgpackMapDoc)},
 
-        {"write_to_stream",
-         py_c_function_cast(PySerializer_write_to_stream),
+        {"get_num_bytes_serialized",
+         py_c_function_cast(PySerializer_get_num_bytes_serialized),
          METH_NOARGS,
-         static_cast<char const*>(cPySerializerWriteToStreamDoc)},
+         static_cast<char const*>(cPySerializerGetNumBytesSerializedDoc)},
 
-        {"get_buffer_size",
-         py_c_function_cast(PySerializer_get_buffer_size),
+        {"flush",
+         py_c_function_cast(PySerializer_flush),
          METH_NOARGS,
-         static_cast<char const*>(cPySerializerGetBufferSizeDoc)},
-
-        {"flush_stream",
-         py_c_function_cast(PySerializer_flush_stream),
-         METH_NOARGS,
-         static_cast<char const*>(cPySerializerFlushStreamDoc)},
+         static_cast<char const*>(cPySerializerFlushDoc)},
 
         {"close",
          py_c_function_cast(PySerializer_close),
-         METH_VARARGS | METH_KEYWORDS,
+         METH_NOARGS,
          static_cast<char const*>(cPySerializerCloseDoc)},
 
         {"__enter__",
@@ -205,7 +183,6 @@ PyType_Slot PySerializer_slots[]{
         {Py_tp_dealloc, reinterpret_cast<void*>(PySerializer_dealloc)},
         {Py_tp_new, reinterpret_cast<void*>(PyType_GenericNew)},
         {Py_tp_init, reinterpret_cast<void*>(PySerializer_init)},
-        {Py_tp_finalize, reinterpret_cast<void*>(PySerializer_finalize)},
         {Py_tp_methods, static_cast<void*>(PySerializer_method_table)},
         {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPySerializerDoc))},
         {0, nullptr}
@@ -219,54 +196,70 @@ PyType_Spec PySerializer_type_spec{
         "clp_ffi_py.ir.native.Serializer",
         sizeof(PySerializer),
         0,
-        Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_FINALIZE,
+        Py_TPFLAGS_DEFAULT,
         static_cast<PyType_Slot*>(PySerializer_slots)
 };
 
 CLP_FFI_PY_METHOD auto
 PySerializer_init(PySerializer* self, PyObject* args, PyObject* keywords) -> int {
     static char keyword_output_stream[]{"output_stream"};
-    static char* keyword_table[]{static_cast<char*>(keyword_output_stream), nullptr};
+    static char keyword_buffer_size_limit[]{"buffer_size_limit"};
+    static char* keyword_table[]{
+            static_cast<char*>(keyword_output_stream),
+            static_cast<char*>(keyword_buffer_size_limit),
+            nullptr
+    };
 
     // If the argument parsing fails, `self` will be deallocated. We must reset all pointers to
     // nullptr in advance, otherwise the deallocator might trigger segmentation fault.
     self->default_init();
 
     PyObject* output_stream{Py_None};
+    Py_ssize_t buffer_size_limit{PySerializer::cDefaultBufferSizeLimit};
     if (false
         == static_cast<bool>(PyArg_ParseTupleAndKeywords(
                 args,
                 keywords,
-                "O",
+                "O|L",
                 static_cast<char**>(keyword_table),
-                &output_stream
+                &output_stream,
+                &buffer_size_limit
         )))
     {
         return -1;
     }
 
-    // Ensure the `output_stream` has `write` and `flush` methods
-    PyObjectPtr<PyObject> const write_method{PyObject_GetAttrString(output_stream, "write")};
-    if (nullptr == write_method) {
+    // Ensure the `output_stream` has `write`, `flush`, and `close` methods
+    auto output_stream_has_method = [&](char const* method_name) -> bool {
+        PyObjectPtr<PyObject> const write_method{PyObject_GetAttrString(output_stream, method_name)
+        };
+        if (nullptr == write_method) {
+            return false;
+        }
+        if (false == static_cast<bool>(PyCallable_Check(write_method.get()))) {
+            PyErr_SetString(PyExc_TypeError, "");
+            PyErr_Format(
+                    PyExc_TypeError,
+                    "The attribute `%s` of the given output stream object is not callable.",
+                    method_name
+            );
+            return false;
+        }
+        return true;
+    };
+
+    if (false == output_stream_has_method("write")) {
         return -1;
     }
-    if (false == static_cast<bool>(PyCallable_Check(write_method.get()))) {
-        PyErr_SetString(
-                PyExc_TypeError,
-                "The attribute `write` of the given output stream object is not callable."
-        );
+    if (false == output_stream_has_method("flush")) {
+        return -1;
+    }
+    if (false == output_stream_has_method("close")) {
         return -1;
     }
 
-    PyObjectPtr<PyObject> const flush_method{PyObject_GetAttrString(output_stream, "flush")};
-    if (nullptr == flush_method) {
-        return -1;
-    }
-    if (false == static_cast<bool>(PyCallable_Check(flush_method.get()))) {
-        PyErr_SetString(
-                PyExc_TypeError,
-                "The attribute `flush` of the given output stream object is not callable."
-        );
+    if (0 > buffer_size_limit) {
+        PyErr_SetString(PyExc_ValueError, "The buffer size limit cannot be negative");
         return -1;
     }
 
@@ -280,12 +273,17 @@ PySerializer_init(PySerializer* self, PyObject* args, PyObject* keywords) -> int
         return -1;
     }
 
-    return self->init(output_stream, std::move(serializer_result.value())) ? 0 : -1;
+    if (false == self->init(output_stream, std::move(serializer_result.value()), buffer_size_limit))
+    {
+        return -1;
+    }
+
+    return 0;
 }
 
 CLP_FFI_PY_METHOD auto
-PySerializer_serialize_msgpack(PySerializer* self, PyObject* msgpack_byte_sequence) -> PyObject* {
-    if (false == static_cast<bool>(PyBytes_Check(msgpack_byte_sequence))) {
+PySerializer_serialize_msgpack_map(PySerializer* self, PyObject* msgpack_map) -> PyObject* {
+    if (false == static_cast<bool>(PyBytes_Check(msgpack_map))) {
         PyErr_SetString(
                 PyExc_TypeError,
                 "`msgpack_byte_sequence` is supposed to return a `bytes` object"
@@ -293,67 +291,35 @@ PySerializer_serialize_msgpack(PySerializer* self, PyObject* msgpack_byte_sequen
         return nullptr;
     }
 
-    auto* py_bytes_msgpack_byte_sequence{py_reinterpret_cast<PyBytesObject>(msgpack_byte_sequence)};
+    auto* py_bytes_msgpack_map{py_reinterpret_cast<PyBytesObject>(msgpack_map)};
     // Since the type is already checked, we can use the macro to avoid duplicated type checking.
-    if (false
-        == self->serialize_msgpack_map(
-                {PyBytes_AS_STRING(py_bytes_msgpack_byte_sequence),
-                 static_cast<size_t>(PyBytes_GET_SIZE(py_bytes_msgpack_byte_sequence))}
-        ))
-    {
+    auto const num_byte_serialized{self->serialize_msgpack_map(
+            {PyBytes_AS_STRING(py_bytes_msgpack_map),
+             static_cast<size_t>(PyBytes_GET_SIZE(py_bytes_msgpack_map))}
+    )};
+    if (false == num_byte_serialized.has_value()) {
         return nullptr;
     }
 
-    Py_RETURN_NONE;
+    return PyLong_FromSsize_t(num_byte_serialized.value());
 }
 
-CLP_FFI_PY_METHOD auto PySerializer_write_to_stream(PySerializer* self) -> PyObject* {
-    auto const optional_num_bytes_write{self->write_ir_buf_to_output_stream()};
-    if (false == optional_num_bytes_write.has_value()) {
-        return nullptr;
-    }
-    return PyLong_FromSsize_t(optional_num_bytes_write.value());
+CLP_FFI_PY_METHOD auto PySerializer_get_num_bytes_serialized(PySerializer* self) -> PyObject* {
+    return PyLong_FromSsize_t(self->get_num_bytes_serialized());
 }
 
-CLP_FFI_PY_METHOD auto PySerializer_get_buffer_size(PySerializer* self) -> PyObject* {
-    if (false == self->assert_is_not_closed()) {
-        return nullptr;
-    }
-    return PyLong_FromSsize_t(self->get_ir_buf_size());
-}
-
-CLP_FFI_PY_METHOD auto PySerializer_flush_stream(PySerializer* self) -> PyObject* {
-    if (false == self->flush_output_stream()) {
+CLP_FFI_PY_METHOD auto PySerializer_flush(PySerializer* self) -> PyObject* {
+    if (false == self->flush()) {
         return nullptr;
     }
     Py_RETURN_NONE;
 }
 
-CLP_FFI_PY_METHOD auto
-PySerializer_close(PySerializer* self, PyObject* args, PyObject* keywords) -> PyObject* {
-    static char keyword_flush_stream[]{"flush_stream"};
-    static char* keyword_table[]{static_cast<char*>(keyword_flush_stream), nullptr};
-
-    int flush_stream{1};
-
-    if (false
-        == static_cast<bool>(PyArg_ParseTupleAndKeywords(
-                args,
-                keywords,
-                "|p",
-                static_cast<char**>(keyword_table),
-                &flush_stream
-        )))
-    {
+CLP_FFI_PY_METHOD auto PySerializer_close(PySerializer* self) -> PyObject* {
+    if (false == self->close()) {
         return nullptr;
     }
-
-    auto const optional_num_bytes_written{self->close(static_cast<bool>(flush_stream))};
-    if (false == optional_num_bytes_written.has_value()) {
-        return nullptr;
-    }
-
-    return PyLong_FromSsize_t(optional_num_bytes_written.value());
+    Py_RETURN_NONE;
 }
 
 CLP_FFI_PY_METHOD auto PySerializer_enter(PySerializer* self) -> PyObject* {
@@ -391,7 +357,7 @@ PySerializer_exit(PySerializer* self, PyObject* args, PyObject* keywords) -> PyO
 
     // We don't do anything with the given exception. It is the caller's responsibility to raise
     // the exceptions: https://docs.python.org/3/reference/datamodel.html#object.__exit__
-    if (false == self->close(true).has_value()) {
+    if (false == self->close()) {
         return nullptr;
     }
 
@@ -399,35 +365,42 @@ PySerializer_exit(PySerializer* self, PyObject* args, PyObject* keywords) -> PyO
 }
 
 CLP_FFI_PY_METHOD auto PySerializer_dealloc(PySerializer* self) -> void {
-    self->clean();
-}
-
-CLP_FFI_PY_METHOD auto PySerializer_finalize(PySerializer* self) -> void {
     PyErrGuard const err_guard;
-    if (self->is_closed()) {
-        return;
+
+    if (false == self->is_closed()) {
+        if (0
+            != PyErr_WarnEx(
+                    PyExc_RuntimeWarning,
+                    "`Serializer.close()` is not called before object destruction",
+                    1
+            ))
+        {
+            PyErr_Clear();
+        }
     }
 
-    if (0
-        != PyErr_WarnEx(
-                PyExc_RuntimeWarning,
-                "`Serializer.close()` is not called before object destruction",
-                1
-        ))
-    {
-        PyErr_Clear();
-    }
+    self->clean();
 }
 }  // namespace
 
-auto PySerializer::init(PyObject* output_stream, PySerializer::ClpIrSerializer serializer) -> bool {
+auto PySerializer::init(
+        PyObject* output_stream,
+        PySerializer::ClpIrSerializer serializer,
+        Py_ssize_t buffer_size_limit
+) -> bool {
     m_output_stream = output_stream;
     Py_INCREF(output_stream);
     m_serializer = new PySerializer::ClpIrSerializer{std::move(serializer)};
+    m_buffer_size_limit = buffer_size_limit;
     if (nullptr == m_serializer) {
         PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::cOutofMemoryError);
         return false;
     }
+    auto const preamble_size{get_ir_buf_size()};
+    if (preamble_size > m_buffer_size_limit && false == write_ir_buf_to_output_stream()) {
+        return false;
+    }
+    m_num_total_bytes_serialized += preamble_size;
     return true;
 }
 
@@ -439,83 +412,75 @@ auto PySerializer::assert_is_not_closed() const -> bool {
     return true;
 }
 
-auto PySerializer::serialize_msgpack_map(std::span<char const> msgpack_byte_sequence) -> bool {
+auto PySerializer::serialize_msgpack_map(std::span<char const> msgpack_byte_sequence
+) -> std::optional<Py_ssize_t> {
     if (false == assert_is_not_closed()) {
-        return false;
+        return std::nullopt;
     }
 
     auto const unpack_result{unpack_msgpack(msgpack_byte_sequence)};
     if (unpack_result.has_error()) {
         PyErr_SetString(PyExc_RuntimeError, unpack_result.error().c_str());
-        return false;
+        return std::nullopt;
     }
 
     auto const& msgpack_obj{unpack_result.value().get()};
     if (msgpack::type::MAP != msgpack_obj.type) {
         PyErr_SetString(PyExc_TypeError, "Unpacked msgpack is not a map");
-        return false;
+        return std::nullopt;
     }
 
+    auto const buffer_size_before_serialization{get_ir_buf_size()};
     if (false == m_serializer->serialize_msgpack_map(msgpack_obj.via.map)) {
         PyErr_SetString(PyExc_RuntimeError, cSerializerSerializeMsgpackMapError.data());
-        return false;
-    }
-
-    return true;
-}
-
-auto PySerializer::write_ir_buf_to_output_stream() -> std::optional<Py_ssize_t> {
-    if (false == assert_is_not_closed()) {
         return std::nullopt;
     }
+    auto const buffer_size_after_serialization{get_ir_buf_size()};
+    auto const num_bytes_serialized{
+            buffer_size_after_serialization - buffer_size_before_serialization
+    };
+    m_num_total_bytes_serialized += num_bytes_serialized;
 
-    auto const optional_num_bytes_written{write_to_output_stream(m_serializer->get_ir_buf_view())};
-    if (false == optional_num_bytes_written.has_value()) {
+    if (buffer_size_after_serialization > m_buffer_size_limit
+        && false == write_ir_buf_to_output_stream())
+    {
         return std::nullopt;
     }
-
-    m_serializer->clear_ir_buf();
-    return optional_num_bytes_written;
+    return num_bytes_serialized;
 }
 
-auto PySerializer::flush_output_stream() -> bool {
+auto PySerializer::flush() -> bool {
     if (false == assert_is_not_closed()) {
         return false;
     }
-    if (nullptr == PyObject_CallMethod(m_output_stream, "flush", "")) {
+    if (false == write_ir_buf_to_output_stream()) {
         return false;
     }
-    return true;
+    return flush_output_stream();
 }
 
-auto PySerializer::close(bool flush_stream) -> std::optional<Py_ssize_t> {
+auto PySerializer::close() -> bool {
     if (false == assert_is_not_closed()) {
-        return std::nullopt;
+        return false;
     }
 
-    // Write the IR buffer into the stream.
-    auto const optional_num_bytes_written_from_ir_buf{write_ir_buf_to_output_stream()};
-    if (false == optional_num_bytes_written_from_ir_buf.has_value()) {
-        return std::nullopt;
+    if (false == write_ir_buf_to_output_stream()) {
+        return false;
     }
 
     // Write end-of-stream
     constexpr std::array<int8_t, 1> cEndOfStreamBuf{clp::ffi::ir_stream::cProtocol::Eof};
-    auto const optional_num_bytes_written_from_end_of_stream_buf{
-            write_to_output_stream({cEndOfStreamBuf.cbegin(), cEndOfStreamBuf.cend()})
-    };
-    if (false == optional_num_bytes_written_from_end_of_stream_buf.has_value()) {
-        return std::nullopt;
+    if (false == write_to_output_stream({cEndOfStreamBuf.cbegin(), cEndOfStreamBuf.cend()})) {
+        return false;
     }
+    m_num_total_bytes_serialized += cEndOfStreamBuf.size();
 
-    // Flush the output stream if needed
-    if (flush_stream && false == flush_output_stream()) {
-        return std::nullopt;
+    if (false == (flush_output_stream() && close_output_stream())) {
+        return false;
     }
 
     close_serializer();
-    return optional_num_bytes_written_from_ir_buf.value()
-           + optional_num_bytes_written_from_end_of_stream_buf.value();
+    return true;
 }
 
 auto PySerializer::module_level_init(PyObject* py_module) -> bool {
@@ -526,6 +491,28 @@ auto PySerializer::module_level_init(PyObject* py_module) -> bool {
         return false;
     }
     return add_python_type(get_py_type(), "Serializer", py_module);
+}
+
+auto PySerializer::write_ir_buf_to_output_stream() -> bool {
+    if (false == assert_is_not_closed()) {
+        return false;
+    }
+
+    auto const optional_num_bytes_written{write_to_output_stream(m_serializer->get_ir_buf_view())};
+    if (false == optional_num_bytes_written.has_value()) {
+        return false;
+    }
+    if (optional_num_bytes_written.value() != get_ir_buf_size()) {
+        PyErr_SetString(
+                PyExc_RuntimeError,
+                "The number of bytes written to the output stream doesn't match the size of the "
+                "internal buffer"
+        );
+        return false;
+    }
+
+    m_serializer->clear_ir_buf();
+    return true;
 }
 
 auto PySerializer::write_to_output_stream(PySerializer::BufferView buf
@@ -558,5 +545,13 @@ auto PySerializer::write_to_output_stream(PySerializer::BufferView buf
         return std::nullopt;
     }
     return num_bytes_written;
+}
+
+auto PySerializer::flush_output_stream() -> bool {
+    return nullptr != PyObject_CallMethod(m_output_stream, "flush", "");
+}
+
+auto PySerializer::close_output_stream() -> bool {
+    return nullptr != PyObject_CallMethod(m_output_stream, "close", "");
 }
 }  // namespace clp_ffi_py::ir::native

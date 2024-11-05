@@ -1,4 +1,3 @@
-
 from io import BytesIO
 from pathlib import Path
 
@@ -51,6 +50,8 @@ class TestCaseSerializer(TestCLPBase):
     """
 
     input_src_dir: str = "test_json"
+    current_dir: Path = Path(__file__).resolve().parent
+    test_src_dir: Path = current_dir / Path(input_src_dir)
 
     def test_serialize_json(self) -> None:
         """
@@ -59,43 +60,80 @@ class TestCaseSerializer(TestCLPBase):
         The JSON parser will parse the file into Python dictionaries,
         and then convert them into msgpack and feed into `clp_ffi_py.ir.Serializer`.
         """
-        current_dir: Path = Path(__file__).resolve().parent
-        test_src_dir: Path = current_dir / Path(TestCaseSerializer.input_src_dir)
 
         byte_buffer: BytesIO
         num_bytes_serialized: int
         serializer: Serializer
 
         # Test with context manager
-        for file_path in test_src_dir.rglob("*"):
+        for file_path in TestCaseSerializer.test_src_dir.rglob("*"):
             if not file_path.is_file():
                 continue
             byte_buffer = BytesIO()
-            num_bytes_serialized = 0
             with Serializer(byte_buffer) as serializer:
+                num_bytes_serialized = serializer.get_num_bytes_serialized()
                 for json_obj in JsonFileReader(file_path).read_json_lines():
-                    serializer.serialize_msgpack(serialize_dict_to_msgpack(json_obj))
-                    num_bytes_serialized += serializer.write_to_stream()
-                    self.assertEqual(0, serializer.write_to_stream())
-                    serializer.flush_stream()
-            self.assertEqual(num_bytes_serialized + 1, len(byte_buffer.getvalue()))
-            byte_buffer.close()
+                    num_bytes_serialized += serializer.serialize_msgpack_map(
+                        serialize_dict_to_msgpack(json_obj)
+                    )
+                    serializer.flush()
+                    self.assertEqual(
+                        len(byte_buffer.getvalue()), serializer.get_num_bytes_serialized()
+                    )
+                    self.assertEqual(num_bytes_serialized, serializer.get_num_bytes_serialized())
 
         # Test without context manager
-        for file_path in test_src_dir.rglob("*"):
+        for file_path in TestCaseSerializer.test_src_dir.rglob("*"):
             if not file_path.is_file():
                 continue
             byte_buffer = BytesIO()
-            num_bytes_serialized = 0
             serializer = Serializer(byte_buffer)
+            num_bytes_serialized = serializer.get_num_bytes_serialized()
             for json_obj in JsonFileReader(file_path).read_json_lines():
-                serializer.serialize_msgpack(serialize_dict_to_msgpack(json_obj))
-                num_bytes_serialized += serializer.write_to_stream()
-                self.assertEqual(0, serializer.write_to_stream())
-                serializer.flush_stream()
-            self.assertEqual(num_bytes_serialized, len(byte_buffer.getvalue()))
+                num_bytes_serialized += serializer.serialize_msgpack_map(
+                    serialize_dict_to_msgpack(json_obj)
+                )
+                serializer.flush()
+                self.assertEqual(len(byte_buffer.getvalue()), serializer.get_num_bytes_serialized())
+                self.assertEqual(num_bytes_serialized, serializer.get_num_bytes_serialized())
             serializer.close()
-            byte_buffer.close()
+            self.assertEqual(
+                num_bytes_serialized + 1,
+                serializer.get_num_bytes_serialized(),
+                "End-of-stream byte is missing",
+            )
+
+    def test_serialize_with_customized_buffer_size_limit(self) -> None:
+        """
+        Tests serializing with customized buffer size limit.
+        """
+        buffer_size_limit: int = 3000
+        for file_path in TestCaseSerializer.test_src_dir.rglob("*"):
+            if not file_path.is_file():
+                continue
+            byte_buffer: BytesIO = BytesIO()
+            with Serializer(
+                buffer_size_limit=buffer_size_limit, output_stream=byte_buffer
+            ) as serializer:
+                serializer.flush()
+                num_bytes_in_ir_buffer: int = 0
+                for json_obj in JsonFileReader(file_path).read_json_lines():
+                    num_bytes_serialized: int = serializer.serialize_msgpack_map(
+                        serialize_dict_to_msgpack(json_obj)
+                    )
+                    self.assertNotEqual(0, num_bytes_serialized)
+                    num_bytes_in_ir_buffer += num_bytes_serialized
+                    if num_bytes_in_ir_buffer > buffer_size_limit:
+                        # The IR buffer should already be written to the stream
+                        self.assertEqual(
+                            serializer.get_num_bytes_serialized(), len(byte_buffer.getvalue())
+                        )
+                        num_bytes_in_ir_buffer = 0
+                    else:
+                        self.assertEqual(
+                            serializer.get_num_bytes_serialized(),
+                            num_bytes_in_ir_buffer + len(byte_buffer.getvalue()),
+                        )
 
     def test_closing_empty(self) -> None:
         """
@@ -105,13 +143,17 @@ class TestCaseSerializer(TestCLPBase):
         serializer: Serializer
 
         byte_buffer = BytesIO()
-        with Serializer(byte_buffer) as serializer:
-            serializer.flush_stream()
-        self.assertTrue(1 < len(byte_buffer.getvalue()))
-        byte_buffer.close()
+        preamble_size: int
+        with Serializer(byte_buffer, 0) as serializer:
+            self.assertTrue(len(byte_buffer.getvalue()) > 0)
+            self.assertEqual(len(byte_buffer.getvalue()), serializer.get_num_bytes_serialized())
+            preamble_size = serializer.get_num_bytes_serialized()
 
         byte_buffer = BytesIO()
         serializer = Serializer(byte_buffer)
         serializer.close()
-        self.assertTrue(1 < len(byte_buffer.getvalue()))
-        byte_buffer.close()
+        self.assertEqual(
+            serializer.get_num_bytes_serialized(),
+            preamble_size + 1,
+            "End-of-stream byte is missing",
+        )

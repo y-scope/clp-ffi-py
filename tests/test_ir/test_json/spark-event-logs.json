@@ -330,3 +330,5 @@
 {"Event":"org.apache.spark.sql.execution.ui.SparkListenerDriverAccumUpdates","executionId":11,"accumUpdates":[[47,8],[48,990697],[49,23598],[50,0]]}
 {"Event":"org.apache.spark.sql.execution.ui.SparkListenerSQLExecutionEnd","executionId":11,"time":1633886655028}
 {"Event":"SparkListenerApplicationEnd","Timestamp":1633886655029}
+{}
+{"empty":{},"null":null}
