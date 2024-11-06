@@ -162,4 +162,4 @@ class TestCaseSerializer(TestCLPBase):
     def test_not_closed(self) -> None:
         serializer: Optional[Serializer] = Serializer(BytesIO())
         with self.assertWarns(ResourceWarning) as _:
-            serializer = None # noqa
+            serializer = None  # noqa
