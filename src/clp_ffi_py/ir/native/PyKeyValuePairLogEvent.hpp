@@ -16,6 +16,18 @@ namespace clp_ffi_py::ir::native {
  */
 class PyKeyValuePairLogEvent {
 public:
+    // Delete default constructor to disable direct instantiation.
+    PyKeyValuePairLogEvent() = delete;
+
+    // Delete copy/move constructors and assignments
+    PyKeyValuePairLogEvent(PyKeyValuePairLogEvent const&) = delete;
+    PyKeyValuePairLogEvent(PyKeyValuePairLogEvent&&) = delete;
+    auto operator=(PyKeyValuePairLogEvent const&) -> PyKeyValuePairLogEvent& = delete;
+    auto operator=(PyKeyValuePairLogEvent&&) -> PyKeyValuePairLogEvent& = delete;
+
+    // Destructor
+    ~PyKeyValuePairLogEvent() = default;
+
     /**
      * Initializes the underlying data with the given inputs. Since the memory allocation of
      * `PyKeyValuePairLogEvent` is handled by CPython's allocator, cpp constructors will not be
