@@ -323,6 +323,7 @@ CLP_FFI_PY_METHOD auto PySerializer_close(PySerializer* self) -> PyObject* {
 }
 
 CLP_FFI_PY_METHOD auto PySerializer_enter(PySerializer* self) -> PyObject* {
+    Py_INCREF(self);
     return py_reinterpret_cast<PyObject>(self);
 }
 
@@ -382,7 +383,7 @@ CLP_FFI_PY_METHOD auto PySerializer_dealloc(PySerializer* self) -> void {
     }
 
     self->clean();
-    PySerializer::get_py_type()->tp_free(py_reinterpret_cast<PyObject>(self));
+    Py_TYPE(self)->tp_free(py_reinterpret_cast<PyObject>(self));
 }
 }  // namespace
 
