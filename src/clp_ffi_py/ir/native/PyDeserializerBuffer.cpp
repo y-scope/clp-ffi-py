@@ -300,8 +300,11 @@ auto PyDeserializerBuffer::metadata_init(PyMetadata* metadata) -> bool {
 
 auto PyDeserializerBuffer::py_getbuffer(Py_buffer* view, int flags) -> int {
     if (false == is_py_buffer_protocol_enabled()) {
+        // `view->obj` should be set to NULL according to the doc:
+        // https://docs.python.org/3/c-api/typeobj.html#c.PyBufferProcs.bf_getbuffer
+        view->obj = nullptr;
         PyErr_SetString(
-                PyExc_RuntimeError,
+                PyExc_BufferError,
                 "Attempted access to the internal buffer via the buffer protocol outside of "
                 "authorized methods"
         );
