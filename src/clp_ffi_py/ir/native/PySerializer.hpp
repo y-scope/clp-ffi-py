@@ -33,6 +33,9 @@ public:
     auto operator=(PySerializer const&) -> PySerializer& = delete;
     auto operator=(PySerializer&&) -> PySerializer& = delete;
 
+    // Destructor
+    ~PySerializer() = default;
+
     /**
      * The default buffer size limit. Any change to the value should also be applied to `__init__`'s
      * doc string and Python stub file.
