@@ -290,14 +290,14 @@ auto convert_py_dict_to_key_value_pair_log_event(PyDictObject* py_dict
             return std::nullopt;
         }
         auto const ir_unit_type{result.value()};
-        if (ir_unit_type == clp::ffi::ir_stream::IrUnitType::SchemaTreeNodeInsertion) {
-            continue;
+        if (clp::ffi::ir_stream::IrUnitType::LogEvent == ir_unit_type) {
+            break;
         }
-        if (ir_unit_type != clp::ffi::ir_stream::IrUnitType::LogEvent) {
+        if (clp::ffi::ir_stream::IrUnitType::SchemaTreeNodeInsertion != ir_unit_type) {
+            continue;
             PyErr_SetString(PyExc_RuntimeError, "Unexpected Ir Unit Type");
             return std::nullopt;
         }
-        break;
     }
 
     if (false == ir_unit_handler.m_log_event.has_value()) {
