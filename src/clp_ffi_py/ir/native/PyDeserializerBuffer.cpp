@@ -299,9 +299,15 @@ auto PyDeserializerBuffer::metadata_init(PyMetadata* metadata) -> bool {
 }
 
 auto PyDeserializerBuffer::py_getbuffer(Py_buffer* view, int flags) -> int {
-    // Don't need to set the exception message during the failure. The Python level caller will set
-    // the exception and thus overwrite it.
     if (false == is_py_buffer_protocol_enabled()) {
+        // The steps below are required by the spec
+        // https://docs.python.org/3/c-api/typeobj.html#c.PyBufferProcs.bf_getbuffer
+        view->obj = nullptr;
+        PyErr_SetString(
+                PyExc_BufferError,
+                "Attempted access to the internal buffer via the buffer protocol outside of "
+                "authorized methods"
+        );
         return -1;
     }
     auto const buffer{m_read_buffer.subspan(m_buffer_size, m_read_buffer.size() - m_buffer_size)};
