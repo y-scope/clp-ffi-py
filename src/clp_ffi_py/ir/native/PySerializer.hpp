@@ -24,6 +24,15 @@ public:
     using ClpIrSerializer = clp::ffi::ir_stream::Serializer<clp::ir::four_byte_encoded_variable_t>;
     using BufferView = ClpIrSerializer::BufferView;
 
+    // Delete default constructor to disable direct instantiation.
+    PySerializer() = delete;
+
+    // Delete copy/move constructors and assignments
+    PySerializer(PySerializer const&) = delete;
+    PySerializer(PySerializer&&) = delete;
+    auto operator=(PySerializer const&) -> PySerializer& = delete;
+    auto operator=(PySerializer&&) -> PySerializer& = delete;
+
     /**
      * The default buffer size limit. Any change to the value should also be applied to `__init__`'s
      * doc string and Python stub file.
@@ -60,8 +69,8 @@ public:
      * Releases the memory allocated for underlying data fields.
      */
     auto clean() -> void {
-        Py_XDECREF(m_output_stream);
         close_serializer();
+        Py_XDECREF(m_output_stream);
     }
 
     [[nodiscard]] auto is_closed() const -> bool { return nullptr == m_serializer; }
