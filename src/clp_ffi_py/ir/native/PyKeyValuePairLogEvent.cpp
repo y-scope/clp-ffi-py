@@ -294,7 +294,6 @@ auto convert_py_dict_to_key_value_pair_log_event(PyDictObject* py_dict
             break;
         }
         if (clp::ffi::ir_stream::IrUnitType::SchemaTreeNodeInsertion != ir_unit_type) {
-            continue;
             PyErr_SetString(PyExc_RuntimeError, "Unexpected Ir Unit Type");
             return std::nullopt;
         }
