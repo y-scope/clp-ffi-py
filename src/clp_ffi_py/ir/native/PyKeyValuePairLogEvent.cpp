@@ -205,15 +205,15 @@ CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_to_dict(PyKeyValuePairLogEvent* se
         return nullptr;
     }
     auto const json_str{serialized_json_result.value().dump()};
-    auto* parsed_json{py_utils_parse_json_str(json_str)};
+    PyObjectPtr<PyObject> parsed_json{py_utils_parse_json_str(json_str)};
     if (nullptr == parsed_json) {
         return nullptr;
     }
-    if (false == static_cast<bool>(PyDict_Check(parsed_json))) {
+    if (false == static_cast<bool>(PyDict_Check(parsed_json.get()))) {
         PyErr_SetString(PyExc_TypeError, "Serialized JSON object is not a dictionary");
         return nullptr;
     }
-    return parsed_json;
+    return parsed_json.release();
 }
 
 auto convert_py_dict_to_key_value_pair_log_event(PyDictObject* py_dict
