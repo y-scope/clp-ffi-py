@@ -24,7 +24,7 @@ from clp_ffi_py.ir import (
 from clp_ffi_py.wildcard_query import WildcardQuery
 
 
-class JsonFileReader:
+class JsonLinesFileReader:
     """
     Class for reading JSON files.
 
@@ -40,7 +40,7 @@ class JsonFileReader:
         """
         self.file_path: Path = file_path
 
-    def read_json_lines(self) -> Generator[Any, None, None]:
+    def read_line(self) -> Generator[Any, None, None]:
         """
         Reads each line in the JSON file, parses it as a JSON object, and yields the JSON object.
 
