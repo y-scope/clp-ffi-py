@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any, Dict
 
-from test_ir.test_utils import JsonFileReader, TestCLPBase
+from test_ir.test_utils import JsonLinesFileReader, TestCLPBase
 
 from clp_ffi_py.ir import KeyValuePairLogEvent
 
@@ -23,8 +23,8 @@ class TestCaseKeyValuePairLogEvent(TestCLPBase):
         for file_path in test_src_dir.rglob("*"):
             if not file_path.is_file():
                 continue
-            json_file_reader: JsonFileReader = JsonFileReader(file_path)
-            for expected in json_file_reader.read_json_lines():
+            json_file_reader: JsonLinesFileReader = JsonLinesFileReader(file_path)
+            for expected in json_file_reader.read_line():
                 self.assertIsInstance(expected, dict, "Input must be a dictionary")
                 actual: KeyValuePairLogEvent = KeyValuePairLogEvent(expected)
                 serialized_py_dict: Dict[Any, Any] = actual.to_dict()
