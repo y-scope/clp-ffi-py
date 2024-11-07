@@ -24,7 +24,7 @@ class TestCaseKeyValuePairLogEvent(TestCLPBase):
             if not file_path.is_file():
                 continue
             json_file_reader: JsonLinesFileReader = JsonLinesFileReader(file_path)
-            for expected in json_file_reader.read_line():
+            for expected in json_file_reader.read_lines():
                 self.assertIsInstance(expected, dict, "Input must be a dictionary")
                 actual: KeyValuePairLogEvent = KeyValuePairLogEvent(expected)
                 serialized_py_dict: Dict[Any, Any] = actual.to_dict()
