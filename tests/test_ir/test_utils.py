@@ -40,14 +40,15 @@ class JsonLinesFileReader:
         """
         self.file_path: Path = file_path
 
-    def read_line(self) -> Generator[Any, None, None]:
+    def read_lines(self) -> Generator[Any, None, None]:
         """
         Reads each line in the JSON file, parses it as a JSON object, and yields the JSON object.
 
         :yield: Parsed JSON object for each line in the file.
         """
         with open(self.file_path, "r", encoding="utf-8") as file:
-            yield from (json.loads(line.strip()) for line in file)
+            for line in file:
+                yield json.loads(line.strip())
 
 
 def _zstd_compressions_handler(
