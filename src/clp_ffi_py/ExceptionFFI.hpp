@@ -5,6 +5,8 @@
 
 #include <clp/TraceableException.hpp>
 
+#include <clp_ffi_py/PyExceptionContext.hpp>
+
 namespace clp_ffi_py {
 /**
  * A class that represents a traceable exception during the native code execution. Note: for
@@ -23,7 +25,12 @@ public:
 
     [[nodiscard]] auto what() const noexcept -> char const* override { return m_message.c_str(); }
 
+    [[nodiscard]] auto get_exception_context() -> PyExceptionContext& {
+        return m_exception_context;
+    }
+
 private:
+    PyExceptionContext m_exception_context;
     std::string m_message;
 };
 }  // namespace clp_ffi_py

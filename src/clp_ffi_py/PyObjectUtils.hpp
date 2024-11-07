@@ -59,6 +59,9 @@ using PyObjectStaticPtr = std::unique_ptr<PyObjectType, PyObjectTrivialDeleter<P
  */
 class PyErrGuard {
 public:
+    // Constructor
+    PyErrGuard() = default;
+
     // Destructor
     ~PyErrGuard() { m_exception_context.restore(); }
 

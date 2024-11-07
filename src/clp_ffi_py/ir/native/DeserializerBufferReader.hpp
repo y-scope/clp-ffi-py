@@ -80,6 +80,20 @@ private:
     explicit DeserializerBufferReader(PyDeserializerBuffer* py_deserializer_buffer)
             : m_py_deserializer_buffer{py_deserializer_buffer} {}
 
+    // Methods
+    /**
+     * Fills the underlying deserializer buffer by calling its `try_read`.
+     * @return true on success.
+     * @return false if `try_read` returns false and `IncompleteStreamError` has been set.
+     * @throw ExceptionFFI on any other failure.
+     */
+    [[nodiscard]] auto fill_deserializer_buffer() -> bool;
+
+    [[nodiscard]] auto is_deserializer_buffer_empty() -> bool {
+        return 0 != m_py_deserializer_buffer->get_num_unconsumed_bytes();
+    }
+
+    // Variables
     PyDeserializerBuffer* m_py_deserializer_buffer{nullptr};
     size_t m_pos{0};
 };
