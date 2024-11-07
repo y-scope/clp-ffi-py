@@ -89,6 +89,8 @@ set(CLP_FFI_PY_LIB_IR_SOURCES
     ${CLP_FFI_PY_LIB_SRC_DIR}/api_decoration.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/error_messages.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ExceptionFFI.hpp
+    ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/DeserializerBufferReader.cpp
+    ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/DeserializerBufferReader.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/deserialization_methods.cpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/deserialization_methods.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/LogEvent.hpp
@@ -117,6 +119,7 @@ set(CLP_FFI_PY_LIB_IR_SOURCES
     ${CLP_FFI_PY_LIB_SRC_DIR}/modules/ir_native.cpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/Py_utils.cpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/Py_utils.hpp
+    ${CLP_FFI_PY_LIB_SRC_DIR}/PyExceptionContext.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/PyObjectCast.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/PyObjectUtils.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/Python.hpp
