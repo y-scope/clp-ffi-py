@@ -2,7 +2,7 @@ from io import BytesIO
 from pathlib import Path
 from typing import Optional
 
-from test_ir.test_utils import JsonFileReader, TestCLPBase
+from test_ir.test_utils import JsonLinesFileReader, TestCLPBase
 
 from clp_ffi_py.ir import FourByteSerializer, Serializer
 from clp_ffi_py.utils import serialize_dict_to_msgpack
@@ -73,7 +73,7 @@ class TestCaseSerializer(TestCLPBase):
             byte_buffer = BytesIO()
             with Serializer(byte_buffer) as serializer:
                 num_bytes_serialized = serializer.get_num_bytes_serialized()
-                for json_obj in JsonFileReader(file_path).read_json_lines():
+                for json_obj in JsonLinesFileReader(file_path).read_lines():
                     num_bytes_serialized += serializer.serialize_msgpack_map(
                         serialize_dict_to_msgpack(json_obj)
                     )
@@ -90,7 +90,7 @@ class TestCaseSerializer(TestCLPBase):
             byte_buffer = BytesIO()
             serializer = Serializer(byte_buffer)
             num_bytes_serialized = serializer.get_num_bytes_serialized()
-            for json_obj in JsonFileReader(file_path).read_json_lines():
+            for json_obj in JsonLinesFileReader(file_path).read_lines():
                 num_bytes_serialized += serializer.serialize_msgpack_map(
                     serialize_dict_to_msgpack(json_obj)
                 )
@@ -118,7 +118,7 @@ class TestCaseSerializer(TestCLPBase):
             ) as serializer:
                 serializer.flush()
                 num_bytes_in_ir_buffer: int = 0
-                for json_obj in JsonFileReader(file_path).read_json_lines():
+                for json_obj in JsonLinesFileReader(file_path).read_lines():
                     num_bytes_serialized: int = serializer.serialize_msgpack_map(
                         serialize_dict_to_msgpack(json_obj)
                     )
