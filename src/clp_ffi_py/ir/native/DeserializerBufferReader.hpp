@@ -73,13 +73,14 @@ public:
 private:
     // Constructor
     /**
-     * Constructs a `DeserializerBufferReader` by stealing the reference of the given Python
+     * Constructs a `DeserializerBufferReader` by holding a new reference of the given Python
      * objects. Must be called from the factory function.
-     * @param py_deserializer_buffer A `PyDeserializerBuffer` reference stolen from the factory
-     * function.
+     * @param py_deserializer_buffer
      */
     explicit DeserializerBufferReader(PyDeserializerBuffer* py_deserializer_buffer)
-            : m_py_deserializer_buffer{py_deserializer_buffer} {}
+            : m_py_deserializer_buffer{py_deserializer_buffer} {
+        Py_INCREF(py_deserializer_buffer);
+    }
 
     // Methods
     /**

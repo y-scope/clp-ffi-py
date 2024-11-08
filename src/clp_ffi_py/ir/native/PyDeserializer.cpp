@@ -2,11 +2,11 @@
 
 #include "PyDeserializer.hpp"
 
-#include <optional>
 #include <system_error>
 #include <type_traits>
 #include <utility>
 
+#include <clp/ErrorCode.hpp>
 #include <clp/ffi/ir_stream/decoding_methods.hpp>
 #include <clp/ffi/ir_stream/Deserializer.hpp>
 #include <clp/ffi/ir_stream/IrUnitType.hpp>
@@ -17,11 +17,11 @@
 
 #include <clp_ffi_py/api_decoration.hpp>
 #include <clp_ffi_py/error_messages.hpp>
+#include <clp_ffi_py/ExceptionFFI.hpp>
 #include <clp_ffi_py/ir/native/DeserializerBufferReader.hpp>
 #include <clp_ffi_py/ir/native/error_messages.hpp>
 #include <clp_ffi_py/ir/native/PyKeyValuePairLogEvent.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
-#include <clp_ffi_py/PyObjectUtils.hpp>
 #include <clp_ffi_py/utils.hpp>
 
 namespace clp_ffi_py::ir::native {
@@ -211,10 +211,6 @@ auto PyDeserializer::init(
         m_deserializer = new clp::ffi::ir_stream::Deserializer<PyDeserializer::IrUnitHandler>{
                 std::move(deserializer_result.value())
         };
-        if (nullptr == m_deserializer) {
-            PyErr_SetString(PyExc_MemoryError, clp_ffi_py::cOutofMemoryError);
-            return false;
-        }
     } catch (clp::TraceableException& exception) {
         set_py_exception(exception);
         return false;
@@ -224,12 +220,8 @@ auto PyDeserializer::init(
 }
 
 auto PyDeserializer::deserialize_to_next_log_event() -> PyObject* {
-    if (m_end_of_stream_reached) {
-        Py_RETURN_NONE;
-    }
-
     try {
-        while (true) {
+        while (false == is_stream_complete()) {
             auto const ir_unit_type_result{
                     m_deserializer->deserialize_next_ir_unit(*m_deserializer_buffer_reader)
             };
@@ -237,12 +229,9 @@ auto PyDeserializer::deserialize_to_next_log_event() -> PyObject* {
                 if (false == handle_incomplete_ir_error(ir_unit_type_result.error())) {
                     return nullptr;
                 }
-                Py_RETURN_NONE;
+                break;
             }
             auto const ir_unit_type{ir_unit_type_result.value()};
-            if (IrUnitType::EndOfStream == ir_unit_type) {
-                Py_RETURN_NONE;
-            }
             if (IrUnitType::LogEvent == ir_unit_type && has_unreleased_deserialized_log_event()) {
                 return py_reinterpret_cast<PyObject>(
                         PyKeyValuePairLogEvent::create(release_deserialized_log_event())
@@ -253,6 +242,8 @@ auto PyDeserializer::deserialize_to_next_log_event() -> PyObject* {
         set_py_exception(exception);
         return nullptr;
     }
+
+    Py_RETURN_NONE;
 }
 
 auto PyDeserializer::module_level_init(PyObject* py_module) -> bool {
@@ -270,10 +261,6 @@ auto PyDeserializer::handle_log_event(clp::ffi::KeyValuePairLogEvent&& log_event
         release_deserialized_log_event();
     }
     m_deserialized_log_event = new clp::ffi::KeyValuePairLogEvent{std::move(log_event)};
-    if (nullptr == m_deserialized_log_event) {
-        // TODO: we may want to throw here...
-        return IRErrorCode::IRErrorCode_Corrupted_IR;
-    }
     return IRErrorCode::IRErrorCode_Success;
 }
 

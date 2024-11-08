@@ -188,6 +188,7 @@ private:
     // Methods
     /**
      * Implements `IrUnitHandler::EndOfStreamHandle`.
+     * This handle function sets the underlying `m_end_of_stream_reached` to true.
      * @return IRErrorCode::IRErrorCode_Success on success.
      */
     [[maybe_unused]] auto handle_end_of_stream() -> clp::ffi::ir_stream::IRErrorCode {
@@ -197,9 +198,10 @@ private:
 
     /**
      * Implements `IrUnitHandler::LogEventHandle`.
+     * This handle function sets the underlying `m_deserialized_log_event` with the given input.
      * @param kv_log_event
      * @return IRErrorCode::IRErrorCode_Success on success.
-     * @return IRErrorCode::IRErrorCode_Corrupted_IR on failure.
+     *
      */
     [[nodiscard]] auto handle_log_event(clp::ffi::KeyValuePairLogEvent&& log_event
     ) -> clp::ffi::ir_stream::IRErrorCode;
@@ -233,6 +235,8 @@ private:
      * - Incomplete IR stream is not allowed.
      */
     [[nodiscard]] auto handle_incomplete_ir_error(std::error_code err) -> bool;
+
+    [[nodiscard]] auto is_stream_complete() const -> bool { return m_end_of_stream_reached; }
 
     // Variables
     PyObject_HEAD;

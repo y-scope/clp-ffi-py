@@ -6,7 +6,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <gsl/gsl>
-#include <iostream>
 #include <span>
 
 #include <clp/ErrorCode.hpp>
@@ -15,11 +14,12 @@
 #include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ExceptionFFI.hpp>
 #include <clp_ffi_py/ir/native/PyDeserializerBuffer.hpp>
+#include <clp_ffi_py/PyObjectUtils.hpp>
 
 namespace clp_ffi_py::ir::native {
 auto DeserializerBufferReader::create(PyObject* input_stream, Py_ssize_t buf_capacity)
         -> gsl::owner<DeserializerBufferReader*> {
-    PyObjectPtr<PyDeserializerBuffer> py_deserializer_buffer{
+    PyObjectPtr<PyDeserializerBuffer> const py_deserializer_buffer{
             PyDeserializerBuffer::create(input_stream, buf_capacity)
     };
     if (nullptr == py_deserializer_buffer) {
@@ -28,11 +28,6 @@ auto DeserializerBufferReader::create(PyObject* input_stream, Py_ssize_t buf_cap
     gsl::owner<DeserializerBufferReader*> result{
             new DeserializerBufferReader{py_deserializer_buffer.get()}
     };
-    if (nullptr == result) {
-        PyErr_SetString(PyExc_MemoryError, clp_ffi_py::cOutofMemoryError);
-        return nullptr;
-    }
-    py_deserializer_buffer.release();
     return result;
 }
 
