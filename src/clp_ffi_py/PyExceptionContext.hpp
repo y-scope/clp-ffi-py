@@ -31,7 +31,7 @@ public:
     /**
      * @return Whether the context indicates an exception.
      */
-    [[nodiscard]] auto has_exception() const -> bool { return nullptr != m_value; }
+    [[nodiscard]] auto has_exception() const noexcept -> bool { return nullptr != m_value; }
 
     /**
      * Restores the exception by the context.
@@ -41,7 +41,7 @@ public:
      * - This method should be called strictly once, otherwise the error indicator will be cleared.
      * @return Whether an exception has been set after restore.
      */
-    [[maybe_unused]] auto restore() -> bool {
+    [[maybe_unused]] auto restore() noexcept -> bool {
         auto const exception_has_been_set{has_exception()};
         PyErr_Restore(m_type, m_value, m_traceback);
         m_type = nullptr;

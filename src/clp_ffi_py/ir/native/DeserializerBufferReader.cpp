@@ -3,23 +3,37 @@
 #include "DeserializerBufferReader.hpp"
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <gsl/gsl>
+#include <iostream>
+#include <span>
 
 #include <clp/ErrorCode.hpp>
 #include <clp/type_utils.hpp>
 
+#include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ExceptionFFI.hpp>
 #include <clp_ffi_py/ir/native/PyDeserializerBuffer.hpp>
 
 namespace clp_ffi_py::ir::native {
 auto DeserializerBufferReader::create(PyObject* input_stream, Py_ssize_t buf_capacity)
         -> gsl::owner<DeserializerBufferReader*> {
-    auto* py_deserializer_buffer{PyDeserializerBuffer::create(input_stream, buf_capacity)};
+    PyObjectPtr<PyDeserializerBuffer> py_deserializer_buffer{
+            PyDeserializerBuffer::create(input_stream, buf_capacity)
+    };
     if (nullptr == py_deserializer_buffer) {
         return nullptr;
     }
-    return new DeserializerBufferReader{py_deserializer_buffer};
+    gsl::owner<DeserializerBufferReader*> result{
+            new DeserializerBufferReader{py_deserializer_buffer.get()}
+    };
+    if (nullptr == result) {
+        PyErr_SetString(PyExc_MemoryError, clp_ffi_py::cOutofMemoryError);
+        return nullptr;
+    }
+    py_deserializer_buffer.release();
+    return result;
 }
 
 auto DeserializerBufferReader::try_read(char* buf, size_t num_bytes_to_read, size_t& num_bytes_read)
@@ -38,9 +52,18 @@ auto DeserializerBufferReader::try_read(char* buf, size_t num_bytes_to_read, siz
 
         // Commit read
         auto const num_bytes_copied{bytes_to_copy.size()};
-        m_py_deserializer_buffer->commit_read_buffer_consumption(
-                static_cast<Py_ssize_t>(num_bytes_copied)
-        );
+        if (false
+            == m_py_deserializer_buffer->commit_read_buffer_consumption(
+                    static_cast<Py_ssize_t>(num_bytes_copied)
+            ))
+        {
+            throw ExceptionFFI(
+                    clp::ErrorCode_Failure,
+                    __FILE__,
+                    __LINE__,
+                    "`commit_read_buffer_consumption` failed"
+            );
+        }
         num_bytes_read += num_bytes_copied;
         dst_buf = dst_buf.last(dst_buf.size() - num_bytes_copied);
     }
@@ -49,8 +72,7 @@ auto DeserializerBufferReader::try_read(char* buf, size_t num_bytes_to_read, siz
 }
 
 auto DeserializerBufferReader::fill_deserializer_buffer() -> bool {
-    auto const has_error{m_py_deserializer_buffer->try_read()};
-    if (false == has_error) {
+    if (m_py_deserializer_buffer->try_read()) {
         return true;
     }
     if (static_cast<bool>(

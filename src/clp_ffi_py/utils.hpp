@@ -10,6 +10,7 @@
 #include <vector>
 
 #include <clp/ffi/encoding_methods.hpp>
+#include <clp/TraceableException.hpp>
 #include <msgpack.hpp>
 #include <outcome/single-header/outcome.hpp>
 
@@ -71,6 +72,12 @@ auto parse_py_int(PyObject* py_int, int_type& val) -> bool;
  */
 [[nodiscard]] auto unpack_msgpack(std::span<char const> msgpack_byte_sequence
 ) -> outcome_v2::std_result<msgpack::object_handle, std::string>;
+
+/**
+ * Sets a Python exception according to the given CLP exception object.
+ * @param exception
+ */
+auto set_py_exception(clp::TraceableException& exception) noexcept -> void;
 
 /**
  * A template that always evaluates as false.

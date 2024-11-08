@@ -44,8 +44,9 @@ public:
      * @param buf
      * @param num_bytes_to_read
      * @param num_bytes_read Returns the number of bytes read.
-     * @return ErrorCode_EndOfFile if there is no more buffered data.
      * @return ErrorCode_Success on success.
+     * @return ErrorCode_EndOfFile if there is no more data to read.
+     * @throw ExceptionFFI that forwards `fill_deserializer_buffer`'s throw.
      */
     [[nodiscard]] auto try_read(char* buf, size_t num_bytes_to_read, size_t& num_bytes_read)
             -> clp::ErrorCode override;
@@ -89,8 +90,8 @@ private:
      */
     [[nodiscard]] auto fill_deserializer_buffer() -> bool;
 
-    [[nodiscard]] auto is_deserializer_buffer_empty() -> bool {
-        return 0 != m_py_deserializer_buffer->get_num_unconsumed_bytes();
+    [[nodiscard]] auto is_deserializer_buffer_empty() const -> bool {
+        return m_py_deserializer_buffer->get_unconsumed_bytes().empty();
     }
 
     // Variables

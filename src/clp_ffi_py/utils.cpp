@@ -6,9 +6,11 @@
 #include <span>
 #include <string>
 
+#include <clp/TraceableException.hpp>
 #include <msgpack.hpp>
 #include <outcome/single-header/outcome.hpp>
 
+#include <clp_ffi_py/ExceptionFFI.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
 
 namespace clp_ffi_py {
@@ -74,5 +76,24 @@ auto unpack_msgpack(std::span<char const> msgpack_byte_sequence
         return std::string{error.what()};
     }
     return handle;
+}
+
+auto set_py_exception(clp::TraceableException& exception) noexcept -> void {
+    if (auto* py_ffi_exception{dynamic_cast<ExceptionFFI*>(&exception)}) {
+        auto& exception_context{py_ffi_exception->get_exception_context()};
+        if (exception_context.has_exception()) {
+            exception_context.restore();
+            return;
+        }
+    }
+
+    PyErr_Format(
+            PyExc_RuntimeError,
+            "%s:%d: ErrorCode: %d; Message: %s",
+            exception.get_filename(),
+            exception.get_line_number(),
+            static_cast<int>(exception.get_error_code()),
+            exception.what()
+    );
 }
 }  // namespace clp_ffi_py
