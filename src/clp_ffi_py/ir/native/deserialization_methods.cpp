@@ -265,6 +265,8 @@ auto deserialize_preamble(PyObject* Py_UNUSED(self), PyObject* py_deserializer_b
         if (IRProtocolErrorCode::BackwardCompatible != error_code) {
             switch (error_code) {
                 case IRProtocolErrorCode::Supported:
+                    // This represents a key-value pair IR stream, which is not supported by these
+                    // old deserialization methods.
                     PyErr_Format(PyExc_RuntimeError, "Version too new: %s", version.c_str());
                     break;
                 case IRProtocolErrorCode::Unsupported:
