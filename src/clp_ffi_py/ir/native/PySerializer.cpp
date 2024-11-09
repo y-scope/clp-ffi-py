@@ -537,7 +537,7 @@ auto PySerializer::write_to_output_stream(PySerializer::BufferView buf
         return std::nullopt;
     }
 
-    PyObject* py_num_bytes_written{
+    PyObjectPtr<PyObject> const py_num_bytes_written{
             PyObject_CallMethod(m_output_stream, "write", "O", ir_buf_mem_view.get())
     };
     if (nullptr == py_num_bytes_written) {
@@ -545,17 +545,25 @@ auto PySerializer::write_to_output_stream(PySerializer::BufferView buf
     }
 
     Py_ssize_t num_bytes_written{};
-    if (false == parse_py_int(py_num_bytes_written, num_bytes_written)) {
+    if (false == parse_py_int(py_num_bytes_written.get(), num_bytes_written)) {
         return std::nullopt;
     }
     return num_bytes_written;
 }
 
 auto PySerializer::flush_output_stream() -> bool {
-    return nullptr != PyObject_CallMethod(m_output_stream, "flush", "");
+    PyObjectPtr<PyObject> const ret_val{PyObject_CallMethod(m_output_stream, "flush", "")};
+    if (nullptr == ret_val) {
+        return false;
+    }
+    return true;
 }
 
 auto PySerializer::close_output_stream() -> bool {
-    return nullptr != PyObject_CallMethod(m_output_stream, "close", "");
+    PyObjectPtr<PyObject> const ret_val{PyObject_CallMethod(m_output_stream, "close", "")};
+    if (nullptr == ret_val) {
+        return false;
+    }
+    return true;
 }
 }  // namespace clp_ffi_py::ir::native
