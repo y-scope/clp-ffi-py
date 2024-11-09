@@ -55,7 +55,7 @@ public:
     }
 
     [[nodiscard]] auto get_kv_pair_log_event() const -> clp::ffi::KeyValuePairLogEvent const* {
-        return m_kv_pair_log_event;
+        return static_cast<clp::ffi::KeyValuePairLogEvent const*>(m_kv_pair_log_event);
     }
 
     /**
