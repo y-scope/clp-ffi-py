@@ -118,8 +118,6 @@ PyDeserializer_init(PyDeserializer* self, PyObject* args, PyObject* keywords) ->
             nullptr
     };
 
-    std::cerr << "Init start...\n";
-
     // If the argument parsing fails, `self` will be deallocated. We must reset all pointers to
     // nullptr in advance, otherwise the deallocator might trigger segmentation fault.
     self->default_init();
@@ -140,8 +138,6 @@ PyDeserializer_init(PyDeserializer* self, PyObject* args, PyObject* keywords) ->
     {
         return -1;
     }
-
-    std::cerr << "Arg parsed...\n";
 
     if (false
         == self->init(input_stream, buffer_capacity, static_cast<bool>(allow_incomplete_stream)))
