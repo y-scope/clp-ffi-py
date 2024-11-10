@@ -76,22 +76,8 @@ public:
 };
 
 /**
- * Concept for `PyDictSerializationIterator`'s destructor callback.
- * Signature: (SchemaTree::Node const* schema_tree_node, PyDictObject* parent, PyDictObject* dict)
- * @tparam Func
- */
-template <typename Func>
-concept PyDictSerializationIteratorDestructorCallback = std::is_nothrow_invocable_v<
-        Func,
-        SchemaTree::Node const*,
-        PyDictObject*,
-        PyObjectPtr<PyDictObject>&>;
-
-/**
  * Helper class for `PyKeyValuePairLogEvent::to_dict`.
- * @tparam DestructorCallback The callback function to be called when destructing the iterator.
  */
-template <PyDictSerializationIteratorDestructorCallback DestructorCallback>
 class PyDictSerializationIterator {
 public:
     // Factory function
@@ -100,7 +86,6 @@ public:
      * @param schema_tree_node
      * @param schema_subtree_bitmap
      * @param parent
-     * @param destructor_callback
      * @return A newly created iterator that holds a new reference of a Python dictionary on
      * success.
      * @return std::nullopt on failure with the relevant Python exception and error set.
@@ -108,8 +93,7 @@ public:
     [[nodiscard]] static auto create(
             SchemaTree::Node const* schema_tree_node,
             std::vector<bool> const& schema_subtree_bitmap,
-            PyDictObject* parent,
-            DestructorCallback destructor_callback
+            PyDictObject* parent
     ) -> std::optional<PyDictSerializationIterator> {
         if (schema_tree_node->is_root() && nullptr != parent) {
             PyErr_SetString(
@@ -142,8 +126,7 @@ public:
                 schema_tree_node,
                 std::move(child_schema_tree_nodes),
                 parent,
-                std::move(py_dict),
-                destructor_callback
+                std::move(py_dict)
         };
     }
 
@@ -156,9 +139,7 @@ public:
     auto operator=(PyDictSerializationIterator&&) -> PyDictSerializationIterator& = default;
 
     // Destructor
-    ~PyDictSerializationIterator() {
-        // m_destructor_callback(m_schema_tree_node, m_parent, m_py_dict);
-    }
+    ~PyDictSerializationIterator() = default;
 
     /**
      * @return Whether there are more child schema tree nodes to traverse.
@@ -175,30 +156,66 @@ public:
         return *(m_child_schema_tree_node_it++);
     }
 
+    /**
+     * Adds the underlying Python dictionary into the parent.
+     * @return true on success.
+     * @return false on failure with the relevant Python exception and error set.
+     */
+    [[nodiscard]] auto add_to_parent() -> bool {
+        if (is_root()) {
+            PyErr_SetString(
+                    PyExc_RuntimeError,
+                    "KeyValuePairLogEvent.to_dict(): root has no parent to add"
+            );
+            return false;
+        }
+        return 0
+               == PyDict_SetItemString(
+                       py_reinterpret_cast<PyObject>(m_parent),
+                       m_schema_tree_node->get_key_name().data(),
+                       py_reinterpret_cast<PyObject>(m_py_dict.get())
+               );
+    }
+
+    /**
+     * Releases the underlying Python dictionary as the root dictionary to return.
+     * @return The released Python dictionary on success.
+     * @return nullptr on failure with the relevant Python exception and error set.
+     */
+    [[nodiscard]] auto release_root() -> PyDictObject* {
+        if (false == is_root()) {
+            PyErr_SetString(
+                    PyExc_RuntimeError,
+                    "KeyValuePairLogEvent.to_dict(): only root can be released"
+            );
+            return nullptr;
+        }
+        return m_py_dict.release();
+    }
+
     [[nodiscard]] auto get_py_dict() -> PyDictObject* { return m_py_dict.get(); }
 
-public:
+    [[nodiscard]] auto is_root() const -> bool { return m_schema_tree_node->is_root(); }
+
+private:
     // Constructor
     PyDictSerializationIterator(
             SchemaTree::Node const* schema_tree_node,
             std::vector<SchemaTree::Node::id_t> child_schema_tree_nodes,
             PyDictObject* parent,
-            PyObjectPtr<PyDictObject> py_dict,
-            DestructorCallback destructor_callback
+            PyObjectPtr<PyDictObject> py_dict
     )
             : m_schema_tree_node{schema_tree_node},
               m_child_schema_tree_nodes{std::move(child_schema_tree_nodes)},
               m_child_schema_tree_node_it{m_child_schema_tree_nodes.cbegin()},
               m_parent{parent},
-              m_py_dict{std::move(py_dict)},
-              m_destructor_callback{destructor_callback} {}
+              m_py_dict{std::move(py_dict)} {}
 
     SchemaTree::Node const* m_schema_tree_node;
     std::vector<SchemaTree::Node::id_t> m_child_schema_tree_nodes;
     std::vector<SchemaTree::Node::id_t>::const_iterator m_child_schema_tree_node_it;
     PyDictObject* m_parent;
     PyObjectPtr<PyDictObject> m_py_dict;
-    DestructorCallback m_destructor_callback;
 };
 
 /**
@@ -369,29 +386,6 @@ CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_init(
 }
 
 CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_to_dict(PyKeyValuePairLogEvent* self) -> PyObject* {
-#if 0
-    // TODO: use an efficient algorithm to turn the underlying log event to a Python
-    auto const* kv_pair_log_event{self->get_kv_pair_log_event()};
-    auto const serialized_json_result{kv_pair_log_event->serialize_to_json()};
-    if (serialized_json_result.has_error()) {
-        PyErr_Format(
-                PyExc_RuntimeError,
-                cKeyValuePairLogEventSerializeToStringErrorFormatStr.data(),
-                serialized_json_result.error().message().c_str()
-        );
-        return nullptr;
-    }
-    auto const json_str{serialized_json_result.value().dump()};
-    PyObjectPtr<PyObject> parsed_json{py_utils_parse_json_str(json_str)};
-    if (nullptr == parsed_json) {
-        return nullptr;
-    }
-    if (false == static_cast<bool>(PyDict_Check(parsed_json.get()))) {
-        PyErr_SetString(PyExc_TypeError, "Serialized JSON object is not a dictionary");
-        return nullptr;
-    }
-    return parsed_json.release();
-#endif
     return py_reinterpret_cast<PyObject>(self->to_dict());
 }
 
@@ -491,109 +485,30 @@ CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_dealloc(PyKeyValuePairLogEvent* se
     Py_TYPE(self)->tp_free(py_reinterpret_cast<PyObject>(self));
 }
 
-auto get_schema_subtree_bitmap(
-        clp::ffi::KeyValuePairLogEvent::NodeIdValuePairs const& node_id_value_pairs,
-        clp::ffi::SchemaTree const& schema_tree
-) -> OUTCOME_V2_NAMESPACE::std_result<std::vector<bool>> {
-    auto schema_subtree_bitmap{std::vector<bool>(schema_tree.get_size(), false)};
-    for (auto const& [node_id, val] : node_id_value_pairs) {
-        if (node_id >= schema_subtree_bitmap.size()) {
-            return std::errc::result_out_of_range;
-        }
-        schema_subtree_bitmap[node_id] = true;
-
-        // Iteratively mark the parents as true
-        auto optional_parent_id{schema_tree.get_node(node_id).get_parent_id()};
-        while (true) {
-            // Ideally, we'd use this if statement as the loop condition, but clang-tidy will
-            // complain about an unchecked `optional` access.
-            if (false == optional_parent_id.has_value()) {
-                // Reached the root
-                break;
-            }
-            auto const parent_id{optional_parent_id.value()};
-            if (schema_subtree_bitmap[parent_id]) {
-                // Parent already set by other child
-                break;
-            }
-            schema_subtree_bitmap[parent_id] = true;
-            optional_parent_id = schema_tree.get_node(parent_id).get_parent_id();
-        }
-    }
-    return schema_subtree_bitmap;
-}
-
 auto serialize_node_id_value_pair_to_py_dict(
         SchemaTree const& schema_tree,
         std::vector<bool> const& schema_subtree_bitmap,
         KeyValuePairLogEvent::NodeIdValuePairs const& node_id_value_pairs
 ) -> PyDictObject* {
     PyObjectPtr<PyDictObject> root_dict;
-
-    // Flag to indicate whether serialization failed. Initialized to false.
-    bool serialization_failed{false};
-
-    // The destructor callback. If the destructor fails, it will raise `serialization_failed` flag
-    // with the corresponded Python exception/error set.
-    auto iterator_destructor_callback = [&](SchemaTree::Node const* schema_tree_node,
-                                            PyDictObject* parent,
-                                            PyObjectPtr<PyDictObject>& dict) noexcept -> void {
-        if (serialization_failed) {
-            // An error already happened. Simply return to clean everything up using default
-            // destruction
-            return;
-        }
-        if (schema_tree_node->is_root()) {
-            // Release and reset the root dictionary
-            root_dict = std::move(dict);
-            return;
-        }
-        if (nullptr == dict.get()) {
-            PyErr_SetString(PyExc_RuntimeError, "What the fuck is going on?");
-            serialization_failed = true;
-            return;
-        }
-        if (0
-            != PyDict_SetItemString(
-                    py_reinterpret_cast<PyObject>(parent),
-                    schema_tree_node->get_key_name().data(),
-                    py_reinterpret_cast<PyObject>(dict.get())
-            ))
-        {
-            serialization_failed = true;
-        }
-    };
-    using DfsIterator = PyDictSerializationIterator<decltype(iterator_destructor_callback)>;
+    using DfsIterator = PyDictSerializationIterator;
 
     std::stack<DfsIterator> dfs_stack;
-    auto optional_root_iterator = DfsIterator::create(
-            &schema_tree.get_root(),
-            schema_subtree_bitmap,
-            nullptr,
-            iterator_destructor_callback
-    );
+    auto optional_root_iterator
+            = DfsIterator::create(&schema_tree.get_root(), schema_subtree_bitmap, nullptr);
     if (false == optional_root_iterator.has_value()) {
-        // Explicit set the failure to true so that the destructor can save some work
-        serialization_failed = true;
         return nullptr;
     }
     dfs_stack.emplace(std::move(optional_root_iterator.value()));
 
-    while (false == dfs_stack.empty() && false == serialization_failed) {
+    while (false == dfs_stack.empty()) {
         auto& top{dfs_stack.top()};
         if (false == top.has_next_child_schema_tree_node()) {
-            assert(nullptr != top.m_py_dict);
-            if (top.m_schema_tree_node->is_root()) {
-                root_dict = std::move(top.m_py_dict);
+            if (top.is_root()) {
+                root_dict.reset(top.release_root());
             } else {
-                if (0
-                    != PyDict_SetItemString(
-                            py_reinterpret_cast<PyObject>(top.m_parent),
-                            top.m_schema_tree_node->get_key_name().data(),
-                            py_reinterpret_cast<PyObject>(top.m_py_dict.get())
-                    ))
-                {
-                    serialization_failed = true;
+                if (false == top.add_to_parent()) {
+                    return nullptr;
                 }
             }
             dfs_stack.pop();
@@ -605,15 +520,12 @@ auto serialize_node_id_value_pair_to_py_dict(
             auto optional_iterator{DfsIterator::create(
                     &child_schema_tree_node,
                     schema_subtree_bitmap,
-                    top.get_py_dict(),
-                    iterator_destructor_callback
+                    top.get_py_dict()
             )};
             if (false == optional_iterator.has_value()) {
-                // Explicit set the failure to true so that the destructor can save some work
-                serialization_failed = true;
-            } else {
-                dfs_stack.emplace(std::move(optional_iterator.value()));
+                return nullptr;
             }
+            dfs_stack.emplace(std::move(optional_iterator.value()));
             continue;
         }
         if (false
@@ -623,12 +535,8 @@ auto serialize_node_id_value_pair_to_py_dict(
                     top.get_py_dict()
             ))
         {
-            serialization_failed = true;
+            return nullptr;
         }
-    }
-
-    if (serialization_failed) {
-        return nullptr;
     }
 
     return root_dict.release();
@@ -704,6 +612,10 @@ auto serialize_node_id_value_pair_to_py_dict(
             return false;
     }
 
+    if (nullptr == py_value) {
+        return false;
+    }
+
     return 0
            == PyDict_SetItemString(
                    py_reinterpret_cast<PyObject>(dict),
@@ -737,9 +649,7 @@ auto PyKeyValuePairLogEvent::init(clp::ffi::KeyValuePairLogEvent kv_pair_log_eve
 [[nodiscard]] auto PyKeyValuePairLogEvent::to_dict() -> PyDictObject* {
     auto const& node_id_value_pairs{m_kv_pair_log_event->get_node_id_value_pairs()};
     auto const& schema_tree{m_kv_pair_log_event->get_schema_tree()};
-    auto const schema_subtree_bitmap_result{
-            get_schema_subtree_bitmap(node_id_value_pairs, schema_tree)
-    };
+    auto const schema_subtree_bitmap_result{m_kv_pair_log_event->get_schema_subtree_bitmap()};
     if (schema_subtree_bitmap_result.has_error()) {
         PyErr_Format(
                 PyExc_RuntimeError,
@@ -753,6 +663,21 @@ auto PyKeyValuePairLogEvent::init(clp::ffi::KeyValuePairLogEvent kv_pair_log_eve
             schema_subtree_bitmap_result.value(),
             node_id_value_pairs
     );
+}
+
+auto PyKeyValuePairLogEvent::create(clp::ffi::KeyValuePairLogEvent kv_log_event
+) -> PyKeyValuePairLogEvent* {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+    PyKeyValuePairLogEvent* self{PyObject_New(PyKeyValuePairLogEvent, get_py_type())};
+    if (nullptr == self) {
+        PyErr_SetString(PyExc_MemoryError, clp_ffi_py::cOutofMemoryError);
+        return nullptr;
+    }
+    self->default_init();
+    if (false == self->init(std::move(kv_log_event))) {
+        return nullptr;
+    }
+    return self;
 }
 
 auto PyKeyValuePairLogEvent::get_py_type() -> PyTypeObject* {

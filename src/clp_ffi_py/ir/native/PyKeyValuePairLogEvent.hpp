@@ -66,6 +66,16 @@ public:
     [[nodiscard]] auto to_dict() -> PyDictObject*;
 
     /**
+     * CPython-level factory function.
+     * @param kv_log_event
+     * @return a new reference of a `PyKeyValuePairLogEvent` object that is initialized with the
+     * given kv log event.
+     * @return nullptr on failure with the relevant Python exception and error set.
+     */
+    [[nodiscard]] static auto create(clp::ffi::KeyValuePairLogEvent kv_log_event
+    ) -> PyKeyValuePairLogEvent*;
+
+    /**
      * Gets the `PyTypeObject` that represents `PyKeyValuePair`'s Python type. This type is
      * dynamically created and initialized during the execution of `module_level_init`.
      * @return Python type object associated with `PyKeyValuePairLogEvent`.
