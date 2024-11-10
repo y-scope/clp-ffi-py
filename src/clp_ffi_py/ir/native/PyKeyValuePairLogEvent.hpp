@@ -59,6 +59,13 @@ public:
     }
 
     /**
+     * Converts the underlying key-value pair log event into a Python dictionary.
+     * @return A new reference to the created dictionary on success.
+     * @return nullptr on failure with the relevant Python exception and error set.
+     */
+    [[nodiscard]] auto to_dict() -> PyDictObject*;
+
+    /**
      * Gets the `PyTypeObject` that represents `PyKeyValuePair`'s Python type. This type is
      * dynamically created and initialized during the execution of `module_level_init`.
      * @return Python type object associated with `PyKeyValuePairLogEvent`.
