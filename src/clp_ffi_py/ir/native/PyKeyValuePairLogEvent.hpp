@@ -59,14 +59,11 @@ public:
     }
 
     /**
-     * CPython-level factory function.
-     * @param kv_log_event
-     * @return a new reference of a `PyKeyValuePairLogEvent` object that is initialized with the
-     * given kv log event.
+     * Converts the underlying key-value pair log event into a Python dictionary.
+     * @return A new reference to the created dictionary on success.
      * @return nullptr on failure with the relevant Python exception and error set.
      */
-    [[nodiscard]] static auto create(clp::ffi::KeyValuePairLogEvent kv_log_event
-    ) -> PyKeyValuePairLogEvent*;
+    [[nodiscard]] auto to_dict() -> PyDictObject*;
 
     /**
      * Gets the `PyTypeObject` that represents `PyKeyValuePair`'s Python type. This type is
