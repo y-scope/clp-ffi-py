@@ -262,16 +262,15 @@ auto deserialize_preamble(PyObject* Py_UNUSED(self), PyObject* py_deserializer_b
                 static_cast<char const*>(clp::ffi::ir_stream::cProtocol::Metadata::VersionKey)
         )};
         auto const error_code{clp::ffi::ir_stream::validate_protocol_version(version)};
-        if (IRProtocolErrorCode::IRProtocolErrorCode_Supported != error_code) {
+        if (IRProtocolErrorCode::BackwardCompatible != error_code) {
             switch (error_code) {
-                case IRProtocolErrorCode::IRProtocolErrorCode_Invalid:
-                    PyErr_Format(PyExc_RuntimeError, "Invalid version number: %s", version.c_str());
-                    break;
-                case IRProtocolErrorCode::IRProtocolErrorCode_Too_New:
+                case IRProtocolErrorCode::Supported:
+                    // This represents a key-value pair IR stream, which is not supported by these
+                    // old deserialization methods.
                     PyErr_Format(PyExc_RuntimeError, "Version too new: %s", version.c_str());
                     break;
-                case IRProtocolErrorCode::IRProtocolErrorCode_Too_Old:
-                    PyErr_Format(PyExc_RuntimeError, "Version too old: %s", version.c_str());
+                case IRProtocolErrorCode::Unsupported:
+                    PyErr_Format(PyExc_RuntimeError, "Version unsupported: %s", version.c_str());
                     break;
                 default:
                     PyErr_Format(
