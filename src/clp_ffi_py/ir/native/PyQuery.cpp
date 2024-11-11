@@ -4,7 +4,6 @@
 #include "PyQuery.hpp"
 
 #include <clp/string_utils/string_utils.hpp>
-#include <clp/TraceableException.hpp>
 
 #include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ir/native/LogEvent.hpp>
@@ -621,7 +620,7 @@ auto PyQuery::init(
                 wildcard_queries,
                 search_time_termination_margin
         );
-    } catch (clp::TraceableException& ex) {
+    } catch (clp_ffi_py::ExceptionFFI& ex) {
         handle_traceable_exception(ex);
         m_query = nullptr;
         return false;

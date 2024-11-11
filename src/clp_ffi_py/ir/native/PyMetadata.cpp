@@ -2,8 +2,6 @@
 
 #include "PyMetadata.hpp"
 
-#include <clp/TraceableException.hpp>
-
 #include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ExceptionFFI.hpp>
 #include <clp_ffi_py/ir/native/Metadata.hpp>
@@ -239,7 +237,7 @@ auto PyMetadata::init(nlohmann::json const& metadata, bool is_four_byte_encoding
     try {
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         m_metadata = new Metadata(metadata, is_four_byte_encoding);
-    } catch (clp::TraceableException& ex) {
+    } catch (clp_ffi_py::ExceptionFFI& ex) {
         handle_traceable_exception(ex);
         m_metadata = nullptr;
         return false;
