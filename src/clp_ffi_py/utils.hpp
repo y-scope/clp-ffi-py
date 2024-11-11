@@ -9,6 +9,7 @@
 #include <vector>
 
 #include <clp/ffi/encoding_methods.hpp>
+#include <clp/TraceableException.hpp>
 
 namespace clp_ffi_py {
 /**
@@ -59,6 +60,12 @@ auto get_py_bool(bool is_true) -> PyObject*;
  */
 template <typename int_type>
 auto parse_py_int(PyObject* py_int, int_type& val) -> bool;
+
+/**
+ * Handles a `clp::TraceableException` by setting a Python exception accordingly.
+ * @param exception
+ */
+auto handle_traceable_exception(clp::TraceableException& exception) noexcept -> void;
 
 /**
  * A template that always evaluates as false.
