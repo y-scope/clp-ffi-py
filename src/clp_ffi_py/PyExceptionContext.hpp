@@ -37,7 +37,7 @@ public:
     [[nodiscard]] auto has_exception() const noexcept -> bool { return nullptr != m_value; }
 
     /**
-     * Restores the exception by the context.
+     * Restores the exception from the context.
      * NOTE:
      * - This method will clear the existing exception if one is set.
      * - The stored context will be cleared after restoration.
