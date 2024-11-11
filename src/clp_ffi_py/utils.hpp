@@ -62,7 +62,7 @@ template <typename int_type>
 auto parse_py_int(PyObject* py_int, int_type& val) -> bool;
 
 /**
- * Handles a `clp::TraceableException` by setting a Python exception and errors accordingly.
+ * Handles a `clp::TraceableException` by setting a Python exception accordingly.
  * @param exception
  */
 auto handle_traceable_exception(clp::TraceableException& exception) noexcept -> void;
