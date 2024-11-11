@@ -4,6 +4,7 @@
 #include "PyQuery.hpp"
 
 #include <clp/string_utils/string_utils.hpp>
+#include <clp/TraceableException.hpp>
 
 #include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ir/native/LogEvent.hpp>
@@ -620,12 +621,8 @@ auto PyQuery::init(
                 wildcard_queries,
                 search_time_termination_margin
         );
-    } catch (ExceptionFFI const& ex) {
-        PyErr_Format(
-                PyExc_RuntimeError,
-                "Failed to initialize Query object. Error message: %s",
-                ex.what()
-        );
+    } catch (clp::TraceableException& ex) {
+        handle_traceable_exception(ex);
         m_query = nullptr;
         return false;
     }
