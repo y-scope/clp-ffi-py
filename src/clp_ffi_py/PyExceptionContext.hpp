@@ -23,12 +23,14 @@ public:
     auto operator=(PyExceptionContext const&) -> PyExceptionContext& = delete;
     auto operator=(PyExceptionContext&&) -> PyExceptionContext& = delete;
 
+    // Destructor
     ~PyExceptionContext() {
         Py_XDECREF(m_type);
         Py_XDECREF(m_value);
         Py_XDECREF(m_traceback);
     }
 
+    // Methods
     /**
      * @return Whether the context stores an exception.
      */
