@@ -66,7 +66,8 @@ auto get_py_bool(bool is_true) -> PyObject* {
 auto handle_traceable_exception(clp::TraceableException& exception) noexcept -> void {
     if (auto* py_ffi_exception{dynamic_cast<ExceptionFFI*>(&exception)}) {
         auto& exception_context{py_ffi_exception->get_py_exception_context()};
-        if (exception_context.has_exception() && exception_context.restore()) {
+        if (exception_context.has_exception()) {
+            exception_context.restore();
             return;
         }
     }
