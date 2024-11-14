@@ -37,8 +37,9 @@ namespace {
 class IrUnitHandler {
 public:
     // Methods that implement the `clp::ffi::ir_stream::IrUnitHandlerInterface` interface
-    [[nodiscard]] auto handle_log_event(clp::ffi::KeyValuePairLogEvent&& log_event) -> IRErrorCode {
-        m_log_event.emplace(std::move(log_event));
+    [[nodiscard]] auto handle_log_event(clp::ffi::KeyValuePairLogEvent&& deserialized_log_event
+    ) -> IRErrorCode {
+        log_event.emplace(std::move(deserialized_log_event));
         return IRErrorCode::IRErrorCode_Success;
     }
 
@@ -59,8 +60,9 @@ public:
         return IRErrorCode::IRErrorCode_Success;
     }
 
-    // NOLINTNEXTLINE(*)
-    std::optional<clp::ffi::KeyValuePairLogEvent> m_log_event;
+    // TODO: we should enable linting when clang-tidy config is up-to-date to allow simple classes.
+    // NOLINTNEXTLINE(misc-non-private-member-variables-in-classes,readability-identifier-naming)
+    std::optional<clp::ffi::KeyValuePairLogEvent> log_event;
 };
 
 /**
@@ -299,12 +301,12 @@ auto convert_py_dict_to_key_value_pair_log_event(PyDictObject* py_dict
         }
     }
 
-    if (false == ir_unit_handler.m_log_event.has_value()) {
+    if (false == ir_unit_handler.log_event.has_value()) {
         PyErr_SetString(PyExc_RuntimeError, "No log event has been deserialized");
         return std::nullopt;
     }
 
-    return std::move(ir_unit_handler.m_log_event);
+    return std::move(ir_unit_handler.log_event);
 }
 
 CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_dealloc(PyKeyValuePairLogEvent* self) -> void {
