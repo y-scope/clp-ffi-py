@@ -20,6 +20,7 @@ class TestCaseKeyValuePairLogEvent(TestCLPBase):
         """
         current_dir: Path = Path(__file__).resolve().parent
         test_src_dir: Path = current_dir / Path(TestCaseKeyValuePairLogEvent.input_src_dir)
+        num_files_tested: int = 0
         for file_path in test_src_dir.rglob("*"):
             if not file_path.is_file():
                 continue
@@ -29,3 +30,7 @@ class TestCaseKeyValuePairLogEvent(TestCLPBase):
                 actual: KeyValuePairLogEvent = KeyValuePairLogEvent(expected)
                 serialized_py_dict: Dict[Any, Any] = actual.to_dict()
                 self.assertEqual(expected, serialized_py_dict)
+            num_files_tested += 1
+        self.assertNotEqual(
+            num_files_tested, 0, f"No test files found in directory: {test_src_dir}"
+        )
