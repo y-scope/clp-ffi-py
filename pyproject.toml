@@ -91,6 +91,7 @@ exclude = [
     "clp_ffi_py/ir/__init__.py"
 ]
 line-length = 100
+src = ["."]
 
 [tool.ruff.lint]
 select = ["E", "I", "F"]
