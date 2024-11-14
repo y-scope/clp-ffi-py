@@ -3,9 +3,8 @@
 
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
-#include <gsl/gsl>
-
 #include <clp/ffi/KeyValuePairLogEvent.hpp>
+#include <gsl/gsl>
 
 #include <clp_ffi_py/PyObjectUtils.hpp>
 

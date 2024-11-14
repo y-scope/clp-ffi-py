@@ -10,9 +10,9 @@
 #include <vector>
 
 #include <clp/ffi/encoding_methods.hpp>
+#include <clp/TraceableException.hpp>
 #include <msgpack.hpp>
 #include <outcome/single-header/outcome.hpp>
-#include <clp/TraceableException.hpp>
 
 namespace clp_ffi_py {
 /**

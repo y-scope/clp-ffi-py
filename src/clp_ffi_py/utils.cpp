@@ -6,10 +6,9 @@
 #include <span>
 #include <string>
 
+#include <clp/TraceableException.hpp>
 #include <msgpack.hpp>
 #include <outcome/single-header/outcome.hpp>
-
-#include <clp/TraceableException.hpp>
 
 #include <clp_ffi_py/ExceptionFFI.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
