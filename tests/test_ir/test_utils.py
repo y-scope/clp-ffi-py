@@ -29,7 +29,7 @@ class JsonLinesFileReader:
     Class for reading JSON files.
 
     It assumes each line in the file is a JSON string, and the parser parses each line into a JSON
-    object, and return then through a generator.
+    object, and returns then through a generator.
     """
 
     def __init__(self, file_path: Path):

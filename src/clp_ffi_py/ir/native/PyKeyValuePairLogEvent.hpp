@@ -19,7 +19,7 @@ public:
     // Delete default constructor to disable direct instantiation.
     PyKeyValuePairLogEvent() = delete;
 
-    // Delete copy/move constructors and assignments
+    // Delete copy/move constructors and assignment operators
     PyKeyValuePairLogEvent(PyKeyValuePairLogEvent const&) = delete;
     PyKeyValuePairLogEvent(PyKeyValuePairLogEvent&&) = delete;
     auto operator=(PyKeyValuePairLogEvent const&) -> PyKeyValuePairLogEvent& = delete;
@@ -31,8 +31,8 @@ public:
     /**
      * Initializes the underlying data with the given inputs. Since the memory allocation of
      * `PyKeyValuePairLogEvent` is handled by CPython's allocator, cpp constructors will not be
-     * explicitly called. This function serves as the default constructor initialize the underlying
-     * key-value pair log event. It has to be manually called whenever creating a new
+     * explicitly called. This function serves as the default constructor to initialize the
+     * underlying key-value pair log event. It has to be called manually to create a
      * `PyKeyValuePairLogEvent` object through CPython APIs.
      * @param kv_pair_log_event
      * @return true on success.
@@ -68,8 +68,8 @@ public:
     /**
      * Creates and initializes `PyKeyValuePairLogEvent` as a Python type, and then incorporates this
      * type as a Python object into the py_module module.
-     * @param py_module This is the Python module where the initialized `PyKeyValuePairLogEvent`
-     * will be incorporated.
+     * @param py_module The Python module where the initialized `PyKeyValuePairLogEvent` will be
+     * incorporated.
      * @return true on success.
      * @return false on failure with the relevant Python exception and error set.
      */
