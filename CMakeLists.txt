@@ -59,7 +59,7 @@ set(CLP_FFI_PY_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(CLP_FFI_PY_LIB_SRC_DIR "${CLP_FFI_PY_SRC_DIR}/clp_ffi_py")
 set(CLP_FFI_PY_CLP_CORE_DIR "${CLP_FFI_PY_SRC_DIR}/clp/components/core")
 
-# Add clp's string utility
+# Add CLP's string_utils
 add_subdirectory(${CLP_FFI_PY_CLP_CORE_DIR}/src/clp/string_utils)
 
 # Add GSL
