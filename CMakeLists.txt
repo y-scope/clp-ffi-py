@@ -115,6 +115,7 @@ set(CLP_FFI_PY_LIB_IR_SOURCES
     ${CLP_FFI_PY_LIB_SRC_DIR}/modules/ir_native.cpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/Py_utils.cpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/Py_utils.hpp
+    ${CLP_FFI_PY_LIB_SRC_DIR}/PyExceptionContext.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/PyObjectCast.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/PyObjectUtils.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/Python.hpp
