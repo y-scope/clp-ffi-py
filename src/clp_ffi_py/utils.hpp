@@ -66,7 +66,7 @@ auto parse_py_int(PyObject* py_int, int_type& val) -> bool;
 /**
  * Unpacks the given msgpack byte sequence.
  * @param msgpack_byte_sequence
- * @return A result containing the unpack msgpack object handle on success or an error string
+ * @return A result containing the unpacked msgpack object handle on success or an error string
  * indicating the unpack failure (forwarded from the thrown `msgpack::unpack_error`).
  */
 [[nodiscard]] auto unpack_msgpack(std::span<char const> msgpack_byte_sequence
