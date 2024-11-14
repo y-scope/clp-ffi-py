@@ -36,7 +36,7 @@ namespace {
  */
 class IrUnitHandler {
 public:
-    // Implements `clp::ffi::ir_stream::IrUnitHandlerInterface` interface
+    // Methods that implement the `clp::ffi::ir_stream::IrUnitHandlerInterface` interface
     [[nodiscard]] auto handle_log_event(clp::ffi::KeyValuePairLogEvent&& log_event) -> IRErrorCode {
         m_log_event.emplace(std::move(log_event));
         return IRErrorCode::IRErrorCode_Success;
