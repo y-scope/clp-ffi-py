@@ -72,14 +72,14 @@ PyDoc_STRVAR(
         "This class represents a key-value pair log event and provides ways to access the"
         " underlying log data. This class is designed to be instantiated by the IR deserializer."
         " However, direct instantiation using the `__init__` method is also supported for testing"
-        " purposes, although this may not be as efficient as emitting from the IR deserializer.\n\n"
-        "The signature of `__init__` method is shown as following:\n\n"
+        " purposes, although this may not be as efficient as emission from the IR deserializer.\n\n"
+        "The signature of `__init__` method is:\n\n"
         "__init__(self, dictionary)\n\n"
         "Initializes an object that represents a key-value pair log event from the given Python"
-        " dictionary. Notice that each object should be strictly initialized only once. Double"
-        " initialization will result in memory leak.\n\n"
+        " dictionary. Note that each object should only be initialized once. Double initialization"
+        " will result in a memory leak.\n\n"
         ":param dictionary: A dictionary representing the key-value log event, where all keys are"
-        " expected to be of string type, including keys inside any sub-dictionaries.\n"
+        " expected to strings, including keys inside any sub-dictionaries.\n"
 );
 CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_init(
         PyKeyValuePairLogEvent* self,
@@ -144,8 +144,8 @@ PyType_Spec PyKeyValuePairLogEvent_type_spec{
  * from a dictionary-like structure. As a workaround, this function serializes the dictionary
  * using the key-value pair IR format, then deserializes it to create a `KeyValuePairLogEvent`
  * instance. This approach is inefficient and intended solely for testing purposes, as it allows
- * instance creation without a full IR stream. Future implementations should replace this method
- * with a more efficient conversion once a direct utility is available.
+ * instance creation without a full IR stream. TODO: Replace this method with a more efficient
+ * conversion once a direct utility is available.
  * @param py_dict
  * @return The converted key-value log event of the given dictionary on success.
  * @return std::nullopt on failure with the relevant Python exception and error set.
@@ -193,7 +193,7 @@ CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_init(
 }
 
 CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_to_dict(PyKeyValuePairLogEvent* self) -> PyObject* {
-    // TODO: use an efficient algorithm to turn the underlying log event to a Python dictionary
+    // TODO: Use an efficient algorithm to turn the underlying log event into a Python dictionary
     auto const* kv_pair_log_event{self->get_kv_pair_log_event()};
     auto const serialized_json_result{kv_pair_log_event->serialize_to_json()};
     if (serialized_json_result.has_error()) {
