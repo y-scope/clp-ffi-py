@@ -50,9 +50,9 @@ class TestCaseSerializer(TestCLPBase):
     Class for testing `clp_ffi_py.ir.Serializer`.
     """
 
-    input_src_dir: str = "test_json/jsonl"
+    jsonl_test_data_dir: Path = Path("test_data") / "jsonl"
     current_dir: Path = Path(__file__).resolve().parent
-    test_src_dir: Path = current_dir / Path(input_src_dir)
+    test_data_dir: Path = current_dir / jsonl_test_data_dir
 
     def test_serialize_json(self) -> None:
         """
@@ -67,7 +67,7 @@ class TestCaseSerializer(TestCLPBase):
         serializer: Serializer
 
         # Test with context manager
-        for file_path in TestCaseSerializer.test_src_dir.rglob("*"):
+        for file_path in TestCaseSerializer.test_data_dir.rglob("*"):
             if not file_path.is_file():
                 continue
             byte_buffer = BytesIO()
@@ -84,7 +84,7 @@ class TestCaseSerializer(TestCLPBase):
                     self.assertEqual(num_bytes_serialized, serializer.get_num_bytes_serialized())
 
         # Test without context manager
-        for file_path in TestCaseSerializer.test_src_dir.rglob("*"):
+        for file_path in TestCaseSerializer.test_data_dir.rglob("*"):
             if not file_path.is_file():
                 continue
             byte_buffer = BytesIO()
@@ -109,7 +109,7 @@ class TestCaseSerializer(TestCLPBase):
         Tests serializing with customized buffer size limit.
         """
         buffer_size_limit: int = 3000
-        for file_path in TestCaseSerializer.test_src_dir.rglob("*"):
+        for file_path in TestCaseSerializer.test_data_dir.rglob("*"):
             if not file_path.is_file():
                 continue
             byte_buffer: BytesIO = BytesIO()
