@@ -36,8 +36,11 @@ PyDoc_STRVAR(
         " leak.\n\n"
         ":param output_stream: A writable byte output stream to which the serializer will write the"
         " serialized IR byte sequences.\n"
+        ":type output_stream: IO[bytes]\n"
         ":param buffer_size_limit: Threshold of how much serialized data to buffer before flushing"
         " it to `output_stream`. Defaults to 64 KiB.\n"
+        ":type buffer_size_limit: int\n"
+        ":rtype: int\n"
 );
 CLP_FFI_PY_METHOD auto
 PySerializer_init(PySerializer* self, PyObject* args, PyObject* keywords) -> int;
@@ -53,7 +56,9 @@ PyDoc_STRVAR(
         "Serializes the given log event.\n\n"
         ":param msgpack_map: The log event as a packed msgpack map where all keys are"
         " strings.\n"
+        ":type msgpack_map: bytes\n"
         ":return: The number of bytes serialized.\n"
+        ":rtype: int\n"
         ":raise IOError: If the serializer has already been closed.\n"
         ":raise TypeError: If `msgpack_map` is not a packed msgpack map.\n"
         ":raise RuntimeError: If `msgpack_map` couldn't be unpacked or the serialization method"
@@ -71,6 +76,7 @@ PyDoc_STRVAR(
         "get_num_bytes_serialized(self)\n"
         "--\n\n"
         ":return: The total number of bytes serialized.\n"
+        ":rtype: int\n"
         ":raise IOError: If the serializer has already been closed.\n"
 );
 CLP_FFI_PY_METHOD auto PySerializer_get_num_bytes_serialized(PySerializer* self) -> PyObject*;
@@ -84,6 +90,7 @@ PyDoc_STRVAR(
         "flush(self)\n"
         "--\n\n"
         "Flushes any buffered data and the output stream.\n\n"
+        ":return: None\n"
         ":raise IOError: If the serializer has already been closed.\n"
 );
 CLP_FFI_PY_METHOD auto PySerializer_flush(PySerializer* self) -> PyObject*;
@@ -101,6 +108,7 @@ PyDoc_STRVAR(
         " closed.\n"
         "NOTE: This method must be called to properly terminate an IR stream. If it isn't called"
         " the stream will be incomplete, and any buffered data may be lost.\n\n"
+        ":return: None\n"
         ":raise IOError: If the serializer has already been closed.\n"
 );
 CLP_FFI_PY_METHOD auto PySerializer_close(PySerializer* self) -> PyObject*;
@@ -115,6 +123,7 @@ PyDoc_STRVAR(
         "--\n\n"
         "Enters the runtime context.\n\n"
         ":return: self.\n"
+        ":rtype: :class:`Serializer`\n"
 );
 CLP_FFI_PY_METHOD auto PySerializer_enter(PySerializer* self) -> PyObject*;
 

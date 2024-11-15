@@ -43,9 +43,13 @@ PyDoc_STRVAR(
         " leak.\n\n"
         ":param input_stream: Input stream that contains serialized CLP IR. It should be an"
         " object of type `IO[bytes]` that has the `readinto` method.\n"
+        ":type input_stream: IO[bytes]\n"
         ":param buffer_capacity: The capacity used to initialize the underlying read buffer.\n"
+        ":type buffer_capacity: int\n"
         ":param allow_incomplete_stream: If set to `True`, an incomplete CLP IR stream is not"
         " treated as an error.\n"
+        ":type allow_incomplete_stream: bool\n"
+        ":rtype: int\n"
 );
 CLP_FFI_PY_METHOD auto
 PyDeserializer_init(PyDeserializer* self, PyObject* args, PyObject* keywords) -> int;
@@ -61,6 +65,7 @@ PyDoc_STRVAR(
         ":return:\n"
         "     - The next deserialized log event from the IR stream.\n"
         "     - None if there are no more log events in the stream.\n"
+        ":rtype: :class:`KeyValuePairLogEvent` | None\n"
         ":raises: Appropriate exceptions with detailed information on any encountered failure.\n"
 );
 CLP_FFI_PY_METHOD auto PyDeserializer_deserialize_log_event(PyDeserializer* self) -> PyObject*;
