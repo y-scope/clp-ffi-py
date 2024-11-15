@@ -237,7 +237,6 @@ PyDoc_STRVAR(
         ":param dictionary: A dictionary representing the key-value pair log event, where all keys"
         " must be strings, including keys inside any sub-dictionaries.\n"
         ":type dictionary: dict[str, Any]\n"
-        ":rtype: int\n"
 );
 CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_init(
         PyKeyValuePairLogEvent* self,
