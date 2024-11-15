@@ -11,7 +11,8 @@ class TestCaseKeyValuePairLogEvent(TestCLPBase):
     Class for testing `clp_ffi_py.ir.KeyValuePairLogEvent`.
     """
 
-    input_src_dir: str = "test_json"
+    test_data_dir: Path = Path("test_data")
+    jsonl_dir: Path = Path("jsonl")
 
     def test_basic(self) -> None:
         """
@@ -19,7 +20,11 @@ class TestCaseKeyValuePairLogEvent(TestCLPBase):
         ensuring accurate serialization and deserialization in both directions.
         """
         current_dir: Path = Path(__file__).resolve().parent
-        test_src_dir: Path = current_dir / Path(TestCaseKeyValuePairLogEvent.input_src_dir)
+        test_src_dir: Path = (
+            current_dir
+            / TestCaseKeyValuePairLogEvent.test_data_dir
+            / TestCaseKeyValuePairLogEvent.jsonl_dir
+        )
         num_files_tested: int = 0
         for file_path in test_src_dir.rglob("*"):
             if not file_path.is_file():
