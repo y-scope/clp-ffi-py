@@ -92,7 +92,7 @@ public:
      * @return A new reference to `Py_None` when the end of IR stream is reached.
      * @return nullptr on failure with the relevant Python exception and error set.
      */
-    [[nodiscard]] auto deserialize_to_next_log_event() -> PyObject*;
+    [[nodiscard]] auto deserialize_log_event() -> PyObject*;
 
     /**
      * Gets the `PyTypeObject` that represents `PyDeserializer`'s Python type. This type is

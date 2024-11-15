@@ -51,21 +51,19 @@ CLP_FFI_PY_METHOD auto
 PyDeserializer_init(PyDeserializer* self, PyObject* args, PyObject* keywords) -> int;
 
 /**
- * Callback of `PyDeserializer`'s `deserialize_to_next_log_event`.
+ * Callback of `PyDeserializer`'s `deserialize_log_event`.
  */
 PyDoc_STRVAR(
-        cPyDeserializerDeserializeToNextLogEventDoc,
-        "deserialize_to_next_log_event(self)\n"
+        cPyDeserializerDeserializeLogEventDoc,
+        "deserialize_log_event(self)\n"
         "--\n\n"
         "Deserializes the IR stream until the next log event has been deserialized.\n\n"
         ":return:\n"
-        // extra indent?
         "     - The next deserialized log event from the IR stream.\n"
         "     - None if there are no more log events in the stream.\n"
         ":raises: Appropriate exceptions with detailed information on any encountered failure.\n"
 );
-CLP_FFI_PY_METHOD auto PyDeserializer_deserialize_to_next_log_event(PyDeserializer* self
-) -> PyObject*;
+CLP_FFI_PY_METHOD auto PyDeserializer_deserialize_log_event(PyDeserializer* self) -> PyObject*;
 
 /**
  * Callback of `PyDeserializer`'s deallocator.
@@ -74,10 +72,10 @@ CLP_FFI_PY_METHOD auto PyDeserializer_dealloc(PyDeserializer* self) -> void;
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyMethodDef PyDeserializer_method_table[]{
-        {"deserialize_to_next_log_event",
-         py_c_function_cast(PyDeserializer_deserialize_to_next_log_event),
+        {"deserialize_log_event",
+         py_c_function_cast(PyDeserializer_deserialize_log_event),
          METH_NOARGS,
-         static_cast<char const*>(cPyDeserializerDeserializeToNextLogEventDoc)},
+         static_cast<char const*>(cPyDeserializerDeserializeLogEventDoc)},
 
         {nullptr}
 };
@@ -147,9 +145,8 @@ PyDeserializer_init(PyDeserializer* self, PyObject* args, PyObject* keywords) ->
     return 0;
 }
 
-CLP_FFI_PY_METHOD auto PyDeserializer_deserialize_to_next_log_event(PyDeserializer* self
-) -> PyObject* {
-    return self->deserialize_to_next_log_event();
+CLP_FFI_PY_METHOD auto PyDeserializer_deserialize_log_event(PyDeserializer* self) -> PyObject* {
+    return self->deserialize_log_event();
 }
 
 CLP_FFI_PY_METHOD auto PyDeserializer_dealloc(PyDeserializer* self) -> void {
@@ -214,7 +211,7 @@ auto PyDeserializer::init(
     return true;
 }
 
-auto PyDeserializer::deserialize_to_next_log_event() -> PyObject* {
+auto PyDeserializer::deserialize_log_event() -> PyObject* {
     try {
         while (false == is_stream_complete()) {
             auto const ir_unit_type_result{

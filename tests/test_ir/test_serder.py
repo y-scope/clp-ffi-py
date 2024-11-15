@@ -82,17 +82,17 @@ class TestCaseSerDerBase(TestCLPBase):
             buffer_capacity=buffer_capacity,
         )
         for expected in expected_outputs:
-            actual: Optional[KeyValuePairLogEvent] = deserializer.deserialize_to_next_log_event()
+            actual: Optional[KeyValuePairLogEvent] = deserializer.deserialize_log_event()
             self.assertNotEqual(actual, None)
             assert actual is not None  # To silent mypy
             self.assertEqual(actual.to_dict(), expected)
 
         if not self.generate_incomplete_ir or allow_incomplete_ir_stream:
-            self.assertEqual(None, deserializer.deserialize_to_next_log_event())
+            self.assertEqual(None, deserializer.deserialize_log_event())
             return
 
         with self.assertRaises(IncompleteStreamError):
-            deserializer.deserialize_to_next_log_event()
+            deserializer.deserialize_log_event()
 
     def _get_ir_stream_path(
         self,
