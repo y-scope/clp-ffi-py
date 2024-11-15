@@ -35,18 +35,17 @@ namespace {
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cPyDeserializerDoc,
-        "Deserialize for CLP key-value pair IR stream.\n"
+        "Deserializer for deserializing CLP key-value pair IR streams.\n"
         "This class deserializes log events from a CLP key-value pair IR stream.\n\n"
         "__init__(self, input_stream, buffer_capacity=65536, allow_incomplete_stream=False)\n\n"
-        "Initializes a :class:`Deserializer` instance with the given inputs. Notice that each"
-        " object should be strictly initialized only once. Double initialization will result in"
-        " memory leak.\n\n"
-        ":param input_stream: Input stream that contains serialized CLP IR. It should be an "
-        "instance of type `IO[bytes]` with the method `readinto` supported.\n"
+        "Initializes a :class:`Deserializer` instance with the given inputs. Note that each"
+        " object should only be initialized once. Double initialization will result in a memory"
+        " leak.\n\n"
+        ":param input_stream: Input stream that contains serialized CLP IR. It should be an"
+        " object of type `IO[bytes]` that has the `readinto` method.\n"
         ":param buffer_capacity: The capacity used to initialize the underlying read buffer.\n"
         ":param allow_incomplete_stream: If set to `True`, an incomplete CLP IR stream is not"
-        " treated as an error. Instead, an incomplete stream is interpreted as the end of stream"
-        " without raising any exceptions.\n"
+        " treated as an error.\n"
 );
 CLP_FFI_PY_METHOD auto
 PyDeserializer_init(PyDeserializer* self, PyObject* args, PyObject* keywords) -> int;
@@ -58,11 +57,11 @@ PyDoc_STRVAR(
         cPyDeserializerDeserializeToNextLogEventDoc,
         "deserialize_to_next_log_event(self)\n"
         "--\n\n"
-        "Deserializes the IR stream until the next log event IR unit has been deserialized.\n\n"
+        "Deserializes the IR stream until the next log event has been deserialized.\n\n"
         ":return:\n"
-        "     - A newly created :class:`KeyValuePairLogEvent` object representing the next "
-        "       deserialized log event from the IR stream.\n"
-        "     - None when the end of IR stream is reached.\n"
+        // extra indent?
+        "     - The next deserialized log event from the IR stream.\n"
+        "     - None if there are no more log events in the stream.\n"
         ":raises: Appropriate exceptions with detailed information on any encountered failure.\n"
 );
 CLP_FFI_PY_METHOD auto PyDeserializer_deserialize_to_next_log_event(PyDeserializer* self

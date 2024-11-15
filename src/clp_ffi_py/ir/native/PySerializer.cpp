@@ -27,19 +27,17 @@ namespace {
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cPySerializerDoc,
-        "Serializer for CLP key-value pair IR stream.\n"
-        "This class serializes log events into CLP IR format (using four-byte-encoding) and writes"
-        " the serialized data to a specified byte stream object.\n\n"
-        "__init__(self, output_stream, buffer_size_limit)\n\n"
-        "Initializes a :class:`Serializer` instance with the given output stream. Notice that each"
-        " object should be strictly initialized only once. Double initialization will result in"
-        " memory leak.\n\n"
-        ":param output_stream: A writable byte stream to which the serializer will write serialized"
-        " IR byte sequence.\n"
-        ":param buffer_size_limit: The buffer size in bytes that will trigger the internal buffer"
-        " flush, defaults to 65536. The serialized log events will be first buffered inside the"
-        " internal buffer. When the size of the buffer exceeds this limit, the internal buffer will"
-        " be written to the output stream.\n"
+        "Serializer for serializing CLP key-value pair IR streams.\n"
+        "This class serializes log events using the CLP key-value pair IR format and writes the"
+        " serialized data to a specified byte stream object.\n\n"
+        "__init__(self, output_stream, buffer_size_limit=65536)\n\n"
+        "Initializes a :class:`Serializer` instance with the given output stream. Note that each"
+        " object should only be initialized once. Double initialization will result in a memory"
+        " leak.\n\n"
+        ":param output_stream: A writable byte output stream to which the serializer will write the"
+        " serialized IR byte sequences.\n"
+        ":param buffer_size_limit: Threshold of how much serialized data to buffer before flushing"
+        " it to `output_stream`. Defaults to 64 KiB.\n"
 );
 CLP_FFI_PY_METHOD auto
 PySerializer_init(PySerializer* self, PyObject* args, PyObject* keywords) -> int;
@@ -85,7 +83,7 @@ PyDoc_STRVAR(
         cPySerializerFlushDoc,
         "flush(self)\n"
         "--\n\n"
-        "Flushes the internal buffer and the output stream.\n\n"
+        "Flushes any buffered data and the output stream.\n\n"
         ":raise IOError: If the serializer has already been closed.\n"
 );
 CLP_FFI_PY_METHOD auto PySerializer_flush(PySerializer* self) -> PyObject*;
@@ -98,12 +96,11 @@ PyDoc_STRVAR(
         cPySerializerCloseDoc,
         "close(self)\n"
         "--\n\n"
-        "Closes the serializer, writing any remaining data to the output stream and appending a"
-        " byte sequence to mark the end of a CLP IR stream. The output stream is then flushed and"
+        "Closes the serializer, writing any buffered data to the output stream and appending a byte"
+        " sequence to mark the end of the CLP IR stream. The output stream is then flushed and"
         " closed.\n"
-        "NOTE: This method must be called to properly terminate an IR stream. Forgetting/failing"
-        " to call it will leave the stream incomplete, and potentially resulting in data loss due"
-        " to data buffering.\n\n"
+        "NOTE: This method must be called to properly terminate an IR stream. If it isn't called"
+        " the stream will be incomplete, and any buffered data may be lost.\n\n"
         ":raise IOError: If the serializer has already been closed.\n"
 );
 CLP_FFI_PY_METHOD auto PySerializer_close(PySerializer* self) -> PyObject*;
@@ -130,8 +127,8 @@ PyDoc_STRVAR(
         "--\n\n"
         "Exits the runtime context, automatically calling :meth:`close` to flush all buffered data"
         " into the output stream."
-        ":param exc_type: The type of the exception caused the context to be exited. Unused.\n"
-        ":param exc_value: The value of the exception caused the context to be exited. Unused.\n"
+        ":param exc_type: The type of the exception that caused the exit. Unused.\n"
+        ":param exc_value: The value of the exception that caused the exit. Unused.\n"
         ":param exc_traceable: The traceback. Unused.\n"
 );
 CLP_FFI_PY_METHOD auto
