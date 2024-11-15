@@ -5,11 +5,11 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
-#include <gsl/gsl>
 #include <span>
 
 #include <clp/ErrorCode.hpp>
 #include <clp/type_utils.hpp>
+#include <gsl/gsl>
 
 #include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ExceptionFFI.hpp>

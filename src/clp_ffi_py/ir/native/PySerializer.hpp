@@ -4,12 +4,12 @@
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
 #include <cstddef>
-#include <gsl/gsl>
 #include <optional>
 #include <span>
 
 #include <clp/ffi/ir_stream/Serializer.hpp>
 #include <clp/ir/types.hpp>
+#include <gsl/gsl>
 
 #include <clp_ffi_py/PyObjectUtils.hpp>
 

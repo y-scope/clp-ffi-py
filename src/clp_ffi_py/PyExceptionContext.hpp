@@ -5,8 +5,9 @@
 
 namespace clp_ffi_py {
 /**
- * Class to get/set Python exception context.
- * Doc: https://docs.python.org/3/c-api/exceptions.html#c.PyErr_Fetch
+ * Class to get/set Python exception context, designed to capture the current exception state upon
+ * instantiation and provide a restore API that allows users to reinstate the exception context when
+ * needed. Doc: https://docs.python.org/3/c-api/exceptions.html#c.PyErr_Fetch
  */
 class PyExceptionContext {
 public:
@@ -22,24 +23,27 @@ public:
     auto operator=(PyExceptionContext const&) -> PyExceptionContext& = delete;
     auto operator=(PyExceptionContext&&) -> PyExceptionContext& = delete;
 
+    // Destructor
     ~PyExceptionContext() {
         Py_XDECREF(m_type);
         Py_XDECREF(m_value);
         Py_XDECREF(m_traceback);
     }
 
+    // Methods
     /**
-     * @return Whether the context indicates an exception.
+     * @return Whether the context stores an exception.
      */
     [[nodiscard]] auto has_exception() const noexcept -> bool { return nullptr != m_value; }
 
     /**
-     * Restores the exception by the context.
+     * Restores the exception from the context.
      * NOTE:
      * - This method will clear the existing exception if one is set.
+     * - The stored context will be cleared after restoration.
      * - If there's no exception in the stored context, the error indicator will be cleared.
      * - This method should be called strictly once, otherwise the error indicator will be cleared.
-     * @return Whether an exception has been set after restore.
+     * @return Whether an exception has been set by restoring the context.
      */
     [[maybe_unused]] auto restore() noexcept -> bool {
         auto const exception_has_been_set{has_exception()};

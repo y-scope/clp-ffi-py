@@ -4,7 +4,6 @@
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
 #include <functional>
-#include <gsl/gsl>
 #include <system_error>
 #include <utility>
 
@@ -13,6 +12,7 @@
 #include <clp/ffi/KeyValuePairLogEvent.hpp>
 #include <clp/ffi/SchemaTree.hpp>
 #include <clp/time_types.hpp>
+#include <gsl/gsl>
 
 #include <clp_ffi_py/ir/native/DeserializerBufferReader.hpp>
 #include <clp_ffi_py/PyObjectUtils.hpp>

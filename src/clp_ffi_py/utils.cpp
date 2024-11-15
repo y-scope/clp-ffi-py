@@ -78,9 +78,9 @@ auto unpack_msgpack(std::span<char const> msgpack_byte_sequence
     return handle;
 }
 
-auto set_py_exception(clp::TraceableException& exception) noexcept -> void {
+auto handle_traceable_exception(clp::TraceableException& exception) noexcept -> void {
     if (auto* py_ffi_exception{dynamic_cast<ExceptionFFI*>(&exception)}) {
-        auto& exception_context{py_ffi_exception->get_exception_context()};
+        auto& exception_context{py_ffi_exception->get_py_exception_context()};
         if (exception_context.has_exception()) {
             exception_context.restore();
             return;

@@ -207,7 +207,7 @@ auto PyDeserializer::init(
                 std::move(deserializer_result.value())
         };
     } catch (clp::TraceableException& exception) {
-        set_py_exception(exception);
+        handle_traceable_exception(exception);
         return false;
     }
 
@@ -234,7 +234,7 @@ auto PyDeserializer::deserialize_to_next_log_event() -> PyObject* {
             }
         }
     } catch (clp::TraceableException& exception) {
-        set_py_exception(exception);
+        handle_traceable_exception(exception);
         return nullptr;
     }
 

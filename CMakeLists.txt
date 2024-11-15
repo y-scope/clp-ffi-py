@@ -18,7 +18,7 @@ if(DEFINED SKBUILD_PROJECT_NAME)
         "The version of the project parsed by scikit-build-core."
         FORCE
     )
-    set(CLP_FFI_PY_LINT OFF CACHE BOOL "Disable linting." FORCE)
+    set(CLP_FFI_PY_ENABLE_LINTING OFF)
 else()
     set(CLP_FFI_PY_INSTALL_LIBS OFF CACHE BOOL "Disable installing the built libraries." FORCE)
     set(CLP_FFI_PY_PROJECT_NAME "clp-ffi-py" CACHE STRING "Use a placeholder project name." FORCE)
@@ -29,7 +29,7 @@ else()
         "Enable/Disable output of compile commands during generation."
         FORCE
     )
-    set(CLP_FFI_PY_LINT ON CACHE BOOL "Enable linting." FORCE)
+    set(CLP_FFI_PY_ENABLE_LINTING ON)
 endif()
 
 project(${CLP_FFI_PY_PROJECT_NAME} LANGUAGES CXX VERSION ${CLP_FFI_PY_VERSION})
@@ -59,13 +59,16 @@ set(CLP_FFI_PY_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(CLP_FFI_PY_LIB_SRC_DIR "${CLP_FFI_PY_SRC_DIR}/clp_ffi_py")
 set(CLP_FFI_PY_CLP_CORE_DIR "${CLP_FFI_PY_SRC_DIR}/clp/components/core")
 
+# Add CLP's string_utils
 add_subdirectory(${CLP_FFI_PY_CLP_CORE_DIR}/src/clp/string_utils)
 
-set(MSGPACK_CXX20 ON CACHE BOOL "Enable C++20 in msgpack")
-set(MSGPACK_USE_BOOST OFF CACHE BOOL "Disable Boost in msgpack")
-add_subdirectory(${CLP_FFI_PY_SRC_DIR}/msgpack EXCLUDE_FROM_ALL)
-
+# Add GSL
 add_subdirectory(${CLP_FFI_PY_SRC_DIR}/GSL)
+
+# Add msgpack
+set(MSGPACK_CXX20 ON CACHE BOOL "Enable C++20 in msgpack" FORCE)
+set(MSGPACK_USE_BOOST OFF CACHE BOOL "Disable Boost in msgpack" FORCE)
+add_subdirectory(${CLP_FFI_PY_SRC_DIR}/msgpack EXCLUDE_FROM_ALL)
 
 # NOTE: We don't add headers here since CLP core is technically a library we're using, not a part of
 # this project.
@@ -148,7 +151,7 @@ target_include_directories(
 
 target_include_directories(${CLP_FFI_PY_LIB_IR} PRIVATE ${CLP_FFI_PY_SRC_DIR})
 
-if(CLP_FFI_PY_LINT)
+if(CLP_FFI_PY_ENABLE_LINTING)
     target_compile_definitions(${CLP_FFI_PY_LIB_IR} PRIVATE CLP_FFI_PY_ENABLE_LINTING)
 endif()
 

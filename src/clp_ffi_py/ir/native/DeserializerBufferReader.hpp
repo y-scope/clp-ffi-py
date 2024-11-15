@@ -4,10 +4,10 @@
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
 #include <cstddef>
-#include <gsl/gsl>
 
 #include <clp/ErrorCode.hpp>
 #include <clp/ReaderInterface.hpp>
+#include <gsl/gsl>
 
 #include <clp_ffi_py/ir/native/PyDeserializerBuffer.hpp>
 
