@@ -71,17 +71,18 @@ public:
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cPyKeyValuePairLogEventDoc,
-        "This class represents a key-value pair log event and provides ways to access the"
-        " underlying log data. This class is designed to be instantiated by the IR deserializer."
+        "This class represents a key-value pair log event and provides methods to access the"
+        " key-value pairs. This class is designed to be instantiated by the IR deserializer."
         " However, direct instantiation using the `__init__` method is also supported for testing"
         " purposes, although this may not be as efficient as emission from the IR deserializer.\n\n"
-        "The signature of `__init__` method is:\n\n"
         "__init__(self, dictionary)\n\n"
-        "Initializes an object that represents a key-value pair log event from the given Python"
-        " dictionary. Note that each object should only be initialized once. Double initialization"
-        " will result in a memory leak.\n\n"
-        ":param dictionary: A dictionary representing the key-value log event, where all keys are"
-        " expected to strings, including keys inside any sub-dictionaries.\n"
+        "Initializes a :class:`KeyValuePairLogEvent` from the given Python dictionary. Note that"
+        " each object should only be initialized once. Double initialization will result in a"
+        " memory leak.\n\n"
+        ":param dictionary: A dictionary representing the key-value pair log event, where all keys"
+        " must be strings, including keys inside any sub-dictionaries.\n"
+        ":type dictionary: dict[str, Any]\n"
+        ":rtype: int\n"
 );
 CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_init(
         PyKeyValuePairLogEvent* self,
@@ -99,6 +100,7 @@ PyDoc_STRVAR(
         "--\n\n"
         "Converts the underlying key-value pair log event into a Python dictionary.\n\n"
         ":return: Serialized log event in a Python dictionary.\n"
+        ":rtype: dict[str, Any]"
 );
 CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_to_dict(PyKeyValuePairLogEvent* self) -> PyObject*;
 
