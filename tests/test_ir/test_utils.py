@@ -1,9 +1,11 @@
+import json
 import random
 import time
 import unittest
 from datetime import tzinfo
 from math import floor
-from typing import IO, List, Optional, Set, Tuple, Union
+from pathlib import Path
+from typing import Any, Generator, IO, List, Optional, Set, Tuple, Union
 
 import dateutil.tz
 from smart_open import register_compressor  # type: ignore
@@ -20,6 +22,33 @@ from clp_ffi_py.ir import (
     Query,
 )
 from clp_ffi_py.wildcard_query import WildcardQuery
+
+
+class JsonLinesFileReader:
+    """
+    Class for reading JSON files.
+
+    It assumes each line in the file is a JSON string, and the parser parses each line into a JSON
+    object, and returns them through a generator.
+    """
+
+    def __init__(self, file_path: Path):
+        """
+        Initializes the `JSONFileReader` with the given file path.
+
+        :param file_path: Path to the JSON file to read.
+        """
+        self.file_path: Path = file_path
+
+    def read_lines(self) -> Generator[Any, None, None]:
+        """
+        Reads each line in the JSON file, parses it as a JSON object, and yields the JSON object.
+
+        :yield: Parsed JSON object for each line in the file.
+        """
+        with open(self.file_path, "r", encoding="utf-8") as file:
+            for line in file:
+                yield json.loads(line.strip())
 
 
 def _zstd_compressions_handler(

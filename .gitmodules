@@ -1,3 +1,9 @@
 [submodule "src/clp"]
 	path = src/clp
 	url = https://github.com/y-scope/clp.git
+[submodule "src/msgpack"]
+	path = src/msgpack
+	url = https://github.com/msgpack/msgpack-c
+[submodule "src/GSL"]
+	path = src/GSL
+	url = https://github.com/microsoft/GSL.git

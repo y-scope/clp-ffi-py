@@ -3,6 +3,7 @@
 #include <clp_ffi_py/ir/native/PyDeserializerBuffer.hpp>
 #include <clp_ffi_py/ir/native/PyFourByteDeserializer.hpp>
 #include <clp_ffi_py/ir/native/PyFourByteSerializer.hpp>
+#include <clp_ffi_py/ir/native/PyKeyValuePairLogEvent.hpp>
 #include <clp_ffi_py/ir/native/PyLogEvent.hpp>
 #include <clp_ffi_py/ir/native/PyMetadata.hpp>
 #include <clp_ffi_py/ir/native/PyQuery.hpp>
@@ -65,6 +66,11 @@ PyMODINIT_FUNC PyInit_native() {
     }
 
     if (false == clp_ffi_py::ir::native::PyFourByteSerializer::module_level_init(new_module)) {
+        Py_DECREF(new_module);
+        return nullptr;
+    }
+
+    if (false == clp_ffi_py::ir::native::PyKeyValuePairLogEvent::module_level_init(new_module)) {
         Py_DECREF(new_module);
         return nullptr;
     }

@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, tzinfo
 from typing import Any, Dict, Optional
 
@@ -45,3 +46,13 @@ def serialize_dict_to_msgpack(dictionary: Dict[Any, Any]) -> bytes:
     if not isinstance(dictionary, dict):
         raise TypeError("The type of the input object must be a dictionary.")
     return msgpack.packb(dictionary)
+
+
+def parse_json_str(json_str: str) -> Any:
+    """
+    Wrapper of `json.loads`, which parses a JSON string into a Python object.
+
+    :param json_str: The JSON string to parse.
+    :return: The parsed JSON object.
+    """
+    return json.loads(json_str)

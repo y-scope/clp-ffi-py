@@ -13,6 +13,7 @@ __all__: List[str] = [
     "FourByteEncoder",  # native_deprecated
     "FourByteSerializer",  # native
     "IncompleteStreamError",  # native
+    "KeyValuePairLogEvent",  # native
     "LogEvent",  # native
     "Metadata",  # native
     "Query",  # native
