@@ -60,7 +60,7 @@ public:
         return IRErrorCode::IRErrorCode_Success;
     }
 
-    // TODO: we should enable linting when clang-tidy config is up-to-date to allow simple classes.
+    // TODO: We should enable linting when clang-tidy config is up-to-date to allow simple classes.
     // NOLINTNEXTLINE(misc-non-private-member-variables-in-classes,readability-identifier-naming)
     std::optional<clp::ffi::KeyValuePairLogEvent> log_event;
 };
@@ -98,8 +98,8 @@ PyDoc_STRVAR(
         cPyKeyValuePairLogEventToDictDoc,
         "to_dict(self)\n"
         "--\n\n"
-        "Converts the underlying key-value pair log event into a Python dictionary.\n\n"
-        ":return: Serialized log event in a Python dictionary.\n"
+        "Converts the log event into a Python dictionary.\n\n"
+        ":return: The log event as a Python dictionary.\n"
         ":rtype: dict[str, Any]\n"
 );
 CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_to_dict(PyKeyValuePairLogEvent* self) -> PyObject*;

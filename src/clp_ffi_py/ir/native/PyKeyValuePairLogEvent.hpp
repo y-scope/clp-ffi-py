@@ -18,7 +18,7 @@ public:
     // Delete default constructor to disable direct instantiation.
     PyKeyValuePairLogEvent() = delete;
 
-    // Delete copy/move constructors and assignment operators
+    // Delete copy & move constructors and assignment operators
     PyKeyValuePairLogEvent(PyKeyValuePairLogEvent const&) = delete;
     PyKeyValuePairLogEvent(PyKeyValuePairLogEvent&&) = delete;
     auto operator=(PyKeyValuePairLogEvent const&) -> PyKeyValuePairLogEvent& = delete;
