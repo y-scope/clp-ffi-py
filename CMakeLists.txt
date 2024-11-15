@@ -94,6 +94,8 @@ set(CLP_FFI_PY_LIB_IR_SOURCES
     ${CLP_FFI_PY_LIB_SRC_DIR}/ExceptionFFI.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/deserialization_methods.cpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/deserialization_methods.hpp
+    ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/DeserializerBufferReader.cpp
+    ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/DeserializerBufferReader.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/LogEvent.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/Metadata.cpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/Metadata.hpp
