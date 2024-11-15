@@ -61,8 +61,8 @@ PyDoc_STRVAR(
         ":rtype: int\n"
         ":raise IOError: If the serializer has already been closed.\n"
         ":raise TypeError: If `msgpack_map` is not a packed msgpack map.\n"
-        ":raise RuntimeError: If `msgpack_map` couldn't be unpacked or the serialization method"
-        " returns failure.\n"
+        ":raise RuntimeError: If `msgpack_map` couldn't be unpacked or the native serialization"
+        " method returns failure.\n"
 );
 CLP_FFI_PY_METHOD auto
 PySerializer_serialize_msgpack_map(PySerializer* self, PyObject* msgpack_map) -> PyObject*;
