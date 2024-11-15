@@ -52,14 +52,14 @@ PyDoc_STRVAR(
         cPySerializerSerializeMsgpackMapDoc,
         "serialize_msgpack_map(self, msgpack_map)\n"
         "--\n\n"
-        "Serializes the given msgpack byte sequence into as a log event into CLP IR format.\n\n"
-        ":param msgpack_map: A byte sequence encoded in msgpack as the input log event."
-        " The unpacked result must be a msgpack map with all keys as strings.\n"
+        "Serializes the given log event.\n\n"
+        ":param msgpack_map: The log event as a packed msgpack map where all keys are"
+        " strings.\n"
         ":return: The number of bytes serialized.\n"
         ":raise IOError: If the serializer has already been closed.\n"
-        ":raise TypeError: If the unpacked result is not a msgpack map.\n"
-        ":raise RuntimeError: If it fails to unpack the given msgpack byte sequence, or the"
-        " serialization method returns failure.\n"
+        ":raise TypeError: If `msgpack_map` is not a packed msgpack map.\n"
+        ":raise RuntimeError: If `msgpack_map` couldn't be unpacked or the serialization method"
+        " returns failure.\n"
 );
 CLP_FFI_PY_METHOD auto
 PySerializer_serialize_msgpack_map(PySerializer* self, PyObject* msgpack_map) -> PyObject*;
