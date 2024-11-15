@@ -49,8 +49,8 @@ PySerializer_init(PySerializer* self, PyObject* args, PyObject* keywords) -> int
  */
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
-        cPySerializerSerializeMsgpackMapDoc,
-        "serialize_msgpack_map(self, msgpack_map)\n"
+        cPySerializerSerializeLogEventFromMsgpackMapDoc,
+        "serialize_log_event_from_msgpack_map(self, msgpack_map)\n"
         "--\n\n"
         "Serializes the given log event.\n\n"
         ":param msgpack_map: The log event as a packed msgpack map where all keys are"
@@ -63,8 +63,10 @@ PyDoc_STRVAR(
         ":raise RuntimeError: If `msgpack_map` couldn't be unpacked or serialization into the IR"
         " stream failed.\n"
 );
-CLP_FFI_PY_METHOD auto
-PySerializer_serialize_msgpack_map(PySerializer* self, PyObject* msgpack_map) -> PyObject*;
+CLP_FFI_PY_METHOD auto PySerializer_serialize_log_event_from_msgpack_map(
+        PySerializer* self,
+        PyObject* msgpack_map
+) -> PyObject*;
 
 /**
  * Callback of `PySerializer`'s `get_num_bytes_serialized` method.
@@ -147,10 +149,10 @@ CLP_FFI_PY_METHOD auto PySerializer_dealloc(PySerializer* self) -> void;
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyMethodDef PySerializer_method_table[]{
-        {"serialize_msgpack_map",
-         py_c_function_cast(PySerializer_serialize_msgpack_map),
+        {"serialize_log_event_from_msgpack_map",
+         py_c_function_cast(PySerializer_serialize_log_event_from_msgpack_map),
          METH_O,
-         static_cast<char const*>(cPySerializerSerializeMsgpackMapDoc)},
+         static_cast<char const*>(cPySerializerSerializeLogEventFromMsgpackMapDoc)},
 
         {"get_num_bytes_serialized",
          py_c_function_cast(PySerializer_get_num_bytes_serialized),
@@ -284,8 +286,10 @@ PySerializer_init(PySerializer* self, PyObject* args, PyObject* keywords) -> int
     return 0;
 }
 
-CLP_FFI_PY_METHOD auto
-PySerializer_serialize_msgpack_map(PySerializer* self, PyObject* msgpack_map) -> PyObject* {
+CLP_FFI_PY_METHOD auto PySerializer_serialize_log_event_from_msgpack_map(
+        PySerializer* self,
+        PyObject* msgpack_map
+) -> PyObject* {
     if (false == static_cast<bool>(PyBytes_Check(msgpack_map))) {
         PyErr_SetString(
                 PyExc_TypeError,
@@ -296,7 +300,7 @@ PySerializer_serialize_msgpack_map(PySerializer* self, PyObject* msgpack_map) ->
 
     auto* py_bytes_msgpack_map{py_reinterpret_cast<PyBytesObject>(msgpack_map)};
     // Since the type is already checked, we can use the macro to avoid duplicated type checking.
-    auto const num_byte_serialized{self->serialize_msgpack_map(
+    auto const num_byte_serialized{self->serialize_log_event_from_msgpack_map(
             {PyBytes_AS_STRING(py_bytes_msgpack_map),
              static_cast<size_t>(PyBytes_GET_SIZE(py_bytes_msgpack_map))}
     )};
@@ -419,7 +423,7 @@ auto PySerializer::assert_is_not_closed() const -> bool {
     return true;
 }
 
-auto PySerializer::serialize_msgpack_map(std::span<char const> msgpack_byte_sequence
+auto PySerializer::serialize_log_event_from_msgpack_map(std::span<char const> msgpack_byte_sequence
 ) -> std::optional<Py_ssize_t> {
     if (false == assert_is_not_closed()) {
         return std::nullopt;

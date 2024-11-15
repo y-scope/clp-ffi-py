@@ -50,7 +50,7 @@ class TestCaseSerializer(TestCLPBase):
     Class for testing `clp_ffi_py.ir.Serializer`.
     """
 
-    input_src_dir: str = "test_json"
+    input_src_dir: str = "test_json/jsonl"
     current_dir: Path = Path(__file__).resolve().parent
     test_src_dir: Path = current_dir / Path(input_src_dir)
 
@@ -74,7 +74,7 @@ class TestCaseSerializer(TestCLPBase):
             with Serializer(byte_buffer) as serializer:
                 num_bytes_serialized = serializer.get_num_bytes_serialized()
                 for json_obj in JsonLinesFileReader(file_path).read_lines():
-                    num_bytes_serialized += serializer.serialize_msgpack_map(
+                    num_bytes_serialized += serializer.serialize_log_event_from_msgpack_map(
                         serialize_dict_to_msgpack(json_obj)
                     )
                     serializer.flush()
@@ -91,7 +91,7 @@ class TestCaseSerializer(TestCLPBase):
             serializer = Serializer(byte_buffer)
             num_bytes_serialized = serializer.get_num_bytes_serialized()
             for json_obj in JsonLinesFileReader(file_path).read_lines():
-                num_bytes_serialized += serializer.serialize_msgpack_map(
+                num_bytes_serialized += serializer.serialize_log_event_from_msgpack_map(
                     serialize_dict_to_msgpack(json_obj)
                 )
                 serializer.flush()
@@ -119,7 +119,7 @@ class TestCaseSerializer(TestCLPBase):
                 serializer.flush()
                 num_bytes_in_ir_buffer: int = 0
                 for json_obj in JsonLinesFileReader(file_path).read_lines():
-                    num_bytes_serialized: int = serializer.serialize_msgpack_map(
+                    num_bytes_serialized: int = serializer.serialize_log_event_from_msgpack_map(
                         serialize_dict_to_msgpack(json_obj)
                     )
                     self.assertNotEqual(0, num_bytes_serialized)

@@ -15,7 +15,7 @@ class TestCaseSerDerBase(TestCLPBase):
     Class for testing serialization and deserialization of CLP key-value pair IR stream.
     """
 
-    input_src_dir: str = "test_json"
+    input_src_dir: str = "test_data/jsonl"
     current_dir: Path = Path(__file__).resolve().parent
     test_src_dir: Path = current_dir / Path(input_src_dir)
 
@@ -52,7 +52,7 @@ class TestCaseSerDerBase(TestCLPBase):
         file_stream: IO[bytes] = open(ir_stream_path, "wb")
         serializer: Serializer = Serializer(file_stream)
         for input_dict in inputs:
-            serializer.serialize_msgpack_map(serialize_dict_to_msgpack(input_dict))
+            serializer.serialize_log_event_from_msgpack_map(serialize_dict_to_msgpack(input_dict))
         serializer.flush()
         if self.generate_incomplete_ir:
             file_stream.close()
