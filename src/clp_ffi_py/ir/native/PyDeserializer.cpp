@@ -49,7 +49,6 @@ PyDoc_STRVAR(
         ":param allow_incomplete_stream: If set to `True`, an incomplete CLP IR stream is not"
         " treated as an error.\n"
         ":type allow_incomplete_stream: bool\n"
-        ":rtype: int\n"
 );
 CLP_FFI_PY_METHOD auto
 PyDeserializer_init(PyDeserializer* self, PyObject* args, PyObject* keywords) -> int;

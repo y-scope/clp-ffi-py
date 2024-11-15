@@ -40,7 +40,6 @@ PyDoc_STRVAR(
         ":param buffer_size_limit: Threshold of how much serialized data to buffer before flushing"
         " it to `output_stream`. Defaults to 64 KiB.\n"
         ":type buffer_size_limit: int\n"
-        ":rtype: int\n"
 );
 CLP_FFI_PY_METHOD auto
 PySerializer_init(PySerializer* self, PyObject* args, PyObject* keywords) -> int;
