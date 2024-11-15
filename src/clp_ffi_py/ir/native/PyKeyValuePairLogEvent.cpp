@@ -100,7 +100,7 @@ PyDoc_STRVAR(
         "--\n\n"
         "Converts the underlying key-value pair log event into a Python dictionary.\n\n"
         ":return: Serialized log event in a Python dictionary.\n"
-        ":rtype: dict[str, Any]"
+        ":rtype: dict[str, Any]\n"
 );
 CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_to_dict(PyKeyValuePairLogEvent* self) -> PyObject*;
 
