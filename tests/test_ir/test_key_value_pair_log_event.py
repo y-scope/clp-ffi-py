@@ -11,8 +11,7 @@ class TestCaseKeyValuePairLogEvent(TestCLPBase):
     Class for testing `clp_ffi_py.ir.KeyValuePairLogEvent`.
     """
 
-    test_data_dir: Path = Path("test_data")
-    jsonl_dir: Path = Path("jsonl")
+    jsonl_test_data_dir: Path = Path("test_data") / "jsonl"
 
     def test_basic(self) -> None:
         """
@@ -20,13 +19,9 @@ class TestCaseKeyValuePairLogEvent(TestCLPBase):
         ensuring accurate serialization and deserialization in both directions.
         """
         current_dir: Path = Path(__file__).resolve().parent
-        test_src_dir: Path = (
-            current_dir
-            / TestCaseKeyValuePairLogEvent.test_data_dir
-            / TestCaseKeyValuePairLogEvent.jsonl_dir
-        )
+        test_data_dir: Path = current_dir / TestCaseKeyValuePairLogEvent.jsonl_test_data_dir
         num_files_tested: int = 0
-        for file_path in test_src_dir.rglob("*"):
+        for file_path in test_data_dir.rglob("*"):
             if not file_path.is_file():
                 continue
             json_file_reader: JsonLinesFileReader = JsonLinesFileReader(file_path)
@@ -37,5 +32,5 @@ class TestCaseKeyValuePairLogEvent(TestCLPBase):
                 self.assertEqual(expected, serialized_py_dict)
             num_files_tested += 1
         self.assertNotEqual(
-            num_files_tested, 0, f"No test files found in directory: {test_src_dir}"
+            num_files_tested, 0, f"No test files found in directory: {test_data_dir}"
         )
