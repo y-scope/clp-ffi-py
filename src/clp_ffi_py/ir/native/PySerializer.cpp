@@ -60,8 +60,8 @@ PyDoc_STRVAR(
         ":rtype: int\n"
         ":raise IOError: If the serializer has already been closed.\n"
         ":raise TypeError: If `msgpack_map` is not a packed msgpack map.\n"
-        ":raise RuntimeError: If `msgpack_map` couldn't be unpacked or the native serialization"
-        " method returns failure.\n"
+        ":raise RuntimeError: If `msgpack_map` couldn't be unpacked or serialization into the IR"
+        " stream failed.\n"
 );
 CLP_FFI_PY_METHOD auto
 PySerializer_serialize_msgpack_map(PySerializer* self, PyObject* msgpack_map) -> PyObject*;
@@ -89,7 +89,6 @@ PyDoc_STRVAR(
         "flush(self)\n"
         "--\n\n"
         "Flushes any buffered data and the output stream.\n\n"
-        ":return: None\n"
         ":raise IOError: If the serializer has already been closed.\n"
 );
 CLP_FFI_PY_METHOD auto PySerializer_flush(PySerializer* self) -> PyObject*;
@@ -105,9 +104,8 @@ PyDoc_STRVAR(
         "Closes the serializer, writing any buffered data to the output stream and appending a byte"
         " sequence to mark the end of the CLP IR stream. The output stream is then flushed and"
         " closed.\n"
-        "NOTE: This method must be called to properly terminate an IR stream. If it isn't called"
+        "NOTE: This method must be called to properly terminate an IR stream. If it isn't called,"
         " the stream will be incomplete, and any buffered data may be lost.\n\n"
-        ":return: None\n"
         ":raise IOError: If the serializer has already been closed.\n"
 );
 CLP_FFI_PY_METHOD auto PySerializer_close(PySerializer* self) -> PyObject*;
