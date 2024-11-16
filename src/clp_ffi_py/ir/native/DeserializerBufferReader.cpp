@@ -60,7 +60,7 @@ auto DeserializerBufferReader::try_read(char* buf, size_t num_bytes_to_read, siz
             );
         }
         num_bytes_read += num_bytes_copied;
-        dst_buf = dst_buf.last(dst_buf.size() - num_bytes_copied);
+        dst_buf = dst_buf.subspan(num_bytes_copied);
     }
 
     return clp::ErrorCode_Success;
