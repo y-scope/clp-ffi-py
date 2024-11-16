@@ -13,15 +13,20 @@
 #ifdef CLP_FFI_PY_ENABLE_LINTING
 // Inform IWYU of the headers that we use that are exported by Python.h
 // IWYU pragma: begin_exports
+#include <boolobject.h>
 #include <bytesobject.h>
 #include <dictobject.h>
+#include <floatobject.h>
+#include <longobject.h>
 #include <methodobject.h>
 #include <modsupport.h>
 #include <object.h>
 #include <objimpl.h>
 #include <pyerrors.h>
 #include <pymacro.h>
+#include <pyport.h>
 #include <typeslots.h>
+#include <unicodeobject.h>
 // IWYU pragma: end_exports
 #endif
 // clang-format on
