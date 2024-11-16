@@ -3,7 +3,14 @@
 #include "utils.hpp"
 
 #include <iostream>
+#include <span>
+#include <string>
 
+#include <clp/TraceableException.hpp>
+#include <msgpack.hpp>
+#include <outcome/single-header/outcome.hpp>
+
+#include <clp_ffi_py/ExceptionFFI.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
 
 namespace clp_ffi_py {
@@ -58,5 +65,35 @@ auto get_py_bool(bool is_true) -> PyObject* {
         Py_RETURN_TRUE;
     }
     Py_RETURN_FALSE;
+}
+
+auto unpack_msgpack(std::span<char const> msgpack_byte_sequence
+) -> outcome_v2::std_result<msgpack::object_handle, std::string> {
+    msgpack::object_handle handle;
+    try {
+        msgpack::unpack(handle, msgpack_byte_sequence.data(), msgpack_byte_sequence.size());
+    } catch (msgpack::unpack_error const& error) {
+        return std::string{error.what()};
+    }
+    return handle;
+}
+
+auto handle_traceable_exception(clp::TraceableException& exception) noexcept -> void {
+    if (auto* py_ffi_exception{dynamic_cast<ExceptionFFI*>(&exception)}) {
+        auto& exception_context{py_ffi_exception->get_py_exception_context()};
+        if (exception_context.has_exception()) {
+            exception_context.restore();
+            return;
+        }
+    }
+
+    PyErr_Format(
+            PyExc_RuntimeError,
+            "%s:%d: ErrorCode: %d; Message: %s",
+            exception.get_filename(),
+            exception.get_line_number(),
+            static_cast<int>(exception.get_error_code()),
+            exception.what()
+    );
 }
 }  // namespace clp_ffi_py

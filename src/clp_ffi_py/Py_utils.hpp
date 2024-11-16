@@ -3,6 +3,9 @@
 
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
+#include <string>
+#include <string_view>
+
 #include <clp/ffi/encoding_methods.hpp>
 
 namespace clp_ffi_py {
@@ -37,11 +40,19 @@ namespace clp_ffi_py {
 
 /**
  * CPython wrapper of `clp_ffi_py.utils.serialize_dict_to_msgpack`.
- * @param dictionary
- * @return a new reference of a Python `bytes` object containing msgpack-serialized dictionary.
+ * @param py_dict
+ * @return a new reference of a `PyByteObject` containing msgpack-serialized dictionary.
  * @return nullptr on failure with the relevant Python exception and error set.
  */
-[[nodiscard]] auto py_utils_serialize_dict_to_msgpack(PyObject* dictionary) -> PyObject*;
+[[nodiscard]] auto py_utils_serialize_dict_to_msgpack(PyDictObject* py_dict) -> PyBytesObject*;
+
+/**
+ * CPython wrapper of `clp_ffi_py.utils.parse_json_str_to_dict`.
+ * @param json_str
+ * @return a new reference of the parsed JSON object.
+ * @return nullptr on failure with the relevant Python exception and error set.
+ */
+[[nodiscard]] auto py_utils_parse_json_str(std::string_view json_str) -> PyObject*;
 }  // namespace clp_ffi_py
 
 #endif  // CLP_FFI_PY_PY_UTILS_HPP

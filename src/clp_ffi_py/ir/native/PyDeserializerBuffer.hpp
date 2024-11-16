@@ -162,6 +162,19 @@ public:
     [[nodiscard]] auto test_streaming(uint32_t seed) -> PyObject*;
 
     /**
+     * CPython-level factory function.
+     * @param input_stream
+     * @param buf_capacity
+     * @return a new reference of a `PyDeserializerBuffer` object that is initialized with the given
+     * inputs.
+     * @return nullptr on failure with the relevant Python exception and error set.
+     */
+    [[nodiscard]] static auto create(
+            PyObject* input_stream,
+            Py_ssize_t buf_capacity = PyDeserializerBuffer::cDefaultInitialCapacity
+    ) -> PyDeserializerBuffer*;
+
+    /**
      * Gets the PyTypeObject that represents PyDeserializerBuffer's Python type. This type is
      * dynamically created and initialized during the execution of
      * `PyDeserializerBuffer::module_level_init`.

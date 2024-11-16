@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import List, Optional, Tuple
 
 from smart_open import open  # type: ignore
-from test_ir.test_utils import get_current_timestamp, LogGenerator, TestCLPBase
+from test_ir.test_utils import get_current_timestamp, LOG_DIR, LogGenerator, TestCLPBase
 
 from clp_ffi_py.ir import (
     DeserializerBuffer,
@@ -14,8 +14,6 @@ from clp_ffi_py.ir import (
     Query,
 )
 from clp_ffi_py.wildcard_query import WildcardQuery
-
-LOG_DIR: Path = Path("unittest-logs")
 
 
 class TestCaseFourByteDeserializerBase(TestCLPBase):
