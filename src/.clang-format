@@ -10,9 +10,7 @@ IncludeCategories:
   - Regex: "^<clp_ffi_py"
     Priority: 4
   # Third-party headers. Update when adding new third-party library
-  - Regex: "^<(clp)"
-    Priority: 3
-  - Regex: "<(json)"
+  - Regex: "<(clp|gsl|json|msgpack|outcome)"
     Priority: 3
   # C headers
   - Regex: "^<.*.h>$"

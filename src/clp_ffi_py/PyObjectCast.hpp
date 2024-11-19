@@ -112,18 +112,22 @@ auto py_reinterpret_cast(Src* src) noexcept -> Dst* {
 }
 
 namespace ir::native {
-class PyDeserializer;
 class PyDeserializerBuffer;
+class PyFourByteDeserializer;
+class PyKeyValuePairLogEvent;
 class PyLogEvent;
 class PyMetadata;
 class PyQuery;
 }  // namespace ir::native
 
-CLP_FFI_PY_MARK_AS_PYOBJECT(ir::native::PyDeserializer);
 CLP_FFI_PY_MARK_AS_PYOBJECT(ir::native::PyDeserializerBuffer);
+CLP_FFI_PY_MARK_AS_PYOBJECT(ir::native::PyFourByteDeserializer);
+CLP_FFI_PY_MARK_AS_PYOBJECT(ir::native::PyKeyValuePairLogEvent);
 CLP_FFI_PY_MARK_AS_PYOBJECT(ir::native::PyLogEvent);
 CLP_FFI_PY_MARK_AS_PYOBJECT(ir::native::PyMetadata);
 CLP_FFI_PY_MARK_AS_PYOBJECT(ir::native::PyQuery);
+CLP_FFI_PY_MARK_AS_PYOBJECT(PyBytesObject);
+CLP_FFI_PY_MARK_AS_PYOBJECT(PyDictObject);
 CLP_FFI_PY_MARK_AS_PYOBJECT(PyTypeObject);
 }  // namespace clp_ffi_py
 

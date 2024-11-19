@@ -2,10 +2,10 @@ from pathlib import Path
 from typing import List, Optional, Tuple
 
 from test_ir.test_deserializer import (
-    TestCaseDeserializerBase,
-    TestCaseDeserializerTimeRangeQueryBase,
-    TestCaseDeserializerTimeRangeWildcardQueryBase,
-    TestCaseDeserializerWildcardQueryBase,
+    TestCaseFourByteDeserializerBase,
+    TestCaseFourByteDeserializerTimeRangeQueryBase,
+    TestCaseFourByteDeserializerTimeRangeWildcardQueryBase,
+    TestCaseFourByteDeserializerWildcardQueryBase,
 )
 from test_ir.test_utils import TestCLPBase
 
@@ -37,7 +37,7 @@ def read_log_stream(
     return metadata, log_events
 
 
-class TestCaseReaderBase(TestCaseDeserializerBase):
+class TestCaseReaderBase(TestCaseFourByteDeserializerBase):
     # override
     def _deserialize_log_stream(
         self, log_path: Path, query: Optional[Query]
@@ -45,7 +45,7 @@ class TestCaseReaderBase(TestCaseDeserializerBase):
         return read_log_stream(log_path, query, self.enable_compression)
 
 
-class TestCaseReaderTimeRangeQueryBase(TestCaseDeserializerTimeRangeQueryBase):
+class TestCaseReaderTimeRangeQueryBase(TestCaseFourByteDeserializerTimeRangeQueryBase):
     # override
     def _deserialize_log_stream(
         self, log_path: Path, query: Optional[Query]
@@ -53,7 +53,7 @@ class TestCaseReaderTimeRangeQueryBase(TestCaseDeserializerTimeRangeQueryBase):
         return read_log_stream(log_path, query, self.enable_compression)
 
 
-class TestCaseReaderWildcardQueryBase(TestCaseDeserializerWildcardQueryBase):
+class TestCaseReaderWildcardQueryBase(TestCaseFourByteDeserializerWildcardQueryBase):
     # override
     def _deserialize_log_stream(
         self, log_path: Path, query: Optional[Query]
@@ -61,7 +61,9 @@ class TestCaseReaderWildcardQueryBase(TestCaseDeserializerWildcardQueryBase):
         return read_log_stream(log_path, query, self.enable_compression)
 
 
-class TestCaseReaderTimeRangeWildcardQueryBase(TestCaseDeserializerTimeRangeWildcardQueryBase):
+class TestCaseReaderTimeRangeWildcardQueryBase(
+    TestCaseFourByteDeserializerTimeRangeWildcardQueryBase
+):
     # override
     def _deserialize_log_stream(
         self, log_path: Path, query: Optional[Query]
@@ -184,7 +186,9 @@ class TestIncompleteIRStream(TestCLPBase):
     Tests on reading an incomplete stream.
     """
 
-    test_src: Path = Path(__file__).resolve().parent / "test_data/incomplete_ir.log.zst"
+    test_src: Path = (
+        Path(__file__).resolve().parent / "test_data/unstructured_ir/incomplete_ir.log.zst"
+    )
 
     def test_incomplete_ir_stream_error(self) -> None:
         """

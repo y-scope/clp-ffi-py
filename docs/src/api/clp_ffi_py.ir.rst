@@ -8,6 +8,7 @@ Submodules
    :maxdepth: 4
 
    clp_ffi_py.ir.native
+   clp_ffi_py.ir.native_deprecated
    clp_ffi_py.ir.query_builder
    clp_ffi_py.ir.readers
 

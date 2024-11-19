@@ -4,10 +4,11 @@ from pathlib import Path
 from sys import stderr
 from types import TracebackType
 from typing import Generator, IO, Iterator, Optional, Type, Union
+from warnings import warn
 
 from zstandard import ZstdDecompressionReader, ZstdDecompressor
 
-from clp_ffi_py.ir.native import Deserializer, DeserializerBuffer, LogEvent, Metadata, Query
+from clp_ffi_py.ir.native import DeserializerBuffer, FourByteDeserializer, LogEvent, Metadata, Query
 
 
 class ClpIrStreamReader(Iterator[LogEvent]):
@@ -21,9 +22,13 @@ class ClpIrStreamReader(Iterator[LogEvent]):
     :param allow_incomplete_stream: If set to `True`, an incomplete CLP IR stream is not treated as
         an error. Instead, encountering such a stream is seen as reaching its end without raising
         any exceptions.
+    :param decoder_buffer_size: Deprecated since 0.0.13. Use `deserializer_buffer_size` instead.
+        This argument is provided for backward compatibility and if set, will overwrite
+        `deserializer_buffer_size`'s value.
     """
 
     DEFAULT_DESERIALIZER_BUFFER_SIZE: int = 65536
+    DEFAULT_DECODER_BUFFER_SIZE: int = DEFAULT_DESERIALIZER_BUFFER_SIZE
 
     def __init__(
         self,
@@ -31,7 +36,17 @@ class ClpIrStreamReader(Iterator[LogEvent]):
         deserializer_buffer_size: int = DEFAULT_DESERIALIZER_BUFFER_SIZE,
         enable_compression: bool = True,
         allow_incomplete_stream: bool = False,
+        decoder_buffer_size: Optional[int] = None,
     ):
+        if decoder_buffer_size is not None:
+            deserializer_buffer_size = decoder_buffer_size
+            warn(
+                "Argument `decoder_buffer_size` has been renamed to `deserializer_buffer_size`"
+                " since 0.0.13",
+                category=DeprecationWarning,
+                stacklevel=2,
+            )
+
         self.__istream: Union[IO[bytes], ZstdDecompressionReader]
         if enable_compression:
             dctx: ZstdDecompressor = ZstdDecompressor()
@@ -52,9 +67,9 @@ class ClpIrStreamReader(Iterator[LogEvent]):
             - Next unread log event represented as an instance of LogEvent.
             - None if the end of IR stream is reached.
         :raise Exception:
-            If :meth:`~clp_ffi_py.ir.native.Deserializer.deserialize_next_log_event` fails.
+            If :meth:`~clp_ffi_py.ir.native.FourByteDeserializer.deserialize_next_log_event` fails.
         """
-        return Deserializer.deserialize_next_log_event(
+        return FourByteDeserializer.deserialize_next_log_event(
             self._deserializer_buffer, allow_incomplete_stream=self._allow_incomplete_stream
         )
 
@@ -65,11 +80,11 @@ class ClpIrStreamReader(Iterator[LogEvent]):
         need to be readable on a reader's construction, but until the user starts to iterate logs.
 
         :raise Exception:
-            If :meth:`~clp_ffi_py.ir.native.Deserializer.deserialize_preamble` fails.
+            If :meth:`~clp_ffi_py.ir.native.FourByteDeserializer.deserialize_preamble` fails.
         """
         if self.has_metadata():
             return
-        self._metadata = Deserializer.deserialize_preamble(self._deserializer_buffer)
+        self._metadata = FourByteDeserializer.deserialize_preamble(self._deserializer_buffer)
 
     def get_metadata(self) -> Metadata:
         if None is self._metadata:
@@ -90,7 +105,7 @@ class ClpIrStreamReader(Iterator[LogEvent]):
         if False is self.has_metadata():
             self.read_preamble()
         while True:
-            log_event: Optional[LogEvent] = Deserializer.deserialize_next_log_event(
+            log_event: Optional[LogEvent] = FourByteDeserializer.deserialize_next_log_event(
                 self._deserializer_buffer,
                 query=query,
                 allow_incomplete_stream=self._allow_incomplete_stream,
@@ -138,7 +153,16 @@ class ClpIrFileReader(ClpIrStreamReader):
         deserializer_buffer_size: int = ClpIrStreamReader.DEFAULT_DESERIALIZER_BUFFER_SIZE,
         enable_compression: bool = True,
         allow_incomplete_stream: bool = False,
+        decoder_buffer_size: Optional[int] = None,
     ):
+        if decoder_buffer_size is not None:
+            deserializer_buffer_size = decoder_buffer_size
+            warn(
+                "Argument `decoder_buffer_size` has been renamed to `deserializer_buffer_size`"
+                " since 0.0.13",
+                category=DeprecationWarning,
+                stacklevel=2,
+            )
         self._path: Path = fpath
         super().__init__(
             open(fpath, "rb"),

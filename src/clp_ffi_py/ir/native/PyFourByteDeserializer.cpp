@@ -1,6 +1,6 @@
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
-#include "PyDeserializer.hpp"
+#include "PyFourByteDeserializer.hpp"
 
 #include <clp_ffi_py/ir/native/deserialization_methods.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
@@ -45,7 +45,7 @@ PyDoc_STRVAR(
 );
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
-PyMethodDef PyDeserializer_method_table[]{
+PyMethodDef PyFourByteDeserializer_method_table[]{
         {"deserialize_preamble",
          deserialize_preamble,
          METH_O | METH_STATIC,
@@ -61,43 +61,44 @@ PyMethodDef PyDeserializer_method_table[]{
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
-        cPyDeserializerDoc,
-        "Namespace for all CLP IR deserialization methods.\n\n"
+        cPyFourByteDeserializerDoc,
+        "Namespace for all CLP four-byte encoded IR deserialization methods.\n\n"
         "Methods deserialize log events from serialized CLP IR streams. This class should never be "
         "instantiated since it only contains static methods.\n"
 );
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-const-cast)
-PyType_Slot PyDeserializer_slots[]{
-        {Py_tp_methods, static_cast<void*>(PyDeserializer_method_table)},
-        {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyDeserializerDoc))},
+PyType_Slot PyFourByteDeserializer_slots[]{
+        {Py_tp_methods, static_cast<void*>(PyFourByteDeserializer_method_table)},
+        {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyFourByteDeserializerDoc))},
         {0, nullptr}
 };
 // NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-const-cast)
 
 /**
- * PyDeserializer Python type specifications.
+ * PyFourByteDeserializer Python type specifications.
  */
-PyType_Spec PyDeserializer_type_spec{
-        "clp_ffi_py.ir.native.Deserializer",
-        sizeof(PyDeserializer),
+PyType_Spec PyFourByteDeserializer_type_spec{
+        "clp_ffi_py.ir.native.FourByteDeserializer",
+        sizeof(PyFourByteDeserializer),
         0,
         Py_TPFLAGS_DEFAULT,
-        static_cast<PyType_Slot*>(PyDeserializer_slots)
+        static_cast<PyType_Slot*>(PyFourByteDeserializer_slots)
 };
 }  // namespace
 
-PyObjectStaticPtr<PyTypeObject> PyDeserializer::m_py_type{nullptr};
+PyObjectStaticPtr<PyTypeObject> PyFourByteDeserializer::m_py_type{nullptr};
 
-auto PyDeserializer::module_level_init(PyObject* py_module) -> bool {
-    static_assert(std::is_trivially_destructible<PyDeserializer>());
-    auto* type{py_reinterpret_cast<PyTypeObject>(PyType_FromSpec(&PyDeserializer_type_spec))};
+auto PyFourByteDeserializer::module_level_init(PyObject* py_module) -> bool {
+    static_assert(std::is_trivially_destructible<PyFourByteDeserializer>());
+    auto* type{py_reinterpret_cast<PyTypeObject>(PyType_FromSpec(&PyFourByteDeserializer_type_spec))
+    };
     m_py_type.reset(type);
     if (nullptr == type) {
         return false;
     }
     // Explicitly set the tp_new to nullptr to mark this type non-instantiable.
     type->tp_new = nullptr;
-    return add_python_type(type, "Deserializer", py_module);
+    return add_python_type(type, "FourByteDeserializer", py_module);
 }
 }  // namespace clp_ffi_py::ir::native

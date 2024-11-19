@@ -620,12 +620,8 @@ auto PyQuery::init(
                 wildcard_queries,
                 search_time_termination_margin
         );
-    } catch (ExceptionFFI const& ex) {
-        PyErr_Format(
-                PyExc_RuntimeError,
-                "Failed to initialize Query object. Error message: %s",
-                ex.what()
-        );
+    } catch (clp_ffi_py::ExceptionFFI& ex) {
+        handle_traceable_exception(ex);
         m_query = nullptr;
         return false;
     }

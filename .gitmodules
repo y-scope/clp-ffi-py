@@ -4,3 +4,9 @@
 [submodule "tools/yscope-dev-utils"]
 	path = tools/yscope-dev-utils
 	url = https://github.com/y-scope/yscope-dev-utils.git
+[submodule "src/msgpack"]
+	path = src/msgpack
+	url = https://github.com/msgpack/msgpack-c
+[submodule "src/GSL"]
+	path = src/GSL
+	url = https://github.com/microsoft/GSL.git

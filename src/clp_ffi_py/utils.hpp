@@ -4,11 +4,15 @@
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
 #include <iostream>
+#include <span>
 #include <string>
 #include <type_traits>
 #include <vector>
 
 #include <clp/ffi/encoding_methods.hpp>
+#include <clp/TraceableException.hpp>
+#include <msgpack.hpp>
+#include <outcome/single-header/outcome.hpp>
 
 namespace clp_ffi_py {
 /**
@@ -59,6 +63,21 @@ auto get_py_bool(bool is_true) -> PyObject*;
  */
 template <typename int_type>
 auto parse_py_int(PyObject* py_int, int_type& val) -> bool;
+
+/**
+ * Unpacks the given msgpack byte sequence.
+ * @param msgpack_byte_sequence
+ * @return A result containing the unpacked msgpack object handle on success or an error string
+ * indicating the unpack failure (forwarded from the thrown `msgpack::unpack_error`).
+ */
+[[nodiscard]] auto unpack_msgpack(std::span<char const> msgpack_byte_sequence
+) -> outcome_v2::std_result<msgpack::object_handle, std::string>;
+
+/*
+ * Handles a `clp::TraceableException` by setting a Python exception accordingly.
+ * @param exception
+ */
+auto handle_traceable_exception(clp::TraceableException& exception) noexcept -> void;
 
 /**
  * A template that always evaluates as false.

@@ -72,14 +72,18 @@ class FourByteSerializer:
     @staticmethod
     def serialize_end_of_ir() -> bytearray: ...
 
-class Deserializer:
+class FourByteDeserializer:
     @staticmethod
     def deserialize_preamble(decoder_buffer: DeserializerBuffer) -> Metadata: ...
     @staticmethod
     def deserialize_next_log_event(
-        decoder_buffer: DeserializerBuffer,
+        deserializer_buffer: DeserializerBuffer,
         query: Optional[Query] = None,
         allow_incomplete_stream: bool = False,
     ) -> Optional[LogEvent]: ...
+
+class KeyValuePairLogEvent:
+    def __init__(self, dictionary: Dict[Any, Any]): ...
+    def to_dict(self) -> Dict[Any, Any]: ...
 
 class IncompleteStreamError(Exception): ...
