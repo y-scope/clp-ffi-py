@@ -37,6 +37,7 @@ tasks:
           FLAGS: "--in-place"
 
   cpp-configs:
+    # TODO: remove this once all clang-tidy has been fixed
     deps: [":config-cmake-project"]
     cmds:
       - "tools/yscope-dev-utils/lint-configs/symlink-cpp-lint-configs.sh"
