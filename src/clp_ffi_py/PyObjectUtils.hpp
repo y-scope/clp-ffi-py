@@ -5,6 +5,8 @@
 
 #include <memory>
 
+#include <clp_ffi_py/PyExceptionContext.hpp>
+
 namespace clp_ffi_py {
 /**
  * A specialized deleter for PyObjectPtr which decrements the pointed PyObject reference count when
@@ -58,10 +60,10 @@ using PyObjectStaticPtr = std::unique_ptr<PyObjectType, PyObjectTrivialDeleter<P
 class PyErrGuard {
 public:
     // Constructor
-    PyErrGuard() { PyErr_Fetch(&m_error_type, &m_error_value, &m_error_traceback); }
+    PyErrGuard() = default;
 
     // Destructor
-    ~PyErrGuard() { PyErr_Restore(m_error_type, m_error_value, m_error_traceback); }
+    ~PyErrGuard() { m_exception_context.restore(); }
 
     // Delete copy/move constructor and assignment
     PyErrGuard(PyErrGuard const&) = delete;
@@ -71,9 +73,7 @@ public:
 
 private:
     // Variables
-    PyObject* m_error_type{nullptr};
-    PyObject* m_error_value{nullptr};
-    PyObject* m_error_traceback{nullptr};
+    PyExceptionContext m_exception_context;
 };
 }  // namespace clp_ffi_py
 
