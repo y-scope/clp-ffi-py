@@ -56,7 +56,7 @@ public:
      * Tries to seek to the given position, relative to the beginning of the data.
      * TODO: Implement this method when needed.
      * @param pos
-     * @return clp::ErrorCode_Unsupported
+     * @return clp::ErrorCode_Unsupported always.
      */
     [[nodiscard]] auto try_seek_from_begin([[maybe_unused]] size_t pos) -> clp::ErrorCode override {
         return clp::ErrorCode_Unsupported;
@@ -64,7 +64,7 @@ public:
 
     /**
      * @param pos Returns the position of the read head in the buffer.
-     * @return ErrorCode_Success on success.
+     * @return ErrorCode_Success always.
      */
     [[nodiscard]] auto try_get_pos(size_t& pos) -> clp::ErrorCode override {
         pos = m_pos;
