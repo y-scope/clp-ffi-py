@@ -4,12 +4,12 @@
 #include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
 
 #include <cstddef>
-#include <gsl/gsl>
 #include <optional>
 #include <span>
 
 #include <clp/ffi/ir_stream/Serializer.hpp>
 #include <clp/ir/types.hpp>
+#include <gsl/gsl>
 
 #include <clp_ffi_py/PyObjectUtils.hpp>
 
@@ -85,13 +85,14 @@ public:
     [[nodiscard]] auto assert_is_not_closed() const -> bool;
 
     /**
-     * Serializes the given msgpack byte sequence as a msgpack map into IR format.
+     * Serializes the log event from the given msgpack map into IR format.
      * NOTE: the serializer must not be closed to call this method.
      * @param msgpack_byte_sequence
      * @return the number of bytes serialized on success.
      * @return std::nullptr on failure with the relevant Python exception and error set.
      */
-    [[nodiscard]] auto serialize_msgpack_map(std::span<char const> msgpack_byte_sequence
+    [[nodiscard]] auto serialize_log_event_from_msgpack_map(
+            std::span<char const> msgpack_byte_sequence
     ) -> std::optional<Py_ssize_t>;
 
     [[nodiscard]] auto get_num_bytes_serialized() const -> Py_ssize_t {

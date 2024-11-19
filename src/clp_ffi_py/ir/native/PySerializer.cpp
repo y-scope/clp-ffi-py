@@ -27,19 +27,19 @@ namespace {
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cPySerializerDoc,
-        "Serializer for CLP key-value pair IR stream.\n"
-        "This class serializes log events into CLP IR format (using four-byte-encoding) and writes"
-        " the serialized data to a specified byte stream object.\n\n"
-        "__init__(self, output_stream, buffer_size_limit)\n\n"
-        "Initializes a :class:`Serializer` instance with the given output stream. Notice that each"
-        " object should be strictly initialized only once. Double initialization will result in"
-        " memory leak.\n\n"
-        ":param output_stream: A writable byte stream to which the serializer will write serialized"
-        " IR byte sequence.\n"
-        ":param buffer_size_limit: The buffer size in bytes that will trigger the internal buffer"
-        " flush, defaults to 65536. The serialized log events will be first buffered inside the"
-        " internal buffer. When the size of the buffer exceeds this limit, the internal buffer will"
-        " be written to the output stream.\n"
+        "Serializer for serializing CLP key-value pair IR streams.\n"
+        "This class serializes log events using the CLP key-value pair IR format and writes the"
+        " serialized data to a specified byte stream object.\n\n"
+        "__init__(self, output_stream, buffer_size_limit=65536)\n\n"
+        "Initializes a :class:`Serializer` instance with the given output stream. Note that each"
+        " object should only be initialized once. Double initialization will result in a memory"
+        " leak.\n\n"
+        ":param output_stream: A writable byte output stream to which the serializer will write the"
+        " serialized IR byte sequences.\n"
+        ":type output_stream: IO[bytes]\n"
+        ":param buffer_size_limit: Threshold of how much serialized data to buffer before flushing"
+        " it to `output_stream`. Defaults to 64 KiB.\n"
+        ":type buffer_size_limit: int\n"
 );
 CLP_FFI_PY_METHOD auto
 PySerializer_init(PySerializer* self, PyObject* args, PyObject* keywords) -> int;
@@ -49,20 +49,24 @@ PySerializer_init(PySerializer* self, PyObject* args, PyObject* keywords) -> int
  */
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
-        cPySerializerSerializeMsgpackMapDoc,
-        "serialize_msgpack_map(self, msgpack_map)\n"
+        cPySerializerSerializeLogEventFromMsgpackMapDoc,
+        "serialize_log_event_from_msgpack_map(self, msgpack_map)\n"
         "--\n\n"
-        "Serializes the given msgpack byte sequence into as a log event into CLP IR format.\n\n"
-        ":param msgpack_map: A byte sequence encoded in msgpack as the input log event."
-        " The unpacked result must be a msgpack map with all keys as strings.\n"
+        "Serializes the given log event.\n\n"
+        ":param msgpack_map: The log event as a packed msgpack map where all keys are"
+        " strings.\n"
+        ":type msgpack_map: bytes\n"
         ":return: The number of bytes serialized.\n"
+        ":rtype: int\n"
         ":raise IOError: If the serializer has already been closed.\n"
-        ":raise TypeError: If the unpacked result is not a msgpack map.\n"
-        ":raise RuntimeError: If it fails to unpack the given msgpack byte sequence, or the"
-        " serialization method returns failure.\n"
+        ":raise TypeError: If `msgpack_map` is not a packed msgpack map.\n"
+        ":raise RuntimeError: If `msgpack_map` couldn't be unpacked or serialization into the IR"
+        " stream failed.\n"
 );
-CLP_FFI_PY_METHOD auto
-PySerializer_serialize_msgpack_map(PySerializer* self, PyObject* msgpack_map) -> PyObject*;
+CLP_FFI_PY_METHOD auto PySerializer_serialize_log_event_from_msgpack_map(
+        PySerializer* self,
+        PyObject* msgpack_map
+) -> PyObject*;
 
 /**
  * Callback of `PySerializer`'s `get_num_bytes_serialized` method.
@@ -73,6 +77,7 @@ PyDoc_STRVAR(
         "get_num_bytes_serialized(self)\n"
         "--\n\n"
         ":return: The total number of bytes serialized.\n"
+        ":rtype: int\n"
         ":raise IOError: If the serializer has already been closed.\n"
 );
 CLP_FFI_PY_METHOD auto PySerializer_get_num_bytes_serialized(PySerializer* self) -> PyObject*;
@@ -85,7 +90,7 @@ PyDoc_STRVAR(
         cPySerializerFlushDoc,
         "flush(self)\n"
         "--\n\n"
-        "Flushes the internal buffer and the output stream.\n\n"
+        "Flushes any buffered data and the output stream.\n\n"
         ":raise IOError: If the serializer has already been closed.\n"
 );
 CLP_FFI_PY_METHOD auto PySerializer_flush(PySerializer* self) -> PyObject*;
@@ -98,12 +103,11 @@ PyDoc_STRVAR(
         cPySerializerCloseDoc,
         "close(self)\n"
         "--\n\n"
-        "Closes the serializer, writing any remaining data to the output stream and appending a"
-        " byte sequence to mark the end of a CLP IR stream. The output stream is then flushed and"
+        "Closes the serializer, writing any buffered data to the output stream and appending a byte"
+        " sequence to mark the end of the CLP IR stream. The output stream is then flushed and"
         " closed.\n"
-        "NOTE: This method must be called to properly terminate an IR stream. Forgetting/failing"
-        " to call it will leave the stream incomplete, and potentially resulting in data loss due"
-        " to data buffering.\n\n"
+        "NOTE: This method must be called to properly terminate an IR stream. If it isn't called,"
+        " the stream will be incomplete, and any buffered data may be lost.\n\n"
         ":raise IOError: If the serializer has already been closed.\n"
 );
 CLP_FFI_PY_METHOD auto PySerializer_close(PySerializer* self) -> PyObject*;
@@ -118,6 +122,7 @@ PyDoc_STRVAR(
         "--\n\n"
         "Enters the runtime context.\n\n"
         ":return: self.\n"
+        ":rtype: :class:`Serializer`\n"
 );
 CLP_FFI_PY_METHOD auto PySerializer_enter(PySerializer* self) -> PyObject*;
 
@@ -130,8 +135,8 @@ PyDoc_STRVAR(
         "--\n\n"
         "Exits the runtime context, automatically calling :meth:`close` to flush all buffered data"
         " into the output stream."
-        ":param exc_type: The type of the exception caused the context to be exited. Unused.\n"
-        ":param exc_value: The value of the exception caused the context to be exited. Unused.\n"
+        ":param exc_type: The type of the exception that caused the exit. Unused.\n"
+        ":param exc_value: The value of the exception that caused the exit. Unused.\n"
         ":param exc_traceable: The traceback. Unused.\n"
 );
 CLP_FFI_PY_METHOD auto
@@ -144,10 +149,10 @@ CLP_FFI_PY_METHOD auto PySerializer_dealloc(PySerializer* self) -> void;
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyMethodDef PySerializer_method_table[]{
-        {"serialize_msgpack_map",
-         py_c_function_cast(PySerializer_serialize_msgpack_map),
+        {"serialize_log_event_from_msgpack_map",
+         py_c_function_cast(PySerializer_serialize_log_event_from_msgpack_map),
          METH_O,
-         static_cast<char const*>(cPySerializerSerializeMsgpackMapDoc)},
+         static_cast<char const*>(cPySerializerSerializeLogEventFromMsgpackMapDoc)},
 
         {"get_num_bytes_serialized",
          py_c_function_cast(PySerializer_get_num_bytes_serialized),
@@ -281,8 +286,10 @@ PySerializer_init(PySerializer* self, PyObject* args, PyObject* keywords) -> int
     return 0;
 }
 
-CLP_FFI_PY_METHOD auto
-PySerializer_serialize_msgpack_map(PySerializer* self, PyObject* msgpack_map) -> PyObject* {
+CLP_FFI_PY_METHOD auto PySerializer_serialize_log_event_from_msgpack_map(
+        PySerializer* self,
+        PyObject* msgpack_map
+) -> PyObject* {
     if (false == static_cast<bool>(PyBytes_Check(msgpack_map))) {
         PyErr_SetString(
                 PyExc_TypeError,
@@ -293,7 +300,7 @@ PySerializer_serialize_msgpack_map(PySerializer* self, PyObject* msgpack_map) ->
 
     auto* py_bytes_msgpack_map{py_reinterpret_cast<PyBytesObject>(msgpack_map)};
     // Since the type is already checked, we can use the macro to avoid duplicated type checking.
-    auto const num_byte_serialized{self->serialize_msgpack_map(
+    auto const num_byte_serialized{self->serialize_log_event_from_msgpack_map(
             {PyBytes_AS_STRING(py_bytes_msgpack_map),
              static_cast<size_t>(PyBytes_GET_SIZE(py_bytes_msgpack_map))}
     )};
@@ -416,7 +423,7 @@ auto PySerializer::assert_is_not_closed() const -> bool {
     return true;
 }
 
-auto PySerializer::serialize_msgpack_map(std::span<char const> msgpack_byte_sequence
+auto PySerializer::serialize_log_event_from_msgpack_map(std::span<char const> msgpack_byte_sequence
 ) -> std::optional<Py_ssize_t> {
     if (false == assert_is_not_closed()) {
         return std::nullopt;
