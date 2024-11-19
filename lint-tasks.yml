@@ -36,10 +36,7 @@ tasks:
         vars:
           FLAGS: "--in-place"
 
-  cpp-configs:
-    deps: [":config-cmake-project"]
-    cmds:
-      - "tools/yscope-dev-utils/lint-configs/symlink-cpp-lint-configs.sh"
+  cpp-configs: "tools/yscope-dev-utils/lint-configs/symlink-cpp-lint-configs.sh"
 
   cpp-check:
     cmds:
