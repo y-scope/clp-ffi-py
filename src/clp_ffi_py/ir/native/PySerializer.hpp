@@ -27,7 +27,7 @@ public:
     // Delete default constructor to disable direct instantiation.
     PySerializer() = delete;
 
-    // Delete copy/move constructors and assignments
+    // Delete copy & move constructors and assignment operators
     PySerializer(PySerializer const&) = delete;
     PySerializer(PySerializer&&) = delete;
     auto operator=(PySerializer const&) -> PySerializer& = delete;
@@ -46,8 +46,7 @@ public:
      * Initializes the underlying data with the given inputs. Since the memory allocation of
      * `PySerializer` is handled by CPython's allocator, cpp constructors will not be explicitly
      * called. This function serves as the default constructor initialize the underlying serializer.
-     * It has to be manually called whenever creating a new `PySerializer` object through
-     * CPython APIs.
+     * It has to be called manually to create a `PySerializer` object through CPython APIs.
      * @param output_stream
      * @param serializer
      * @param buffer_size_limit
@@ -126,8 +125,7 @@ public:
     /**
      * Creates and initializes `PySerializer` as a Python type, and then incorporates this
      * type as a Python object into the py_module module.
-     * @param py_module This is the Python module where the initialized `PySerializer` will be
-     * incorporated.
+     * @param py_module The Python module where the initialized `PySerializer` will be incorporated.
      * @return true on success.
      * @return false on failure with the relevant Python exception and error set.
      */
