@@ -36,9 +36,10 @@ namespace {
  */
 class IrUnitHandler {
 public:
-    // Implements `clp::ffi::ir_stream::IrUnitHandlerInterface` interface
-    [[nodiscard]] auto handle_log_event(clp::ffi::KeyValuePairLogEvent&& log_event) -> IRErrorCode {
-        m_log_event.emplace(std::move(log_event));
+    // Methods that implement the `clp::ffi::ir_stream::IrUnitHandlerInterface` interface
+    [[nodiscard]] auto handle_log_event(clp::ffi::KeyValuePairLogEvent&& deserialized_log_event
+    ) -> IRErrorCode {
+        log_event.emplace(std::move(deserialized_log_event));
         return IRErrorCode::IRErrorCode_Success;
     }
 
@@ -59,8 +60,9 @@ public:
         return IRErrorCode::IRErrorCode_Success;
     }
 
-    // NOLINTNEXTLINE(*)
-    std::optional<clp::ffi::KeyValuePairLogEvent> m_log_event;
+    // TODO: We should enable linting when clang-tidy config is up-to-date to allow simple classes.
+    // NOLINTNEXTLINE(misc-non-private-member-variables-in-classes,readability-identifier-naming)
+    std::optional<clp::ffi::KeyValuePairLogEvent> log_event;
 };
 
 /**
@@ -69,17 +71,17 @@ public:
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cPyKeyValuePairLogEventDoc,
-        "This class represents a key-value pair log event and provides ways to access the"
-        " underlying log data. This class is designed to be instantiated by the IR deserializer."
+        "This class represents a key-value pair log event and provides methods to access the"
+        " key-value pairs. This class is designed to be instantiated by the IR deserializer."
         " However, direct instantiation using the `__init__` method is also supported for testing"
-        " purposes, although this may not be as efficient as emitting from the IR deserializer.\n\n"
-        "The signature of `__init__` method is shown as following:\n\n"
+        " purposes, although this may not be as efficient as emission from the IR deserializer.\n\n"
         "__init__(self, dictionary)\n\n"
-        "Initializes an object that represents a key-value pair log event from the given Python"
-        " dictionary. Notice that each object should be strictly initialized only once. Double"
-        " initialization will result in memory leak.\n\n"
-        ":param dictionary: A dictionary representing the key-value log event, where all keys are"
-        " expected to be of string type, including keys inside any sub-dictionaries.\n"
+        "Initializes a :class:`KeyValuePairLogEvent` from the given Python dictionary. Note that"
+        " each object should only be initialized once. Double initialization will result in a"
+        " memory leak.\n\n"
+        ":param dictionary: A dictionary representing the key-value pair log event, where all keys"
+        " must be strings, including keys inside any sub-dictionaries.\n"
+        ":type dictionary: dict[str, Any]\n"
 );
 CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_init(
         PyKeyValuePairLogEvent* self,
@@ -95,8 +97,9 @@ PyDoc_STRVAR(
         cPyKeyValuePairLogEventToDictDoc,
         "to_dict(self)\n"
         "--\n\n"
-        "Converts the underlying key-value pair log event into a Python dictionary.\n\n"
-        ":return: Serialized log event in a Python dictionary.\n"
+        "Converts the log event into a Python dictionary.\n\n"
+        ":return: The log event as a Python dictionary.\n"
+        ":rtype: dict[str, Any]\n"
 );
 CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_to_dict(PyKeyValuePairLogEvent* self) -> PyObject*;
 
@@ -144,8 +147,8 @@ PyType_Spec PyKeyValuePairLogEvent_type_spec{
  * from a dictionary-like structure. As a workaround, this function serializes the dictionary
  * using the key-value pair IR format, then deserializes it to create a `KeyValuePairLogEvent`
  * instance. This approach is inefficient and intended solely for testing purposes, as it allows
- * instance creation without a full IR stream. Future implementations should replace this method
- * with a more efficient conversion once a direct utility is available.
+ * instance creation without a full IR stream. TODO: Replace this method with a more efficient
+ * conversion once a direct utility is available.
  * @param py_dict
  * @return The converted key-value log event of the given dictionary on success.
  * @return std::nullopt on failure with the relevant Python exception and error set.
@@ -193,7 +196,7 @@ CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_init(
 }
 
 CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_to_dict(PyKeyValuePairLogEvent* self) -> PyObject* {
-    // TODO: use an efficient algorithm to turn the underlying log event to a Python dictionary
+    // TODO: Use an efficient algorithm to turn the underlying log event into a Python dictionary
     auto const* kv_pair_log_event{self->get_kv_pair_log_event()};
     auto const serialized_json_result{kv_pair_log_event->serialize_to_json()};
     if (serialized_json_result.has_error()) {
@@ -214,6 +217,11 @@ CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_to_dict(PyKeyValuePairLogEvent* se
         return nullptr;
     }
     return parsed_json.release();
+}
+
+CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_dealloc(PyKeyValuePairLogEvent* self) -> void {
+    self->clean();
+    Py_TYPE(self)->tp_free(py_reinterpret_cast<PyObject>(self));
 }
 
 auto convert_py_dict_to_key_value_pair_log_event(PyDictObject* py_dict
@@ -299,17 +307,12 @@ auto convert_py_dict_to_key_value_pair_log_event(PyDictObject* py_dict
         }
     }
 
-    if (false == ir_unit_handler.m_log_event.has_value()) {
+    if (false == ir_unit_handler.log_event.has_value()) {
         PyErr_SetString(PyExc_RuntimeError, "No log event has been deserialized");
         return std::nullopt;
     }
 
-    return std::move(ir_unit_handler.m_log_event);
-}
-
-CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_dealloc(PyKeyValuePairLogEvent* self) -> void {
-    self->clean();
-    Py_TYPE(self)->tp_free(py_reinterpret_cast<PyObject>(self));
+    return std::move(ir_unit_handler.log_event);
 }
 }  // namespace
 

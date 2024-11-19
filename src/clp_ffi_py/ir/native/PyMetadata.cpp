@@ -237,13 +237,8 @@ auto PyMetadata::init(nlohmann::json const& metadata, bool is_four_byte_encoding
     try {
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         m_metadata = new Metadata(metadata, is_four_byte_encoding);
-    } catch (ExceptionFFI const& ex) {
-        PyErr_Format(
-                PyExc_RuntimeError,
-                "Failed to initialize metadata from deserialized JSON format preamble. "
-                "Error message: %s",
-                ex.what()
-        );
+    } catch (clp_ffi_py::ExceptionFFI& ex) {
+        handle_traceable_exception(ex);
         m_metadata = nullptr;
         return false;
     }
