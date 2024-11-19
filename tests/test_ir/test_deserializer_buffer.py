@@ -14,7 +14,7 @@ class TestCaseDeserializerBuffer(TestCLPBase):
     Class for testing clp_ffi_py.ir.DeserializerBuffer.
     """
 
-    input_src_dir: str = "test_data"
+    deserializer_buffer_test_data_dir: Path = Path("test_data") / "unstructured_ir"
 
     def test_buffer_protocol(self) -> None:
         """
@@ -60,8 +60,10 @@ class TestCaseDeserializerBuffer(TestCLPBase):
         :param buffer_capacity: The buffer capacity used to initialize the deserializer buffer.
         """
         current_dir: Path = Path(__file__).resolve().parent
-        test_src_dir: Path = current_dir / TestCaseDeserializerBuffer.input_src_dir
-        for file_path in test_src_dir.rglob("*"):
+        test_data_dir: Path = (
+            current_dir / TestCaseDeserializerBuffer.deserializer_buffer_test_data_dir
+        )
+        for file_path in test_data_dir.rglob("*"):
             if not file_path.is_file():
                 continue
             streaming_result: bytearray
