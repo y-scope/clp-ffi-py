@@ -1,6 +1,6 @@
 from io import BytesIO
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 from test_ir.test_utils import JsonLinesFileReader, TestCLPBase
 
@@ -62,14 +62,13 @@ class TestCaseSerializer(TestCLPBase):
         and then convert them into msgpack and feed into `clp_ffi_py.ir.Serializer`.
         """
 
+        test_files: List[Path] = self.__get_test_files()
         byte_buffer: BytesIO
         num_bytes_serialized: int
         serializer: Serializer
 
         # Test with context manager
-        for file_path in TestCaseSerializer.test_data_dir.rglob("*"):
-            if not file_path.is_file():
-                continue
+        for file_path in test_files:
             byte_buffer = BytesIO()
             with Serializer(byte_buffer) as serializer:
                 num_bytes_serialized = serializer.get_num_bytes_serialized()
@@ -84,9 +83,7 @@ class TestCaseSerializer(TestCLPBase):
                     self.assertEqual(num_bytes_serialized, serializer.get_num_bytes_serialized())
 
         # Test without context manager
-        for file_path in TestCaseSerializer.test_data_dir.rglob("*"):
-            if not file_path.is_file():
-                continue
+        for file_path in test_files:
             byte_buffer = BytesIO()
             serializer = Serializer(byte_buffer)
             num_bytes_serialized = serializer.get_num_bytes_serialized()
@@ -109,9 +106,7 @@ class TestCaseSerializer(TestCLPBase):
         Tests serializing with customized buffer size limit.
         """
         buffer_size_limit: int = 3000
-        for file_path in TestCaseSerializer.test_data_dir.rglob("*"):
-            if not file_path.is_file():
-                continue
+        for file_path in self.__get_test_files():
             byte_buffer: BytesIO = BytesIO()
             with Serializer(
                 buffer_size_limit=buffer_size_limit, output_stream=byte_buffer
@@ -163,3 +158,12 @@ class TestCaseSerializer(TestCLPBase):
         serializer: Optional[Serializer] = Serializer(BytesIO())
         with self.assertWarns(ResourceWarning) as _:
             serializer = None  # noqa
+
+    def __get_test_files(self) -> List[Path]:
+        test_files: List[Path] = []
+        for file_path in TestCaseSerializer.test_data_dir.rglob("*"):
+            if not file_path.is_file():
+                continue
+            test_files.append(file_path)
+        self.assertFalse(0 == len(test_files), "No test files found")
+        return test_files
