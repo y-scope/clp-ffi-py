@@ -21,6 +21,7 @@
 #include <objimpl.h>
 #include <pyerrors.h>
 #include <pymacro.h>
+#include <pyport.h>
 #include <typeslots.h>
 // IWYU pragma: end_exports
 #endif
