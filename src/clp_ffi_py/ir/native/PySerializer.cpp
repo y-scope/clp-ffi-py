@@ -28,7 +28,7 @@ namespace {
 PyDoc_STRVAR(
         cPySerializerDoc,
         "Serializer for serializing CLP key-value pair IR streams.\n"
-        "This class serializes log events using the CLP key-value pair IR format and writes the"
+        "This class serializes log events into the CLP key-value pair IR format and writes the"
         " serialized data to a specified byte stream object.\n\n"
         "__init__(self, output_stream, buffer_size_limit=65536)\n\n"
         "Initializes a :class:`Serializer` instance with the given output stream. Note that each"
@@ -37,7 +37,7 @@ PyDoc_STRVAR(
         ":param output_stream: A writable byte output stream to which the serializer will write the"
         " serialized IR byte sequences.\n"
         ":type output_stream: IO[bytes]\n"
-        ":param buffer_size_limit: Threshold of how much serialized data to buffer before flushing"
+        ":param buffer_size_limit: The maximum amount of serialized data to buffer before flushing"
         " it to `output_stream`. Defaults to 64 KiB.\n"
         ":type buffer_size_limit: int\n"
 );
@@ -379,9 +379,9 @@ CLP_FFI_PY_METHOD auto PySerializer_dealloc(PySerializer* self) -> void {
         if (0
             != PyErr_WarnEx(
                     PyExc_ResourceWarning,
-                    "`Serializer.close()` is not called before object destruction. Forget to call "
-                    "`close` will leave the stream incomplete, and potentially resulting in data "
-                    "loss due to data buffering",
+                    "`Serializer.close()` is not called before object destruction, which will leave"
+                    " the stream incomplete, and potentially resulting in data"
+                    " loss due to data buffering",
                     1
             ))
         {
