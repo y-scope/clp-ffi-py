@@ -4,8 +4,8 @@ vars:
   G_LINT_VENV_DIR: "{{.BUILD_DIR}}/lint-venv"
   G_LINT_VENV_CHECKSUM_FILE: "{{.BUILD_DIR}}/lint#venv.md5"
   # Linter target dirs
-  G_PYTHON_LINT_DIRS: ["{{.ROOT_DIR}}/clp_ffi_py", "{{.ROOT_DIR}}/tests"]
   G_CPP_LINT_DIRS: ["{{.CLP_FFI_PY_CPP_SRC_DIR}}"]
+  G_PYTHON_LINT_DIRS: ["{{.ROOT_DIR}}/clp_ffi_py", "{{.ROOT_DIR}}/tests"]
 
 tasks:
   check:
