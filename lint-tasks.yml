@@ -114,7 +114,7 @@ tasks:
         vars:
           DOCFORMATTER_FLAGS: "--check --diff"
           BLACK_FLAGS: "--check --diff"
-          RUFF_FLAGS: ""
+          RUFF_FLAGS: "--output-format=github"
           SRC_DIRS:
             ref: ".G_PYTHON_LINT_DIRS"
 
