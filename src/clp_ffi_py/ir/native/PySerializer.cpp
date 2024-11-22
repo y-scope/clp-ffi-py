@@ -236,12 +236,11 @@ PySerializer_init(PySerializer* self, PyObject* args, PyObject* keywords) -> int
 
     // Ensure the `output_stream` has `write`, `flush`, and `close` methods
     auto output_stream_has_method = [&](char const* method_name) -> bool {
-        PyObjectPtr<PyObject> const write_method{PyObject_GetAttrString(output_stream, method_name)
-        };
-        if (nullptr == write_method) {
+        PyObjectPtr<PyObject> const method{PyObject_GetAttrString(output_stream, method_name)};
+        if (nullptr == method) {
             return false;
         }
-        if (false == static_cast<bool>(PyCallable_Check(write_method.get()))) {
+        if (false == static_cast<bool>(PyCallable_Check(method.get()))) {
             PyErr_SetString(PyExc_TypeError, "");
             PyErr_Format(
                     PyExc_TypeError,
