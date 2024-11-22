@@ -113,6 +113,8 @@ set(CLP_FFI_PY_LIB_IR_SOURCES
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PyMetadata.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PyQuery.cpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PyQuery.hpp
+    ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PySerializer.cpp
+    ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PySerializer.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/Query.cpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/Query.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/serialization_methods.cpp

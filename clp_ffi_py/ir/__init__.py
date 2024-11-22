@@ -18,6 +18,7 @@ __all__: List[str] = [
     "Metadata",  # native
     "Query",  # native
     "QueryBuilder",  # query_builder
+    "Serializer",  # native
     "ClpIrFileReader",  # readers
     "ClpIrStreamReader",  # readers
 ]
