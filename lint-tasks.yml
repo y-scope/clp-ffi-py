@@ -103,17 +103,13 @@ tasks:
     cmds:
       - task: ":utils:clang-tidy"
         vars:
-          FLAGS: "--config-file=.clang-tidy -p {{.CLP_FFI_PY_COMPILE_COMMANDS_DB}}"
+          FLAGS: "--config-file={{.ROOT_DIR}}/.clang-tidy -p {{.CLP_FFI_PY_COMPILE_COMMANDS_DB}}"
           SRC_PATHS:
             ref: ".G_CPP_LINT_DIRS"
           VENV_DIR: "{{.G_LINT_VENV_DIR}}"
 
   py-check:
     cmds:
-      - task: "mypy"
-        vars:
-          SRC_DIRS:
-            ref: ".G_PYTHON_LINT_DIRS"
       - task: "py"
         vars:
           DOCFORMATTER_FLAGS: "--check --diff"
@@ -158,28 +154,18 @@ tasks:
       . "{{.G_LINT_VENV_DIR}}/bin/activate"
       gersemi {{.FLAGS}} CMakeLists.txt {{.CLP_FFI_PY_CPP_SRC_DIR}}
 
-  mypy:
+  py:
     internal: true
     requires:
-      vars: ["SRC_DIRS"]
+      vars: ["DOCFORMATTER_FLAGS", "BLACK_FLAGS", "RUFF_FLAGS", "SRC_DIRS"]
     deps: ["venv"]
+    dir: "{{.ROOT_DIR}}"
     cmds:
       - for:
           var: "SRC_DIRS"
         cmd: |-
           . "{{.G_LINT_VENV_DIR}}/bin/activate"
           mypy {{.ITEM}}
-
-  py:
-    internal: true
-    requires:
-      vars: ["DOCFORMATTER_FLAGS", "BLACK_FLAGS", "RUFF_FLAGS", "SRC_DIRS"]
-    deps: ["venv"]
-    cmds:
-      - for:
-          var: "SRC_DIRS"
-        cmd: |-
-          . "{{.G_LINT_VENV_DIR}}/bin/activate"
           docformatter {{.DOCFORMATTER_FLAGS}} --recursive {{.ITEM}}
           black --color --line-length 100 {{.BLACK_FLAGS}} {{.ITEM}}
           ruff check {{.RUFF_FLAGS}} {{.ITEM}}
@@ -206,8 +192,8 @@ tasks:
           LABEL: "lint"
           OUTPUT_DIR: "{{.OUTPUT_DIR}}"
           # TODO: Separate the current requirements-dev.txt into linter & dev requirements.
-          # Let linter venv install both linter requirements, and let build_wheel install only
-          # dev requirements.
+          # Let linter venv install both linter and dev requirements, and let build_wheel install
+          # only dev requirements.
           REQUIREMENTS_FILE: "requirements-dev.txt"
       # This command must be last
       - task: ":utils:compute-checksum"
