@@ -225,7 +225,7 @@ PySerializer_init(PySerializer* self, PyObject* args, PyObject* keywords) -> int
         == static_cast<bool>(PyArg_ParseTupleAndKeywords(
                 args,
                 keywords,
-                "O|L",
+                "O|n",
                 static_cast<char**>(keyword_table),
                 &output_stream,
                 &buffer_size_limit
