@@ -78,14 +78,7 @@ public:
     [[nodiscard]] auto is_closed() const -> bool { return nullptr == m_serializer; }
 
     /**
-     * Asserts the serializer has not been closed.
-     * @return true on success, false if it's already been closed with `IOError` set.
-     */
-    [[nodiscard]] auto assert_is_not_closed() const -> bool;
-
-    /**
      * Serializes the log event from the given msgpack map into IR format.
-     * NOTE: the serializer must not be closed to call this method.
      * @param msgpack_byte_sequence
      * @return the number of bytes serialized on success.
      * @return std::nullptr on failure with the relevant Python exception and error set.
@@ -100,7 +93,6 @@ public:
 
     /**
      * Flushes the underlying IR buffer and `m_output_stream`.
-     * NOTE: the serializer must not be closed to call this method.
      * @return true on success.
      * @return false on failure with the relevant Python exception and error set.
      */
@@ -109,7 +101,6 @@ public:
     /**
      * Closes the serializer by writing the buffered results into the output stream with
      * end-of-stream IR Unit appended in the end.
-     * NOTE: the serializer must not be closed to call this method.
      * @return true on success.
      * @return false on failure with the relevant Python exception and error set.
      */
@@ -132,6 +123,12 @@ public:
     [[nodiscard]] static auto module_level_init(PyObject* py_module) -> bool;
 
 private:
+    /**
+     * Asserts the serializer has not been closed.
+     * @return true on success, false if it's already been closed with `IOError` set.
+     */
+    [[nodiscard]] auto assert_is_not_closed() const -> bool;
+
     [[nodiscard]] auto get_ir_buf_size() const -> Py_ssize_t {
         return static_cast<Py_ssize_t>(m_serializer->get_ir_buf_view().size());
     }
