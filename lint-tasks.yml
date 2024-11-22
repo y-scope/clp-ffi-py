@@ -1,11 +1,11 @@
 version: "3"
 
 vars:
-  LINT_VENV_DIR: "{{.BUILD_DIR}}/lint-venv"
-  LINT_VENV_CHECKSUM_FILE: "{{.BUILD_DIR}}/lint#venv.md5"
+  G_LINT_VENV_DIR: "{{.BUILD_DIR}}/lint-venv"
+  G_LINT_VENV_CHECKSUM_FILE: "{{.BUILD_DIR}}/lint#venv.md5"
   # Linter target dirs
-  PYTHON_LINT_DIRS: ["{{.ROOT_DIR}}/clp_ffi_py", "{{.ROOT_DIR}}/tests"]
-  CPP_LINT_DIRS: ["{{.CLP_FFI_PY_SRC_DIR}}"]
+  G_PYTHON_LINT_DIRS: ["{{.ROOT_DIR}}/clp_ffi_py", "{{.ROOT_DIR}}/tests"]
+  G_CPP_LINT_DIRS: ["{{.CLP_FFI_PY_CPP_SRC_DIR}}"]
 
 tasks:
   check:
@@ -56,12 +56,11 @@ tasks:
 
   cpp-format-check:
     sources: &cpp_format_src_files
-      - "{{.LINT_VENV_CHECKSUM_FILE}}"
-      - "{{.CLP_FFI_PY_SRC_DIR}}/**/*.cpp"
-      - "{{.CLP_FFI_PY_SRC_DIR}}/**/*.h"
-      - "{{.CLP_FFI_PY_SRC_DIR}}/**/*.hpp"
-      - "{{.CLP_FFI_PY_SRC_DIR}}/**/*.inc"
-      - "src/.clang-format"
+      - "{{.G_LINT_VENV_CHECKSUM_FILE}}"
+      - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/**/*.cpp"
+      - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/**/*.h"
+      - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/**/*.hpp"
+      - "src/clp_ffi_py/.clang-format"
       - "{{.TASKFILE}}"
       - ".clang-format"
     deps: ["cpp-configs", "venv"]
@@ -70,8 +69,8 @@ tasks:
         vars:
           FLAGS: "--dry-run"
           SRC_PATHS:
-            ref: ".CPP_LINT_DIRS"
-          VENV_DIR: "{{.LINT_VENV_DIR}}"
+            ref: ".G_CPP_LINT_DIRS"
+          VENV_DIR: "{{.G_LINT_VENV_DIR}}"
 
   cpp-format-fix:
     sources: *cpp_format_src_files
@@ -81,8 +80,8 @@ tasks:
         vars:
           FLAGS: "-i"
           SRC_PATHS:
-            ref: ".CPP_LINT_DIRS"
-          VENV_DIR: "{{.LINT_VENV_DIR}}"
+            ref: ".G_CPP_LINT_DIRS"
+          VENV_DIR: "{{.G_LINT_VENV_DIR}}"
 
   cpp-static-check:
     # Alias task to `cpp-static-fix` since we don't currently support automatic fixes.
@@ -91,10 +90,10 @@ tasks:
     # fix them.
     aliases: ["cpp-static-fix"]
     sources:
-      - "{{.LINT_VENV_CHECKSUM_FILE}}"
-      - "{{.CLP_FFI_PY_SRC_DIR}}/**/*.cpp"
-      - "{{.CLP_FFI_PY_SRC_DIR}}/**/*.h"
-      - "{{.CLP_FFI_PY_SRC_DIR}}/**/*.hpp"
+      - "{{.G_LINT_VENV_CHECKSUM_FILE}}"
+      - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/**/*.cpp"
+      - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/**/*.h"
+      - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/**/*.hpp"
       - "{{.CLP_FFI_PY_CMAKE_CACHE}}"
       - "{{.CLP_FFI_PY_COMPILE_COMMANDS_DB}}"
       - "{{.TASKFILE}}"
@@ -106,22 +105,22 @@ tasks:
         vars:
           FLAGS: "--config-file=.clang-tidy -p {{.CLP_FFI_PY_COMPILE_COMMANDS_DB}}"
           SRC_PATHS:
-            ref: ".CPP_LINT_DIRS"
-          VENV_DIR: "{{.LINT_VENV_DIR}}"
+            ref: ".G_CPP_LINT_DIRS"
+          VENV_DIR: "{{.G_LINT_VENV_DIR}}"
 
   py-check:
     cmds:
       - task: "mypy"
         vars:
           SRC_DIRS:
-            ref: ".PYTHON_LINT_DIRS"
+            ref: ".G_PYTHON_LINT_DIRS"
       - task: "py"
         vars:
           DOCFORMATTER_FLAGS: "--check --diff"
-          BLACK_FLAGS: "--check"
+          BLACK_FLAGS: "--check --diff"
           RUFF_FLAGS: ""
           SRC_DIRS:
-            ref: ".PYTHON_LINT_DIRS"
+            ref: ".G_PYTHON_LINT_DIRS"
 
   py-fix:
     cmds:
@@ -131,7 +130,7 @@ tasks:
           BLACK_FLAGS: ""
           RUFF_FLAGS: "--fix"
           SRC_DIRS:
-            ref: ".PYTHON_LINT_DIRS"
+            ref: ".G_PYTHON_LINT_DIRS"
 
   yml:
     aliases:
@@ -140,15 +139,15 @@ tasks:
     deps: ["venv"]
     cmds:
       - |-
-        . "{{.LINT_VENV_DIR}}/bin/activate"
+        . "{{.G_LINT_VENV_DIR}}/bin/activate"
         yamllint \
           --config-file "tools/yscope-dev-utils/lint-configs/.yamllint.yml" \
           --strict \
           .gersemirc \
           .github \
-          docs \
+          docs/tasks.yml \
           lint-tasks.yml \
-          src/.clang-format \
+          src/clp_ffi_py/.clang-format \
           Taskfile.yml
 
   cmake:
@@ -156,8 +155,8 @@ tasks:
     requires:
       vars: ["FLAGS"]
     cmd: |-
-      . "{{.LINT_VENV_DIR}}/bin/activate"
-      gersemi {{.FLAGS}} CMakeLists.txt {{.CLP_FFI_PY_SRC_DIR}}
+      . "{{.G_LINT_VENV_DIR}}/bin/activate"
+      gersemi {{.FLAGS}} CMakeLists.txt {{.CLP_FFI_PY_CPP_SRC_DIR}}
 
   mypy:
     internal: true
@@ -168,7 +167,7 @@ tasks:
       - for:
           var: "SRC_DIRS"
         cmd: |-
-          . "{{.LINT_VENV_DIR}}/bin/activate"
+          . "{{.G_LINT_VENV_DIR}}/bin/activate"
           mypy {{.ITEM}}
 
   py:
@@ -180,7 +179,7 @@ tasks:
       - for:
           var: "SRC_DIRS"
         cmd: |-
-          . "{{.LINT_VENV_DIR}}/bin/activate"
+          . "{{.G_LINT_VENV_DIR}}/bin/activate"
           docformatter {{.DOCFORMATTER_FLAGS}} --recursive {{.ITEM}}
           black --color --line-length 100 {{.BLACK_FLAGS}} {{.ITEM}}
           ruff check {{.RUFF_FLAGS}} {{.ITEM}}
@@ -188,12 +187,12 @@ tasks:
   venv:
     internal: true
     vars:
-      CHECKSUM_FILE: "{{.LINT_VENV_CHECKSUM_FILE}}"
-      OUTPUT_DIR: "{{.LINT_VENV_DIR}}"
+      CHECKSUM_FILE: "{{.G_LINT_VENV_CHECKSUM_FILE}}"
+      OUTPUT_DIR: "{{.G_LINT_VENV_DIR}}"
     sources:
       - "{{.ROOT_DIR}}/Taskfile.yml"
       - "{{.TASKFILE}}"
-      - "lint-requirements.txt"
+      - "requirements-dev.txt"
     generates: ["{{.CHECKSUM_FILE}}"]
     deps:
       - ":init"
