@@ -1,22 +1,46 @@
 version: "3"
 
 includes:
-  docs:
-    taskfile: "docs/tasks.yml"
+  docs: "docs/tasks.yml"
+  lint: "lint-tasks.yml"
+  utils: "tools/yscope-dev-utils/taskfiles/utils.yml"
 
 vars:
   # Paths
   BUILD_DIR: "{{.ROOT_DIR}}/build"
+  CLP_FFI_PY_CMAKE_BUILD_DIR: "{{.BUILD_DIR}}/cmake_build"
+  CLP_FFI_PY_CMAKE_CACHE: "{{.CLP_FFI_PY_CMAKE_BUILD_DIR}}/CMakeCache.txt"
+  CLP_FFI_PY_COMPILE_COMMANDS_DB: "{{.CLP_FFI_PY_CMAKE_BUILD_DIR}}/compile_commands.json"
+  CLP_FFI_PY_CPP_SRC_DIR: "{{.ROOT_DIR}}/src/clp_ffi_py"
   WHEEL_BUILD_DIR: "{{.BUILD_DIR}}/dist"
   WHEEL_VENV_DIR: "{{.BUILD_DIR}}/wheel-venv"
 
 tasks:
   default:
-    deps: ["wheel"]
+    deps: ["init", "wheel"]
 
   clean:
     cmds:
       - "rm -rf '{{.BUILD_DIR}}'"
+
+  config-cmake-project:
+    internal: true
+    deps:
+      - "init"
+      - "submodules"
+    sources:
+      - "{{.TASKFILE}}"
+      - "CMakeLists.txt"
+    generates:
+      - "{{.CLP_FFI_PY_CMAKE_CACHE}}"
+      - "{{.CLP_FFI_PY_COMPILE_COMMANDS_DB}}"
+    cmd: "cmake -S '{{.ROOT_DIR}}' -B '{{.CLP_FFI_PY_CMAKE_BUILD_DIR}}'"
+
+  init:
+    internal: true
+    silent: true
+    run: "once"
+    cmds: ["mkdir -p '{{.BUILD_DIR}}'"]
 
   wheel:
     vars:
