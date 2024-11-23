@@ -66,6 +66,5 @@ html_context = {
 # -- Theme custom CSS and JS ---------------------------------------------------
 # https://pydata-sphinx-theme.readthedocs.io/en/stable/user_guide/static_assets.html
 
-
 def setup(app):
     app.add_css_file("custom.css")
