@@ -34,7 +34,7 @@ public:
     // Delete default constructor to disable direct instantiation.
     PyDeserializer() = delete;
 
-    // Delete copy/move constructors and assignments
+    // Delete copy & move constructors and assignment operators
     PyDeserializer(PyDeserializer const&) = delete;
     PyDeserializer(PyDeserializer&&) = delete;
     auto operator=(PyDeserializer const&) -> PyDeserializer& = delete;

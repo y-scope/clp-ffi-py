@@ -129,7 +129,7 @@ PyDeserializer_init(PyDeserializer* self, PyObject* args, PyObject* keywords) ->
         == static_cast<bool>(PyArg_ParseTupleAndKeywords(
                 args,
                 keywords,
-                "O|Lp",
+                "O|np",
                 static_cast<char**>(keyword_table),
                 &input_stream,
                 &buffer_capacity,
