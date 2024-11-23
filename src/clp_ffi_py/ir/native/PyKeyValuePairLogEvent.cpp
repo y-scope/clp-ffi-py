@@ -325,6 +325,21 @@ auto PyKeyValuePairLogEvent::init(clp::ffi::KeyValuePairLogEvent kv_pair_log_eve
     return true;
 }
 
+auto PyKeyValuePairLogEvent::create(clp::ffi::KeyValuePairLogEvent kv_log_event
+) -> PyKeyValuePairLogEvent* {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+    PyKeyValuePairLogEvent* self{PyObject_New(PyKeyValuePairLogEvent, get_py_type())};
+    if (nullptr == self) {
+        PyErr_SetString(PyExc_MemoryError, clp_ffi_py::cOutofMemoryError);
+        return nullptr;
+    }
+    self->default_init();
+    if (false == self->init(std::move(kv_log_event))) {
+        return nullptr;
+    }
+    return self;
+}
+
 auto PyKeyValuePairLogEvent::get_py_type() -> PyTypeObject* {
     return m_py_type.get();
 }
