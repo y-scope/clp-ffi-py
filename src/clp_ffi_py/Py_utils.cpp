@@ -2,7 +2,10 @@
 
 #include "Py_utils.hpp"
 
+#include <string>
 #include <string_view>
+
+#include <clp/ir/types.hpp>
 
 #include <clp_ffi_py/PyObjectCast.hpp>
 #include <clp_ffi_py/PyObjectUtils.hpp>
@@ -10,16 +13,17 @@
 namespace clp_ffi_py {
 namespace {
 constexpr char const* const cPyFuncNameGetFormattedTimestamp{"get_formatted_timestamp"};
-PyObjectStaticPtr<PyObject> Py_func_get_formatted_timestamp{nullptr};
-
 constexpr char const* const cPyFuncNameGetTimezoneFromTimezoneId{"get_timezone_from_timezone_id"};
-PyObjectStaticPtr<PyObject> Py_func_get_timezone_from_timezone_id{nullptr};
-
 constexpr std::string_view cPyFuncNameSerializeDictToMsgpack{"serialize_dict_to_msgpack"};
-PyObjectStaticPtr<PyObject> Py_func_serialize_dict_to_msgpack{nullptr};
-
 constexpr std::string_view cPyFuncNameParseJsonStr{"parse_json_str"};
-PyObjectStaticPtr<PyObject> Py_func_parse_json_str{nullptr};
+
+// NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
+PyObjectStaticPtr<PyObject> py_func_get_formatted_timestamp{nullptr};
+PyObjectStaticPtr<PyObject> py_func_get_timezone_from_timezone_id{nullptr};
+PyObjectStaticPtr<PyObject> py_func_serialize_dict_to_msgpack{nullptr};
+PyObjectStaticPtr<PyObject> py_func_parse_json_str{nullptr};
+
+// NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
 
 /**
  * Wrapper of PyObject_CallObject.
@@ -39,29 +43,29 @@ auto py_utils_init() -> bool {
         return false;
     }
 
-    Py_func_get_timezone_from_timezone_id.reset(
+    py_func_get_timezone_from_timezone_id.reset(
             PyObject_GetAttrString(py_utils, cPyFuncNameGetTimezoneFromTimezoneId)
     );
-    if (nullptr == Py_func_get_timezone_from_timezone_id.get()) {
+    if (nullptr == py_func_get_timezone_from_timezone_id.get()) {
         return false;
     }
 
-    Py_func_get_formatted_timestamp.reset(
+    py_func_get_formatted_timestamp.reset(
             PyObject_GetAttrString(py_utils, cPyFuncNameGetFormattedTimestamp)
     );
-    if (nullptr == Py_func_get_formatted_timestamp.get()) {
+    if (nullptr == py_func_get_formatted_timestamp.get()) {
         return false;
     }
 
-    Py_func_serialize_dict_to_msgpack.reset(
+    py_func_serialize_dict_to_msgpack.reset(
             PyObject_GetAttrString(py_utils, cPyFuncNameSerializeDictToMsgpack.data())
     );
-    if (nullptr == Py_func_serialize_dict_to_msgpack.get()) {
+    if (nullptr == py_func_serialize_dict_to_msgpack.get()) {
         return false;
     }
 
-    Py_func_parse_json_str.reset(PyObject_GetAttrString(py_utils, cPyFuncNameParseJsonStr.data()));
-    if (nullptr == Py_func_parse_json_str.get()) {
+    py_func_parse_json_str.reset(PyObject_GetAttrString(py_utils, cPyFuncNameParseJsonStr.data()));
+    if (nullptr == py_func_parse_json_str.get()) {
         return false;
     }
 
@@ -75,7 +79,7 @@ auto py_utils_get_formatted_timestamp(clp::ir::epoch_time_ms_t timestamp, PyObje
     if (nullptr == func_args) {
         return nullptr;
     }
-    return py_utils_function_call_wrapper(Py_func_get_formatted_timestamp.get(), func_args);
+    return py_utils_function_call_wrapper(py_func_get_formatted_timestamp.get(), func_args);
 }
 
 auto py_utils_get_timezone_from_timezone_id(std::string const& timezone_id) -> PyObject* {
@@ -84,7 +88,7 @@ auto py_utils_get_timezone_from_timezone_id(std::string const& timezone_id) -> P
     if (nullptr == func_args) {
         return nullptr;
     }
-    return py_utils_function_call_wrapper(Py_func_get_timezone_from_timezone_id.get(), func_args);
+    return py_utils_function_call_wrapper(py_func_get_timezone_from_timezone_id.get(), func_args);
 }
 
 auto py_utils_serialize_dict_to_msgpack(PyDictObject* py_dict) -> PyBytesObject* {
@@ -95,7 +99,7 @@ auto py_utils_serialize_dict_to_msgpack(PyDictObject* py_dict) -> PyBytesObject*
     if (nullptr == func_args) {
         return nullptr;
     }
-    auto* result{py_utils_function_call_wrapper(Py_func_serialize_dict_to_msgpack.get(), func_args)
+    auto* result{py_utils_function_call_wrapper(py_func_serialize_dict_to_msgpack.get(), func_args)
     };
     if (nullptr == result) {
         return nullptr;
@@ -117,6 +121,6 @@ auto py_utils_parse_json_str(std::string_view json_str) -> PyObject* {
     if (nullptr == func_args) {
         return nullptr;
     }
-    return py_utils_function_call_wrapper(Py_func_parse_json_str.get(), func_args);
+    return py_utils_function_call_wrapper(py_func_parse_json_str.get(), func_args);
 }
 }  // namespace clp_ffi_py

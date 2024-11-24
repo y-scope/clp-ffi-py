@@ -16,6 +16,7 @@
 #include <abstract.h>
 #include <bytesobject.h>
 #include <dictobject.h>
+#include <import.h>
 #include <longobject.h>
 #include <memoryobject.h>
 #include <methodobject.h>
