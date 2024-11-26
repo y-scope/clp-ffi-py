@@ -214,21 +214,23 @@ auto PyDeserializer::init(
 auto PyDeserializer::deserialize_log_event() -> PyObject* {
     try {
         while (false == is_stream_completed()) {
-            if (auto const ir_unit_type_result{
-                        m_deserializer->deserialize_next_ir_unit(*m_deserializer_buffer_reader)
-                };
-                ir_unit_type_result.has_error())
-            {
+            auto const ir_unit_type_result{
+                    m_deserializer->deserialize_next_ir_unit(*m_deserializer_buffer_reader)
+            };
+            if (ir_unit_type_result.has_error()) {
                 if (false == handle_incomplete_ir_error(ir_unit_type_result.error())) {
                     return nullptr;
                 }
                 break;
             }
-            if (has_unreleased_deserialized_log_event()) {
-                return py_reinterpret_cast<PyObject>(
-                        PyKeyValuePairLogEvent::create(release_deserialized_log_event())
-                );
+            if (IrUnitType::LogEvent != ir_unit_type_result.value()
+                || false == has_unreleased_deserialized_log_event())
+            {
+                continue;
             }
+            return py_reinterpret_cast<PyObject>(
+                    PyKeyValuePairLogEvent::create(release_deserialized_log_event())
+            );
         }
     } catch (clp::TraceableException& exception) {
         handle_traceable_exception(exception);
