@@ -1,0 +1,5 @@
+# yamllint disable-line rule:line-length
+# yaml-language-server: $schema=https://raw.githubusercontent.com/BlankSpruce/gersemi/master/gersemi/configuration.schema.json
+
+line_length: 100
+list_expansion: "favour-expansion"

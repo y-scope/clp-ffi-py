@@ -3,6 +3,7 @@ build>=0.8.0
 cibuildwheel>=2.16.2
 # Lock to v18.x until we can upgrade our code to meet v19's formatting standards.
 clang-format~=18.1
+clang-tidy>=19.1.0
 docformatter>=1.7.5
 gersemi>=0.16.2
 # Lock to v0.3.0 to support Python3.7
@@ -14,4 +15,5 @@ ruff>=0.4.6
 smart_open==6.4.0
 types-Deprecated>=1.2.9
 types-python-dateutil>=2.8
+yamllint>=1.35.1
 zstandard>=0.18.0

@@ -1,6 +1,6 @@
 # clp-ffi-py
 
-[![PyPI platforms][badge_pypi]][16]
+[![PyPI platforms][badge_pypi]][7]
 [![Build status][badge_build_status]][clp_ffi_py_gh_actions]
 [![Downloads][badge_total_downloads]][pepy/clp_ffi_py]
 [![Downloads][badge_monthly_downloads]][pepy/clp_ffi_py]
@@ -27,7 +27,7 @@ Note:
 - Tested on Linux, macOS and Windows.
 
 To install an older version or download the prebuilt `whl` package, check the
-project homepage on PyPI [here][16].
+project homepage on PyPI [here][7].
 
 ## Compatibility
 
@@ -36,7 +36,7 @@ version >= 3.7.
 
 ## API Reference
 
-The API reference for this library can be found on our [docs hub][19].
+The API reference for this library can be found on our [docs hub][10].
 
 ## Building/Packaging
 
@@ -51,7 +51,13 @@ To manually build a package for distribution, follow the steps below.
 * python3
 * python3-dev
 * python3-venv
-* [Task][18] >= 3.35.1
+* [Task][9] >= 3.38.0
+
+### Set up
+* Initialize and update yscope-dev-utils submodules:
+  ```shell
+  git submodule update --init --recursive tools/yscope-dev-utils
+  ```
 
 ### Build commands
 
@@ -188,7 +194,7 @@ help(SubstringWildcardQuery)
 ### Streaming Deserialize/Search Directly from S3 Remote Storage
 
 When working with CLP IR files stored on S3-compatible storage systems,
-[smart_open][17] can be used to open and read the IR stream for the following
+[smart_open][8] can be used to open and read the IR stream for the following
 benefits:
 
 - It only performs stream operation and does not download the file to the disk.
@@ -235,9 +241,9 @@ closed.
 
 ### Parallel Processing
 
-The `Query` and `LogEvent` classes can be serialized by [pickle][15]. Therefore,
+The `Query` and `LogEvent` classes can be serialized by [pickle][6]. Therefore,
 deserializing and searching can be parallelized across streams/files using libraries
-such as [multiprocessing][13] and [tqlm][14].
+such as [multiprocessing][4] and [tqlm][5].
 
 ## Testing
 
@@ -271,7 +277,7 @@ python -m unittest -bv
 
 ## Build and Test with cibuildwheel
 
-This project utilizes [cibuildwheel][7] configuration. Whenever modifications
+This project utilizes [cibuildwheel][3] configuration. Whenever modifications
 are made and committed to GitHub, the cibuildwheel Action will automatically
 initiate, building this library for several Python environments across diverse
 OS and architectures. You can access the build outcomes (wheel files) via the
@@ -279,61 +285,56 @@ GitHub Action page. For instructions on customizing the build targets or running
 cibuildwheel locally, please refer to the official documentation of
 cibuildwheel.
 
-## Contributing
+## Adding files
+Certain file types need to be added to our linting rules manually:
 
-Before submitting a pull request, run the following error-checking and
-formatting tools (found in [pyproject.toml]):
+- **CMake**. If adding a CMake file, add it (or its parent directory) as an argument to the
+  `gersemi` command in [lint-tasks.yaml](lint-tasks.yaml).
+  - If adding a directory, the file must be named `CMakeLists.txt` or use the `.cmake` extension.
+- **YAML**. If adding a YAML file (regardless of its extension), add it as an argument to the
+  `yamllint` command in [lint-tasks.yaml](lint-tasks.yaml).
+## Linting
+Before submitting a pull request, ensure you’ve run the linting commands below and either fixed any
+violations or suppressed the warning.
 
-* [mypy][3]: `mypy clp_ffi_py`
-  * mypy checks for typing errors. You should resolve all typing errors or if an
-    error cannot be resolved (e.g., it's due to a third-party library), you
-    should add a comment `# type: ignore` to [silence][4] the error.
-* [docformatter][11]: `docformatter -i clp_ffi_py tests`
-  * This formats docstrings. You should review and add any changes to your PR.
-* [Black][5]: `black clp_ffi_py`
-  * This formats the Python code according to Black's code-style rules. You
-    should review and add any changes to your PR.
-* [clang-format][6]: `clang-format -i src/clp_ffi_py/**`
-  * This formats the C++ code according to the code-style rules specified in
-    `.clang-format`. You should review and add any changes to your PR.
-* [ruff][10]: `ruff check --fix clp_ffi_py tests`
-  * This performs linting according to PEPs. You should review and add any
-    changes to your PR.
-* [gersemi][9]: `gersemi -i -l 100 --list-expansion favour-expansion CMakeLists.txt`
-  * This formats CMakeLists.txt. You should review and add any changes to your PR.
+To run all linting checks:
+```shell
+task lint:check
+```
 
-Note that `docformatter` should be run before `black` to give Black the
-[last][12].
+To run all linting checks AND automatically fix any fixable issues:
+```shell
+task lint:fix
+```
 
-Additionally, the following tools can be useful during development. However,
-they cannot be installed using `pip`. Developers need to install them using
-other package management tools such as `apt-get`:
+### Running specific linters
+The commands above run all linting checks, but for performance you may want to run a subset (e.g.,
+if you only changed C++ files, you don't need to run the YAML linting checks) using one of the tasks
+in the table below.
 
-* [clang-tidy][8]: `clang-tidy --extra-arg=-std=c++17 PATH_TO_THE_FILE`
-  * This static analysis tool catches improper coding behaviors based on the
-    rules specified in `.clang-tidy`, and sends suggestions corresponding to
-    each warning. Developers should manually review all the warnings and try
-    with their best effort to fix the reasonable ones.
+| Task                    | Description                                              |
+|-------------------------|----------------------------------------------------------|
+| `lint:cmake-check`      | Runs the CMake linters.                                  |
+| `lint:cmake-fix`        | Runs the CMake linters and fixes any violations.         |
+| `lint:cpp-check`        | Runs the C++ linters (formatters and static analyzers).  |
+| `lint:cpp-fix`          | Runs the C++ linters and fixes some violations.          |
+| `lint:cpp-format-check` | Runs the C++ formatters.                                 |
+| `lint:cpp-format-fix`   | Runs the C++ formatters and fixes some violations.       |
+| `lint:py-check`         | Runs the Python linters.                                 |
+| `lint:py-fix`           | Runs the Python linters and fixes some violations.       |
+| `lint:yml-check`        | Runs the YAML linters.                                   |
+| `lint:yml-fix`          | Runs the YAML linters and fixes some violations.         |
 
 [1]: https://github.com/y-scope/clp/tree/main/components/core
 [2]: https://github.com/y-scope/clp
-[3]: https://mypy.readthedocs.io/en/stable/index.html
-[4]: https://mypy.readthedocs.io/en/stable/common_issues.html#spurious-errors-and-locally-silencing-the-checker
-[5]: https://black.readthedocs.io/en/stable/index.html
-[6]: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
-[7]: https://cibuildwheel.readthedocs.io/en/stable/
-[8]: https://clang.llvm.org/extra/clang-tidy/
-[9]: https://github.com/BlankSpruce/gersemi
-[10]: https://beta.ruff.rs/docs/
-[11]: https://docformatter.readthedocs.io/en/latest/
-[12]: https://docformatter.readthedocs.io/en/latest/faq.html#interaction-with-black
-[13]: https://docs.python.org/3/library/multiprocessing.html
-[14]: https://tqdm.github.io/
-[15]: https://docs.python.org/3/library/pickle.html
-[16]: https://pypi.org/project/clp-ffi-py/
-[17]: https://github.com/RaRe-Technologies/smart_open
-[18]: https://taskfile.dev/installation/
-[19]: https://docs.yscope.com/clp-ffi-py/main/api/clp_ffi_py.html
+[3]: https://cibuildwheel.readthedocs.io/en/stable/
+[4]: https://docs.python.org/3/library/multiprocessing.html
+[5]: https://tqdm.github.io/
+[6]: https://docs.python.org/3/library/pickle.html
+[7]: https://pypi.org/project/clp-ffi-py/
+[8]: https://github.com/RaRe-Technologies/smart_open
+[9]: https://taskfile.dev/installation/
+[10]: https://docs.yscope.com/clp-ffi-py/main/api/clp_ffi_py.html
 
 [badge_build_status]: https://github.com/y-scope/clp-ffi-py/workflows/Build/badge.svg
 [badge_monthly_downloads]: https://static.pepy.tech/badge/clp-ffi-py/month 

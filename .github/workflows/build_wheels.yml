@@ -1,10 +1,8 @@
-name: Build
+name: "Build"
 
 on:
   pull_request:
     paths:
-      - ".clang-format"
-      - ".clang-tidy"
       - ".github/workflows/build_wheels.yml"
       - ".gitmodules"
       - "CMakeLists.txt"
@@ -16,8 +14,6 @@ on:
       - "tests/**"
   push:
     paths:
-      - ".clang-format"
-      - ".clang-tidy"
       - ".github/workflows/build_wheels.yml"
       - ".gitmodules"
       - "CMakeLists.txt"
@@ -38,198 +34,189 @@ concurrency:
 
 jobs:
   linters:
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v4
+      - uses: "actions/checkout@v4"
+        with:
+          submodules: "recursive"
 
-      - uses: actions/setup-python@v5
+      - uses: "actions/setup-python@v5"
         with:
           python-version: "3.11"
 
       - run: |
           pip install --upgrade pip
-          pip install -r requirements-dev.txt
 
-      - run: docformatter --check --diff clp_ffi_py tests
+      - run: "npm install -g @go-task/cli"
 
-      - run: black --diff --check clp_ffi_py tests
-
-      - run: ruff check --output-format=github clp_ffi_py tests
-
-      - run: mypy clp_ffi_py tests
-
-      - run: |
-          find src/clp_ffi_py/ -type f | xargs clang-format --dry-run --Werror
-
-      - run: |
-          gersemi --check --line-length 100 --list-expansion favour-expansion CMakeLists.txt
+      - run: "task lint:check"
 
   build_wheels:
-    needs: [linters]
-    name: Build ${{ matrix.build.name }}
-    runs-on: ${{ matrix.build.os }}
+    needs: ["linters"]
+    name: "Build ${{ matrix.build.name }}"
+    runs-on: "${{ matrix.build.os }}"
     strategy:
       matrix:
         build:
           # macOS builds
-          - name: cp37-macosx_x86_64
-            os: macos-14
-          - name: cp38-macosx_arm64
-            os: macos-14
-          - name: cp38-macosx_universal2
-            os: macos-14
-          - name: cp38-macosx_x86_64
-            os: macos-14
-          - name: cp39-macosx_arm64
-            os: macos-14
-          - name: cp39-macosx_universal2
-            os: macos-14
-          - name: cp39-macosx_x86_64
-            os: macos-14
-          - name: cp310-macosx_arm64
-            os: macos-14
-          - name: cp310-macosx_universal2
-            os: macos-14
-          - name: cp310-macosx_x86_64
-            os: macos-14
-          - name: cp311-macosx_arm64
-            os: macos-14
-          - name: cp311-macosx_universal2
-            os: macos-14
-          - name: cp311-macosx_x86_64
-            os: macos-14
-          - name: cp312-macosx_arm64
-            os: macos-14
-          - name: cp312-macosx_universal2
-            os: macos-14
-          - name: cp312-macosx_x86_64
-            os: macos-14
+          - name: "cp37-macosx_x86_64"
+            os: "macos-14"
+          - name: "cp38-macosx_arm64"
+            os: "macos-14"
+          - name: "cp38-macosx_universal2"
+            os: "macos-14"
+          - name: "cp38-macosx_x86_64"
+            os: "macos-14"
+          - name: "cp39-macosx_arm64"
+            os: "macos-14"
+          - name: "cp39-macosx_universal2"
+            os: "macos-14"
+          - name: "cp39-macosx_x86_64"
+            os: "macos-14"
+          - name: "cp310-macosx_arm64"
+            os: "macos-14"
+          - name: "cp310-macosx_universal2"
+            os: "macos-14"
+          - name: "cp310-macosx_x86_64"
+            os: "macos-14"
+          - name: "cp311-macosx_arm64"
+            os: "macos-14"
+          - name: "cp311-macosx_universal2"
+            os: "macos-14"
+          - name: "cp311-macosx_x86_64"
+            os: "macos-14"
+          - name: "cp312-macosx_arm64"
+            os: "macos-14"
+          - name: "cp312-macosx_universal2"
+            os: "macos-14"
+          - name: "cp312-macosx_x86_64"
+            os: "macos-14"
 
           # Linux builds
-          - name: cp310-manylinux_aarch64
-            os: ubuntu-22.04
-          - name: cp310-manylinux_i686
-            os: ubuntu-22.04
-          - name: cp310-manylinux_x86_64
-            os: ubuntu-22.04
-          - name: cp310-musllinux_aarch64
-            os: ubuntu-22.04
-          - name: cp310-musllinux_i686
-            os: ubuntu-22.04
-          - name: cp310-musllinux_x86_64
-            os: ubuntu-22.04
-          - name: cp311-manylinux_aarch64
-            os: ubuntu-22.04
-          - name: cp311-manylinux_i686
-            os: ubuntu-22.04
-          - name: cp311-manylinux_x86_64
-            os: ubuntu-22.04
-          - name: cp311-musllinux_aarch64
-            os: ubuntu-22.04
-          - name: cp311-musllinux_i686
-            os: ubuntu-22.04
-          - name: cp311-musllinux_x86_64
-            os: ubuntu-22.04
-          - name: cp312-manylinux_aarch64
-            os: ubuntu-22.04
-          - name: cp312-manylinux_i686
-            os: ubuntu-22.04
-          - name: cp312-manylinux_x86_64
-            os: ubuntu-22.04
-          - name: cp312-musllinux_aarch64
-            os: ubuntu-22.04
-          - name: cp312-musllinux_i686
-            os: ubuntu-22.04
-          - name: cp312-musllinux_x86_64
-            os: ubuntu-22.04
-          - name: cp37-manylinux_aarch64
-            os: ubuntu-22.04
-          - name: cp37-manylinux_i686
-            os: ubuntu-22.04
-          - name: cp37-manylinux_x86_64
-            os: ubuntu-22.04
-          - name: cp37-musllinux_aarch64
-            os: ubuntu-22.04
-          - name: cp37-musllinux_i686
-            os: ubuntu-22.04
-          - name: cp37-musllinux_x86_64
-            os: ubuntu-22.04
-          - name: cp38-manylinux_aarch64
-            os: ubuntu-22.04
-          - name: cp38-manylinux_i686
-            os: ubuntu-22.04
-          - name: cp38-manylinux_x86_64
-            os: ubuntu-22.04
-          - name: cp38-musllinux_aarch64
-            os: ubuntu-22.04
-          - name: cp38-musllinux_i686
-            os: ubuntu-22.04
-          - name: cp38-musllinux_x86_64
-            os: ubuntu-22.04
-          - name: cp39-manylinux_aarch64
-            os: ubuntu-22.04
-          - name: cp39-manylinux_i686
-            os: ubuntu-22.04
-          - name: cp39-manylinux_x86_64
-            os: ubuntu-22.04
-          - name: cp39-musllinux_aarch64
-            os: ubuntu-22.04
-          - name: cp39-musllinux_i686
-            os: ubuntu-22.04
-          - name: cp39-musllinux_x86_64
-            os: ubuntu-22.04
+          - name: "cp310-manylinux_aarch64"
+            os: "ubuntu-22.04"
+          - name: "cp310-manylinux_i686"
+            os: "ubuntu-22.04"
+          - name: "cp310-manylinux_x86_64"
+            os: "ubuntu-22.04"
+          - name: "cp310-musllinux_aarch64"
+            os: "ubuntu-22.04"
+          - name: "cp310-musllinux_i686"
+            os: "ubuntu-22.04"
+          - name: "cp310-musllinux_x86_64"
+            os: "ubuntu-22.04"
+          - name: "cp311-manylinux_aarch64"
+            os: "ubuntu-22.04"
+          - name: "cp311-manylinux_i686"
+            os: "ubuntu-22.04"
+          - name: "cp311-manylinux_x86_64"
+            os: "ubuntu-22.04"
+          - name: "cp311-musllinux_aarch64"
+            os: "ubuntu-22.04"
+          - name: "cp311-musllinux_i686"
+            os: "ubuntu-22.04"
+          - name: "cp311-musllinux_x86_64"
+            os: "ubuntu-22.04"
+          - name: "cp312-manylinux_aarch64"
+            os: "ubuntu-22.04"
+          - name: "cp312-manylinux_i686"
+            os: "ubuntu-22.04"
+          - name: "cp312-manylinux_x86_64"
+            os: "ubuntu-22.04"
+          - name: "cp312-musllinux_aarch64"
+            os: "ubuntu-22.04"
+          - name: "cp312-musllinux_i686"
+            os: "ubuntu-22.04"
+          - name: "cp312-musllinux_x86_64"
+            os: "ubuntu-22.04"
+          - name: "cp37-manylinux_aarch64"
+            os: "ubuntu-22.04"
+          - name: "cp37-manylinux_i686"
+            os: "ubuntu-22.04"
+          - name: "cp37-manylinux_x86_64"
+            os: "ubuntu-22.04"
+          - name: "cp37-musllinux_aarch64"
+            os: "ubuntu-22.04"
+          - name: "cp37-musllinux_i686"
+            os: "ubuntu-22.04"
+          - name: "cp37-musllinux_x86_64"
+            os: "ubuntu-22.04"
+          - name: "cp38-manylinux_aarch64"
+            os: "ubuntu-22.04"
+          - name: "cp38-manylinux_i686"
+            os: "ubuntu-22.04"
+          - name: "cp38-manylinux_x86_64"
+            os: "ubuntu-22.04"
+          - name: "cp38-musllinux_aarch64"
+            os: "ubuntu-22.04"
+          - name: "cp38-musllinux_i686"
+            os: "ubuntu-22.04"
+          - name: "cp38-musllinux_x86_64"
+            os: "ubuntu-22.04"
+          - name: "cp39-manylinux_aarch64"
+            os: "ubuntu-22.04"
+          - name: "cp39-manylinux_i686"
+            os: "ubuntu-22.04"
+          - name: "cp39-manylinux_x86_64"
+            os: "ubuntu-22.04"
+          - name: "cp39-musllinux_aarch64"
+            os: "ubuntu-22.04"
+          - name: "cp39-musllinux_i686"
+            os: "ubuntu-22.04"
+          - name: "cp39-musllinux_x86_64"
+            os: "ubuntu-22.04"
 
           # Windows builds
-          - name: cp37-win_amd64
-            os: windows-2022
-          - name: cp38-win_amd64
-            os: windows-2022
-          - name: cp39-win_amd64
-            os: windows-2022
-          - name: cp310-win_amd64
-            os: windows-2022
-          - name: cp311-win_amd64
-            os: windows-2022
-          - name: cp312-win_amd64
-            os: windows-2022
+          - name: "cp37-win_amd64"
+            os: "windows-2022"
+          - name: "cp38-win_amd64"
+            os: "windows-2022"
+          - name: "cp39-win_amd64"
+            os: "windows-2022"
+          - name: "cp310-win_amd64"
+            os: "windows-2022"
+          - name: "cp311-win_amd64"
+            os: "windows-2022"
+          - name: "cp312-win_amd64"
+            os: "windows-2022"
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: "Checkout"
+        uses: "actions/checkout@v4"
         with:
-          submodules: recursive
+          submodules: "recursive"
 
-      - name: Set up QEMU
-        if: runner.os == 'Linux'
-        uses: docker/setup-qemu-action@v3
+      - name: "Set up QEMU"
+        if: "runner.os == 'Linux'"
+        uses: "docker/setup-qemu-action@v3"
         with:
-          platforms: all
+          platforms: "all"
 
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v2.21
+      - name: "Build wheels"
+        uses: "pypa/cibuildwheel@v2.21"
         env:
-          CIBW_BUILD: ${{ matrix.build.name }}
+          CIBW_BUILD: "${{ matrix.build.name }}"
 
-      - uses: actions/upload-artifact@v4
+      - uses: "actions/upload-artifact@v4"
         with:
-          name: wheel-${{ matrix.build.name }}
-          path: ./wheelhouse/*.whl
+          name: "wheel-${{ matrix.build.name }}"
+          path: "./wheelhouse/*.whl"
           retention-days: 1
 
   combine-wheels:
-    needs: [build_wheels]
-    name: Combine wheels
-    runs-on: ubuntu-latest
+    needs: ["build_wheels"]
+    name: "Combine wheels"
+    runs-on: "ubuntu-latest"
     env:
-      WHEEL_DIR: /tmp/wheels
+      WHEEL_DIR: "/tmp/wheels"
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: "actions/download-artifact@v4"
         with:
-          path: ${{env.WHEEL_DIR}}
+          path: "${{env.WHEEL_DIR}}"
           merge-multiple: true
 
-      - uses: actions/upload-artifact@v4
+      - uses: "actions/upload-artifact@v4"
         with:
-          name: all-wheels
-          path: ${{env.WHEEL_DIR}}
+          name: "all-wheels"
+          path: "${{env.WHEEL_DIR}}"
