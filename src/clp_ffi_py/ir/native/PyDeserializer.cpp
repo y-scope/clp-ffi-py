@@ -6,7 +6,6 @@
 #include <type_traits>
 #include <utility>
 
-#include <clp/ErrorCode.hpp>
 #include <clp/ffi/ir_stream/decoding_methods.hpp>
 #include <clp/ffi/ir_stream/Deserializer.hpp>
 #include <clp/ffi/ir_stream/IrUnitType.hpp>
@@ -16,8 +15,6 @@
 #include <clp/TraceableException.hpp>
 
 #include <clp_ffi_py/api_decoration.hpp>
-#include <clp_ffi_py/error_messages.hpp>
-#include <clp_ffi_py/ExceptionFFI.hpp>
 #include <clp_ffi_py/ir/native/DeserializerBufferReader.hpp>
 #include <clp_ffi_py/ir/native/error_messages.hpp>
 #include <clp_ffi_py/ir/native/PyKeyValuePairLogEvent.hpp>
@@ -217,17 +214,17 @@ auto PyDeserializer::init(
 auto PyDeserializer::deserialize_log_event() -> PyObject* {
     try {
         while (false == is_stream_completed()) {
-            auto const ir_unit_type_result{
-                    m_deserializer->deserialize_next_ir_unit(*m_deserializer_buffer_reader)
-            };
-            if (ir_unit_type_result.has_error()) {
+            if (auto const ir_unit_type_result{
+                        m_deserializer->deserialize_next_ir_unit(*m_deserializer_buffer_reader)
+                };
+                ir_unit_type_result.has_error())
+            {
                 if (false == handle_incomplete_ir_error(ir_unit_type_result.error())) {
                     return nullptr;
                 }
                 break;
             }
-            auto const ir_unit_type{ir_unit_type_result.value()};
-            if (IrUnitType::LogEvent == ir_unit_type && has_unreleased_deserialized_log_event()) {
+            if (has_unreleased_deserialized_log_event()) {
                 return py_reinterpret_cast<PyObject>(
                         PyKeyValuePairLogEvent::create(release_deserialized_log_event())
                 );
@@ -253,7 +250,13 @@ auto PyDeserializer::module_level_init(PyObject* py_module) -> bool {
 
 auto PyDeserializer::handle_log_event(clp::ffi::KeyValuePairLogEvent&& log_event) -> IRErrorCode {
     if (has_unreleased_deserialized_log_event()) {
-        release_deserialized_log_event();
+        // This situation may occur if the deserializer methods return an error after the last
+        // successful call to `handle_log_event`. If the user resolves the error and invokes the
+        // deserializer methods again, the underlying deserialized log event from the previous
+        // failed calls remains unreleased.
+        // To prevent a memory leak, we must free the associated memory by clearing the last
+        // deserialized log event.
+        clear_deserialized_log_event();
     }
     m_deserialized_log_event = new clp::ffi::KeyValuePairLogEvent{std::move(log_event)};
     return IRErrorCode::IRErrorCode_Success;

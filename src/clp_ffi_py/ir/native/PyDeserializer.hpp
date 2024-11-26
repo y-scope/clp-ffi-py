@@ -80,9 +80,7 @@ public:
     auto clean() -> void {
         delete m_deserializer;
         delete m_deserializer_buffer_reader;
-        if (has_unreleased_deserialized_log_event()) {
-            release_deserialized_log_event();
-        }
+        clear_deserialized_log_event();
     }
 
     /**
@@ -219,10 +217,9 @@ private:
      * ensure the ownership is legal.
      * @return The released ownership of the deserialized log event.
      */
-    [[maybe_unused]] auto release_deserialized_log_event() -> clp::ffi::KeyValuePairLogEvent {
+    [[nodiscard]] auto release_deserialized_log_event() -> clp::ffi::KeyValuePairLogEvent {
         auto released{std::move(*m_deserialized_log_event)};
-        delete m_deserialized_log_event;
-        m_deserialized_log_event = nullptr;
+        clear_deserialized_log_event();
         return released;
     }
 
@@ -237,6 +234,11 @@ private:
     [[nodiscard]] auto handle_incomplete_ir_error(std::error_code err) -> bool;
 
     [[nodiscard]] auto is_stream_completed() const -> bool { return m_end_of_stream_reached; }
+
+    auto clear_deserialized_log_event() -> void {
+        delete m_deserialized_log_event;
+        m_deserialized_log_event = nullptr;
+    }
 
     // Variables
     PyObject_HEAD;
