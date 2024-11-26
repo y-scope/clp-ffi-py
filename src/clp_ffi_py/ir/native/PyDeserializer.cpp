@@ -41,7 +41,7 @@ PyDoc_STRVAR(
         "Initializes a :class:`Deserializer` instance with the given inputs. Note that each"
         " object should only be initialized once. Double initialization will result in a memory"
         " leak.\n\n"
-        ":param input_stream: Input stream that contains serialized CLP IR.\n"
+        ":param input_stream: Serialized CLP IR stream.\n"
         ":type input_stream: IO[bytes]\n"
         ":param buffer_capacity: The capacity of the underlying read buffer.\n"
         ":type buffer_capacity: int\n"
