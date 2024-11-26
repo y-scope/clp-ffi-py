@@ -86,7 +86,7 @@ public:
     }
 
     /**
-     * Deserializes to the next key value pair log event from the IR stream.
+     * Deserializes the next key value pair log event from the IR stream.
      * @return A new reference to a `KeyValuePairLogEvent` object representing the deserialized log
      * event on success.
      * @return A new reference to `Py_None` when the end of IR stream is reached.

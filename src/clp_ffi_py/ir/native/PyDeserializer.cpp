@@ -36,14 +36,14 @@ namespace {
 PyDoc_STRVAR(
         cPyDeserializerDoc,
         "Deserializer for deserializing CLP key-value pair IR streams.\n"
-        "This class deserializes log events from a CLP key-value pair IR stream.\n\n"
+        "This class deserializes a CLP key-value pair IR stream into log events.\n\n"
         "__init__(self, input_stream, buffer_capacity=65536, allow_incomplete_stream=False)\n\n"
         "Initializes a :class:`Deserializer` instance with the given inputs. Note that each"
         " object should only be initialized once. Double initialization will result in a memory"
         " leak.\n\n"
         ":param input_stream: Input stream that contains serialized CLP IR.\n"
         ":type input_stream: IO[bytes]\n"
-        ":param buffer_capacity: The capacity used to initialize the underlying read buffer.\n"
+        ":param buffer_capacity: The capacity of the underlying read buffer.\n"
         ":type buffer_capacity: int\n"
         ":param allow_incomplete_stream: If set to `True`, an incomplete CLP IR stream is not"
         " treated as an error.\n"
@@ -59,7 +59,7 @@ PyDoc_STRVAR(
         cPyDeserializerDeserializeLogEventDoc,
         "deserialize_log_event(self)\n"
         "--\n\n"
-        "Deserializes the IR stream until the next log event has been deserialized.\n\n"
+        "Deserializes the next log event from the IR stream.\n\n"
         ":return:\n"
         "     - The next deserialized log event from the IR stream.\n"
         "     - None if there are no more log events in the stream.\n"
