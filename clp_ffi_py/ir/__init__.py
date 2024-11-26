@@ -8,7 +8,7 @@ from typing import List
 __all__: List[str] = [
     "Decoder",  # native_deprecated
     "DecoderBuffer",  # native_deprecated
-    "Deserializer",  # Native
+    "Deserializer",  # native
     "DeserializerBuffer",  # native
     "FourByteDeserializer",  # native
     "FourByteEncoder",  # native_deprecated
