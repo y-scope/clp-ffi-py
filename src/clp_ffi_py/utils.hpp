@@ -87,7 +87,6 @@ template <typename T>
 [[maybe_unused]] constexpr bool cAlwaysFalse{false};
 
 /**
- * A consteval to get the C-string from a constexpr string view.
  * @param sv
  * @return The underlying C-string of the given constexpr string view.
  */
