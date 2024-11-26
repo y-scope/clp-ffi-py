@@ -216,7 +216,7 @@ auto PyDeserializer::init(
 
 auto PyDeserializer::deserialize_log_event() -> PyObject* {
     try {
-        while (false == is_stream_complete()) {
+        while (false == is_stream_completed()) {
             auto const ir_unit_type_result{
                     m_deserializer->deserialize_next_ir_unit(*m_deserializer_buffer_reader)
             };

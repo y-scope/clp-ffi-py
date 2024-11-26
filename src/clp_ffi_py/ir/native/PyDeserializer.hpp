@@ -236,7 +236,7 @@ private:
      */
     [[nodiscard]] auto handle_incomplete_ir_error(std::error_code err) -> bool;
 
-    [[nodiscard]] auto is_stream_complete() const -> bool { return m_end_of_stream_reached; }
+    [[nodiscard]] auto is_stream_completed() const -> bool { return m_end_of_stream_reached; }
 
     // Variables
     PyObject_HEAD;
