@@ -103,7 +103,9 @@ tasks:
     cmds:
       - task: ":utils:clang-tidy"
         vars:
-          FLAGS: "--config-file={{.ROOT_DIR}}/.clang-tidy -p {{.CLP_FFI_PY_COMPILE_COMMANDS_DB}}"
+          FLAGS: >
+            --config-file={{.CLP_FFI_PY_CPP_SRC_DIR}}/.clang-tidy
+            -p {{.CLP_FFI_PY_COMPILE_COMMANDS_DB}}
           SRC_PATHS:
             ref: ".G_CPP_LINT_DIRS"
           VENV_DIR: "{{.G_LINT_VENV_DIR}}"
