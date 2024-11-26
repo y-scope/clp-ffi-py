@@ -19,10 +19,10 @@ constexpr std::string_view cPyFuncNameSerializeDictToMsgpack{"serialize_dict_to_
 constexpr std::string_view cPyFuncNameParseJsonStr{"parse_json_str"};
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
-PyObjectStaticPtr<PyObject> py_func_get_formatted_timestamp{nullptr};
-PyObjectStaticPtr<PyObject> py_func_get_timezone_from_timezone_id{nullptr};
-PyObjectStaticPtr<PyObject> py_func_serialize_dict_to_msgpack{nullptr};
-PyObjectStaticPtr<PyObject> py_func_parse_json_str{nullptr};
+PyObjectStaticPtr<PyObject> Py_func_get_formatted_timestamp{nullptr};
+PyObjectStaticPtr<PyObject> Py_func_get_timezone_from_timezone_id{nullptr};
+PyObjectStaticPtr<PyObject> Py_func_serialize_dict_to_msgpack{nullptr};
+PyObjectStaticPtr<PyObject> Py_func_parse_json_str{nullptr};
 
 // NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
 
@@ -44,35 +44,35 @@ auto py_utils_init() -> bool {
         return false;
     }
 
-    py_func_get_timezone_from_timezone_id.reset(PyObject_GetAttrString(
+    Py_func_get_timezone_from_timezone_id.reset(PyObject_GetAttrString(
             py_utils,
             get_c_str_from_constexpr_string_view(cPyFuncNameGetTimezoneFromTimezoneId)
     ));
-    if (nullptr == py_func_get_timezone_from_timezone_id.get()) {
+    if (nullptr == Py_func_get_timezone_from_timezone_id.get()) {
         return false;
     }
 
-    py_func_get_formatted_timestamp.reset(PyObject_GetAttrString(
+    Py_func_get_formatted_timestamp.reset(PyObject_GetAttrString(
             py_utils,
             get_c_str_from_constexpr_string_view(cPyFuncNameGetFormattedTimestamp)
     ));
-    if (nullptr == py_func_get_formatted_timestamp.get()) {
+    if (nullptr == Py_func_get_formatted_timestamp.get()) {
         return false;
     }
 
-    py_func_serialize_dict_to_msgpack.reset(PyObject_GetAttrString(
+    Py_func_serialize_dict_to_msgpack.reset(PyObject_GetAttrString(
             py_utils,
             get_c_str_from_constexpr_string_view(cPyFuncNameSerializeDictToMsgpack)
     ));
-    if (nullptr == py_func_serialize_dict_to_msgpack.get()) {
+    if (nullptr == Py_func_serialize_dict_to_msgpack.get()) {
         return false;
     }
 
-    py_func_parse_json_str.reset(PyObject_GetAttrString(
+    Py_func_parse_json_str.reset(PyObject_GetAttrString(
             py_utils,
             get_c_str_from_constexpr_string_view(cPyFuncNameParseJsonStr)
     ));
-    if (nullptr == py_func_parse_json_str.get()) {
+    if (nullptr == Py_func_parse_json_str.get()) {
         return false;
     }
 
@@ -86,7 +86,7 @@ auto py_utils_get_formatted_timestamp(clp::ir::epoch_time_ms_t timestamp, PyObje
     if (nullptr == func_args) {
         return nullptr;
     }
-    return py_utils_function_call_wrapper(py_func_get_formatted_timestamp.get(), func_args);
+    return py_utils_function_call_wrapper(Py_func_get_formatted_timestamp.get(), func_args);
 }
 
 auto py_utils_get_timezone_from_timezone_id(std::string const& timezone_id) -> PyObject* {
@@ -95,7 +95,7 @@ auto py_utils_get_timezone_from_timezone_id(std::string const& timezone_id) -> P
     if (nullptr == func_args) {
         return nullptr;
     }
-    return py_utils_function_call_wrapper(py_func_get_timezone_from_timezone_id.get(), func_args);
+    return py_utils_function_call_wrapper(Py_func_get_timezone_from_timezone_id.get(), func_args);
 }
 
 auto py_utils_serialize_dict_to_msgpack(PyDictObject* py_dict) -> PyBytesObject* {
@@ -106,7 +106,7 @@ auto py_utils_serialize_dict_to_msgpack(PyDictObject* py_dict) -> PyBytesObject*
     if (nullptr == func_args) {
         return nullptr;
     }
-    auto* result{py_utils_function_call_wrapper(py_func_serialize_dict_to_msgpack.get(), func_args)
+    auto* result{py_utils_function_call_wrapper(Py_func_serialize_dict_to_msgpack.get(), func_args)
     };
     if (nullptr == result) {
         return nullptr;
@@ -130,6 +130,6 @@ auto py_utils_parse_json_str(std::string_view json_str) -> PyObject* {
     if (nullptr == func_args) {
         return nullptr;
     }
-    return py_utils_function_call_wrapper(py_func_parse_json_str.get(), func_args);
+    return py_utils_function_call_wrapper(Py_func_parse_json_str.get(), func_args);
 }
 }  // namespace clp_ffi_py

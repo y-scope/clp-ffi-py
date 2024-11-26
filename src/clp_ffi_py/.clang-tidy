@@ -1,0 +1,6 @@
+InheritParentConfig: true
+
+CheckOptions:
+  # Variable naming rules
+  # NOTE: we set this to allow PyObject global variables to start with `Py_`
+  readability-identifier-naming.GlobalVariableIgnoredRegexp: "Py_.*"
