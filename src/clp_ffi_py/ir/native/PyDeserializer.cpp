@@ -218,7 +218,16 @@ auto PyDeserializer::deserialize_log_event() -> PyObject* {
                     m_deserializer->deserialize_next_ir_unit(*m_deserializer_buffer_reader)
             };
             if (ir_unit_type_result.has_error()) {
-                if (false == handle_incomplete_ir_error(ir_unit_type_result.error())) {
+                auto const err{ir_unit_type_result.error()};
+                if (std::errc::result_out_of_range != err) {
+                    PyErr_Format(
+                            PyExc_RuntimeError,
+                            cDeserializerDeserializeNextIrUnitErrorFormatStr.data(),
+                            err.message().c_str()
+                    );
+                    return nullptr;
+                }
+                if (false == handle_incomplete_stream_error()) {
                     return nullptr;
                 }
                 break;
@@ -274,22 +283,14 @@ auto PyDeserializer::handle_log_event(clp::ffi::KeyValuePairLogEvent&& log_event
     return IRErrorCode::IRErrorCode_Success;
 }
 
-auto PyDeserializer::handle_incomplete_ir_error(std::error_code err) -> bool {
-    if (std::errc::result_out_of_range == err || std::errc::no_message_available == err) {
-        if (m_allow_incomplete_stream) {
-            handle_end_of_stream();
-            return true;
-        }
-        PyErr_SetString(
-                PyDeserializerBuffer::get_py_incomplete_stream_error(),
-                cDeserializerIncompleteIRError
-        );
-        return false;
+auto PyDeserializer::handle_incomplete_stream_error() -> bool {
+    if (m_allow_incomplete_stream) {
+        handle_end_of_stream();
+        return true;
     }
-    PyErr_Format(
-            PyExc_RuntimeError,
-            cDeserializerDeserializeNextIrUnitErrorFormatStr.data(),
-            err.message().c_str()
+    PyErr_SetString(
+            PyDeserializerBuffer::get_py_incomplete_stream_error(),
+            cDeserializerIncompleteIRError
     );
     return false;
 }

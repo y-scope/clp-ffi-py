@@ -224,14 +224,11 @@ private:
     }
 
     /**
-     * Handles the incomplete IR error returned from `Deserializer::deserialize_next_ir_unit`.
-     * @param err
-     * @return true if the error is resolved on success.
-     * @return false with the relevant Python exception and error set on failures:
-     * - The error doesn't indicate an incomplete IR stream.
-     * - Incomplete IR stream is not allowed.
+     * Handles the incomplete stream error returned from `Deserializer::deserialize_next_ir_unit`.
+     * @return true if incomplete stream is allowed.
+     * @return false with the relevant Python exception and error set otherwise.
      */
-    [[nodiscard]] auto handle_incomplete_ir_error(std::error_code err) -> bool;
+    [[nodiscard]] auto handle_incomplete_stream_error() -> bool;
 
     [[nodiscard]] auto is_stream_completed() const -> bool { return m_end_of_stream_reached; }
 
