@@ -147,7 +147,7 @@ public:
     /**
      * @return Whether there are more child schema tree nodes to traverse.
      */
-    [[nodiscard]] auto has_next_child_schema_tree_node() const -> bool {
+    [[nodiscard]] auto has_next_child_schema_tree_node_id() const -> bool {
         return m_child_schema_tree_node_it != m_child_schema_tree_nodes.end();
     }
 
@@ -160,11 +160,11 @@ public:
     }
 
     /**
-     * Adds the underlying Python dictionary into the parent.
+     * Adds the underlying Python dictionary into the parent dictionary.
      * @return true on success.
      * @return false on failure with the relevant Python exception and error set.
      */
-    [[nodiscard]] auto add_to_parent() -> bool {
+    [[nodiscard]] auto add_to_parent_dict() -> bool {
         if (is_root()) {
             PyErr_SetString(
                     PyExc_RuntimeError,
@@ -174,7 +174,7 @@ public:
         }
         return 0
                == PyDict_SetItemString(
-                       py_reinterpret_cast<PyObject>(m_parent),
+                       py_reinterpret_cast<PyObject>(m_parent_py_dict),
                        m_schema_tree_node->get_key_name().data(),
                        py_reinterpret_cast<PyObject>(m_py_dict.get())
                );
@@ -211,13 +211,13 @@ private:
             : m_schema_tree_node{schema_tree_node},
               m_child_schema_tree_nodes{std::move(child_schema_tree_nodes)},
               m_child_schema_tree_node_it{m_child_schema_tree_nodes.cbegin()},
-              m_parent{parent},
+              m_parent_py_dict{parent},
               m_py_dict{std::move(py_dict)} {}
 
     SchemaTree::Node const* m_schema_tree_node;
     std::vector<SchemaTree::Node::id_t> m_child_schema_tree_nodes;
     std::vector<SchemaTree::Node::id_t>::const_iterator m_child_schema_tree_node_it;
-    PyDictObject* m_parent;
+    PyDictObject* m_parent_py_dict;
     PyObjectPtr<PyDictObject> m_py_dict;
 };
 
@@ -507,11 +507,11 @@ auto serialize_node_id_value_pair_to_py_dict(
 
     while (false == dfs_stack.empty()) {
         auto& top{dfs_stack.top()};
-        if (false == top.has_next_child_schema_tree_node()) {
+        if (false == top.has_next_child_schema_tree_node_id()) {
             if (top.is_root()) {
                 root_dict.reset(top.release_root());
             } else {
-                if (false == top.add_to_parent()) {
+                if (false == top.add_to_parent_dict()) {
                     return nullptr;
                 }
             }
