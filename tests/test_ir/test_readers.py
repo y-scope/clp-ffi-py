@@ -186,7 +186,9 @@ class TestIncompleteIRStream(TestCLPBase):
     Tests on reading an incomplete stream.
     """
 
-    test_src: Path = Path(__file__).resolve().parent / "test_data/incomplete_ir.log.zst"
+    test_src: Path = (
+        Path(__file__).resolve().parent / "test_data/unstructured_ir/incomplete_ir.log.zst"
+    )
 
     def test_incomplete_ir_stream_error(self) -> None:
         """

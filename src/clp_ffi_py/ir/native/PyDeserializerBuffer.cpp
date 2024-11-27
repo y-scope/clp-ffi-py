@@ -219,6 +219,10 @@ PyDoc_STRVAR(
 }  // namespace
 
 auto PyDeserializerBuffer::init(PyObject* input_stream, Py_ssize_t buf_capacity) -> bool {
+    if (0 >= buf_capacity) {
+        PyErr_SetString(PyExc_ValueError, "Buffer capacity must be a positive integer (> 0).");
+        return false;
+    }
     m_read_buffer_mem_owner = static_cast<int8_t*>(PyMem_Malloc(buf_capacity));
     if (nullptr == m_read_buffer_mem_owner) {
         PyErr_NoMemory();
@@ -375,6 +379,21 @@ auto PyDeserializerBuffer::test_streaming(uint32_t seed) -> PyObject* {
 
 PyObjectStaticPtr<PyTypeObject> PyDeserializerBuffer::m_py_type{nullptr};
 PyObjectStaticPtr<PyObject> PyDeserializerBuffer::m_py_incomplete_stream_error{nullptr};
+
+auto PyDeserializerBuffer::create(PyObject* input_stream, Py_ssize_t buf_capacity)
+        -> PyDeserializerBuffer* {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+    PyDeserializerBuffer* self{PyObject_New(PyDeserializerBuffer, get_py_type())};
+    if (nullptr == self) {
+        PyErr_SetString(PyExc_MemoryError, clp_ffi_py::cOutofMemoryError);
+        return nullptr;
+    }
+    self->default_init();
+    if (false == self->init(input_stream, buf_capacity)) {
+        return nullptr;
+    }
+    return self;
+}
 
 auto PyDeserializerBuffer::get_py_type() -> PyTypeObject* {
     return m_py_type.get();

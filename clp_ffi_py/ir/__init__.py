@@ -8,6 +8,7 @@ from typing import List
 __all__: List[str] = [
     "Decoder",  # native_deprecated
     "DecoderBuffer",  # native_deprecated
+    "Deserializer",  # native
     "DeserializerBuffer",  # native
     "FourByteDeserializer",  # native
     "FourByteEncoder",  # native_deprecated
@@ -18,6 +19,7 @@ __all__: List[str] = [
     "Metadata",  # native
     "Query",  # native
     "QueryBuilder",  # query_builder
+    "Serializer",  # native
     "ClpIrFileReader",  # readers
     "ClpIrStreamReader",  # readers
 ]

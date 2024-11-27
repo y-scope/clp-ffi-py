@@ -8,12 +8,12 @@ vars:
 
   # Other variables
   PYTHON_VERSION:
-    sh: python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')"
+    sh: "python3 -c \"import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')\""
 
 tasks:
   api-docs:
     dir: "{{.TASKFILE_DIR}}"
-    deps: [ "docs-venv" ]
+    deps: ["docs-venv"]
     cmds:
       - |-
         . "{{.DOCS_VENV_DIR}}/bin/activate"

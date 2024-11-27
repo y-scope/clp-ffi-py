@@ -1,0 +1,202 @@
+version: "3"
+
+vars:
+  G_LINT_VENV_DIR: "{{.BUILD_DIR}}/lint-venv"
+  G_LINT_VENV_CHECKSUM_FILE: "{{.BUILD_DIR}}/lint#venv.md5"
+  # Linter target dirs
+  G_CPP_LINT_DIRS: ["{{.CLP_FFI_PY_CPP_SRC_DIR}}"]
+  G_PYTHON_LINT_DIRS: ["{{.ROOT_DIR}}/clp_ffi_py", "{{.ROOT_DIR}}/tests"]
+
+tasks:
+  check:
+    cmds:
+      - task: "cmake-check"
+      - task: "cpp-check"
+      - task: "py-check"
+      - task: "yml-check"
+
+  fix:
+    cmds:
+      - task: "cmake-fix"
+      - task: "cpp-fix"
+      - task: "py-fix"
+      - task: "yml-fix"
+
+  cmake-check:
+    deps: ["venv"]
+    cmds:
+      - task: "cmake"
+        vars:
+          FLAGS: "--check"
+
+  cmake-fix:
+    deps: ["venv"]
+    cmds:
+      - task: "cmake"
+        vars:
+          FLAGS: "--in-place"
+
+  cpp-configs:
+    # TODO: remove this once all clang-tidy has been fixed
+    deps: [":config-cmake-project"]
+    cmds:
+      - "tools/yscope-dev-utils/lint-configs/symlink-cpp-lint-configs.sh"
+
+  cpp-check:
+    cmds:
+      - task: "cpp-format-check"
+      # TODO: re-enable this once all clang-tidy has been fixed
+      # - task: "cpp-static-check"
+
+  cpp-fix:
+    cmds:
+      - task: "cpp-format-fix"
+      # TODO: re-enable this once all clang-tidy has been fixed
+      # - task: "cpp-static-fix"
+
+  cpp-format-check:
+    sources: &cpp_format_src_files
+      - "{{.G_LINT_VENV_CHECKSUM_FILE}}"
+      - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/**/*.cpp"
+      - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/**/*.h"
+      - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/**/*.hpp"
+      - "src/clp_ffi_py/.clang-format"
+      - "{{.TASKFILE}}"
+      - ".clang-format"
+    deps: ["cpp-configs", "venv"]
+    cmds:
+      - task: ":utils:clang-format"
+        vars:
+          FLAGS: "--dry-run"
+          SRC_PATHS:
+            ref: ".G_CPP_LINT_DIRS"
+          VENV_DIR: "{{.G_LINT_VENV_DIR}}"
+
+  cpp-format-fix:
+    sources: *cpp_format_src_files
+    deps: ["cpp-configs", "venv"]
+    cmds:
+      - task: ":utils:clang-format"
+        vars:
+          FLAGS: "-i"
+          SRC_PATHS:
+            ref: ".G_CPP_LINT_DIRS"
+          VENV_DIR: "{{.G_LINT_VENV_DIR}}"
+
+  cpp-static-check:
+    # Alias task to `cpp-static-fix` since we don't currently support automatic fixes.
+    # NOTE: clang-tidy does have the ability to fix some errors, but the fixes can be inaccurate.
+    # When we eventually determine which errors can be safely fixed, we'll allow clang-tidy to
+    # fix them.
+    aliases: ["cpp-static-fix"]
+    sources:
+      - "{{.G_LINT_VENV_CHECKSUM_FILE}}"
+      - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/**/*.cpp"
+      - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/**/*.h"
+      - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/**/*.hpp"
+      - "{{.CLP_FFI_PY_CMAKE_CACHE}}"
+      - "{{.CLP_FFI_PY_COMPILE_COMMANDS_DB}}"
+      - "{{.TASKFILE}}"
+      - "Taskfile.yml"
+      - ".clang-tidy"
+    deps: [":config-cmake-project", "cpp-configs", "venv"]
+    cmds:
+      - task: ":utils:clang-tidy"
+        vars:
+          FLAGS: "--config-file={{.ROOT_DIR}}/.clang-tidy -p {{.CLP_FFI_PY_COMPILE_COMMANDS_DB}}"
+          SRC_PATHS:
+            ref: ".G_CPP_LINT_DIRS"
+          VENV_DIR: "{{.G_LINT_VENV_DIR}}"
+
+  py-check:
+    cmds:
+      - task: "py"
+        vars:
+          DOCFORMATTER_FLAGS: "--check --diff"
+          BLACK_FLAGS: "--check --diff"
+          RUFF_FLAGS: "--output-format=github"
+          SRC_DIRS:
+            ref: ".G_PYTHON_LINT_DIRS"
+
+  py-fix:
+    cmds:
+      - task: "py"
+        vars:
+          DOCFORMATTER_FLAGS: "-i"
+          BLACK_FLAGS: ""
+          RUFF_FLAGS: "--fix"
+          SRC_DIRS:
+            ref: ".G_PYTHON_LINT_DIRS"
+
+  yml:
+    aliases:
+      - "yml-check"
+      - "yml-fix"
+    deps: ["venv"]
+    cmds:
+      - |-
+        . "{{.G_LINT_VENV_DIR}}/bin/activate"
+        yamllint \
+          --config-file "tools/yscope-dev-utils/lint-configs/.yamllint.yml" \
+          --strict \
+          .gersemirc \
+          .github \
+          docs/tasks.yml \
+          lint-tasks.yml \
+          src/clp_ffi_py/.clang-format \
+          Taskfile.yml
+
+  cmake:
+    internal: true
+    requires:
+      vars: ["FLAGS"]
+    cmd: |-
+      . "{{.G_LINT_VENV_DIR}}/bin/activate"
+      gersemi {{.FLAGS}} CMakeLists.txt {{.CLP_FFI_PY_CPP_SRC_DIR}}
+
+  py:
+    internal: true
+    requires:
+      vars: ["DOCFORMATTER_FLAGS", "BLACK_FLAGS", "RUFF_FLAGS", "SRC_DIRS"]
+    deps: ["venv"]
+    dir: "{{.ROOT_DIR}}"
+    cmds:
+      - for:
+          var: "SRC_DIRS"
+        cmd: |-
+          . "{{.G_LINT_VENV_DIR}}/bin/activate"
+          mypy {{.ITEM}}
+          docformatter {{.DOCFORMATTER_FLAGS}} --recursive {{.ITEM}}
+          black --color --line-length 100 {{.BLACK_FLAGS}} {{.ITEM}}
+          ruff check {{.RUFF_FLAGS}} {{.ITEM}}
+
+  venv:
+    internal: true
+    vars:
+      CHECKSUM_FILE: "{{.G_LINT_VENV_CHECKSUM_FILE}}"
+      OUTPUT_DIR: "{{.G_LINT_VENV_DIR}}"
+    sources:
+      - "{{.ROOT_DIR}}/Taskfile.yml"
+      - "{{.TASKFILE}}"
+      - "requirements-dev.txt"
+    generates: ["{{.CHECKSUM_FILE}}"]
+    deps:
+      - ":init"
+      - task: ":utils:validate-checksum"
+        vars:
+          CHECKSUM_FILE: "{{.CHECKSUM_FILE}}"
+          DATA_DIR: "{{.OUTPUT_DIR}}"
+    cmds:
+      - task: ":utils:create-venv"
+        vars:
+          LABEL: "lint"
+          OUTPUT_DIR: "{{.OUTPUT_DIR}}"
+          # TODO: Separate the current requirements-dev.txt into linter & dev requirements.
+          # Let linter venv install both linter and dev requirements, and let build_wheel install
+          # only dev requirements.
+          REQUIREMENTS_FILE: "requirements-dev.txt"
+      # This command must be last
+      - task: ":utils:compute-checksum"
+        vars:
+          DATA_DIR: "{{.OUTPUT_DIR}}"
+          OUTPUT_FILE: "{{.CHECKSUM_FILE}}"

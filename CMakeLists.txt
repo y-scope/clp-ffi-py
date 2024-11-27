@@ -94,9 +94,13 @@ set(CLP_FFI_PY_LIB_IR_SOURCES
     ${CLP_FFI_PY_LIB_SRC_DIR}/ExceptionFFI.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/deserialization_methods.cpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/deserialization_methods.hpp
+    ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/DeserializerBufferReader.cpp
+    ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/DeserializerBufferReader.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/LogEvent.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/Metadata.cpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/Metadata.hpp
+    ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PyDeserializer.cpp
+    ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PyDeserializer.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PyDeserializerBuffer.cpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PyDeserializerBuffer.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PyFourByteDeserializer.cpp
@@ -111,6 +115,8 @@ set(CLP_FFI_PY_LIB_IR_SOURCES
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PyMetadata.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PyQuery.cpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PyQuery.hpp
+    ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PySerializer.cpp
+    ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PySerializer.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/Query.cpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/Query.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/serialization_methods.cpp
