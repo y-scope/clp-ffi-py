@@ -220,7 +220,7 @@ PyDoc_STRVAR(
 
 auto PyDeserializerBuffer::init(PyObject* input_stream, Py_ssize_t buf_capacity) -> bool {
     if (0 >= buf_capacity) {
-        PyErr_SetString(PyExc_ValueError, "The given buffer capacity must be greater than 0.");
+        PyErr_SetString(PyExc_ValueError, "Buffer capacity must be a positive integer (> 0).");
         return false;
     }
     m_read_buffer_mem_owner = static_cast<int8_t*>(PyMem_Malloc(buf_capacity));
