@@ -223,10 +223,20 @@ auto PyDeserializer::deserialize_log_event() -> PyObject* {
                 }
                 break;
             }
-            if (IrUnitType::LogEvent != ir_unit_type_result.value()
-                || false == has_unreleased_deserialized_log_event())
-            {
+            if (IrUnitType::LogEvent != ir_unit_type_result.value()) {
                 continue;
+            }
+            if (false == has_unreleased_deserialized_log_event()) {
+                // TODO: after native query is implemented, this branch could indicate the
+                // deserialized log event IR unit doesn't match the query and thus not set as a
+                // buffered deserialization result. But before that, this check is added to ensure
+                // we check the ownership is valid before calling `release_deserialized_log_event`.
+                PyErr_SetString(
+                        PyExc_RuntimeError,
+                        "Deserializer failed to set the underlying deserialized log event properly"
+                        " after successfully deserializing a log event IR unit."
+                );
+                return nullptr;
             }
             return py_reinterpret_cast<PyObject>(
                     PyKeyValuePairLogEvent::create(release_deserialized_log_event())
