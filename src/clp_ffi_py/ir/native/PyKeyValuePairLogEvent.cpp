@@ -506,25 +506,25 @@ auto serialize_node_id_value_pair_to_py_dict(
     dfs_stack.emplace(std::move(optional_root_iterator.value()));
 
     while (false == dfs_stack.empty()) {
-        auto& top{dfs_stack.top()};
-        if (false == top.has_next_child_schema_tree_node_id()) {
-            if (top.is_root()) {
-                root_dict.reset(top.release_root());
+        auto& dfs_stack_top{dfs_stack.top()};
+        if (false == dfs_stack_top.has_next_child_schema_tree_node_id()) {
+            if (dfs_stack_top.is_root()) {
+                root_dict.reset(dfs_stack_top.release_root());
             } else {
-                if (false == top.add_to_parent_dict()) {
+                if (false == dfs_stack_top.add_to_parent_dict()) {
                     return nullptr;
                 }
             }
             dfs_stack.pop();
             continue;
         }
-        auto const child_schema_tree_node_id{top.get_next_child_schema_tree_node()};
+        auto const child_schema_tree_node_id{dfs_stack_top.get_next_child_schema_tree_node()};
         auto const& child_schema_tree_node{schema_tree.get_node(child_schema_tree_node_id)};
         if (false == node_id_value_pairs.contains(child_schema_tree_node_id)) {
             auto optional_iterator{DfsIterator::create(
                     &child_schema_tree_node,
                     schema_subtree_bitmap,
-                    top.get_py_dict()
+                    dfs_stack_top.get_py_dict()
             )};
             if (false == optional_iterator.has_value()) {
                 return nullptr;
@@ -536,7 +536,7 @@ auto serialize_node_id_value_pair_to_py_dict(
             == insert_kv_pair_into_py_dict(
                     child_schema_tree_node,
                     node_id_value_pairs.at(child_schema_tree_node_id),
-                    top.get_py_dict()
+                    dfs_stack_top.get_py_dict()
             ))
         {
             return nullptr;
