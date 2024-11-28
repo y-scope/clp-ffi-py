@@ -152,8 +152,8 @@ public:
     }
 
     /**
-     * Gets the next child schema tree node and advances the iterator.
-     * @return The next child schema tree node.
+     * Gets the id of the next child schema tree node and advances the iterator.
+     * @return The id of the next child schema tree node.
      */
     [[nodiscard]] auto get_next_child_schema_tree_node_id() -> SchemaTree::Node::id_t {
         return *(m_child_schema_tree_node_it++);
