@@ -58,6 +58,13 @@ public:
     }
 
     /**
+     * Converts the underlying key-value pair log event into a Python dictionary.
+     * @return A new reference to the created dictionary on success.
+     * @return nullptr on failure with the relevant Python exception and error set.
+     */
+    [[nodiscard]] auto to_dict() -> PyDictObject*;
+
+    /**
      * CPython-level factory function.
      * @param kv_log_event
      * @return a new reference of a `PyKeyValuePairLogEvent` object that is initialized with the
