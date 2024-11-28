@@ -12,6 +12,7 @@ from test_ir.test_metadata import *  # noqa
 from test_ir.test_query import *  # noqa
 from test_ir.test_query_builder import *  # noqa
 from test_ir.test_readers import *  # noqa
+from test_ir.test_serder import *  # noqa
 from test_ir.test_serializer import *  # noqa
 from test_ir.test_utils import TestCLPBase
 
