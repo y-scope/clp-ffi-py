@@ -147,7 +147,7 @@ public:
     /**
      * @return Whether there are more child schema tree nodes to traverse.
      */
-    [[nodiscard]] auto has_next_child_schema_tree_node_id() const -> bool {
+    [[nodiscard]] auto has_next_child_schema_tree_node() const -> bool {
         return m_child_schema_tree_node_it != m_child_schema_tree_nodes.end();
     }
 
@@ -155,7 +155,7 @@ public:
      * Gets the next child schema tree node and advances the iterator.
      * @return The next child schema tree node.
      */
-    [[nodiscard]] auto get_next_child_schema_tree_node() -> SchemaTree::Node::id_t {
+    [[nodiscard]] auto get_next_child_schema_tree_node_id() -> SchemaTree::Node::id_t {
         return *(m_child_schema_tree_node_it++);
     }
 
@@ -507,7 +507,7 @@ auto serialize_node_id_value_pair_to_py_dict(
 
     while (false == dfs_stack.empty()) {
         auto& dfs_stack_top{dfs_stack.top()};
-        if (false == dfs_stack_top.has_next_child_schema_tree_node_id()) {
+        if (false == dfs_stack_top.has_next_child_schema_tree_node()) {
             if (dfs_stack_top.is_root()) {
                 root_dict.reset(dfs_stack_top.release_root());
             } else {
@@ -518,7 +518,7 @@ auto serialize_node_id_value_pair_to_py_dict(
             dfs_stack.pop();
             continue;
         }
-        auto const child_schema_tree_node_id{dfs_stack_top.get_next_child_schema_tree_node()};
+        auto const child_schema_tree_node_id{dfs_stack_top.get_next_child_schema_tree_node_id()};
         auto const& child_schema_tree_node{schema_tree.get_node(child_schema_tree_node_id)};
         if (false == node_id_value_pairs.contains(child_schema_tree_node_id)) {
             auto optional_iterator{DfsIterator::create(
