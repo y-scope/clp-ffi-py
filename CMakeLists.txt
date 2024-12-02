@@ -99,6 +99,8 @@ set(CLP_FFI_PY_LIB_IR_SOURCES
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/LogEvent.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/Metadata.cpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/Metadata.hpp
+    ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PyDeserializer.cpp
+    ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PyDeserializer.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PyDeserializerBuffer.cpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PyDeserializerBuffer.hpp
     ${CLP_FFI_PY_LIB_SRC_DIR}/ir/native/PyFourByteDeserializer.cpp
