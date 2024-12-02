@@ -1,4 +1,4 @@
-#include <clp_ffi_py/Python.hpp>  // Must always be included before any other header file
+#include <wrapped_dependency_headers/Python.hpp>  // Must be included before any other header file
 
 #include "Py_utils.hpp"
 

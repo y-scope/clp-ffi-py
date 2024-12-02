@@ -1,4 +1,4 @@
-#include <clp_ffi_py/Python.hpp>
+#include <wrapped_dependency_headers/Python.hpp>
 
 #include "PyMetadata.hpp"
 

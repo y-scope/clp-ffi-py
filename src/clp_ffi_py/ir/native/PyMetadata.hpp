@@ -1,7 +1,7 @@
 #ifndef CLP_FFI_PY_IR_NATIVE_PYMETADATA_HPP
 #define CLP_FFI_PY_IR_NATIVE_PYMETADATA_HPP
 
-#include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
+#include <wrapped_dependency_headers/Python.hpp>  // Must be included before any other header files
 
 #include <json/single_include/nlohmann/json.hpp>
 
