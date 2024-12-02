@@ -132,9 +132,9 @@ set(CLP_FFI_PY_LIB_IR_SOURCES
     ${CLP_FFI_PY_LIB_SRC_DIR}/utils.hpp
 )
 
-# NOTE: these headers are wrappers of third-party dependency libraries. They are required to silent
+# NOTE: These headers are wrappers of third-party dependency libraries. They are required to silence
 # clang-tidy warnings for missing direct includes.
-set(CLP_FFI_PY_WRAPPED_DEPENDENCY_HEADERS_SOURCES
+set(CLP_FFI_PY_WRAPPED_DEPENDENCY_HEADERS
     ${CLP_FFI_PY_WRAPPED_DEPENDENCY_HEADERS_DIR}/msgpack.hpp
     ${CLP_FFI_PY_WRAPPED_DEPENDENCY_HEADERS_DIR}/Python.hpp
 )
@@ -144,7 +144,7 @@ target_sources(
     PRIVATE
         ${CLP_FFI_PY_CLP_CORE_SOURCES}
         ${CLP_FFI_PY_LIB_IR_SOURCES}
-        ${CLP_FFI_PY_WRAPPED_DEPENDENCY_HEADERS_SOURCES}
+        ${CLP_FFI_PY_WRAPPED_DEPENDENCY_HEADERS}
 )
 
 # NOTE: We mark the include directories below as system headers so that the compiler (including

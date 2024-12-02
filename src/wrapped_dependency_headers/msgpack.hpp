@@ -1,5 +1,4 @@
 // IWYU pragma: begin_exports
-#define PY_SSIZE_T_CLEAN
 #include <msgpack.hpp>
 // IWYU pragma: end_exports
 
