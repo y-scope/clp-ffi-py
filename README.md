@@ -320,7 +320,7 @@ in the table below.
 | `lint:cpp-fix`          | Runs the C++ linters and fixes some violations.         |
 | `lint:cpp-format-check` | Runs the C++ formatters.                                |
 | `lint:cpp-format-fix`   | Runs the C++ formatters and fixes some violations.      |
-| `lint:cpp-static-check` | Runs the C++ linters.                                   |
+| `lint:cpp-static-check` | Runs the C++ static analyzers.                          |
 | `lint:py-check`         | Runs the Python linters.                                |
 | `lint:py-fix`           | Runs the Python linters and fixes some violations.      |
 | `lint:yml-check`        | Runs the YAML linters.                                  |
