@@ -37,22 +37,18 @@ tasks:
           FLAGS: "--in-place"
 
   cpp-configs:
-    # TODO: remove this once all clang-tidy has been fixed
-    deps: [":config-cmake-project"]
     cmds:
       - "tools/yscope-dev-utils/lint-configs/symlink-cpp-lint-configs.sh"
 
   cpp-check:
     cmds:
       - task: "cpp-format-check"
-      # TODO: re-enable this once all clang-tidy has been fixed
-      # - task: "cpp-static-check"
+      - task: "cpp-static-check"
 
   cpp-fix:
     cmds:
       - task: "cpp-format-fix"
-      # TODO: re-enable this once all clang-tidy has been fixed
-      # - task: "cpp-static-fix"
+      - task: "cpp-static-fix"
 
   cpp-format-check:
     sources: &cpp_format_src_files
@@ -107,7 +103,11 @@ tasks:
             --config-file "{{.CLP_FFI_PY_CPP_SRC_DIR}}/.clang-tidy"
             -p "{{.CLP_FFI_PY_COMPILE_COMMANDS_DB}}"
           SRC_PATHS:
-            ref: ".G_CPP_LINT_DIRS"
+            # TODO: Before all clang-tidy violations are resolved, we should only run clang-tidy on
+            # the files whose violations we've fixed, both to ensure they remain free of violations
+            # and so that the workflow doesn't fail due to violations in other files.
+            - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/Py_utils.cpp"
+            - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/Py_utils.hpp"
           VENV_DIR: "{{.G_LINT_VENV_DIR}}"
 
   py-check:
