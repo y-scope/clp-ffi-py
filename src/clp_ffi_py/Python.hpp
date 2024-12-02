@@ -18,7 +18,7 @@
 #include <bytesobject.h>
 #include <dictobject.h>
 #include <floatobject.h>
-#include <longobject.h>
+#include <import.h>
 #include <longobject.h>
 #include <memoryobject.h>
 #include <methodobject.h>

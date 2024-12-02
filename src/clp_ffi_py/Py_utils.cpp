@@ -2,24 +2,29 @@
 
 #include "Py_utils.hpp"
 
+#include <string>
 #include <string_view>
+
+#include <clp/ir/types.hpp>
 
 #include <clp_ffi_py/PyObjectCast.hpp>
 #include <clp_ffi_py/PyObjectUtils.hpp>
+#include <clp_ffi_py/utils.hpp>
 
 namespace clp_ffi_py {
 namespace {
-constexpr char const* const cPyFuncNameGetFormattedTimestamp{"get_formatted_timestamp"};
-PyObjectStaticPtr<PyObject> Py_func_get_formatted_timestamp{nullptr};
-
-constexpr char const* const cPyFuncNameGetTimezoneFromTimezoneId{"get_timezone_from_timezone_id"};
-PyObjectStaticPtr<PyObject> Py_func_get_timezone_from_timezone_id{nullptr};
-
+constexpr std::string_view cPyFuncNameGetFormattedTimestamp{"get_formatted_timestamp"};
+constexpr std::string_view cPyFuncNameGetTimezoneFromTimezoneId{"get_timezone_from_timezone_id"};
 constexpr std::string_view cPyFuncNameSerializeDictToMsgpack{"serialize_dict_to_msgpack"};
-PyObjectStaticPtr<PyObject> Py_func_serialize_dict_to_msgpack{nullptr};
-
 constexpr std::string_view cPyFuncNameParseJsonStr{"parse_json_str"};
+
+// NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
+PyObjectStaticPtr<PyObject> Py_func_get_formatted_timestamp{nullptr};
+PyObjectStaticPtr<PyObject> Py_func_get_timezone_from_timezone_id{nullptr};
+PyObjectStaticPtr<PyObject> Py_func_serialize_dict_to_msgpack{nullptr};
 PyObjectStaticPtr<PyObject> Py_func_parse_json_str{nullptr};
+
+// NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
 
 /**
  * Wrapper of PyObject_CallObject.
@@ -39,28 +44,34 @@ auto py_utils_init() -> bool {
         return false;
     }
 
-    Py_func_get_timezone_from_timezone_id.reset(
-            PyObject_GetAttrString(py_utils, cPyFuncNameGetTimezoneFromTimezoneId)
-    );
+    Py_func_get_timezone_from_timezone_id.reset(PyObject_GetAttrString(
+            py_utils,
+            get_c_str_from_constexpr_string_view(cPyFuncNameGetTimezoneFromTimezoneId)
+    ));
     if (nullptr == Py_func_get_timezone_from_timezone_id.get()) {
         return false;
     }
 
-    Py_func_get_formatted_timestamp.reset(
-            PyObject_GetAttrString(py_utils, cPyFuncNameGetFormattedTimestamp)
-    );
+    Py_func_get_formatted_timestamp.reset(PyObject_GetAttrString(
+            py_utils,
+            get_c_str_from_constexpr_string_view(cPyFuncNameGetFormattedTimestamp)
+    ));
     if (nullptr == Py_func_get_formatted_timestamp.get()) {
         return false;
     }
 
-    Py_func_serialize_dict_to_msgpack.reset(
-            PyObject_GetAttrString(py_utils, cPyFuncNameSerializeDictToMsgpack.data())
-    );
+    Py_func_serialize_dict_to_msgpack.reset(PyObject_GetAttrString(
+            py_utils,
+            get_c_str_from_constexpr_string_view(cPyFuncNameSerializeDictToMsgpack)
+    ));
     if (nullptr == Py_func_serialize_dict_to_msgpack.get()) {
         return false;
     }
 
-    Py_func_parse_json_str.reset(PyObject_GetAttrString(py_utils, cPyFuncNameParseJsonStr.data()));
+    Py_func_parse_json_str.reset(PyObject_GetAttrString(
+            py_utils,
+            get_c_str_from_constexpr_string_view(cPyFuncNameParseJsonStr)
+    ));
     if (nullptr == Py_func_parse_json_str.get()) {
         return false;
     }
@@ -112,7 +123,9 @@ auto py_utils_serialize_dict_to_msgpack(PyDictObject* py_dict) -> PyBytesObject*
 }
 
 auto py_utils_parse_json_str(std::string_view json_str) -> PyObject* {
-    PyObjectPtr<PyObject> const func_args_ptr{Py_BuildValue("(s)", json_str.data())};
+    PyObjectPtr<PyObject> const func_args_ptr{
+            Py_BuildValue("(s#)", json_str.data(), static_cast<Py_ssize_t>(json_str.size()))
+    };
     auto* func_args{func_args_ptr.get()};
     if (nullptr == func_args) {
         return nullptr;

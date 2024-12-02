@@ -6,7 +6,7 @@
 #include <string>
 #include <string_view>
 
-#include <clp/ffi/encoding_methods.hpp>
+#include <clp/ir/types.hpp>
 
 namespace clp_ffi_py {
 /**

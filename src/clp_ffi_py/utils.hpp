@@ -6,6 +6,7 @@
 #include <iostream>
 #include <span>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <vector>
 
@@ -84,6 +85,15 @@ auto handle_traceable_exception(clp::TraceableException& exception) noexcept -> 
  */
 template <typename T>
 [[maybe_unused]] constexpr bool cAlwaysFalse{false};
+
+/**
+ * @param sv
+ * @return The underlying C-string of the given constexpr string view.
+ */
+[[nodiscard]] consteval auto get_c_str_from_constexpr_string_view(std::string_view const& sv
+) -> char const* {
+    return sv.data();
+}
 
 template <typename int_type>
 auto parse_py_int(PyObject* py_int, int_type& val) -> bool {
