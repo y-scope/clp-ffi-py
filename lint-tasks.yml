@@ -4,7 +4,12 @@ vars:
   G_LINT_VENV_DIR: "{{.BUILD_DIR}}/lint-venv"
   G_LINT_VENV_CHECKSUM_FILE: "{{.BUILD_DIR}}/lint#venv.md5"
   # Linter target dirs
-  G_CPP_LINT_DIRS: ["{{.CLP_FFI_PY_CPP_SRC_DIR}}"]
+  G_CPP_LINT_DIRS:
+    # TODO: before all clang-tidy warnings are resolved, we should maintain a list of files that
+    # doesn't have clang-tidy warnings, so that clang-tidy can be executed in the limited scope
+    # without failing existing workflows.
+    - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/Py_utils.cpp"
+    - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/Py_utils.hpp"
   G_PYTHON_LINT_DIRS: ["{{.ROOT_DIR}}/clp_ffi_py", "{{.ROOT_DIR}}/tests"]
 
 tasks:
@@ -37,22 +42,18 @@ tasks:
           FLAGS: "--in-place"
 
   cpp-configs:
-    # TODO: remove this once all clang-tidy has been fixed
-    deps: [":config-cmake-project"]
     cmds:
       - "tools/yscope-dev-utils/lint-configs/symlink-cpp-lint-configs.sh"
 
   cpp-check:
     cmds:
       - task: "cpp-format-check"
-      # TODO: re-enable this once all clang-tidy has been fixed
-      # - task: "cpp-static-check"
+      - task: "cpp-static-check"
 
   cpp-fix:
     cmds:
       - task: "cpp-format-fix"
-      # TODO: re-enable this once all clang-tidy has been fixed
-      # - task: "cpp-static-fix"
+      - task: "cpp-static-fix"
 
   cpp-format-check:
     sources: &cpp_format_src_files
