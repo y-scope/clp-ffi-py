@@ -132,8 +132,8 @@ set(CLP_FFI_PY_LIB_IR_SOURCES
     ${CLP_FFI_PY_LIB_SRC_DIR}/utils.hpp
 )
 
-# NOTE: These headers are wrappers of third-party dependency libraries. They are required to silence
-# clang-tidy warnings for missing direct includes.
+# NOTE: These headers are third-party facade headers wrapped with IWYU exports to resolve clang-tidy
+# violations for missing direct includes.
 set(CLP_FFI_PY_WRAPPED_FACADE_HEADERS
     ${CLP_FFI_PY_WRAPPED_FACADE_HEADERS_DIR}/msgpack.hpp
     ${CLP_FFI_PY_WRAPPED_FACADE_HEADERS_DIR}/Python.hpp

@@ -12,8 +12,7 @@ IncludeCategories:
   # Third-party headers. Update when adding new third-party library
   - Regex: "<(clp|gsl|json|outcome)"
     Priority: 3
-  # Third-party headers with wrappers to silent clang-tidy warnings. Update when adding new
-  # third-party library
+  # Third-party facade headers wrapped with IWYU exports to resolve clang-tidy violations
   - Regex: "<wrapped_facade_headers"
     Priority: 3
   # C headers
