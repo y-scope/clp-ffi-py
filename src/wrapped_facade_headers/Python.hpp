@@ -5,9 +5,11 @@
  * 1. https://docs.python.org/3/c-api/intro.html#include-files
  * 2. https://docs.python.org/3/c-api/arg.html#strings-and-buffers
  */
+// IWYU pragma: begin_exports
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 #include <structmember.h>
+// IWYU pragma: end_exports
 
 // clang-format off
 #ifdef CLP_FFI_PY_ENABLE_LINTING

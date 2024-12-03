@@ -1,4 +1,4 @@
-#include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
+#include <wrapped_facade_headers/Python.hpp>  // Must be included before any other header files
 
 #include "utils.hpp"
 
@@ -7,8 +7,8 @@
 #include <string>
 
 #include <clp/TraceableException.hpp>
-#include <msgpack.hpp>
 #include <outcome/single-header/outcome.hpp>
+#include <wrapped_facade_headers/msgpack.hpp>
 
 #include <clp_ffi_py/ExceptionFFI.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>

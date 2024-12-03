@@ -1,7 +1,7 @@
 #ifndef CLP_FFI_PY_PYEXCEPTIONCONTEXT_HPP
 #define CLP_FFI_PY_PYEXCEPTIONCONTEXT_HPP
 
-#include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
+#include <wrapped_facade_headers/Python.hpp>  // Must be included before any other header files
 
 namespace clp_ffi_py {
 /**

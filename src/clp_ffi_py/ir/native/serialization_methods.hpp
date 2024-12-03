@@ -1,7 +1,7 @@
 #ifndef CLP_FFI_PY_IR_NATIVE_SERIALIZATION_METHODS
 #define CLP_FFI_PY_IR_NATIVE_SERIALIZATION_METHODS
 
-#include <clp_ffi_py/Python.hpp>  // Must always be included before any other header files
+#include <wrapped_facade_headers/Python.hpp>  // Must be included before any other header files
 
 // Documentation for these methods is in clp_ffi_py/ir/native/PyFourByteSerializer.cpp, as it also
 // serves as the documentation for python.
