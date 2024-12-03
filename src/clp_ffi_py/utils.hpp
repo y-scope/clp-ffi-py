@@ -1,7 +1,7 @@
 #ifndef CLP_FFI_PY_UTILS_HPP
 #define CLP_FFI_PY_UTILS_HPP
 
-#include <wrapped_dependency_headers/Python.hpp>  // Must be included before any other header files
+#include <wrapped_facade_headers/Python.hpp>  // Must be included before any other header files
 
 #include <iostream>
 #include <span>
@@ -13,7 +13,7 @@
 #include <clp/ffi/encoding_methods.hpp>
 #include <clp/TraceableException.hpp>
 #include <outcome/single-header/outcome.hpp>
-#include <wrapped_dependency_headers/msgpack.hpp>
+#include <wrapped_facade_headers/msgpack.hpp>
 
 namespace clp_ffi_py {
 /**

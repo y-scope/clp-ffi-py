@@ -1,4 +1,4 @@
-#include <wrapped_dependency_headers/Python.hpp>  // Must be included before any other header files
+#include <wrapped_facade_headers/Python.hpp>  // Must be included before any other header files
 
 #include <clp_ffi_py/ir/native/PyDeserializer.hpp>
 #include <clp_ffi_py/ir/native/PyDeserializerBuffer.hpp>

@@ -1,7 +1,7 @@
 #ifndef CLP_FFI_PY_IR_NATIVE_PYSERIALIZER_HPP
 #define CLP_FFI_PY_IR_NATIVE_PYSERIALIZER_HPP
 
-#include <wrapped_dependency_headers/Python.hpp>  // Must be included before any other header files
+#include <wrapped_facade_headers/Python.hpp>  // Must be included before any other header files
 
 #include <cstddef>
 #include <optional>

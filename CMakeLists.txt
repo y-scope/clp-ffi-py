@@ -57,7 +57,7 @@ target_compile_features(${CLP_FFI_PY_LIB_IR} PRIVATE cxx_std_20)
 
 set(CLP_FFI_PY_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(CLP_FFI_PY_LIB_SRC_DIR "${CLP_FFI_PY_SRC_DIR}/clp_ffi_py")
-set(CLP_FFI_PY_WRAPPED_DEPENDENCY_HEADERS_DIR "${CLP_FFI_PY_SRC_DIR}/wrapped_dependency_headers")
+set(CLP_FFI_PY_WRAPPED_FACADE_HEADERS_DIR "${CLP_FFI_PY_SRC_DIR}/wrapped_facade_headers")
 set(CLP_FFI_PY_CLP_CORE_DIR "${CLP_FFI_PY_SRC_DIR}/clp/components/core")
 
 # Add CLP's string_utils
@@ -134,9 +134,9 @@ set(CLP_FFI_PY_LIB_IR_SOURCES
 
 # NOTE: These headers are wrappers of third-party dependency libraries. They are required to silence
 # clang-tidy warnings for missing direct includes.
-set(CLP_FFI_PY_WRAPPED_DEPENDENCY_HEADERS
-    ${CLP_FFI_PY_WRAPPED_DEPENDENCY_HEADERS_DIR}/msgpack.hpp
-    ${CLP_FFI_PY_WRAPPED_DEPENDENCY_HEADERS_DIR}/Python.hpp
+set(CLP_FFI_PY_WRAPPED_FACADE_HEADERS
+    ${CLP_FFI_PY_WRAPPED_FACADE_HEADERS_DIR}/msgpack.hpp
+    ${CLP_FFI_PY_WRAPPED_FACADE_HEADERS_DIR}/Python.hpp
 )
 
 target_sources(
@@ -144,7 +144,7 @@ target_sources(
     PRIVATE
         ${CLP_FFI_PY_CLP_CORE_SOURCES}
         ${CLP_FFI_PY_LIB_IR_SOURCES}
-        ${CLP_FFI_PY_WRAPPED_DEPENDENCY_HEADERS}
+        ${CLP_FFI_PY_WRAPPED_FACADE_HEADERS}
 )
 
 # NOTE: We mark the include directories below as system headers so that the compiler (including
