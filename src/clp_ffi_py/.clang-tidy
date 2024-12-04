@@ -1,5 +1,9 @@
 InheritParentConfig: true
 
+Checks:
+  # Disable vararg function checks since many CPython APIs are using varargs
+  -cppcoreguidelines-pro-type-vararg
+
 CheckOptions:
   # Variable naming rules
   # Allow PyObject global variables to start with `Py_`

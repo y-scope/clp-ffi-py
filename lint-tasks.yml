@@ -111,6 +111,8 @@ tasks:
             # and so that the workflow doesn't fail due to violations in other files.
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/Py_utils.cpp"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/Py_utils.hpp"
+            - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/utils.cpp"
+            - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/utils.hpp"
             - "{{.G_CPP_WRAPPED_FACADE_HEADERS_DIR}}"
           VENV_DIR: "{{.G_LINT_VENV_DIR}}"
 
