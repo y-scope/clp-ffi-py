@@ -3,15 +3,17 @@
 
 #include <wrapped_facade_headers/Python.hpp>  // Must be included before any other header files
 
-#include <iostream>
+#include <cstddef>
+#include <cstdint>
+#include <limits>
 #include <span>
 #include <string>
 #include <string_view>
 #include <type_traits>
-#include <vector>
 
-#include <clp/ffi/encoding_methods.hpp>
+#include <clp/ir/types.hpp>
 #include <clp/TraceableException.hpp>
+#include <clp/type_utils.hpp>
 #include <outcome/single-header/outcome.hpp>
 #include <wrapped_facade_headers/msgpack.hpp>
 
@@ -24,7 +26,8 @@ namespace clp_ffi_py {
  * @return true on success.
  * @return false on failure with the relevant Python exception and error set.
  */
-auto add_python_type(PyTypeObject* new_type, char const* type_name, PyObject* module) -> bool;
+[[nodiscard]] auto
+add_python_type(PyTypeObject* new_type, char const* type_name, PyObject* module) -> bool;
 
 /**
  * Parses a Python string into std::string.
@@ -34,7 +37,7 @@ auto add_python_type(PyTypeObject* new_type, char const* type_name, PyObject* mo
  * @return true on success.
  * @return false on failure with the relevant Python exception and error set.
  */
-auto parse_py_string(PyObject* py_string, std::string& out) -> bool;
+[[nodiscard]] auto parse_py_string(PyObject* py_string, std::string& out) -> bool;
 
 /**
  * Parses a Python string into std::string_view.
@@ -44,26 +47,27 @@ auto parse_py_string(PyObject* py_string, std::string& out) -> bool;
  * @return true on success.
  * @return false on failure with the relevant Python exception and error set.
  */
-auto parse_py_string_as_string_view(PyObject* py_string, std::string_view& view) -> bool;
+[[nodiscard]] auto
+parse_py_string_as_string_view(PyObject* py_string, std::string_view& view) -> bool;
 
 /**
  * Gets the Python True/False object from a given `bool` value/expression.
  * @param is_true A boolean value/expression.
  * @return PyObject that is either Python True or Python False.
  */
-auto get_py_bool(bool is_true) -> PyObject*;
+[[nodiscard]] auto get_py_bool(bool is_true) -> PyObject*;
 
 /**
  * Parses a Python integer into an int_type variable.
- * @tparam int_type Output integer type (size and signed/unsigned).
+ * @tparam IntType Output integer type (size and signed/unsigned).
  * @param py_int PyObject that represents a Python level integer. Only PyLongObject or an instance
  * of a subtype of PyLongObject will be considered as valid input.
  * @param val The integer parsed.
  * @return true on success.
  * @return false on failure with the relevant Python exception and error set.
  */
-template <typename int_type>
-auto parse_py_int(PyObject* py_int, int_type& val) -> bool;
+template <clp::IntegerType IntType>
+[[nodiscard]] auto parse_py_int(PyObject* py_int, IntType& val) -> bool;
 
 /**
  * Unpacks the given msgpack byte sequence.
@@ -95,20 +99,20 @@ template <typename T>
     return sv.data();
 }
 
-template <typename int_type>
-auto parse_py_int(PyObject* py_int, int_type& val) -> bool {
+template <clp::IntegerType IntType>
+auto parse_py_int(PyObject* py_int, IntType& val) -> bool {
     if (false == static_cast<bool>(PyLong_Check(py_int))) {
         PyErr_SetString(PyExc_TypeError, "parse_py_int receives none-integer argument.");
         return false;
     }
 
-    if constexpr (std::is_same_v<int_type, size_t>) {
+    if constexpr (std::is_same_v<IntType, size_t>) {
         val = PyLong_AsSize_t(py_int);
-    } else if constexpr (std::is_same_v<int_type, clp::ir::epoch_time_ms_t>) {
+    } else if constexpr (std::is_same_v<IntType, clp::ir::epoch_time_ms_t>) {
         val = PyLong_AsLongLong(py_int);
-    } else if constexpr (std::is_same_v<int_type, Py_ssize_t>) {
+    } else if constexpr (std::is_same_v<IntType, Py_ssize_t>) {
         val = PyLong_AsSsize_t(py_int);
-    } else if constexpr (std::is_same_v<int_type, uint32_t>) {
+    } else if constexpr (std::is_same_v<IntType, uint32_t>) {
         uint64_t const val_as_unsigned_long{PyLong_AsUnsignedLong(py_int)};
         if (nullptr != PyErr_Occurred()) {
             return false;
@@ -123,7 +127,7 @@ auto parse_py_int(PyObject* py_int, int_type& val) -> bool {
         }
         val = static_cast<uint32_t>(val_as_unsigned_long);
     } else {
-        static_assert(cAlwaysFalse<int_type>, "Given integer type not supported.");
+        static_assert(cAlwaysFalse<IntType>, "Given integer type not supported.");
     }
 
     return (nullptr == PyErr_Occurred());

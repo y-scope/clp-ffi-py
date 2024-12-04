@@ -2,9 +2,9 @@
 
 #include "utils.hpp"
 
-#include <iostream>
 #include <span>
 #include <string>
+#include <string_view>
 
 #include <clp/TraceableException.hpp>
 #include <outcome/single-header/outcome.hpp>
@@ -32,7 +32,6 @@ auto get_py_string_data(PyObject* py_string) -> char const* {
 }  // namespace
 
 auto add_python_type(PyTypeObject* new_type, char const* type_name, PyObject* module) -> bool {
-    assert(new_type);
     if (PyType_Ready(new_type) < 0) {
         return false;
     }
@@ -56,7 +55,7 @@ auto parse_py_string_as_string_view(PyObject* py_string, std::string_view& view)
     if (nullptr == str) {
         return false;
     }
-    view = std::string_view(str);
+    view = std::string_view{str};
     return true;
 }
 
