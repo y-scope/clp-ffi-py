@@ -95,9 +95,7 @@ template <typename T>
  * @return The underlying C-string of the given constexpr string view.
  */
 [[nodiscard]] consteval auto get_c_str_from_constexpr_string_view(std::string_view const& sv
-) -> char const* {
-    return sv.data();
-}
+) -> char const*;
 
 template <clp::IntegerType IntType>
 auto parse_py_int(PyObject* py_int, IntType& val) -> bool {
@@ -131,6 +129,10 @@ auto parse_py_int(PyObject* py_int, IntType& val) -> bool {
     }
 
     return (nullptr == PyErr_Occurred());
+}
+
+consteval auto get_c_str_from_constexpr_string_view(std::string_view const& sv) -> char const* {
+    return sv.data();
 }
 }  // namespace clp_ffi_py
 

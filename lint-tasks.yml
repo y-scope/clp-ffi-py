@@ -109,8 +109,14 @@ tasks:
             # TODO: Before all clang-tidy violations are resolved, we should only run clang-tidy on
             # the files whose violations we've fixed, both to ensure they remain free of violations
             # and so that the workflow doesn't fail due to violations in other files.
+            - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/api_decoration.hpp"
+            - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/error_messages.hpp"
+            - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/ExceptionFFI.hpp"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/Py_utils.cpp"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/Py_utils.hpp"
+            - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/PyExceptionContext.hpp"
+            - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/PyObjectCast.hpp"
+            - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/PyObjectUtils.hpp"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/utils.cpp"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/utils.hpp"
             - "{{.G_CPP_WRAPPED_FACADE_HEADERS_DIR}}"

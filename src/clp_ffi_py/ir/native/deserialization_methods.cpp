@@ -184,7 +184,7 @@ auto deserialize_preamble(PyObject* Py_UNUSED(self), PyObject* py_deserializer_b
                 PyObject_TypeCheck(py_deserializer_buffer, PyDeserializerBuffer::get_py_type())
         ))
     {
-        PyErr_SetString(PyExc_TypeError, cPyTypeError);
+        PyErr_SetString(PyExc_TypeError, get_c_str_from_constexpr_string_view(cPyTypeError));
         return nullptr;
     }
 
@@ -329,7 +329,7 @@ auto deserialize_next_log_event(PyObject* Py_UNUSED(self), PyObject* args, PyObj
     if (is_query_given
         && false == static_cast<bool>(PyObject_TypeCheck(query_obj, PyQuery::get_py_type())))
     {
-        PyErr_SetString(PyExc_TypeError, cPyTypeError);
+        PyErr_SetString(PyExc_TypeError, get_c_str_from_constexpr_string_view(cPyTypeError));
         return nullptr;
     }
 

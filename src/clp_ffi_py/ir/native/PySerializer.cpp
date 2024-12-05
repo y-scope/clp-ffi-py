@@ -5,6 +5,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <new>
 #include <optional>
 #include <span>
 #include <type_traits>
@@ -400,10 +401,13 @@ auto PySerializer::init(
 ) -> bool {
     m_output_stream = output_stream;
     Py_INCREF(output_stream);
-    m_serializer = new PySerializer::ClpIrSerializer{std::move(serializer)};
+    m_serializer = new (std::nothrow) PySerializer::ClpIrSerializer{std::move(serializer)};
     m_buffer_size_limit = buffer_size_limit;
     if (nullptr == m_serializer) {
-        PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::cOutofMemoryError);
+        PyErr_SetString(
+                PyExc_RuntimeError,
+                get_c_str_from_constexpr_string_view(clp_ffi_py::cOutOfMemoryError)
+        );
         return false;
     }
     auto const preamble_size{get_ir_buf_size()};

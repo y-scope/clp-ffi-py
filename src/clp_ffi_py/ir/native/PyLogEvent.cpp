@@ -2,6 +2,8 @@
 
 #include "PyLogEvent.hpp"
 
+#include <new>
+
 #include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ir/native/LogEvent.hpp>
 #include <clp_ffi_py/ir/native/PyQuery.hpp>
@@ -64,7 +66,10 @@ auto PyLogEvent_init(PyLogEvent* self, PyObject* args, PyObject* keywords) -> in
     if (has_metadata
         && false == static_cast<bool>(PyObject_TypeCheck(metadata, PyMetadata::get_py_type())))
     {
-        PyErr_SetString(PyExc_TypeError, clp_ffi_py::cPyTypeError);
+        PyErr_SetString(
+                PyExc_TypeError,
+                get_c_str_from_constexpr_string_view(clp_ffi_py::cPyTypeError)
+        );
         return -1;
     }
 
@@ -175,13 +180,20 @@ auto PyLogEvent_setstate(PyLogEvent* self, PyObject* state) -> PyObject* {
     self->default_init();
 
     if (false == static_cast<bool>(PyDict_CheckExact(state))) {
-        PyErr_SetString(PyExc_ValueError, clp_ffi_py::cSetstateInputError);
+        PyErr_SetString(
+                PyExc_ValueError,
+                get_c_str_from_constexpr_string_view(clp_ffi_py::cSetstateInputError)
+        );
         return nullptr;
     }
 
     auto* log_message_obj{PyDict_GetItemString(state, cStateLogMessage)};
     if (nullptr == log_message_obj) {
-        PyErr_Format(PyExc_KeyError, clp_ffi_py::cSetstateKeyErrorTemplate, cStateLogMessage);
+        PyErr_Format(
+                PyExc_KeyError,
+                get_c_str_from_constexpr_string_view(clp_ffi_py::cSetstateKeyErrorTemplate),
+                cStateLogMessage
+        );
         return nullptr;
     }
     std::string log_message;
@@ -193,7 +205,7 @@ auto PyLogEvent_setstate(PyLogEvent* self, PyObject* state) -> PyObject* {
     if (nullptr == formatted_timestamp_obj) {
         PyErr_Format(
                 PyExc_KeyError,
-                clp_ffi_py::cSetstateKeyErrorTemplate,
+                get_c_str_from_constexpr_string_view(clp_ffi_py::cSetstateKeyErrorTemplate),
                 cStateFormattedTimestamp
         );
         return nullptr;
@@ -205,7 +217,11 @@ auto PyLogEvent_setstate(PyLogEvent* self, PyObject* state) -> PyObject* {
 
     auto* timestamp_obj{PyDict_GetItemString(state, cStateTimestamp)};
     if (nullptr == timestamp_obj) {
-        PyErr_Format(PyExc_KeyError, clp_ffi_py::cSetstateKeyErrorTemplate, cStateTimestamp);
+        PyErr_Format(
+                PyExc_KeyError,
+                get_c_str_from_constexpr_string_view(clp_ffi_py::cSetstateKeyErrorTemplate),
+                cStateTimestamp
+        );
         return nullptr;
     }
     clp::ir::epoch_time_ms_t timestamp{0};
@@ -215,7 +231,11 @@ auto PyLogEvent_setstate(PyLogEvent* self, PyObject* state) -> PyObject* {
 
     auto* index_obj{PyDict_GetItemString(state, cStateIndex)};
     if (nullptr == index_obj) {
-        PyErr_Format(PyExc_KeyError, clp_ffi_py::cSetstateKeyErrorTemplate, cStateIndex);
+        PyErr_Format(
+                PyExc_KeyError,
+                get_c_str_from_constexpr_string_view(clp_ffi_py::cSetstateKeyErrorTemplate),
+                cStateIndex
+        );
         return nullptr;
     }
     size_t index{0};
@@ -301,7 +321,7 @@ PyDoc_STRVAR(
 
 auto PyLogEvent_match_query(PyLogEvent* self, PyObject* query) -> PyObject* {
     if (false == static_cast<bool>(PyObject_TypeCheck(query, PyQuery::get_py_type()))) {
-        PyErr_SetString(PyExc_TypeError, cPyTypeError);
+        PyErr_SetString(PyExc_TypeError, get_c_str_from_constexpr_string_view(cPyTypeError));
         return nullptr;
     }
     auto* py_query{py_reinterpret_cast<PyQuery>(query)};
@@ -476,9 +496,12 @@ auto PyLogEvent::init(
         std::optional<std::string_view> formatted_timestamp
 ) -> bool {
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-    m_log_event = new LogEvent(log_message, timestamp, index, formatted_timestamp);
+    m_log_event = new (std::nothrow) LogEvent(log_message, timestamp, index, formatted_timestamp);
     if (nullptr == m_log_event) {
-        PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::cOutofMemoryError);
+        PyErr_SetString(
+                PyExc_RuntimeError,
+                get_c_str_from_constexpr_string_view(clp_ffi_py::cOutOfMemoryError)
+        );
         return false;
     }
     set_metadata(metadata);
@@ -510,7 +533,6 @@ auto PyLogEvent::create_new_log_event(
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
     PyLogEvent* self{PyObject_New(PyLogEvent, get_py_type())};
     if (nullptr == self) {
-        PyErr_SetString(PyExc_MemoryError, clp_ffi_py::cOutofMemoryError);
         return nullptr;
     }
     self->default_init();
