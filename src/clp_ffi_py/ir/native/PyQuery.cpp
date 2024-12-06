@@ -35,7 +35,10 @@ auto deserialize_wildcard_queries(
     }
 
     if (false == static_cast<bool>(PyObject_TypeCheck(py_wildcard_queries, &PyList_Type))) {
-        PyErr_SetString(PyExc_TypeError, clp_ffi_py::cPyTypeError);
+        PyErr_SetString(
+                PyExc_TypeError,
+                get_c_str_from_constexpr_string_view(clp_ffi_py::cPyTypeError)
+        );
         return false;
     }
 
@@ -44,7 +47,10 @@ auto deserialize_wildcard_queries(
     for (Py_ssize_t idx{0}; idx < wildcard_queries_size; ++idx) {
         auto* wildcard_query{PyList_GetItem(py_wildcard_queries, idx)};
         if (1 != PyObject_IsInstance(wildcard_query, PyQuery::get_py_wildcard_query_type())) {
-            PyErr_SetString(PyExc_TypeError, clp_ffi_py::cPyTypeError);
+            PyErr_SetString(
+                    PyExc_TypeError,
+                    get_c_str_from_constexpr_string_view(clp_ffi_py::cPyTypeError)
+            );
             return false;
         }
         auto* wildcard_query_py_str{PyObject_GetAttrString(wildcard_query, "wildcard_query")};
@@ -275,7 +281,10 @@ auto PyQuery_setstate(PyQuery* self, PyObject* state) -> PyObject* {
     self->default_init();
 
     if (false == static_cast<bool>(PyDict_CheckExact(state))) {
-        PyErr_SetString(PyExc_ValueError, clp_ffi_py::cSetstateInputError);
+        PyErr_SetString(
+                PyExc_ValueError,
+                get_c_str_from_constexpr_string_view(clp_ffi_py::cSetstateInputError)
+        );
         return nullptr;
     }
 
@@ -283,7 +292,7 @@ auto PyQuery_setstate(PyQuery* self, PyObject* state) -> PyObject* {
     if (nullptr == search_time_lower_bound_obj) {
         PyErr_Format(
                 PyExc_KeyError,
-                clp_ffi_py::cSetstateKeyErrorTemplate,
+                get_c_str_from_constexpr_string_view(clp_ffi_py::cSetstateKeyErrorTemplate),
                 cStateSearchTimeLowerBound
         );
         return nullptr;
@@ -302,7 +311,7 @@ auto PyQuery_setstate(PyQuery* self, PyObject* state) -> PyObject* {
     if (nullptr == search_time_upper_bound_obj) {
         PyErr_Format(
                 PyExc_KeyError,
-                clp_ffi_py::cSetstateKeyErrorTemplate,
+                get_c_str_from_constexpr_string_view(clp_ffi_py::cSetstateKeyErrorTemplate),
                 cStateSearchTimeUpperBound
         );
         return nullptr;
@@ -319,7 +328,11 @@ auto PyQuery_setstate(PyQuery* self, PyObject* state) -> PyObject* {
 
     auto* py_wildcard_queries{PyDict_GetItemString(state, cStateWildcardQueries)};
     if (nullptr == py_wildcard_queries) {
-        PyErr_Format(PyExc_KeyError, clp_ffi_py::cSetstateKeyErrorTemplate, cStateWildcardQueries);
+        PyErr_Format(
+                PyExc_KeyError,
+                get_c_str_from_constexpr_string_view(clp_ffi_py::cSetstateKeyErrorTemplate),
+                cStateWildcardQueries
+        );
         return nullptr;
     }
     std::vector<WildcardQuery> wildcard_queries;
@@ -333,7 +346,7 @@ auto PyQuery_setstate(PyQuery* self, PyObject* state) -> PyObject* {
     if (nullptr == search_time_termination_margin_obj) {
         PyErr_Format(
                 PyExc_KeyError,
-                clp_ffi_py::cSetstateKeyErrorTemplate,
+                get_c_str_from_constexpr_string_view(clp_ffi_py::cSetstateKeyErrorTemplate),
                 cStateSearchTimeTerminationMargin
         );
         return nullptr;
@@ -377,7 +390,7 @@ PyDoc_STRVAR(
 
 auto PyQuery_match_log_event(PyQuery* self, PyObject* log_event) -> PyObject* {
     if (false == static_cast<bool>(PyObject_TypeCheck(log_event, PyLogEvent::get_py_type()))) {
-        PyErr_SetString(PyExc_TypeError, cPyTypeError);
+        PyErr_SetString(PyExc_TypeError, get_c_str_from_constexpr_string_view(cPyTypeError));
         return nullptr;
     }
     auto* py_log_event{py_reinterpret_cast<PyLogEvent>(log_event)};
@@ -620,13 +633,16 @@ auto PyQuery::init(
                 wildcard_queries,
                 search_time_termination_margin
         );
+        if (nullptr == m_query) {
+            PyErr_SetString(
+                    PyExc_RuntimeError,
+                    get_c_str_from_constexpr_string_view(clp_ffi_py::cOutOfMemoryError)
+            );
+            return false;
+        }
     } catch (clp_ffi_py::ExceptionFFI& ex) {
         handle_traceable_exception(ex);
         m_query = nullptr;
-        return false;
-    }
-    if (nullptr == m_query) {
-        PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::cOutofMemoryError);
         return false;
     }
     return true;

@@ -57,26 +57,26 @@ auto py_releasebufferproc_cast(Src src) noexcept -> releasebufferproc {
  * @tparam T
  */
 template <typename T>
-struct is_python_object {
+struct IsPythonObject {
     static constexpr bool cValue = false;
 };
 
 /**
- * This template const expression is a wrapper of underlying `cValue` stored in `is_python_object`,
+ * This template const expression is a wrapper of underlying `cValue` stored in `IsPythonObject`,
  * which is used to determine whether a type T is a valid Python object type.
  * @tparam T
  */
 template <typename T>  // NOLINTNEXTLINE(readability-identifier-naming)
-constexpr bool is_python_object_v{is_python_object<T>::cValue};
+constexpr bool is_python_object_v{IsPythonObject<T>::cValue};
 
 /**
- * The macro to create a specialization of is_python_object for a given type T. Only types that are
+ * The macro to create a specialization of `IsPythonObject` for a given type T. Only types that are
  * marked with this macro will be considered as a valid Python object type.
  */
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define CLP_FFI_PY_MARK_AS_PYOBJECT(T) \
     template <> \
-    struct is_python_object<T> { \
+    struct IsPythonObject<T> { \
         static constexpr bool cValue = true; \
     }
 

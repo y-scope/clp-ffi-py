@@ -139,7 +139,10 @@ PyDoc_STRVAR(
 auto PyMetadata_get_timezone(PyMetadata* self) -> PyObject* {
     auto* timezone{self->get_py_timezone()};
     if (nullptr == timezone) {
-        PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::cTimezoneObjectNotInitialzed);
+        PyErr_SetString(
+                PyExc_RuntimeError,
+                get_c_str_from_constexpr_string_view(clp_ffi_py::cTimezoneObjectNotInitialized)
+        );
         return nullptr;
     }
     Py_INCREF(timezone);
@@ -227,7 +230,10 @@ auto PyMetadata::init(
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     m_metadata = new Metadata(ref_timestamp, input_timestamp_format, input_timezone);
     if (nullptr == m_metadata) {
-        PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::cOutofMemoryError);
+        PyErr_SetString(
+                PyExc_RuntimeError,
+                get_c_str_from_constexpr_string_view(clp_ffi_py::cOutOfMemoryError)
+        );
         return false;
     }
     return init_py_timezone();
@@ -243,7 +249,10 @@ auto PyMetadata::init(nlohmann::json const& metadata, bool is_four_byte_encoding
         return false;
     }
     if (nullptr == m_metadata) {
-        PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::cOutofMemoryError);
+        PyErr_SetString(
+                PyExc_RuntimeError,
+                get_c_str_from_constexpr_string_view(clp_ffi_py::cOutOfMemoryError)
+        );
         return false;
     }
     return init_py_timezone();

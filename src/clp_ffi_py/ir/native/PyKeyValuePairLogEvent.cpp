@@ -644,7 +644,10 @@ auto decode_as_encoded_text_ast(Value const& val) -> std::optional<std::string> 
 auto PyKeyValuePairLogEvent::init(clp::ffi::KeyValuePairLogEvent kv_pair_log_event) -> bool {
     m_kv_pair_log_event = new clp::ffi::KeyValuePairLogEvent{std::move(kv_pair_log_event)};
     if (nullptr == m_kv_pair_log_event) {
-        PyErr_SetString(PyExc_RuntimeError, clp_ffi_py::cOutofMemoryError);
+        PyErr_SetString(
+                PyExc_RuntimeError,
+                get_c_str_from_constexpr_string_view(clp_ffi_py::cOutOfMemoryError)
+        );
         return false;
     }
     return true;
@@ -679,7 +682,6 @@ auto PyKeyValuePairLogEvent::create(clp::ffi::KeyValuePairLogEvent kv_log_event
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
     PyKeyValuePairLogEvent* self{PyObject_New(PyKeyValuePairLogEvent, get_py_type())};
     if (nullptr == self) {
-        PyErr_SetString(PyExc_MemoryError, clp_ffi_py::cOutofMemoryError);
         return nullptr;
     }
     self->default_init();

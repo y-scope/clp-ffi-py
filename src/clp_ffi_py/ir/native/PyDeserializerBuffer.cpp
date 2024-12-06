@@ -385,7 +385,10 @@ auto PyDeserializerBuffer::create(PyObject* input_stream, Py_ssize_t buf_capacit
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
     PyDeserializerBuffer* self{PyObject_New(PyDeserializerBuffer, get_py_type())};
     if (nullptr == self) {
-        PyErr_SetString(PyExc_MemoryError, clp_ffi_py::cOutofMemoryError);
+        PyErr_SetString(
+                PyExc_MemoryError,
+                get_c_str_from_constexpr_string_view(clp_ffi_py::cOutOfMemoryError)
+        );
         return nullptr;
     }
     self->default_init();
