@@ -25,6 +25,7 @@
 #include <memoryobject.h>
 #include <methodobject.h>
 #include <modsupport.h>
+#include <moduleobject.h>
 #include <object.h>
 #include <objimpl.h>
 #include <pyerrors.h>
