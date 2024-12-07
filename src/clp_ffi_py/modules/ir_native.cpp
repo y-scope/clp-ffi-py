@@ -18,7 +18,8 @@ PyDoc_STRVAR(
         "Python interface to the CLP IR serialization and deserialization methods."
 );
 
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
+// NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 PyMethodDef Py_native_method_table[]{{nullptr, nullptr, 0, nullptr}};
 
 PyModuleDef Py_native{
@@ -28,9 +29,11 @@ PyModuleDef Py_native{
         -1,
         static_cast<PyMethodDef*>(Py_native_method_table)
 };
+
+// NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
 }  // namespace
 
-// NOLINTNEXTLINE(modernize-use-trailing-return-type)
+// NOLINTNEXTLINE(modernize-use-trailing-return-type, readability-identifier-naming)
 PyMODINIT_FUNC PyInit_native() {
     PyObject* new_module{PyModule_Create(&Py_native)};
     if (nullptr == new_module) {
