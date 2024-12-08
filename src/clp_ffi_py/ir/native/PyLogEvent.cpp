@@ -2,6 +2,8 @@
 
 #include "PyLogEvent.hpp"
 
+#include <new>
+
 #include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ir/native/LogEvent.hpp>
 #include <clp_ffi_py/ir/native/PyQuery.hpp>
@@ -494,7 +496,7 @@ auto PyLogEvent::init(
         std::optional<std::string_view> formatted_timestamp
 ) -> bool {
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-    m_log_event = new LogEvent(log_message, timestamp, index, formatted_timestamp);
+    m_log_event = new (std::nothrow) LogEvent(log_message, timestamp, index, formatted_timestamp);
     if (nullptr == m_log_event) {
         PyErr_SetString(
                 PyExc_RuntimeError,

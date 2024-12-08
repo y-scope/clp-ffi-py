@@ -4,6 +4,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <new>
 #include <optional>
 #include <span>
 #include <stack>
@@ -642,7 +643,8 @@ auto decode_as_encoded_text_ast(Value const& val) -> std::optional<std::string> 
 }  // namespace
 
 auto PyKeyValuePairLogEvent::init(clp::ffi::KeyValuePairLogEvent kv_pair_log_event) -> bool {
-    m_kv_pair_log_event = new clp::ffi::KeyValuePairLogEvent{std::move(kv_pair_log_event)};
+    m_kv_pair_log_event
+            = new (std::nothrow) clp::ffi::KeyValuePairLogEvent{std::move(kv_pair_log_event)};
     if (nullptr == m_kv_pair_log_event) {
         PyErr_SetString(
                 PyExc_RuntimeError,
