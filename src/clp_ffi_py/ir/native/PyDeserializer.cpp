@@ -2,6 +2,7 @@
 
 #include "PyDeserializer.hpp"
 
+#include <new>
 #include <system_error>
 #include <type_traits>
 #include <utility>
@@ -15,6 +16,7 @@
 #include <clp/TraceableException.hpp>
 
 #include <clp_ffi_py/api_decoration.hpp>
+#include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ir/native/DeserializerBufferReader.hpp>
 #include <clp_ffi_py/ir/native/error_messages.hpp>
 #include <clp_ffi_py/ir/native/PyKeyValuePairLogEvent.hpp>
@@ -200,9 +202,17 @@ auto PyDeserializer::init(
             );
             return false;
         }
-        m_deserializer = new clp::ffi::ir_stream::Deserializer<PyDeserializer::IrUnitHandler>{
-                std::move(deserializer_result.value())
-        };
+        m_deserializer = new (std::nothrow)
+                clp::ffi::ir_stream::Deserializer<PyDeserializer::IrUnitHandler>{
+                        std::move(deserializer_result.value())
+                };
+        if (nullptr == m_deserializer) {
+            PyErr_SetString(
+                    PyExc_RuntimeError,
+                    get_c_str_from_constexpr_string_view(cOutOfMemoryError)
+            );
+            return false;
+        }
     } catch (clp::TraceableException& exception) {
         handle_traceable_exception(exception);
         return false;
@@ -279,7 +289,12 @@ auto PyDeserializer::handle_log_event(clp::ffi::KeyValuePairLogEvent&& log_event
         // deserialized log event.
         clear_deserialized_log_event();
     }
-    m_deserialized_log_event = new clp::ffi::KeyValuePairLogEvent{std::move(log_event)};
+    m_deserialized_log_event
+            = new (std::nothrow) clp::ffi::KeyValuePairLogEvent{std::move(log_event)};
+    if (nullptr == m_deserialized_log_event) {
+        // TODO: Set this to a proper error code when user-defined error code is supported.
+        return IRErrorCode::IRErrorCode_Eof;
+    }
     return IRErrorCode::IRErrorCode_Success;
 }
 

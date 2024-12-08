@@ -3,6 +3,8 @@
 
 #include "PyQuery.hpp"
 
+#include <new>
+
 #include <clp/string_utils/string_utils.hpp>
 
 #include <clp_ffi_py/error_messages.hpp>
@@ -627,12 +629,11 @@ auto PyQuery::init(
 ) -> bool {
     try {
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        m_query = new Query(
-                search_time_lower_bound,
-                search_time_upper_bound,
-                wildcard_queries,
-                search_time_termination_margin
-        );
+        m_query = new (std::nothrow)
+                Query(search_time_lower_bound,
+                      search_time_upper_bound,
+                      wildcard_queries,
+                      search_time_termination_margin);
         if (nullptr == m_query) {
             PyErr_SetString(
                     PyExc_RuntimeError,

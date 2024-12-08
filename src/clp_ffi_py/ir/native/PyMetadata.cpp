@@ -2,6 +2,8 @@
 
 #include "PyMetadata.hpp"
 
+#include <new>
+
 #include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ExceptionFFI.hpp>
 #include <clp_ffi_py/ir/native/Metadata.hpp>
@@ -228,7 +230,7 @@ auto PyMetadata::init(
         char const* input_timezone
 ) -> bool {
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-    m_metadata = new Metadata(ref_timestamp, input_timestamp_format, input_timezone);
+    m_metadata = new (std::nothrow) Metadata(ref_timestamp, input_timestamp_format, input_timezone);
     if (nullptr == m_metadata) {
         PyErr_SetString(
                 PyExc_RuntimeError,
@@ -242,17 +244,17 @@ auto PyMetadata::init(
 auto PyMetadata::init(nlohmann::json const& metadata, bool is_four_byte_encoding) -> bool {
     try {
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        m_metadata = new Metadata(metadata, is_four_byte_encoding);
+        m_metadata = new (std::nothrow) Metadata(metadata, is_four_byte_encoding);
+        if (nullptr == m_metadata) {
+            PyErr_SetString(
+                    PyExc_RuntimeError,
+                    get_c_str_from_constexpr_string_view(clp_ffi_py::cOutOfMemoryError)
+            );
+            return false;
+        }
     } catch (clp_ffi_py::ExceptionFFI& ex) {
         handle_traceable_exception(ex);
         m_metadata = nullptr;
-        return false;
-    }
-    if (nullptr == m_metadata) {
-        PyErr_SetString(
-                PyExc_RuntimeError,
-                get_c_str_from_constexpr_string_view(clp_ffi_py::cOutOfMemoryError)
-        );
         return false;
     }
     return init_py_timezone();

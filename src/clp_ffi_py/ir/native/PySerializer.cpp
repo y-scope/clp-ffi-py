@@ -401,8 +401,8 @@ auto PySerializer::init(
 ) -> bool {
     m_output_stream = output_stream;
     Py_INCREF(output_stream);
-    m_serializer = new PySerializer::ClpIrSerializer{std::move(serializer)};
     m_buffer_size_limit = buffer_size_limit;
+    m_serializer = new (std::nothrow) PySerializer::ClpIrSerializer{std::move(serializer)};
     if (nullptr == m_serializer) {
         PyErr_SetString(
                 PyExc_RuntimeError,
