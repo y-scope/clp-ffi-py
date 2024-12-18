@@ -85,6 +85,13 @@ template <clp::IntegerType IntType>
 auto handle_traceable_exception(clp::TraceableException& exception) noexcept -> void;
 
 /**
+ * @param sv
+ * @return A new reference to the constructed Python string object from the given string view `sv`.
+ * @Return nullptr on failure with the relevant Python exception and error set.
+ */
+[[nodiscard]] auto construct_py_str_from_string_view(std::string_view sv) -> PyObject*;
+
+/**
  * A template that always evaluates as false.
  */
 template <typename T>
