@@ -31,7 +31,7 @@ project homepage on PyPI [here][7].
 
 ## Compatibility
 
-Tested on Python 3.7, 3.8, 3.11 and 3.12, and it should work on any Python
+Tested on Python 3.7, 3.8, 3.11, 3.12, and 3.13, and it should work on any Python
 version >= 3.7.
 
 ## API Reference
