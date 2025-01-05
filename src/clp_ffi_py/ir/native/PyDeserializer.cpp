@@ -48,8 +48,8 @@ PyDoc_STRVAR(
         " treated as an error.\n"
         ":type allow_incomplete_stream: bool\n"
 );
-CLP_FFI_PY_METHOD auto
-PyDeserializer_init(PyDeserializer* self, PyObject* args, PyObject* keywords) -> int;
+CLP_FFI_PY_METHOD auto PyDeserializer_init(PyDeserializer* self, PyObject* args, PyObject* keywords)
+        -> int;
 
 /**
  * Callback of `PyDeserializer`'s `deserialize_log_event`.
@@ -105,8 +105,8 @@ PyType_Spec PyDeserializer_type_spec{
         static_cast<PyType_Slot*>(PyDeserializer_slots)
 };
 
-CLP_FFI_PY_METHOD auto
-PyDeserializer_init(PyDeserializer* self, PyObject* args, PyObject* keywords) -> int {
+CLP_FFI_PY_METHOD auto PyDeserializer_init(PyDeserializer* self, PyObject* args, PyObject* keywords)
+        -> int {
     static char keyword_input_stream[]{"input_stream"};
     static char keyword_buffer_capacity[]{"buffer_capacity"};
     static char keyword_allow_incomplete_stream[]{"allow_incomplete_stream"};

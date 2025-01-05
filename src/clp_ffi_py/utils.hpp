@@ -26,8 +26,8 @@ namespace clp_ffi_py {
  * @return true on success.
  * @return false on failure with the relevant Python exception and error set.
  */
-[[nodiscard]] auto
-add_python_type(PyTypeObject* new_type, char const* type_name, PyObject* module) -> bool;
+[[nodiscard]] auto add_python_type(PyTypeObject* new_type, char const* type_name, PyObject* module)
+        -> bool;
 
 /**
  * Parses a Python string into std::string.
@@ -47,8 +47,8 @@ add_python_type(PyTypeObject* new_type, char const* type_name, PyObject* module)
  * @return true on success.
  * @return false on failure with the relevant Python exception and error set.
  */
-[[nodiscard]] auto
-parse_py_string_as_string_view(PyObject* py_string, std::string_view& view) -> bool;
+[[nodiscard]] auto parse_py_string_as_string_view(PyObject* py_string, std::string_view& view)
+        -> bool;
 
 /**
  * Gets the Python True/False object from a given `bool` value/expression.
@@ -75,8 +75,8 @@ template <clp::IntegerType IntType>
  * @return A result containing the unpacked msgpack object handle on success or an error string
  * indicating the unpack failure (forwarded from the thrown `msgpack::unpack_error`).
  */
-[[nodiscard]] auto unpack_msgpack(std::span<char const> msgpack_byte_sequence
-) -> outcome_v2::std_result<msgpack::object_handle, std::string>;
+[[nodiscard]] auto unpack_msgpack(std::span<char const> msgpack_byte_sequence)
+        -> outcome_v2::std_result<msgpack::object_handle, std::string>;
 
 /*
  * Handles a `clp::TraceableException` by setting a Python exception accordingly.
@@ -101,8 +101,8 @@ template <typename T>
  * @param sv
  * @return The underlying C-string of the given constexpr string view.
  */
-[[nodiscard]] consteval auto get_c_str_from_constexpr_string_view(std::string_view const& sv
-) -> char const*;
+[[nodiscard]] consteval auto get_c_str_from_constexpr_string_view(std::string_view const& sv)
+        -> char const*;
 
 template <clp::IntegerType IntType>
 auto parse_py_int(PyObject* py_int, IntType& val) -> bool {

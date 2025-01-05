@@ -71,8 +71,8 @@ public:
      * given kv log event.
      * @return nullptr on failure with the relevant Python exception and error set.
      */
-    [[nodiscard]] static auto create(clp::ffi::KeyValuePairLogEvent kv_log_event
-    ) -> PyKeyValuePairLogEvent*;
+    [[nodiscard]] static auto create(clp::ffi::KeyValuePairLogEvent kv_log_event)
+            -> PyKeyValuePairLogEvent*;
 
     /**
      * Gets the `PyTypeObject` that represents `PyKeyValuePair`'s Python type. This type is

@@ -118,8 +118,8 @@ PyDoc_STRVAR(
         ":return: Total number of messages deserialized so far.\n"
 );
 
-auto PyDeserializerBuffer_get_num_deserialized_log_messages(PyDeserializerBuffer* self
-) -> PyObject* {
+auto PyDeserializerBuffer_get_num_deserialized_log_messages(PyDeserializerBuffer* self)
+        -> PyObject* {
     return PyLong_FromLongLong(static_cast<long long>(self->get_num_deserialized_message()));
 }
 

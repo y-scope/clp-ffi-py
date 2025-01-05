@@ -39,7 +39,7 @@ public:
             : m_is_four_byte_encoding{true},
               m_ref_timestamp{ref_timestamp},
               m_timestamp_format{std::move(timestamp_format)},
-              m_timezone_id{std::move(timezone)} {};
+              m_timezone_id{std::move(timezone)} {}
 
     [[nodiscard]] auto is_using_four_byte_encoding() const -> bool {
         return m_is_four_byte_encoding;

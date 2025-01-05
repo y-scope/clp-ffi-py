@@ -1,8 +1,7 @@
 black>=24.4.2
 build>=0.8.0
 cibuildwheel>=2.16.2
-# Lock to v18.x until we can upgrade our code to meet v19's formatting standards.
-clang-format~=18.1
+clang-format>=19.1.6
 clang-tidy>=19.1.0
 docformatter>=1.7.5
 gersemi>=0.16.2
