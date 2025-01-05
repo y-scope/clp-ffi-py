@@ -66,8 +66,8 @@ auto get_py_bool(bool is_true) -> PyObject* {
     Py_RETURN_FALSE;
 }
 
-auto unpack_msgpack(std::span<char const> msgpack_byte_sequence
-) -> outcome_v2::std_result<msgpack::object_handle, std::string> {
+auto unpack_msgpack(std::span<char const> msgpack_byte_sequence)
+        -> outcome_v2::std_result<msgpack::object_handle, std::string> {
     msgpack::object_handle handle;
     try {
         msgpack::unpack(handle, msgpack_byte_sequence.data(), msgpack_byte_sequence.size());

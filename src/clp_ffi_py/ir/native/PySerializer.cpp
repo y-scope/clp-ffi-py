@@ -42,8 +42,8 @@ PyDoc_STRVAR(
         " it to `output_stream`. Defaults to 64 KiB.\n"
         ":type buffer_size_limit: int\n"
 );
-CLP_FFI_PY_METHOD auto
-PySerializer_init(PySerializer* self, PyObject* args, PyObject* keywords) -> int;
+CLP_FFI_PY_METHOD auto PySerializer_init(PySerializer* self, PyObject* args, PyObject* keywords)
+        -> int;
 
 /**
  * Callback of `PySerializer`'s `serialize_msgpack` method.
@@ -64,10 +64,9 @@ PyDoc_STRVAR(
         ":raise RuntimeError: If `msgpack_map` couldn't be unpacked or serialization into the IR"
         " stream failed.\n"
 );
-CLP_FFI_PY_METHOD auto PySerializer_serialize_log_event_from_msgpack_map(
-        PySerializer* self,
-        PyObject* msgpack_map
-) -> PyObject*;
+CLP_FFI_PY_METHOD auto
+PySerializer_serialize_log_event_from_msgpack_map(PySerializer* self, PyObject* msgpack_map)
+        -> PyObject*;
 
 /**
  * Callback of `PySerializer`'s `get_num_bytes_serialized` method.
@@ -140,8 +139,8 @@ PyDoc_STRVAR(
         ":param exc_value: The value of the exception that caused the exit. Unused.\n"
         ":param exc_traceable: The traceback. Unused.\n"
 );
-CLP_FFI_PY_METHOD auto
-PySerializer_exit(PySerializer* self, PyObject* args, PyObject* keywords) -> PyObject*;
+CLP_FFI_PY_METHOD auto PySerializer_exit(PySerializer* self, PyObject* args, PyObject* keywords)
+        -> PyObject*;
 
 /**
  * Callback of `PySerializer`'s deallocator.
@@ -206,8 +205,8 @@ PyType_Spec PySerializer_type_spec{
         static_cast<PyType_Slot*>(PySerializer_slots)
 };
 
-CLP_FFI_PY_METHOD auto
-PySerializer_init(PySerializer* self, PyObject* args, PyObject* keywords) -> int {
+CLP_FFI_PY_METHOD auto PySerializer_init(PySerializer* self, PyObject* args, PyObject* keywords)
+        -> int {
     static char keyword_output_stream[]{"output_stream"};
     static char keyword_buffer_size_limit[]{"buffer_size_limit"};
     static char* keyword_table[]{
@@ -286,10 +285,9 @@ PySerializer_init(PySerializer* self, PyObject* args, PyObject* keywords) -> int
     return 0;
 }
 
-CLP_FFI_PY_METHOD auto PySerializer_serialize_log_event_from_msgpack_map(
-        PySerializer* self,
-        PyObject* msgpack_map
-) -> PyObject* {
+CLP_FFI_PY_METHOD auto
+PySerializer_serialize_log_event_from_msgpack_map(PySerializer* self, PyObject* msgpack_map)
+        -> PyObject* {
     if (false == static_cast<bool>(PyBytes_Check(msgpack_map))) {
         PyErr_SetString(
                 PyExc_TypeError,
@@ -334,8 +332,8 @@ CLP_FFI_PY_METHOD auto PySerializer_enter(PySerializer* self) -> PyObject* {
     return py_reinterpret_cast<PyObject>(self);
 }
 
-CLP_FFI_PY_METHOD auto
-PySerializer_exit(PySerializer* self, PyObject* args, PyObject* keywords) -> PyObject* {
+CLP_FFI_PY_METHOD auto PySerializer_exit(PySerializer* self, PyObject* args, PyObject* keywords)
+        -> PyObject* {
     static char keyword_exc_type[]{"exc_type"};
     static char keyword_exc_value[]{"exc_value"};
     static char keyword_traceback[]{"traceback"};
@@ -426,8 +424,8 @@ auto PySerializer::assert_is_not_closed() const -> bool {
     return true;
 }
 
-auto PySerializer::serialize_log_event_from_msgpack_map(std::span<char const> msgpack_byte_sequence
-) -> std::optional<Py_ssize_t> {
+auto PySerializer::serialize_log_event_from_msgpack_map(std::span<char const> msgpack_byte_sequence)
+        -> std::optional<Py_ssize_t> {
     if (false == assert_is_not_closed()) {
         return std::nullopt;
     }
@@ -529,8 +527,8 @@ auto PySerializer::write_ir_buf_to_output_stream() -> bool {
     return true;
 }
 
-auto PySerializer::write_to_output_stream(PySerializer::BufferView buf
-) -> std::optional<Py_ssize_t> {
+auto PySerializer::write_to_output_stream(PySerializer::BufferView buf)
+        -> std::optional<Py_ssize_t> {
     if (buf.empty()) {
         return 0;
     }

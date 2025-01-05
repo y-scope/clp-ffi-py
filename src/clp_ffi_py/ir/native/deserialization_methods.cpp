@@ -59,10 +59,9 @@ concept TerminateHandlerSignature = requires(TerminateHandler handler) {
  * @param nullptr if the IR stream is incomplete not allowed, with the relevant Python exceptions
  * and error set.
  */
-[[nodiscard]] auto handle_incomplete_ir_error(
-        PyDeserializerBuffer* deserializer_buffer,
-        bool allow_incomplete_stream
-) -> std::optional<PyObject*> {
+[[nodiscard]] auto
+handle_incomplete_ir_error(PyDeserializerBuffer* deserializer_buffer, bool allow_incomplete_stream)
+        -> std::optional<PyObject*> {
     if (deserializer_buffer->try_read()) {
         return std::nullopt;
     }
