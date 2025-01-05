@@ -102,8 +102,11 @@ tasks:
     cmds:
       - task: ":utils:clang-tidy"
         vars:
+          # NOTE: Clang-tidy raises a warning in msgpack's source code, unrelated to this project.
+          # A line filter is applied as a temporary workaround to suppress this warning.
           FLAGS: >-
             --config-file "{{.CLP_FFI_PY_CPP_SRC_DIR}}/.clang-tidy"
+            --line-filter="[{\"name\":\"cpp11_zone.hpp\",\"lines\":[[197,197]]}]"
             -p "{{.CLP_FFI_PY_COMPILE_COMMANDS_DB}}"
           SRC_PATHS:
             # TODO: Before all clang-tidy violations are resolved, we should only run clang-tidy on
@@ -113,6 +116,7 @@ tasks:
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/error_messages.hpp"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/ExceptionFFI.hpp"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/ir/native/PyKeyValuePairLogEvent.cpp"
+            - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/ir/native/PyKeyValuePairLogEvent.hpp"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/modules"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/Py_utils.cpp"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/Py_utils.hpp"
