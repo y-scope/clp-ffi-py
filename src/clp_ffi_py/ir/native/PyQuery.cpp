@@ -1,4 +1,3 @@
-
 #include <wrapped_facade_headers/Python.hpp>  // Must be included before any other header files
 
 #include "PyQuery.hpp"

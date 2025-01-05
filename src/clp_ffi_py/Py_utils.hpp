@@ -24,10 +24,9 @@ namespace clp_ffi_py {
  * @return a new reference of a PyObject string that stores the formatted timestamp.
  * @return nullptr on failure with the relevant Python exception and error set.
  */
-[[nodiscard]] auto py_utils_get_formatted_timestamp(
-        clp::ir::epoch_time_ms_t timestamp,
-        PyObject* timezone
-) -> PyObject*;
+[[nodiscard]] auto
+py_utils_get_formatted_timestamp(clp::ir::epoch_time_ms_t timestamp, PyObject* timezone)
+        -> PyObject*;
 
 /**
  * CPython wrapper of `clp_ffi_py.utils.get_timezone_from_timezone_id`.
@@ -35,8 +34,8 @@ namespace clp_ffi_py {
  * @return a new reference of a Python tzinfo object that matches the input timezone id.
  * @return nullptr on failure with the relevant Python exception and error set.
  */
-[[nodiscard]] auto py_utils_get_timezone_from_timezone_id(std::string const& timezone_id
-) -> PyObject*;
+[[nodiscard]] auto py_utils_get_timezone_from_timezone_id(std::string const& timezone_id)
+        -> PyObject*;
 
 /**
  * CPython wrapper of `clp_ffi_py.utils.serialize_dict_to_msgpack`.

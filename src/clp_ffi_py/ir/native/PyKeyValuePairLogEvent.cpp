@@ -51,8 +51,8 @@ namespace {
 class IrUnitHandler {
 public:
     // Methods that implement the `clp::ffi::ir_stream::IrUnitHandlerInterface` interface
-    [[nodiscard]] auto handle_log_event(clp::ffi::KeyValuePairLogEvent&& deserialized_log_event
-    ) -> IRErrorCode {
+    [[nodiscard]] auto handle_log_event(clp::ffi::KeyValuePairLogEvent&& deserialized_log_event)
+            -> IRErrorCode {
         log_event.emplace(std::move(deserialized_log_event));
         return IRErrorCode::IRErrorCode_Success;
     }
@@ -240,11 +240,9 @@ PyDoc_STRVAR(
         " must be strings, including keys inside any sub-dictionaries.\n"
         ":type dictionary: dict[str, Any]\n"
 );
-CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_init(
-        PyKeyValuePairLogEvent* self,
-        PyObject* args,
-        PyObject* keywords
-) -> int;
+CLP_FFI_PY_METHOD auto
+PyKeyValuePairLogEvent_init(PyKeyValuePairLogEvent* self, PyObject* args, PyObject* keywords)
+        -> int;
 
 /**
  * Callback of `PyKeyValuePairLogEvent`'s `to_dict` method.
@@ -310,8 +308,8 @@ PyType_Spec PyKeyValuePairLogEvent_type_spec{
  * @return The converted key-value log event of the given dictionary on success.
  * @return std::nullopt on failure with the relevant Python exception and error set.
  */
-[[nodiscard]] auto convert_py_dict_to_key_value_pair_log_event(PyDictObject* py_dict
-) -> std::optional<clp::ffi::KeyValuePairLogEvent>;
+[[nodiscard]] auto convert_py_dict_to_key_value_pair_log_event(PyDictObject* py_dict)
+        -> std::optional<clp::ffi::KeyValuePairLogEvent>;
 
 /**
  * Serializes the given node id value pairs into a Python dictionary object.
@@ -351,11 +349,9 @@ PyType_Spec PyKeyValuePairLogEvent_type_spec{
  */
 [[nodiscard]] auto decode_as_encoded_text_ast(Value const& val) -> std::optional<std::string>;
 
-CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_init(
-        PyKeyValuePairLogEvent* self,
-        PyObject* args,
-        PyObject* keywords
-) -> int {
+CLP_FFI_PY_METHOD auto
+PyKeyValuePairLogEvent_init(PyKeyValuePairLogEvent* self, PyObject* args, PyObject* keywords)
+        -> int {
     static char keyword_dictionary[]{"dictionary"};
     static char* keyword_table[]{static_cast<char*>(keyword_dictionary), nullptr};
 
@@ -399,8 +395,8 @@ CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_dealloc(PyKeyValuePairLogEvent* se
     Py_TYPE(self)->tp_free(py_reinterpret_cast<PyObject>(self));
 }
 
-auto convert_py_dict_to_key_value_pair_log_event(PyDictObject* py_dict
-) -> std::optional<clp::ffi::KeyValuePairLogEvent> {
+auto convert_py_dict_to_key_value_pair_log_event(PyDictObject* py_dict)
+        -> std::optional<clp::ffi::KeyValuePairLogEvent> {
     PyObjectPtr<PyBytesObject> const serialized_msgpack_byte_sequence{
             py_utils_serialize_dict_to_msgpack(py_dict)
     };
@@ -679,8 +675,8 @@ auto PyKeyValuePairLogEvent::init(clp::ffi::KeyValuePairLogEvent kv_pair_log_eve
     }
 }
 
-auto PyKeyValuePairLogEvent::create(clp::ffi::KeyValuePairLogEvent kv_log_event
-) -> PyKeyValuePairLogEvent* {
+auto PyKeyValuePairLogEvent::create(clp::ffi::KeyValuePairLogEvent kv_log_event)
+        -> PyKeyValuePairLogEvent* {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
     PyKeyValuePairLogEvent* self{PyObject_New(PyKeyValuePairLogEvent, get_py_type())};
     if (nullptr == self) {

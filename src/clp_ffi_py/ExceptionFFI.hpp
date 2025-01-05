@@ -24,7 +24,7 @@ public:
             std::string message
     )
             : TraceableException{error_code, filename, line_number},
-              m_message{std::move(message)} {};
+              m_message{std::move(message)} {}
 
     [[nodiscard]] auto what() const noexcept -> char const* override { return m_message.c_str(); }
 

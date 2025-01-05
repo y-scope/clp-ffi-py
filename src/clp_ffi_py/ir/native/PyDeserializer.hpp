@@ -151,15 +151,14 @@ private:
         ~IrUnitHandler() = default;
 
         // Implements `clp::ffi::ir_stream::IrUnitHandlerInterface` interface
-        [[nodiscard]] auto handle_log_event(clp::ffi::KeyValuePairLogEvent&& log_event
-        ) -> clp::ffi::ir_stream::IRErrorCode {
+        [[nodiscard]] auto handle_log_event(clp::ffi::KeyValuePairLogEvent&& log_event)
+                -> clp::ffi::ir_stream::IRErrorCode {
             return m_log_event_handle(std::move(log_event));
         }
 
-        [[nodiscard]] auto handle_utc_offset_change(
-                clp::UtcOffset utc_offset_old,
-                clp::UtcOffset utc_offset_new
-        ) -> clp::ffi::ir_stream::IRErrorCode {
+        [[nodiscard]] auto
+        handle_utc_offset_change(clp::UtcOffset utc_offset_old, clp::UtcOffset utc_offset_new)
+                -> clp::ffi::ir_stream::IRErrorCode {
             return m_utc_offset_change_handle(utc_offset_old, utc_offset_new);
         }
 
@@ -201,8 +200,8 @@ private:
      * @return IRErrorCode::IRErrorCode_Success on success.
      *
      */
-    [[nodiscard]] auto handle_log_event(clp::ffi::KeyValuePairLogEvent&& log_event
-    ) -> clp::ffi::ir_stream::IRErrorCode;
+    [[nodiscard]] auto handle_log_event(clp::ffi::KeyValuePairLogEvent&& log_event)
+            -> clp::ffi::ir_stream::IRErrorCode;
 
     /**
      * @return Whether `m_deserialized_log_event` has been set.
