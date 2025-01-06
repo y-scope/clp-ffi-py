@@ -95,4 +95,8 @@ auto handle_traceable_exception(clp::TraceableException& exception) noexcept -> 
             exception.what()
     );
 }
+
+auto construct_py_str_from_string_view(std::string_view sv) -> PyObject* {
+    return PyUnicode_FromStringAndSize(sv.data(), static_cast<Py_ssize_t>(sv.size()));
+}
 }  // namespace clp_ffi_py

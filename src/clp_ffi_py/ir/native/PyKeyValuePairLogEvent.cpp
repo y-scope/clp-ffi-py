@@ -27,6 +27,7 @@
 #include <clp/time_types.hpp>
 #include <clp/TraceableException.hpp>
 #include <clp/type_utils.hpp>
+#include <wrapped_facade_headers/msgpack.hpp>
 
 #include <clp_ffi_py/api_decoration.hpp>
 #include <clp_ffi_py/error_messages.hpp>
@@ -173,10 +174,16 @@ public:
             );
             return false;
         }
+        PyObjectPtr<PyObject> const py_key{
+                construct_py_str_from_string_view(m_schema_tree_node->get_key_name())
+        };
+        if (nullptr == py_key) {
+            return false;
+        }
         return 0
-               == PyDict_SetItemString(
+               == PyDict_SetItem(
                        py_reinterpret_cast<PyObject>(m_parent_py_dict),
-                       m_schema_tree_node->get_key_name().data(),
+                       py_key.get(),
                        py_reinterpret_cast<PyObject>(m_py_dict.get())
                );
     }
@@ -263,7 +270,7 @@ CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_to_dict(PyKeyValuePairLogEvent* se
  */
 CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_dealloc(PyKeyValuePairLogEvent* self) -> void;
 
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
+// NOLINTNEXTLINE(*-avoid-c-arrays, cppcoreguidelines-avoid-non-const-global-variables)
 PyMethodDef PyKeyValuePairLogEvent_method_table[]{
         {"to_dict",
          py_c_function_cast(PyKeyValuePairLogEvent_to_dict),
@@ -273,7 +280,8 @@ PyMethodDef PyKeyValuePairLogEvent_method_table[]{
         {nullptr}
 };
 
-// NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
+// NOLINTBEGIN(*-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 PyType_Slot PyKeyValuePairLogEvent_slots[]{
         {Py_tp_alloc, reinterpret_cast<void*>(PyType_GenericAlloc)},
         {Py_tp_dealloc, reinterpret_cast<void*>(PyKeyValuePairLogEvent_dealloc)},
@@ -283,11 +291,12 @@ PyType_Slot PyKeyValuePairLogEvent_slots[]{
         {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyKeyValuePairLogEventDoc))},
         {0, nullptr}
 };
-// NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
+// NOLINTEND(*-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
 
 /**
  * `PyKeyValuePairLogEvent`'s Python type specifications.
  */
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 PyType_Spec PyKeyValuePairLogEvent_type_spec{
         "clp_ffi_py.ir.native.KeyValuePairLogEvent",
         sizeof(PyKeyValuePairLogEvent),
@@ -426,15 +435,19 @@ auto convert_py_dict_to_key_value_pair_log_event(PyDictObject* py_dict)
     if (serializer_result.has_error()) {
         PyErr_Format(
                 PyExc_RuntimeError,
-                cSerializerCreateErrorFormatStr.data(),
+                get_c_str_from_constexpr_string_view(cSerializerCreateErrorFormatStr),
                 serializer_result.error().message().c_str()
         );
         return std::nullopt;
     }
 
     auto& serializer{serializer_result.value()};
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-union-access)
     if (false == serializer.serialize_msgpack_map(msgpack_obj.via.map)) {
-        PyErr_SetString(PyExc_RuntimeError, cSerializerSerializeMsgpackMapError.data());
+        PyErr_SetString(
+                PyExc_RuntimeError,
+                get_c_str_from_constexpr_string_view(cSerializerSerializeMsgpackMapError)
+        );
         return std::nullopt;
     }
 
@@ -450,7 +463,7 @@ auto convert_py_dict_to_key_value_pair_log_event(PyDictObject* py_dict)
     if (deserializer_result.has_error()) {
         PyErr_Format(
                 PyExc_RuntimeError,
-                cDeserializerCreateErrorFormatStr.data(),
+                get_c_str_from_constexpr_string_view(cDeserializerCreateErrorFormatStr),
                 deserializer_result.error().message().c_str()
         );
         return std::nullopt;
@@ -463,7 +476,9 @@ auto convert_py_dict_to_key_value_pair_log_event(PyDictObject* py_dict)
         if (result.has_error()) {
             PyErr_Format(
                     PyExc_RuntimeError,
-                    cDeserializerDeserializeNextIrUnitErrorFormatStr.data(),
+                    get_c_str_from_constexpr_string_view(
+                            cDeserializerDeserializeNextIrUnitErrorFormatStr
+                    ),
                     result.error().message().c_str()
             );
             return std::nullopt;
@@ -548,13 +563,17 @@ auto serialize_node_id_value_pair_to_py_dict(
         std::optional<Value> const& optional_val,
         PyDictObject* dict
 ) -> bool {
-    auto const key_name{node.get_key_name()};
+    PyObjectPtr<PyObject> const py_key{construct_py_str_from_string_view(node.get_key_name())};
+    if (nullptr == py_key) {
+        return false;
+    }
+
     if (false == optional_val.has_value()) {
         PyObjectPtr<PyObject> const empty_dict{PyDict_New()};
         return 0
-               == PyDict_SetItemString(
+               == PyDict_SetItem(
                        py_reinterpret_cast<PyObject>(dict),
-                       key_name.data(),
+                       py_key.get(),
                        empty_dict.get()
                );
     }
@@ -617,12 +636,7 @@ auto serialize_node_id_value_pair_to_py_dict(
         return false;
     }
 
-    return 0
-           == PyDict_SetItemString(
-                   py_reinterpret_cast<PyObject>(dict),
-                   key_name.data(),
-                   py_value.get()
-           );
+    return 0 == PyDict_SetItem(py_reinterpret_cast<PyObject>(dict), py_key.get(), py_value.get());
 }
 
 auto decode_as_encoded_text_ast(Value const& val) -> std::optional<std::string> {
