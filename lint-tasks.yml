@@ -102,8 +102,8 @@ tasks:
     cmds:
       - task: ":utils:clang-tidy"
         vars:
-          # NOTE: Clang-tidy raises a warning in msgpack's source code, unrelated to this project.
-          # A line filter is applied as a temporary workaround to suppress this warning.
+          # NOTE: clang-tidy raises a warning in msgpack's source code, unrelated to this project,
+          # so we suppress the warning using a line filter until clang-tidy or msgpack is updated.
           FLAGS: >-
             --config-file "{{.CLP_FFI_PY_CPP_SRC_DIR}}/.clang-tidy"
             --line-filter="[{\"name\":\"cpp11_zone.hpp\",\"lines\":[[197,197]]}]"
