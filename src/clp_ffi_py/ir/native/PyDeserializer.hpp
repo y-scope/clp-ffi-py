@@ -4,7 +4,6 @@
 #include <wrapped_facade_headers/Python.hpp>  // Must be included before any other header files
 
 #include <functional>
-#include <system_error>
 #include <utility>
 
 #include <clp/ffi/ir_stream/decoding_methods.hpp>

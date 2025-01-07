@@ -72,7 +72,7 @@ CLP_FFI_PY_METHOD auto PyDeserializer_deserialize_log_event(PyDeserializer* self
  */
 CLP_FFI_PY_METHOD auto PyDeserializer_dealloc(PyDeserializer* self) -> void;
 
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
+// NOLINTNEXTLINE(*-avoid-c-arrays, cppcoreguidelines-avoid-non-const-global-variables)
 PyMethodDef PyDeserializer_method_table[]{
         {"deserialize_log_event",
          py_c_function_cast(PyDeserializer_deserialize_log_event),
@@ -82,7 +82,8 @@ PyMethodDef PyDeserializer_method_table[]{
         {nullptr}
 };
 
-// NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
+// NOLINTBEGIN(cppcoreguidelines-pro-type-*-cast)
+// NOLINTNEXTLINE(*-avoid-c-arrays, cppcoreguidelines-avoid-non-const-global-variables)
 PyType_Slot PyDeserializer_slots[]{
         {Py_tp_alloc, reinterpret_cast<void*>(PyType_GenericAlloc)},
         {Py_tp_dealloc, reinterpret_cast<void*>(PyDeserializer_dealloc)},
@@ -92,11 +93,12 @@ PyType_Slot PyDeserializer_slots[]{
         {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyDeserializerDoc))},
         {0, nullptr}
 };
-// NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
+// NOLINTEND(cppcoreguidelines-pro-type-*-cast)
 
 /**
  * `PyDeserializer`'s Python type specifications.
  */
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 PyType_Spec PyDeserializer_type_spec{
         "clp_ffi_py.ir.native.Deserializer",
         sizeof(PyDeserializer),
@@ -197,7 +199,7 @@ auto PyDeserializer::init(
         if (deserializer_result.has_error()) {
             PyErr_Format(
                     PyExc_RuntimeError,
-                    cDeserializerCreateErrorFormatStr.data(),
+                    get_c_str_from_constexpr_string_view(cDeserializerCreateErrorFormatStr),
                     deserializer_result.error().message().c_str()
             );
             return false;
@@ -232,7 +234,9 @@ auto PyDeserializer::deserialize_log_event() -> PyObject* {
                 if (std::errc::result_out_of_range != err) {
                     PyErr_Format(
                             PyExc_RuntimeError,
-                            cDeserializerDeserializeNextIrUnitErrorFormatStr.data(),
+                            get_c_str_from_constexpr_string_view(
+                                    cDeserializerDeserializeNextIrUnitErrorFormatStr
+                            ),
                             err.message().c_str()
                     );
                     return nullptr;
