@@ -33,6 +33,7 @@
 #include <pyport.h>
 #include <typeslots.h>
 #include <unicodeobject.h>
+#include <warnings.h>
 // IWYU pragma: end_exports
 #endif
 // clang-format on
