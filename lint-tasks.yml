@@ -117,6 +117,8 @@ tasks:
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/ExceptionFFI.hpp"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/ir/native/PyKeyValuePairLogEvent.cpp"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/ir/native/PyKeyValuePairLogEvent.hpp"
+            - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/ir/native/PySerializer.cpp"
+            - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/ir/native/PySerializer.hpp"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/modules"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/Py_utils.cpp"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/Py_utils.hpp"

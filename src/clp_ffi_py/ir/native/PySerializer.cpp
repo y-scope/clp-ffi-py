@@ -12,6 +12,7 @@
 #include <utility>
 
 #include <clp/ffi/ir_stream/protocol_constants.hpp>
+#include <wrapped_facade_headers/msgpack.hpp>
 
 #include <clp_ffi_py/api_decoration.hpp>
 #include <clp_ffi_py/error_messages.hpp>
@@ -147,7 +148,7 @@ CLP_FFI_PY_METHOD auto PySerializer_exit(PySerializer* self, PyObject* args, PyO
  */
 CLP_FFI_PY_METHOD auto PySerializer_dealloc(PySerializer* self) -> void;
 
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
+// NOLINTNEXTLINE(*-avoid-c-arrays, cppcoreguidelines-avoid-non-const-global-variables)
 PyMethodDef PySerializer_method_table[]{
         {"serialize_log_event_from_msgpack_map",
          py_c_function_cast(PySerializer_serialize_log_event_from_msgpack_map),
@@ -182,7 +183,8 @@ PyMethodDef PySerializer_method_table[]{
         {nullptr}
 };
 
-// NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
+// NOLINTBEGIN(cppcoreguidelines-pro-type-*-cast)
+// NOLINTNEXTLINE(*-avoid-c-arrays, cppcoreguidelines-avoid-non-const-global-variables)
 PyType_Slot PySerializer_slots[]{
         {Py_tp_alloc, reinterpret_cast<void*>(PyType_GenericAlloc)},
         {Py_tp_dealloc, reinterpret_cast<void*>(PySerializer_dealloc)},
@@ -192,11 +194,12 @@ PyType_Slot PySerializer_slots[]{
         {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPySerializerDoc))},
         {0, nullptr}
 };
-// NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-*-cast)
+// NOLINTEND(cppcoreguidelines-pro-type-*-cast)
 
 /**
  * `PySerializer`'s Python type specifications.
  */
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 PyType_Spec PySerializer_type_spec{
         "clp_ffi_py.ir.native.Serializer",
         sizeof(PySerializer),
@@ -271,7 +274,7 @@ CLP_FFI_PY_METHOD auto PySerializer_init(PySerializer* self, PyObject* args, PyO
     if (serializer_result.has_error()) {
         PyErr_Format(
                 PyExc_RuntimeError,
-                cSerializerCreateErrorFormatStr.data(),
+                get_c_str_from_constexpr_string_view(cSerializerCreateErrorFormatStr),
                 serializer_result.error().message().c_str()
         );
         return -1;
@@ -443,8 +446,12 @@ auto PySerializer::serialize_log_event_from_msgpack_map(std::span<char const> ms
     }
 
     auto const buffer_size_before_serialization{get_ir_buf_size()};
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-union-access)
     if (false == m_serializer->serialize_msgpack_map(msgpack_obj.via.map)) {
-        PyErr_SetString(PyExc_RuntimeError, cSerializerSerializeMsgpackMapError.data());
+        PyErr_SetString(
+                PyExc_RuntimeError,
+                get_c_str_from_constexpr_string_view(cSerializerSerializeMsgpackMapError)
+        );
         return std::nullopt;
     }
     auto const buffer_size_after_serialization{get_ir_buf_size()};
