@@ -51,7 +51,7 @@ auto DeserializerBufferReader::try_read(char* buf, size_t num_bytes_to_read, siz
         auto const bytes_to_copy{
                 buffered_bytes_view.subspan(0, std::min(buffered_bytes_view.size(), dst_buf.size()))
         };
-        std::copy(bytes_to_copy.begin(), bytes_to_copy.end(), dst_buf.begin());
+        std::ranges::copy(bytes_to_copy.begin(), bytes_to_copy.end(), dst_buf.begin());
 
         // Commit read
         auto const num_bytes_copied{bytes_to_copy.size()};
