@@ -24,6 +24,28 @@ public:
     using ClpIrSerializer = clp::ffi::ir_stream::Serializer<clp::ir::four_byte_encoded_variable_t>;
     using BufferView = ClpIrSerializer::BufferView;
 
+    /**
+     * The default buffer size limit. Any change to the value should also be applied to `__init__`'s
+     * doc string and Python stub file.
+     */
+    static constexpr size_t cDefaultBufferSizeLimit{65'536};
+
+    /**
+     * Gets the `PyTypeObject` that represents `PySerializer`'s Python type. This type is
+     * dynamically created and initialized during the execution of `module_level_init`.
+     * @return Python type object associated with `PySerializer`.
+     */
+    [[nodiscard]] static auto get_py_type() -> PyTypeObject* { return m_py_type.get(); }
+
+    /**
+     * Creates and initializes `PySerializer` as a Python type, and then incorporates this
+     * type as a Python object into the py_module module.
+     * @param py_module The Python module where the initialized `PySerializer` will be incorporated.
+     * @return true on success.
+     * @return false on failure with the relevant Python exception and error set.
+     */
+    [[nodiscard]] static auto module_level_init(PyObject* py_module) -> bool;
+
     // Delete default constructor to disable direct instantiation.
     PySerializer() = delete;
 
@@ -35,12 +57,6 @@ public:
 
     // Destructor
     ~PySerializer() = default;
-
-    /**
-     * The default buffer size limit. Any change to the value should also be applied to `__init__`'s
-     * doc string and Python stub file.
-     */
-    static constexpr size_t cDefaultBufferSizeLimit{65'536};
 
     /**
      * Initializes the underlying data with the given inputs. Since the memory allocation of
@@ -106,23 +122,9 @@ public:
      */
     [[nodiscard]] auto close() -> bool;
 
-    /**
-     * Gets the `PyTypeObject` that represents `PySerializer`'s Python type. This type is
-     * dynamically created and initialized during the execution of `module_level_init`.
-     * @return Python type object associated with `PySerializer`.
-     */
-    [[nodiscard]] static auto get_py_type() -> PyTypeObject* { return m_py_type.get(); }
-
-    /**
-     * Creates and initializes `PySerializer` as a Python type, and then incorporates this
-     * type as a Python object into the py_module module.
-     * @param py_module The Python module where the initialized `PySerializer` will be incorporated.
-     * @return true on success.
-     * @return false on failure with the relevant Python exception and error set.
-     */
-    [[nodiscard]] static auto module_level_init(PyObject* py_module) -> bool;
-
 private:
+    static inline PyObjectStaticPtr<PyTypeObject> m_py_type{nullptr};
+
     /**
      * Asserts the serializer has not been closed.
      * @return true on success, false if it's already been closed with `IOError` set.
@@ -179,8 +181,6 @@ private:
     gsl::owner<ClpIrSerializer*> m_serializer;
     Py_ssize_t m_num_total_bytes_serialized;
     Py_ssize_t m_buffer_size_limit;
-
-    static inline PyObjectStaticPtr<PyTypeObject> m_py_type{nullptr};
 };
 }  // namespace clp_ffi_py::ir::native
 

@@ -395,6 +395,16 @@ CLP_FFI_PY_METHOD auto PySerializer_dealloc(PySerializer* self) -> void {
 }
 }  // namespace
 
+auto PySerializer::module_level_init(PyObject* py_module) -> bool {
+    static_assert(std::is_trivially_destructible<PySerializer>());
+    auto* type{py_reinterpret_cast<PyTypeObject>(PyType_FromSpec(&PySerializer_type_spec))};
+    m_py_type.reset(type);
+    if (nullptr == type) {
+        return false;
+    }
+    return add_python_type(get_py_type(), "Serializer", py_module);
+}
+
 auto PySerializer::init(
         PyObject* output_stream,
         PySerializer::ClpIrSerializer serializer,
@@ -500,16 +510,6 @@ auto PySerializer::close() -> bool {
 
     close_serializer();
     return true;
-}
-
-auto PySerializer::module_level_init(PyObject* py_module) -> bool {
-    static_assert(std::is_trivially_destructible<PySerializer>());
-    auto* type{py_reinterpret_cast<PyTypeObject>(PyType_FromSpec(&PySerializer_type_spec))};
-    m_py_type.reset(type);
-    if (nullptr == type) {
-        return false;
-    }
-    return add_python_type(get_py_type(), "Serializer", py_module);
 }
 
 auto PySerializer::write_ir_buf_to_output_stream() -> bool {
