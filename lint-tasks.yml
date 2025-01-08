@@ -119,6 +119,8 @@ tasks:
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/ir/native/DeserializerBufferReader.hpp"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/ir/native/PyDeserializer.cpp"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/ir/native/PyDeserializer.hpp"
+            - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/ir/native/PyDeserializerBuffer.cpp"
+            - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/ir/native/PyDeserializerBuffer.hpp"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/ir/native/PyKeyValuePairLogEvent.cpp"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/ir/native/PyKeyValuePairLogEvent.hpp"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/ir/native/PySerializer.cpp"

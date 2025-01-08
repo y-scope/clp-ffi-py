@@ -3,9 +3,11 @@
 
 #include <wrapped_facade_headers/Python.hpp>  // Must be included before any other header files
 
+#include <cstddef>
+#include <cstdint>
 #include <span>
 
-#include <clp/ffi/ir_stream/decoding_methods.hpp>
+#include <clp/ir/types.hpp>
 
 #include <clp_ffi_py/ir/native/PyMetadata.hpp>
 #include <clp_ffi_py/PyObjectUtils.hpp>
@@ -26,6 +28,56 @@ class PyDeserializerBuffer {
 public:
     static constexpr Py_ssize_t cDefaultInitialCapacity{4096};
 
+    // Static methods
+    /**
+     * CPython-level factory function.
+     * @param input_stream
+     * @param buf_capacity
+     * @return a new reference of a `PyDeserializerBuffer` object that is initialized with the given
+     * inputs.
+     * @return nullptr on failure with the relevant Python exception and error set.
+     */
+    [[nodiscard]] static auto create(
+            PyObject* input_stream,
+            Py_ssize_t buf_capacity = PyDeserializerBuffer::cDefaultInitialCapacity
+    ) -> PyDeserializerBuffer*;
+
+    /**
+     * Gets the PyTypeObject that represents PyDeserializerBuffer's Python type. This type is
+     * dynamically created and initialized during the execution of
+     * `PyDeserializerBuffer::module_level_init`.
+     * @return Python type object associated with PyDeserializerBuffer.
+     */
+    [[nodiscard]] static auto get_py_type() -> PyTypeObject*;
+
+    /**
+     * Gets a PyObject that represents the incomplete stream error as a Python exception.
+     */
+    [[nodiscard]] static auto get_py_incomplete_stream_error() -> PyObject*;
+
+    /**
+     * Creates and initializes PyDeserializerBuffer as a Python type, and then incorporates this
+     * type as a Python object into the py_module module.
+     * @param py_module This is the Python module where the initialized PyDeserializerBuffer will be
+     * incorporated.
+     * @return true on success.
+     * @return false on failure with the relevant Python exception and error set.
+     */
+    [[nodiscard]] static auto module_level_init(PyObject* py_module) -> bool;
+
+    // Delete default constructor to disable direct instantiation.
+    PyDeserializerBuffer() = delete;
+
+    // Delete copy & move constructors and assignment operators
+    PyDeserializerBuffer(PyDeserializerBuffer const&) = delete;
+    PyDeserializerBuffer(PyDeserializerBuffer&&) = delete;
+    auto operator=(PyDeserializerBuffer const&) -> PyDeserializerBuffer& = delete;
+    auto operator=(PyDeserializerBuffer&&) -> PyDeserializerBuffer& = delete;
+
+    // Destructor
+    ~PyDeserializerBuffer() = default;
+
+    // Methods
     /**
      * Since the memory allocation of PyDeserializerBuffer is handled by CPython's allocator, cpp
      * constructors will not be explicitly called. This function serves as the default constructor
@@ -161,43 +213,10 @@ public:
      */
     [[nodiscard]] auto test_streaming(uint32_t seed) -> PyObject*;
 
-    /**
-     * CPython-level factory function.
-     * @param input_stream
-     * @param buf_capacity
-     * @return a new reference of a `PyDeserializerBuffer` object that is initialized with the given
-     * inputs.
-     * @return nullptr on failure with the relevant Python exception and error set.
-     */
-    [[nodiscard]] static auto create(
-            PyObject* input_stream,
-            Py_ssize_t buf_capacity = PyDeserializerBuffer::cDefaultInitialCapacity
-    ) -> PyDeserializerBuffer*;
-
-    /**
-     * Gets the PyTypeObject that represents PyDeserializerBuffer's Python type. This type is
-     * dynamically created and initialized during the execution of
-     * `PyDeserializerBuffer::module_level_init`.
-     * @return Python type object associated with PyDeserializerBuffer.
-     */
-    [[nodiscard]] static auto get_py_type() -> PyTypeObject*;
-
-    /**
-     * Gets a PyObject that represents the incomplete stream error as a Python exception.
-     */
-    [[nodiscard]] static auto get_py_incomplete_stream_error() -> PyObject*;
-
-    /**
-     * Creates and initializes PyDeserializerBuffer as a Python type, and then incorporates this
-     * type as a Python object into the py_module module.
-     * @param py_module This is the Python module where the initialized PyDeserializerBuffer will be
-     * incorporated.
-     * @return true on success.
-     * @return false on failure with the relevant Python exception and error set.
-     */
-    [[nodiscard]] static auto module_level_init(PyObject* py_module) -> bool;
-
 private:
+    static inline PyObjectStaticPtr<PyTypeObject> m_py_type{nullptr};
+    static inline PyObjectStaticPtr<PyObject> m_py_incomplete_stream_error{nullptr};
+
     /**
      * Cleans the consumed bytes by shifting the unconsumed bytes to the beginning of the buffer,
      * and fills the read buffer by reading from the input IR stream. If more than half of the bytes
@@ -229,9 +248,6 @@ private:
     Py_ssize_t m_num_current_bytes_consumed;
     size_t m_num_deserialized_message;
     bool m_py_buffer_protocol_enabled;
-
-    static PyObjectStaticPtr<PyTypeObject> m_py_type;
-    static PyObjectStaticPtr<PyObject> m_py_incomplete_stream_error;
 };
 }  // namespace clp_ffi_py::ir::native
 
