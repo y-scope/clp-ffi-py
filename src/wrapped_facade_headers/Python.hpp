@@ -17,6 +17,7 @@
 // IWYU pragma: begin_exports
 #include <abstract.h>
 #include <boolobject.h>
+#include <bytearrayobject.h>
 #include <bytesobject.h>
 #include <dictobject.h>
 #include <floatobject.h>
@@ -30,6 +31,7 @@
 #include <objimpl.h>
 #include <pyerrors.h>
 #include <pymacro.h>
+#include <pymem.h>
 #include <pyport.h>
 #include <typeslots.h>
 #include <unicodeobject.h>
