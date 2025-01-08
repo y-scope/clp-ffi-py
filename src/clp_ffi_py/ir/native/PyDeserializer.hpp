@@ -30,6 +30,24 @@ public:
      */
     static constexpr Py_ssize_t cDefaultBufferCapacity{65'536};
 
+    /**
+     * Gets the `PyTypeObject` that represents `PyDeserializer`'s Python type. This type is
+     * dynamically created and initialized during the execution of
+     * `PyDeserializer::module_level_init`.
+     * @return Python type object associated with `PyDeserializer`.
+     */
+    [[nodiscard]] static auto get_py_type() -> PyTypeObject* { return m_py_type.get(); }
+
+    /**
+     * Creates and initializes `PyDeserializer` as a Python type, and then incorporates this
+     * type as a Python object into the py_module module.
+     * @param py_module This is the Python module where the initialized `PyDeserializer` will be
+     * incorporated.
+     * @return true on success.
+     * @return false on failure with the relevant Python exception and error set.
+     */
+    [[nodiscard]] static auto module_level_init(PyObject* py_module) -> bool;
+
     // Delete default constructor to disable direct instantiation.
     PyDeserializer() = delete;
 
@@ -90,24 +108,6 @@ public:
      * @return nullptr on failure with the relevant Python exception and error set.
      */
     [[nodiscard]] auto deserialize_log_event() -> PyObject*;
-
-    /**
-     * Gets the `PyTypeObject` that represents `PyDeserializer`'s Python type. This type is
-     * dynamically created and initialized during the execution of
-     * `PyDeserializer::module_level_init`.
-     * @return Python type object associated with `PyDeserializer`.
-     */
-    [[nodiscard]] static auto get_py_type() -> PyTypeObject* { return m_py_type.get(); }
-
-    /**
-     * Creates and initializes `PyDeserializer` as a Python type, and then incorporates this
-     * type as a Python object into the py_module module.
-     * @param py_module This is the Python module where the initialized `PyDeserializer` will be
-     * incorporated.
-     * @return true on success.
-     * @return false on failure with the relevant Python exception and error set.
-     */
-    [[nodiscard]] static auto module_level_init(PyObject* py_module) -> bool;
 
 private:
     /**
@@ -181,6 +181,8 @@ private:
 
     using Deserializer = clp::ffi::ir_stream::Deserializer<IrUnitHandler>;
 
+    static inline PyObjectStaticPtr<PyTypeObject> m_py_type{nullptr};
+
     // Methods
     /**
      * Implements `IrUnitHandler::EndOfStreamHandle`.
@@ -244,8 +246,6 @@ private:
     gsl::owner<Deserializer*> m_deserializer;
     gsl::owner<clp::ffi::KeyValuePairLogEvent*> m_deserialized_log_event;
     // NOLINTEND(cppcoreguidelines-owning-memory)
-
-    static inline PyObjectStaticPtr<PyTypeObject> m_py_type{nullptr};
 };
 }  // namespace clp_ffi_py::ir::native
 

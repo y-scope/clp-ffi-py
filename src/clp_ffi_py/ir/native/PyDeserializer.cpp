@@ -159,6 +159,16 @@ CLP_FFI_PY_METHOD auto PyDeserializer_dealloc(PyDeserializer* self) -> void {
 }
 }  // namespace
 
+auto PyDeserializer::module_level_init(PyObject* py_module) -> bool {
+    static_assert(std::is_trivially_destructible<PyDeserializer>());
+    auto* type{py_reinterpret_cast<PyTypeObject>(PyType_FromSpec(&PyDeserializer_type_spec))};
+    m_py_type.reset(type);
+    if (nullptr == type) {
+        return false;
+    }
+    return add_python_type(get_py_type(), "Deserializer", py_module);
+}
+
 auto PyDeserializer::init(
         PyObject* input_stream,
         Py_ssize_t buffer_capacity,
@@ -271,16 +281,6 @@ auto PyDeserializer::deserialize_log_event() -> PyObject* {
     }
 
     Py_RETURN_NONE;
-}
-
-auto PyDeserializer::module_level_init(PyObject* py_module) -> bool {
-    static_assert(std::is_trivially_destructible<PyDeserializer>());
-    auto* type{py_reinterpret_cast<PyTypeObject>(PyType_FromSpec(&PyDeserializer_type_spec))};
-    m_py_type.reset(type);
-    if (nullptr == type) {
-        return false;
-    }
-    return add_python_type(get_py_type(), "Deserializer", py_module);
 }
 
 auto PyDeserializer::handle_log_event(clp::ffi::KeyValuePairLogEvent&& log_event) -> IRErrorCode {
