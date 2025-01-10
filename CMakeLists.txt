@@ -47,11 +47,7 @@ find_package(
 )
 
 set(CLP_FFI_PY_LIB_IR "native")
-python_add_library(
-    ${CLP_FFI_PY_LIB_IR}
-    MODULE
-    WITH_SOABI
-)
+python_add_library(${CLP_FFI_PY_LIB_IR} MODULE WITH_SOABI)
 
 target_compile_features(${CLP_FFI_PY_LIB_IR} PRIVATE cxx_std_20)
 
