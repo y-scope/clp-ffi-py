@@ -3,6 +3,10 @@
 
 #include <wrapped_facade_headers/Python.hpp>  // Must be included before any other header files
 
+#include <vector>
+
+#include <clp/ir/types.hpp>
+
 #include <clp_ffi_py/ir/native/Query.hpp>
 #include <clp_ffi_py/PyObjectUtils.hpp>
 
@@ -14,6 +18,47 @@ namespace clp_ffi_py::ir::native {
  */
 class PyQuery {
 public:
+    // Static methods
+    /**
+     * Gets the PyTypeObject that represents PyQuery's Python type. This type is dynamically created
+     * and initialized during the execution of `PyQuery::module_level_init`.
+     * @return Python type object associated with PyQuery.
+     */
+    [[nodiscard]] static auto get_py_type() -> PyTypeObject*;
+
+    /**
+     * Creates and initializes PyQuery as a Python type, and then incorporates this type as a Python
+     * object into the py_module module.
+     * @param py_module This is the Python module where the initialized PyQuery will be
+     * incorporated.
+     * @return true on success.
+     * @return false on failure with the relevant Python exception and error set.
+     */
+    [[nodiscard]] static auto module_level_init(PyObject* py_module) -> bool;
+
+    /**
+     * @return PyObject that represents the Python level class `WildcardQuery`.
+     */
+    [[nodiscard]] static auto get_py_wildcard_query_type() -> PyObject*;
+
+    /**
+     * @return PyObject that represents the Python level class `FullStringWildcardQuery`.
+     */
+    [[nodiscard]] static auto get_py_full_string_wildcard_query_type() -> PyObject*;
+
+    // Delete default constructor to disable direct instantiation.
+    PyQuery() = delete;
+
+    // Delete copy & move constructors and assignment operators
+    PyQuery(PyQuery const&) = delete;
+    PyQuery(PyQuery&&) = delete;
+    auto operator=(PyQuery const&) -> PyQuery& = delete;
+    auto operator=(PyQuery&&) -> PyQuery& = delete;
+
+    // Destructor
+    ~PyQuery() = default;
+
+    // Methods
     /**
      * Initializes the underlying data with the given input. Since the memory allocation of PyQuery
      * is handled by CPython's allocator, any cpp constructor will not be explicitly called. This
@@ -48,40 +93,13 @@ public:
 
     [[nodiscard]] auto get_query() -> Query* { return m_query; }
 
-    /**
-     * Gets the PyTypeObject that represents PyQuery's Python type. This type is dynamically created
-     * and initialized during the execution of `PyQuery::module_level_init`.
-     * @return Python type object associated with PyQuery.
-     */
-    [[nodiscard]] static auto get_py_type() -> PyTypeObject*;
-
-    /**
-     * Creates and initializes PyQuery as a Python type, and then incorporates this type as a Python
-     * object into the py_module module.
-     * @param py_module This is the Python module where the initialized PyQuery will be
-     * incorporated.
-     * @return true on success.
-     * @return false on failure with the relevant Python exception and error set.
-     */
-    [[nodiscard]] static auto module_level_init(PyObject* py_module) -> bool;
-
-    /**
-     * @return PyObject that represents the Python level class `WildcardQuery`.
-     */
-    [[nodiscard]] static auto get_py_wildcard_query_type() -> PyObject*;
-
-    /**
-     * @return PyObject that represents the Python level class `FullStringWildcardQuery`.
-     */
-    [[nodiscard]] static auto get_py_full_string_wildcard_query_type() -> PyObject*;
-
 private:
+    static inline PyObjectStaticPtr<PyTypeObject> m_py_type{nullptr};
+    static inline PyObjectStaticPtr<PyObject> m_py_wildcard_query_type{nullptr};
+    static inline PyObjectStaticPtr<PyObject> m_py_full_string_wildcard_query_type{nullptr};
+
     PyObject_HEAD;
     Query* m_query;
-
-    static PyObjectStaticPtr<PyTypeObject> m_py_type;
-    static PyObjectStaticPtr<PyObject> m_py_wildcard_query_type;
-    static PyObjectStaticPtr<PyObject> m_py_full_string_wildcard_query_type;
 };
 }  // namespace clp_ffi_py::ir::native
 
