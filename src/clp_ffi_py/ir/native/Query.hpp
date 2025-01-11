@@ -4,10 +4,11 @@
 #include <limits>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <clp/ErrorCode.hpp>
-#include <clp/ffi/encoding_methods.hpp>
+#include <clp/ir/types.hpp>
 
 #include <clp_ffi_py/ExceptionFFI.hpp>
 #include <clp_ffi_py/ir/native/LogEvent.hpp>
