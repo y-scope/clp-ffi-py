@@ -22,6 +22,7 @@
 #include <dictobject.h>
 #include <floatobject.h>
 #include <import.h>
+#include <listobject.h>
 #include <longobject.h>
 #include <memoryobject.h>
 #include <methodobject.h>
