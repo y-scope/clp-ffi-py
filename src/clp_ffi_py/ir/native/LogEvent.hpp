@@ -1,9 +1,12 @@
 #ifndef CLP_FFI_PY_IR_NATIVE_LOG_EVENT_HPP
 #define CLP_FFI_PY_IR_NATIVE_LOG_EVENT_HPP
 
+#include <cstddef>
 #include <optional>
+#include <string>
+#include <string_view>
 
-#include <clp/ffi/encoding_methods.hpp>
+#include <clp/ir/types.hpp>
 
 namespace clp_ffi_py::ir::native {
 /**
