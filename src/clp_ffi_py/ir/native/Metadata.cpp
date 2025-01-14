@@ -1,9 +1,14 @@
 #include "Metadata.hpp"
 
+#include <exception>
+#include <string>
+
+#include <clp/ErrorCode.hpp>
 #include <clp/ffi/ir_stream/protocol_constants.hpp>
+#include <clp/ir/types.hpp>
+#include <json/single_include/nlohmann/json.hpp>
 
 #include <clp_ffi_py/ExceptionFFI.hpp>
-#include <clp_ffi_py/ir/native/error_messages.hpp>
 
 namespace clp_ffi_py::ir::native {
 namespace {
@@ -14,8 +19,11 @@ namespace {
  * @param key The key to access the data field.
  * @return true if the data is valid.
  */
+[[nodiscard]] auto is_valid_json_string_data(nlohmann::json const& json_data, char const* key)
+        -> bool;
+
 auto is_valid_json_string_data(nlohmann::json const& json_data, char const* key) -> bool {
-    return json_data.contains(key) && json_data[key].is_string();
+    return json_data.contains(key) && json_data.at(key).is_string();
 }
 }  // namespace
 
@@ -42,7 +50,7 @@ Metadata::Metadata(nlohmann::json const& metadata, bool is_four_byte_encoding) {
         );
     }
     try {
-        std::string const ref_timestamp_str{metadata[ref_timestamp_key]};
+        std::string const ref_timestamp_str{metadata.at(ref_timestamp_key)};
         m_ref_timestamp = static_cast<clp::ir::epoch_time_ms_t>(std::stoull(ref_timestamp_str));
     } catch (std::exception const& ex) {
         throw ExceptionFFI(clp::ErrorCode_Unsupported, __FILE__, __LINE__, ex.what());
@@ -59,7 +67,7 @@ Metadata::Metadata(nlohmann::json const& metadata, bool is_four_byte_encoding) {
                 "Valid Timestamp Format cannot be found in the metadata."
         );
     }
-    m_timestamp_format = metadata[timestamp_format_key];
+    m_timestamp_format = metadata.at(timestamp_format_key);
 
     auto const* timezone_id_key{
             static_cast<char const*>(clp::ffi::ir_stream::cProtocol::Metadata::TimeZoneIdKey)
@@ -72,7 +80,6 @@ Metadata::Metadata(nlohmann::json const& metadata, bool is_four_byte_encoding) {
                 "Valid Timezone ID cannot be found in the metadata."
         );
     }
-
-    m_timezone_id = metadata[timezone_id_key];
+    m_timezone_id = metadata.at(timezone_id_key);
 }
 }  // namespace clp_ffi_py::ir::native
