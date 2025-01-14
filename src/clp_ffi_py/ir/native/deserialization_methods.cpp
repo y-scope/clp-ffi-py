@@ -2,15 +2,23 @@
 
 #include "deserialization_methods.hpp"
 
+#include <concepts>
+#include <cstddef>
+#include <cstdint>
 #include <optional>
 #include <span>
+#include <string>
+#include <string_view>
+#include <utility>
 
 #include <clp/BufferReader.hpp>
 #include <clp/ffi/ir_stream/decoding_methods.hpp>
 #include <clp/ffi/ir_stream/protocol_constants.hpp>
+#include <clp/ir/types.hpp>
 #include <clp/type_utils.hpp>
 #include <json/single_include/nlohmann/json.hpp>
 
+#include <clp_ffi_py/api_decoration.hpp>
 #include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ir/native/error_messages.hpp>
 #include <clp_ffi_py/ir/native/PyDeserializerBuffer.hpp>
@@ -18,7 +26,6 @@
 #include <clp_ffi_py/ir/native/PyMetadata.hpp>
 #include <clp_ffi_py/ir/native/PyQuery.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
-#include <clp_ffi_py/PyObjectUtils.hpp>
 #include <clp_ffi_py/utils.hpp>
 
 namespace clp_ffi_py::ir::native {
@@ -61,20 +68,7 @@ concept TerminateHandlerSignature = requires(TerminateHandler handler) {
  */
 [[nodiscard]] auto
 handle_incomplete_ir_error(PyDeserializerBuffer* deserializer_buffer, bool allow_incomplete_stream)
-        -> std::optional<PyObject*> {
-    if (deserializer_buffer->try_read()) {
-        return std::nullopt;
-    }
-    if (allow_incomplete_stream
-        && static_cast<bool>(
-                PyErr_ExceptionMatches(PyDeserializerBuffer::get_py_incomplete_stream_error())
-        ))
-    {
-        PyErr_Clear();
-        Py_RETURN_NONE;
-    }
-    return nullptr;
-}
+        -> std::optional<PyObject*>;
 
 /**
  * Deserializes the next log event from the CLP IR buffer `deserializer_buffer` until terminate
@@ -90,6 +84,35 @@ handle_incomplete_ir_error(PyDeserializerBuffer* deserializer_buffer, bool allow
  * @return PyNone if the IR stream is terminated.
  * @return nullptr on failure with the relevant Python exception and error set.
  */
+template <TerminateHandlerSignature TerminateHandler>
+[[nodiscard]] auto deserialize_log_events(
+        PyDeserializerBuffer* deserializer_buffer,
+        bool allow_incomplete_stream,
+        TerminateHandler terminate_handler
+) -> PyObject*;
+
+/**
+ * @return A new reference to `Py_None`.
+ */
+[[nodiscard]] auto get_new_ref_to_py_none() -> PyObject*;
+
+auto
+handle_incomplete_ir_error(PyDeserializerBuffer* deserializer_buffer, bool allow_incomplete_stream)
+        -> std::optional<PyObject*> {
+    if (deserializer_buffer->try_read()) {
+        return std::nullopt;
+    }
+    if (allow_incomplete_stream
+        && static_cast<bool>(
+                PyErr_ExceptionMatches(PyDeserializerBuffer::get_py_incomplete_stream_error())
+        ))
+    {
+        PyErr_Clear();
+        Py_RETURN_NONE;
+    }
+    return nullptr;
+}
+
 template <TerminateHandlerSignature TerminateHandler>
 auto deserialize_log_events(
         PyDeserializerBuffer* deserializer_buffer,
@@ -166,18 +189,15 @@ auto deserialize_log_events(
     return return_value;
 }
 
-/**
- * @return A new reference to `Py_None`.
- */
-[[nodiscard]] auto get_new_ref_to_py_none() -> PyObject* {
+auto get_new_ref_to_py_none() -> PyObject* {
     Py_INCREF(Py_None);
     return Py_None;
 }
+
 }  // namespace
 
-extern "C" {
-auto deserialize_preamble(PyObject* Py_UNUSED(self), PyObject* py_deserializer_buffer)
-        -> PyObject* {
+CLP_FFI_PY_METHOD auto
+deserialize_preamble(PyObject* Py_UNUSED(self), PyObject* py_deserializer_buffer) -> PyObject* {
     if (false
         == static_cast<bool>(
                 PyObject_TypeCheck(py_deserializer_buffer, PyDeserializerBuffer::get_py_type())
@@ -293,7 +313,8 @@ auto deserialize_preamble(PyObject* Py_UNUSED(self), PyObject* py_deserializer_b
     return py_reinterpret_cast<PyObject>(metadata);
 }
 
-auto deserialize_next_log_event(PyObject* Py_UNUSED(self), PyObject* args, PyObject* keywords)
+CLP_FFI_PY_METHOD auto
+deserialize_next_log_event(PyObject* Py_UNUSED(self), PyObject* args, PyObject* keywords)
         -> PyObject* {
     static char keyword_deserializer_buffer[]{"deserializer_buffer"};
     static char keyword_query[]{"query"};
@@ -397,6 +418,5 @@ auto deserialize_next_log_event(PyObject* Py_UNUSED(self), PyObject* args, PyObj
             static_cast<bool>(allow_incomplete_stream),
             query_terminate_handler
     );
-}
 }
 }  // namespace clp_ffi_py::ir::native

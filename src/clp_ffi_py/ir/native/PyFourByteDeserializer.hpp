@@ -11,6 +11,7 @@ namespace clp_ffi_py::ir::native {
  */
 class PyFourByteDeserializer {
 public:
+    // Static methods
     /**
      * Creates and initializes PyFourByteDeserializer as a Python type, and then incorporates this
      * type as a Python object into py_module.
@@ -21,10 +22,22 @@ public:
      */
     [[nodiscard]] static auto module_level_init(PyObject* py_module) -> bool;
 
-private:
-    PyObject_HEAD;
+    // Delete default constructor to disable direct instantiation.
+    PyFourByteDeserializer() = delete;
 
-    static PyObjectStaticPtr<PyTypeObject> m_py_type;
+    // Delete copy & move constructors and assignment operators
+    PyFourByteDeserializer(PyFourByteDeserializer const&) = delete;
+    PyFourByteDeserializer(PyFourByteDeserializer&&) = delete;
+    auto operator=(PyFourByteDeserializer const&) -> PyFourByteDeserializer& = delete;
+    auto operator=(PyFourByteDeserializer&&) -> PyFourByteDeserializer& = delete;
+
+    // Destructor
+    ~PyFourByteDeserializer() = default;
+
+private:
+    static inline PyObjectStaticPtr<PyTypeObject> m_py_type{nullptr};
+
+    PyObject_HEAD;
 };
 }  // namespace clp_ffi_py::ir::native
 
