@@ -79,7 +79,7 @@ PyType_Slot PyFourByteDeserializer_slots[]{
 // NOLINTEND(cppcoreguidelines-pro-type-*-cast)
 
 /**
- * `PyFourByteDeserializer` Python type specifications.
+ * `PyFourByteDeserializer`'s Python type specifications.
  */
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 PyType_Spec PyFourByteDeserializer_type_spec{
