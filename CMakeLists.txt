@@ -168,10 +168,5 @@ target_link_libraries(
 )
 
 if(CLP_FFI_PY_INSTALL_LIBS)
-    install(
-        TARGETS
-            ${CLP_FFI_PY_LIB_IR}
-            DESTINATION
-            ${CLP_FFI_PY_PROJECT_NAME}/ir
-    )
+    install(TARGETS ${CLP_FFI_PY_LIB_IR} DESTINATION ${CLP_FFI_PY_PROJECT_NAME}/ir)
 endif()
