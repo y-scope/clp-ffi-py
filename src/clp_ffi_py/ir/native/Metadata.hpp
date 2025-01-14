@@ -1,9 +1,10 @@
 #ifndef CLP_FFI_PY_IR_NATIVE_METADATA_HPP
 #define CLP_FFI_PY_IR_NATIVE_METADATA_HPP
 
+#include <string>
 #include <utility>
 
-#include <clp/ffi/encoding_methods.hpp>
+#include <clp/ir/types.hpp>
 #include <json/single_include/nlohmann/json.hpp>
 
 namespace clp_ffi_py::ir::native {
