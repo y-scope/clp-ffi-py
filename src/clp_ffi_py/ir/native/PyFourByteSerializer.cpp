@@ -2,12 +2,22 @@
 
 #include "PyFourByteSerializer.hpp"
 
+#include <type_traits>
+
 #include <clp_ffi_py/ir/native/serialization_methods.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
 #include <clp_ffi_py/utils.hpp>
 
 namespace clp_ffi_py::ir::native {
 namespace {
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
+PyDoc_STRVAR(
+        cPyFourByteSerializerDoc,
+        "Namespace for all CLP four byte IR serialization methods.\n\n"
+        "Methods serialize bytes from the log record to create a CLP log message. This class "
+        "should never be instantiated since it only contains static methods.\n"
+);
+
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cSerializePreambleDoc,
@@ -69,7 +79,7 @@ PyDoc_STRVAR(
         "does not contain this will be considered as an incomplete IR stream.\n"
 );
 
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
+// NOLINTNEXTLINE(*-avoid-c-arrays, cppcoreguidelines-avoid-non-const-global-variables)
 PyMethodDef PyFourByteSerializer_method_table[]{
         {"serialize_preamble",
          clp_ffi_py::ir::native::serialize_four_byte_preamble,
@@ -99,25 +109,19 @@ PyMethodDef PyFourByteSerializer_method_table[]{
         {nullptr, nullptr, 0, nullptr}
 };
 
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
-PyDoc_STRVAR(
-        cPyFourByteSerializerDoc,
-        "Namespace for all CLP four byte IR serialization methods.\n\n"
-        "Methods serialize bytes from the log record to create a CLP log message. This class "
-        "should never be instantiated since it only contains static methods.\n"
-);
-
-// NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-const-cast)
+// NOLINTBEGIN(cppcoreguidelines-pro-type-*-cast)
+// NOLINTNEXTLINE(*-avoid-c-arrays, cppcoreguidelines-avoid-non-const-global-variables)
 PyType_Slot PyFourByteSerializer_slots[]{
         {Py_tp_methods, static_cast<void*>(PyFourByteSerializer_method_table)},
         {Py_tp_doc, const_cast<void*>(static_cast<void const*>(cPyFourByteSerializerDoc))},
         {0, nullptr}
 };
-// NOLINTEND(cppcoreguidelines-avoid-c-arrays, cppcoreguidelines-pro-type-const-cast)
+// NOLINTEND(cppcoreguidelines-pro-type-*-cast)
 
 /**
- * PyFourByteSerializer Python type specifications.
+ * `PyFourByteSerializer`'s Python type specifications.
  */
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 PyType_Spec PyFourByteSerializer_type_spec{
         "clp_ffi_py.ir.native.FourByteSerializer",
         sizeof(PyFourByteSerializer),
@@ -126,8 +130,6 @@ PyType_Spec PyFourByteSerializer_type_spec{
         static_cast<PyType_Slot*>(PyFourByteSerializer_slots)
 };
 }  // namespace
-
-PyObjectStaticPtr<PyTypeObject> PyFourByteSerializer::m_py_type{nullptr};
 
 auto PyFourByteSerializer::module_level_init(PyObject* py_module) -> bool {
     static_assert(std::is_trivially_destructible<PyFourByteSerializer>());

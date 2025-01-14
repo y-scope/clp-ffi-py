@@ -22,9 +22,9 @@ public:
     [[nodiscard]] static auto module_level_init(PyObject* py_module) -> bool;
 
 private:
-    PyObject_HEAD;
+    static inline PyObjectStaticPtr<PyTypeObject> m_py_type{nullptr};
 
-    static PyObjectStaticPtr<PyTypeObject> m_py_type;
+    PyObject_HEAD;
 };
 }  // namespace clp_ffi_py::ir::native
 
