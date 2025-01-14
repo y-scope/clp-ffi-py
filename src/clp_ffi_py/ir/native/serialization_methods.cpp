@@ -15,6 +15,7 @@
 
 #include <clp_ffi_py/api_decoration.hpp>
 #include <clp_ffi_py/ir/native/error_messages.hpp>
+#include <clp_ffi_py/utils.hpp>
 
 namespace clp_ffi_py::ir::native {
 CLP_FFI_PY_METHOD auto serialize_four_byte_preamble(PyObject* Py_UNUSED(self), PyObject* args)
@@ -55,7 +56,11 @@ CLP_FFI_PY_METHOD auto serialize_four_byte_preamble(PyObject* Py_UNUSED(self), P
                 ir_buf
         ))
     {
-        PyErr_SetString(PyExc_NotImplementedError, clp_ffi_py::ir::native::cSerializePreambleError);
+        PyErr_SetString(
+                PyExc_NotImplementedError,
+                get_c_str_from_constexpr_string_view(clp_ffi_py::ir::native::cSerializePreambleError
+                )
+        );
         return nullptr;
     }
 
@@ -83,14 +88,19 @@ serialize_four_byte_message_and_timestamp_delta(PyObject* Py_UNUSED(self), PyObj
     ir_buf.reserve(input_buffer_size * 2);
 
     if (false == clp::ffi::ir_stream::four_byte_encoding::serialize_message(msg, logtype, ir_buf)) {
-        PyErr_SetString(PyExc_NotImplementedError, clp_ffi_py::ir::native::cSerializeMessageError);
+        PyErr_SetString(
+                PyExc_NotImplementedError,
+                get_c_str_from_constexpr_string_view(clp_ffi_py::ir::native::cSerializeMessageError)
+        );
         return nullptr;
     }
 
     if (false == clp::ffi::ir_stream::four_byte_encoding::serialize_timestamp(delta, ir_buf)) {
         PyErr_SetString(
                 PyExc_NotImplementedError,
-                clp_ffi_py::ir::native::cSerializeTimestampError
+                get_c_str_from_constexpr_string_view(
+                        clp_ffi_py::ir::native::cSerializeTimestampError
+                )
         );
         return nullptr;
     }
@@ -118,7 +128,10 @@ CLP_FFI_PY_METHOD auto serialize_four_byte_message(PyObject* Py_UNUSED(self), Py
 
     if (false == clp::ffi::ir_stream::four_byte_encoding::serialize_message(msg, log_type, ir_buf))
     {
-        PyErr_SetString(PyExc_NotImplementedError, clp_ffi_py::ir::native::cSerializeMessageError);
+        PyErr_SetString(
+                PyExc_NotImplementedError,
+                get_c_str_from_constexpr_string_view(clp_ffi_py::ir::native::cSerializeMessageError)
+        );
         return nullptr;
     }
 
@@ -139,7 +152,9 @@ serialize_four_byte_timestamp_delta(PyObject* Py_UNUSED(self), PyObject* args) -
     if (false == clp::ffi::ir_stream::four_byte_encoding::serialize_timestamp(delta, ir_buf)) {
         PyErr_SetString(
                 PyExc_NotImplementedError,
-                clp_ffi_py::ir::native::cSerializeTimestampError
+                get_c_str_from_constexpr_string_view(
+                        clp_ffi_py::ir::native::cSerializeTimestampError
+                )
         );
         return nullptr;
     }

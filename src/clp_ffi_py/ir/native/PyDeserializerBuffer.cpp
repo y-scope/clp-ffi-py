@@ -405,7 +405,10 @@ auto PyDeserializerBuffer::py_getbuffer(Py_buffer* view, int flags) -> int {
 
 auto PyDeserializerBuffer::commit_read_buffer_consumption(Py_ssize_t num_bytes_consumed) -> bool {
     if (get_num_unconsumed_bytes() < num_bytes_consumed) {
-        PyErr_SetString(PyExc_OverflowError, cDeserializerBufferOverflowError);
+        PyErr_SetString(
+                PyExc_OverflowError,
+                get_c_str_from_constexpr_string_view(cDeserializerBufferOverflowError)
+        );
         return false;
     }
     m_num_current_bytes_consumed += num_bytes_consumed;
@@ -418,7 +421,10 @@ auto PyDeserializerBuffer::try_read() -> bool {
         return false;
     }
     if (0 == num_bytes_read) {
-        PyErr_SetString(get_py_incomplete_stream_error(), cDeserializerIncompleteIRError);
+        PyErr_SetString(
+                get_py_incomplete_stream_error(),
+                get_c_str_from_constexpr_string_view(cDeserializerIncompleteIRError)
+        );
         return false;
     }
     return true;

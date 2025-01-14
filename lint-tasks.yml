@@ -119,6 +119,7 @@ tasks:
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/ir/native/deserialization_methods.hpp"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/ir/native/DeserializerBufferReader.cpp"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/ir/native/DeserializerBufferReader.hpp"
+            - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/ir/native/error_messages.hpp"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/ir/native/LogEvent.hpp"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/ir/native/Metadata.cpp"
             - "{{.CLP_FFI_PY_CPP_SRC_DIR}}/ir/native/Metadata.hpp"
