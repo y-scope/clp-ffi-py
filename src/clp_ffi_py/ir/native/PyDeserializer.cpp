@@ -309,7 +309,7 @@ auto PyDeserializer::handle_incomplete_stream_error() -> bool {
     }
     PyErr_SetString(
             PyDeserializerBuffer::get_py_incomplete_stream_error(),
-            cDeserializerIncompleteIRError
+            get_c_str_from_constexpr_string_view(cDeserializerIncompleteIRError)
     );
     return false;
 }

@@ -137,7 +137,11 @@ auto deserialize_log_events(
             IRErrorCode::IRErrorCode_Success != err)
         {
             if (IRErrorCode::IRErrorCode_Incomplete_IR != err) {
-                PyErr_Format(PyExc_RuntimeError, cDeserializerErrorCodeFormatStr, err);
+                PyErr_Format(
+                        PyExc_RuntimeError,
+                        get_c_str_from_constexpr_string_view(cDeserializerErrorCodeFormatStr),
+                        err
+                );
                 return nullptr;
             }
             if (auto const ret_val{
@@ -170,7 +174,11 @@ auto deserialize_log_events(
             continue;
         }
         if (IRErrorCode::IRErrorCode_Success != err) {
-            PyErr_Format(PyExc_RuntimeError, cDeserializerErrorCodeFormatStr, err);
+            PyErr_Format(
+                    PyExc_RuntimeError,
+                    get_c_str_from_constexpr_string_view(cDeserializerErrorCodeFormatStr),
+                    err
+            );
             return nullptr;
         }
 
@@ -222,7 +230,11 @@ deserialize_preamble(PyObject* Py_UNUSED(self), PyObject* py_deserializer_buffer
             break;
         }
         if (IRErrorCode::IRErrorCode_Incomplete_IR != err) {
-            PyErr_Format(PyExc_RuntimeError, cDeserializerErrorCodeFormatStr, err);
+            PyErr_Format(
+                    PyExc_RuntimeError,
+                    get_c_str_from_constexpr_string_view(cDeserializerErrorCodeFormatStr),
+                    err
+            );
             return nullptr;
         }
         if (false == deserializer_buffer->try_read()) {
@@ -256,7 +268,11 @@ deserialize_preamble(PyObject* Py_UNUSED(self), PyObject* py_deserializer_buffer
             break;
         }
         if (IRErrorCode ::IRErrorCode_Incomplete_IR != err) {
-            PyErr_Format(PyExc_RuntimeError, cDeserializerErrorCodeFormatStr, err);
+            PyErr_Format(
+                    PyExc_RuntimeError,
+                    get_c_str_from_constexpr_string_view(cDeserializerErrorCodeFormatStr),
+                    err
+            );
             return nullptr;
         }
         if (false == deserializer_buffer->try_read()) {
