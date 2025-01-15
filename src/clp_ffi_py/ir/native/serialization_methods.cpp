@@ -2,15 +2,23 @@
 
 #include "serialization_methods.hpp"
 
-#include <clp/ffi/encoding_methods.hpp>
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <string_view>
+#include <vector>
+
 #include <clp/ffi/ir_stream/encoding_methods.hpp>
 #include <clp/ffi/ir_stream/protocol_constants.hpp>
+#include <clp/ir/types.hpp>
 #include <clp/type_utils.hpp>
 
+#include <clp_ffi_py/api_decoration.hpp>
 #include <clp_ffi_py/ir/native/error_messages.hpp>
 
 namespace clp_ffi_py::ir::native {
-auto serialize_four_byte_preamble(PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
+CLP_FFI_PY_METHOD auto serialize_four_byte_preamble(PyObject* Py_UNUSED(self), PyObject* args)
+        -> PyObject* {
     clp::ir::epoch_time_ms_t ref_timestamp{};
     char const* input_timestamp_format{};
     char const* input_timezone{};
@@ -57,7 +65,8 @@ auto serialize_four_byte_preamble(PyObject* Py_UNUSED(self), PyObject* args) -> 
     );
 }
 
-auto serialize_four_byte_message_and_timestamp_delta(PyObject* Py_UNUSED(self), PyObject* args)
+CLP_FFI_PY_METHOD auto
+serialize_four_byte_message_and_timestamp_delta(PyObject* Py_UNUSED(self), PyObject* args)
         -> PyObject* {
     clp::ir::epoch_time_ms_t delta{};
     char const* input_buffer{};
@@ -92,7 +101,8 @@ auto serialize_four_byte_message_and_timestamp_delta(PyObject* Py_UNUSED(self), 
     );
 }
 
-auto serialize_four_byte_message(PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
+CLP_FFI_PY_METHOD auto serialize_four_byte_message(PyObject* Py_UNUSED(self), PyObject* args)
+        -> PyObject* {
     char const* input_buffer{};
     Py_ssize_t input_buffer_size{};
     if (0 == PyArg_ParseTuple(args, "y#", &input_buffer, &input_buffer_size)) {
@@ -118,7 +128,8 @@ auto serialize_four_byte_message(PyObject* Py_UNUSED(self), PyObject* args) -> P
     );
 }
 
-auto serialize_four_byte_timestamp_delta(PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
+CLP_FFI_PY_METHOD auto
+serialize_four_byte_timestamp_delta(PyObject* Py_UNUSED(self), PyObject* args) -> PyObject* {
     clp::ir::epoch_time_ms_t delta{};
     if (0 == PyArg_ParseTuple(args, "L", &delta)) {
         return nullptr;
@@ -139,8 +150,8 @@ auto serialize_four_byte_timestamp_delta(PyObject* Py_UNUSED(self), PyObject* ar
     );
 }
 
-auto serialize_end_of_ir(PyObject* Py_UNUSED(self)) -> PyObject* {
-    static constexpr char cEof{clp::ffi::ir_stream::cProtocol::Eof};
+CLP_FFI_PY_METHOD auto serialize_end_of_ir(PyObject* Py_UNUSED(self)) -> PyObject* {
+    constexpr char cEof{clp::ffi::ir_stream::cProtocol::Eof};
     return PyByteArray_FromStringAndSize(&cEof, sizeof(cEof));
 }
 }  // namespace clp_ffi_py::ir::native
