@@ -7,10 +7,12 @@ on:
       - ".gitmodules"
       - "CMakeLists.txt"
       - "clp_ffi_py/**"
+      - "lint-tasks.yml"
       - "pyproject.toml"
       - "README.md"
       - "requirements-dev.txt"
       - "src/**"
+      - "Taskfile.yml"
       - "tests/**"
   push:
     paths:
@@ -18,10 +20,12 @@ on:
       - ".gitmodules"
       - "CMakeLists.txt"
       - "clp_ffi_py/**"
+      - "lint-tasks.yml"
       - "pyproject.toml"
       - "README.md"
       - "requirements-dev.txt"
       - "src/**"
+      - "Taskfile.yml"
       - "tests/**"
   schedule:
     # Run every Tuesday at 00:15 UTC (the 15 is to avoid periods of high load)
