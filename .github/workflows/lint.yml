@@ -1,0 +1,61 @@
+name: "Lint"
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/*.yml"
+      - ".gitmodules"
+      - "CMakeLists.txt"
+      - "clp_ffi_py/**"
+      - "pyproject.toml"
+      - "requirements-dev.txt"
+      - "src/**"
+      - "Taskfile.yml"
+      - "tests/**"
+  push:
+    paths:
+      - ".github/workflows/*.yml"
+      - ".gitmodules"
+      - "CMakeLists.txt"
+      - "clp_ffi_py/**"
+      - "pyproject.toml"
+      - "requirements-dev.txt"
+      - "src/**"
+      - "Taskfile.yml"
+      - "tests/**"
+  schedule:
+    # Run every Tuesday at 00:15 UTC (the 15 is to avoid periods of high load)
+    - cron: "15 0 * * 2"
+
+concurrency:
+  group: "${{github.workflow}}-${{github.ref}}"
+  # Cancel in-progress jobs for efficiency
+  cancel-in-progress: true
+
+jobs:
+  lint-check:
+    strategy:
+      matrix:
+        os: ["macos-latest", "ubuntu-latest"]
+    runs-on: "${{matrix.os}}"
+    steps:
+      - uses: "actions/checkout@v4"
+        with:
+          submodules: "recursive"
+
+      - uses: "actions/setup-python@v5"
+        with:
+          # NOTE: We resolve some of clang-tidy's IWYU violations using CPython 3.10's headers, so
+          # we need to use the same version of Python when running clang-tidy.
+          python-version: "3.10"
+
+      - run: |
+          pip install --upgrade pip
+
+      - run: "npm install -g @go-task/cli"
+
+      - if: "matrix.os == 'macos-latest'"
+        name: "Install coreutils (for md5sum)"
+        run: "brew install coreutils"
+
+      - run: "task lint:check"

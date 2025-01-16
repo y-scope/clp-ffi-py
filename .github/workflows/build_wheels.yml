@@ -7,7 +7,6 @@ on:
       - ".gitmodules"
       - "CMakeLists.txt"
       - "clp_ffi_py/**"
-      - "lint-tasks.yml"
       - "pyproject.toml"
       - "README.md"
       - "requirements-dev.txt"
@@ -20,7 +19,6 @@ on:
       - ".gitmodules"
       - "CMakeLists.txt"
       - "clp_ffi_py/**"
-      - "lint-tasks.yml"
       - "pyproject.toml"
       - "README.md"
       - "requirements-dev.txt"
@@ -37,28 +35,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  linters:
-    runs-on: "ubuntu-latest"
-    steps:
-      - uses: "actions/checkout@v4"
-        with:
-          submodules: "recursive"
-
-      - uses: "actions/setup-python@v5"
-        with:
-          # NOTE: We resolve some of clang-tidy's IWYU violations using CPython 3.10's headers, so
-          # we need to use the same version of Python when running clang-tidy.
-          python-version: "3.10"
-
-      - run: |
-          pip install --upgrade pip
-
-      - run: "npm install -g @go-task/cli"
-
-      - run: "task lint:check"
-
   build_wheels:
-    needs: ["linters"]
     name: "Build ${{ matrix.build.name }}"
     runs-on: "${{ matrix.build.os }}"
     strategy:
