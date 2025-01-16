@@ -38,7 +38,6 @@ concurrency:
 
 jobs:
   build_wheels:
-    needs: ["linters"]
     name: "Build ${{ matrix.build.name }}"
     runs-on: "${{ matrix.build.os }}"
     strategy:
