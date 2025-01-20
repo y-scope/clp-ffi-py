@@ -52,22 +52,28 @@ CLP_FFI_PY_METHOD auto PySerializer_init(PySerializer* self, PyObject* args, PyO
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
 PyDoc_STRVAR(
         cPySerializerSerializeLogEventFromMsgpackMapDoc,
-        "serialize_log_event_from_msgpack_map(self, msgpack_map)\n"
+        "serialize_log_event_from_msgpack_map(self, auto_gen_msgpack_map, user_gen_msgpack_map)\n"
         "--\n\n"
         "Serializes the given log event.\n\n"
-        ":param msgpack_map: The log event as a packed msgpack map where all keys are"
-        " strings.\n"
-        ":type msgpack_map: bytes\n"
+        ":param auto_gen_msgpack_map: The auto-generated key-value pairs of the log event as a"
+        " packed msgpack map where all keys are strings.\n"
+        ":type auto_gen_msgpack_map: bytes\n"
+        ":param user_gen_msgpack_map: The user-generated key-value pairs of the log event as a"
+        " packed msgpack map where all keys are strings.\n"
+        ":type user_gen_msgpack_map: bytes\n"
         ":return: The number of bytes serialized.\n"
         ":rtype: int\n"
         ":raise IOError: If the serializer has already been closed.\n"
-        ":raise TypeError: If `msgpack_map` is not a packed msgpack map.\n"
-        ":raise RuntimeError: If `msgpack_map` couldn't be unpacked or serialization into the IR"
-        " stream failed.\n"
+        ":raise TypeError: If `auto_gen_msgpack_map` or `user_gen_msgpack_map` is not a packed"
+        " msgpack map.\n"
+        ":raise RuntimeError: If `auto_gen_msgpack_map` or `user_gen_msgpack_map` couldn't be"
+        " unpacked or serialization into the IR stream failed.\n"
 );
-CLP_FFI_PY_METHOD auto
-PySerializer_serialize_log_event_from_msgpack_map(PySerializer* self, PyObject* msgpack_map)
-        -> PyObject*;
+CLP_FFI_PY_METHOD auto PySerializer_serialize_log_event_from_msgpack_map(
+        PySerializer* self,
+        PyObject* args,
+        PyObject* keywords
+) -> PyObject*;
 
 /**
  * Callback of `PySerializer`'s `get_num_bytes_serialized` method.
@@ -152,7 +158,7 @@ CLP_FFI_PY_METHOD auto PySerializer_dealloc(PySerializer* self) -> void;
 PyMethodDef PySerializer_method_table[]{
         {"serialize_log_event_from_msgpack_map",
          py_c_function_cast(PySerializer_serialize_log_event_from_msgpack_map),
-         METH_O,
+         METH_VARARGS | METH_KEYWORDS,
          static_cast<char const*>(cPySerializerSerializeLogEventFromMsgpackMapDoc)},
 
         {"get_num_bytes_serialized",
@@ -288,22 +294,41 @@ CLP_FFI_PY_METHOD auto PySerializer_init(PySerializer* self, PyObject* args, PyO
     return 0;
 }
 
-CLP_FFI_PY_METHOD auto
-PySerializer_serialize_log_event_from_msgpack_map(PySerializer* self, PyObject* msgpack_map)
-        -> PyObject* {
-    if (false == static_cast<bool>(PyBytes_Check(msgpack_map))) {
-        PyErr_SetString(
-                PyExc_TypeError,
-                "`msgpack_byte_sequence` is supposed to return a `bytes` object"
-        );
+CLP_FFI_PY_METHOD auto PySerializer_serialize_log_event_from_msgpack_map(
+        PySerializer* self,
+        PyObject* args,
+        PyObject* keywords
+) -> PyObject* {
+    static char keyword_auto_gen_msgpack_map[]{"auto_gen_msgpack_map"};
+    static char keyword_user_gen_msgpack_map[]{"user_gen_msgpack_map"};
+    static char* keyword_table[]{
+            static_cast<char*>(keyword_auto_gen_msgpack_map),
+            static_cast<char*>(keyword_user_gen_msgpack_map),
+            nullptr
+    };
+
+    char const* auto_gen_msgpack_map{};
+    Py_ssize_t auto_gen_msgpack_map_size{};
+    char const* user_gen_msgpack_map{};
+    Py_ssize_t user_gen_msgpack_map_size{};
+    if (false
+        == static_cast<bool>(PyArg_ParseTupleAndKeywords(
+                args,
+                keywords,
+                "y#y#",
+                static_cast<char**>(keyword_table),
+                &auto_gen_msgpack_map,
+                &auto_gen_msgpack_map_size,
+                &user_gen_msgpack_map,
+                &user_gen_msgpack_map_size
+        )))
+    {
         return nullptr;
     }
 
-    auto* py_bytes_msgpack_map{py_reinterpret_cast<PyBytesObject>(msgpack_map)};
-    // Since the type is already checked, we can use the macro to avoid duplicated type checking.
     auto const num_byte_serialized{self->serialize_log_event_from_msgpack_map(
-            {PyBytes_AS_STRING(py_bytes_msgpack_map),
-             static_cast<size_t>(PyBytes_GET_SIZE(py_bytes_msgpack_map))}
+            {auto_gen_msgpack_map, static_cast<size_t>(auto_gen_msgpack_map_size)},
+            {user_gen_msgpack_map, static_cast<size_t>(user_gen_msgpack_map_size)}
     )};
     if (false == num_byte_serialized.has_value()) {
         return nullptr;
@@ -437,27 +462,33 @@ auto PySerializer::assert_is_not_closed() const -> bool {
     return true;
 }
 
-auto PySerializer::serialize_log_event_from_msgpack_map(std::span<char const> msgpack_byte_sequence)
-        -> std::optional<Py_ssize_t> {
+auto PySerializer::serialize_log_event_from_msgpack_map(
+        std::span<char const> auto_gen_msgpack_map,
+        std::span<char const> user_gen_msgpack_map
+) -> std::optional<Py_ssize_t> {
     if (false == assert_is_not_closed()) {
         return std::nullopt;
     }
 
-    auto const unpack_result{unpack_msgpack(msgpack_byte_sequence)};
-    if (unpack_result.has_error()) {
-        PyErr_SetString(PyExc_RuntimeError, unpack_result.error().c_str());
+    auto const optional_auto_gen_msgpack_map_handle{unpack_msgpack_map(auto_gen_msgpack_map)};
+    if (false == optional_auto_gen_msgpack_map_handle.has_value()) {
         return std::nullopt;
     }
 
-    auto const& msgpack_obj{unpack_result.value().get()};
-    if (msgpack::type::MAP != msgpack_obj.type) {
-        PyErr_SetString(PyExc_TypeError, "Unpacked msgpack is not a map");
+    auto const optional_user_gen_msgpack_map_handle{unpack_msgpack_map(user_gen_msgpack_map)};
+    if (false == optional_user_gen_msgpack_map_handle.has_value()) {
         return std::nullopt;
     }
 
     auto const buffer_size_before_serialization{get_ir_buf_size()};
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-union-access)
-    if (false == m_serializer->serialize_msgpack_map(msgpack_obj.via.map)) {
+    // NOLINTBEGIN(cppcoreguidelines-pro-type-union-access)
+    if (false
+        == m_serializer->serialize_msgpack_map(
+                optional_auto_gen_msgpack_map_handle.value().get().via.map,
+                optional_user_gen_msgpack_map_handle.value().get().via.map
+        ))
+    // NOLINTEND(cppcoreguidelines-pro-type-union-access)
+    {
         PyErr_SetString(
                 PyExc_RuntimeError,
                 get_c_str_from_constexpr_string_view(cSerializerSerializeMsgpackMapError)

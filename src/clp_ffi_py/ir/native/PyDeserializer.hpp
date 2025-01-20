@@ -121,9 +121,10 @@ private:
                 = std::function<clp::ffi::ir_stream::IRErrorCode(clp::ffi::KeyValuePairLogEvent&&)>;
         using UtcOffsetChangeHandle
                 = std::function<clp::ffi::ir_stream::IRErrorCode(clp::UtcOffset, clp::UtcOffset)>;
-        using SchemaTreeNodeInsertionHandle
-                = std::function<clp::ffi::ir_stream::IRErrorCode(clp::ffi::SchemaTree::NodeLocator
-                )>;
+        using SchemaTreeNodeInsertionHandle = std::function<clp::ffi::ir_stream::IRErrorCode(
+                bool is_auto_generated,
+                clp::ffi::SchemaTree::NodeLocator
+        )>;
         using EndOfStreamHandle = std::function<clp::ffi::ir_stream::IRErrorCode()>;
 
         // Constructor
@@ -162,9 +163,10 @@ private:
         }
 
         [[nodiscard]] auto handle_schema_tree_node_insertion(
+                bool is_auto_generated,
                 clp::ffi::SchemaTree::NodeLocator schema_tree_node_locator
         ) -> clp::ffi::ir_stream::IRErrorCode {
-            return m_schema_tree_node_insertion_handle(schema_tree_node_locator);
+            return m_schema_tree_node_insertion_handle(is_auto_generated, schema_tree_node_locator);
         }
 
         [[nodiscard]] auto handle_end_of_stream() -> clp::ffi::ir_stream::IRErrorCode {

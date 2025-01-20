@@ -66,6 +66,7 @@ class TestCaseSerializer(TestCLPBase):
         byte_buffer: BytesIO
         num_bytes_serialized: int
         serializer: Serializer
+        msgpack_byte_sequence: bytes
 
         # Test with context manager
         for file_path in test_files:
@@ -73,8 +74,10 @@ class TestCaseSerializer(TestCLPBase):
             with Serializer(byte_buffer) as serializer:
                 num_bytes_serialized = serializer.get_num_bytes_serialized()
                 for json_obj in JsonLinesFileReader(file_path).read_lines():
+                    msgpack_byte_sequence = serialize_dict_to_msgpack(json_obj)
                     num_bytes_serialized += serializer.serialize_log_event_from_msgpack_map(
-                        serialize_dict_to_msgpack(json_obj)
+                        auto_gen_msgpack_map=msgpack_byte_sequence,
+                        user_gen_msgpack_map=msgpack_byte_sequence,
                     )
                     serializer.flush()
                     self.assertEqual(
@@ -88,8 +91,10 @@ class TestCaseSerializer(TestCLPBase):
             serializer = Serializer(byte_buffer)
             num_bytes_serialized = serializer.get_num_bytes_serialized()
             for json_obj in JsonLinesFileReader(file_path).read_lines():
+                msgpack_byte_sequence = serialize_dict_to_msgpack(json_obj)
                 num_bytes_serialized += serializer.serialize_log_event_from_msgpack_map(
-                    serialize_dict_to_msgpack(json_obj)
+                    auto_gen_msgpack_map=msgpack_byte_sequence,
+                    user_gen_msgpack_map=msgpack_byte_sequence,
                 )
                 serializer.flush()
                 self.assertEqual(len(byte_buffer.getvalue()), serializer.get_num_bytes_serialized())
@@ -114,8 +119,10 @@ class TestCaseSerializer(TestCLPBase):
                 serializer.flush()
                 num_bytes_in_ir_buffer: int = 0
                 for json_obj in JsonLinesFileReader(file_path).read_lines():
+                    msgpack_byte_sequence: bytes = serialize_dict_to_msgpack(json_obj)
                     num_bytes_serialized: int = serializer.serialize_log_event_from_msgpack_map(
-                        serialize_dict_to_msgpack(json_obj)
+                        auto_gen_msgpack_map=msgpack_byte_sequence,
+                        user_gen_msgpack_map=msgpack_byte_sequence,
                     )
                     self.assertNotEqual(0, num_bytes_serialized)
                     num_bytes_in_ir_buffer += num_bytes_serialized
