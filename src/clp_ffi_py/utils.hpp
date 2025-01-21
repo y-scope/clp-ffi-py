@@ -104,6 +104,11 @@ template <typename T>
 [[nodiscard]] consteval auto get_c_str_from_constexpr_string_view(std::string_view const& sv)
         -> char const*;
 
+/**
+ * @return A new reference to `Py_None`.
+ */
+[[nodiscard]] auto get_new_ref_to_py_none() -> PyObject*;
+
 template <clp::IntegerType IntType>
 auto parse_py_int(PyObject* py_int, IntType& val) -> bool {
     if (false == static_cast<bool>(PyLong_Check(py_int))) {

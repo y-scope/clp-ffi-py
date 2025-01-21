@@ -91,14 +91,10 @@ template <TerminateHandlerSignature TerminateHandler>
         TerminateHandler terminate_handler
 ) -> PyObject*;
 
-/**
- * @return A new reference to `Py_None`.
- */
-[[nodiscard]] auto get_new_ref_to_py_none() -> PyObject*;
-
-auto
-handle_incomplete_ir_error(PyDeserializerBuffer* deserializer_buffer, bool allow_incomplete_stream)
-        -> std::optional<PyObject*> {
+auto handle_incomplete_ir_error(
+        PyDeserializerBuffer* deserializer_buffer,
+        bool allow_incomplete_stream
+) -> std::optional<PyObject*> {
     if (deserializer_buffer->try_read()) {
         return std::nullopt;
     }
@@ -196,12 +192,6 @@ auto deserialize_log_events(
 
     return return_value;
 }
-
-auto get_new_ref_to_py_none() -> PyObject* {
-    Py_INCREF(Py_None);
-    return Py_None;
-}
-
 }  // namespace
 
 CLP_FFI_PY_METHOD auto
