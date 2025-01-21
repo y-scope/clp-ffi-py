@@ -91,10 +91,9 @@ template <TerminateHandlerSignature TerminateHandler>
         TerminateHandler terminate_handler
 ) -> PyObject*;
 
-auto handle_incomplete_ir_error(
-        PyDeserializerBuffer* deserializer_buffer,
-        bool allow_incomplete_stream
-) -> std::optional<PyObject*> {
+auto
+handle_incomplete_ir_error(PyDeserializerBuffer* deserializer_buffer, bool allow_incomplete_stream)
+        -> std::optional<PyObject*> {
     if (deserializer_buffer->try_read()) {
         return std::nullopt;
     }
