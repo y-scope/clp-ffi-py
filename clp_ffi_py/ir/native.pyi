@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import tzinfo
 from types import TracebackType
-from typing import Any, Dict, IO, List, Optional, Tuple, Type
+from typing import Any, Dict, IO, List, Optional, Type
 
 from clp_ffi_py.wildcard_query import WildcardQuery
 
