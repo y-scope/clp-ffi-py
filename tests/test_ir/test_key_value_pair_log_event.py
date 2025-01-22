@@ -1,9 +1,10 @@
+from io import BytesIO
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from test_ir.test_utils import JsonLinesFileReader, TestCLPBase
 
-from clp_ffi_py.ir import KeyValuePairLogEvent
+from clp_ffi_py.ir import Deserializer, KeyValuePairLogEvent, Serializer
 
 
 class TestCaseKeyValuePairLogEvent(TestCLPBase):
@@ -41,3 +42,45 @@ class TestCaseKeyValuePairLogEvent(TestCLPBase):
         self.assertNotEqual(
             num_files_tested, 0, f"No test files found in directory: {test_data_dir}"
         )
+
+    def test_invalid_utf8_encoding(self) -> None:
+        """
+        Tests handling of invalid UTF-8 encoded strings.
+        """
+        encoding_type: str = "cp932"
+
+        # msgpack map: {"key": 0x970x57}, where "0x970x57" is encoded using "cp932"
+        msgpack_with_invalid_utf8_str: bytes = b"\x81\xa3\x6b\x65\x79\xa2\x97\x5c"
+        expected_dict_with_proper_encoding: Dict[str, str] = {
+            "key": str(b"\x97\x5c", encoding=encoding_type)
+        }
+        expected_dict_with_ignore: Dict[str, str] = {"key": str(b"\x97\x5c", errors="ignore")}
+
+        byte_buffer: BytesIO = BytesIO()
+        serializer: Serializer = Serializer(byte_buffer)
+        serializer.serialize_log_event_from_msgpack_map(
+            msgpack_with_invalid_utf8_str, msgpack_with_invalid_utf8_str
+        )
+        serializer.flush()
+
+        byte_buffer.seek(0)
+        deserializer: Deserializer = Deserializer(byte_buffer)
+        log_event: Optional[KeyValuePairLogEvent] = deserializer.deserialize_log_event()
+        self.assertNotEqual(log_event, None)
+        assert log_event is not None
+
+        with self.assertRaises(UnicodeDecodeError):
+            _, _ = log_event.to_dict()
+
+        with self.assertRaises(UnicodeDecodeError):
+            _, _ = log_event.to_dict(encoding="big5")
+
+        actual_auto_gen_dict, actual_user_gen_dict = log_event.to_dict(encoding=encoding_type)
+        self.assertEqual(expected_dict_with_proper_encoding, actual_auto_gen_dict)
+        self.assertEqual(expected_dict_with_proper_encoding, actual_user_gen_dict)
+
+        actual_auto_gen_dict_with_ignore, actual_user_gen_dict_with_ignore = log_event.to_dict(
+            errors="ignore"
+        )
+        self.assertEqual(expected_dict_with_ignore, actual_auto_gen_dict_with_ignore)
+        self.assertEqual(expected_dict_with_ignore, actual_user_gen_dict_with_ignore)
