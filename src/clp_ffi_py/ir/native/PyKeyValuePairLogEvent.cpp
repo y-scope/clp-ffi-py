@@ -786,7 +786,7 @@ auto PyKeyValuePairLogEvent::init(clp::ffi::KeyValuePairLogEvent kv_pair_log_eve
             return nullptr;
         }
 
-        return Py_BuildValue("(OO)", auto_gen_kv_pairs_dict.get(), user_gen_kv_pairs_dict.get());
+        return PyTuple_Pack(2, auto_gen_kv_pairs_dict.get(), user_gen_kv_pairs_dict.get());
     } catch (clp::TraceableException& ex) {
         handle_traceable_exception(ex);
         return nullptr;
