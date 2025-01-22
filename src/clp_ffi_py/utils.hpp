@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <limits>
+#include <optional>
 #include <span>
 #include <string>
 #include <string_view>
@@ -77,6 +78,17 @@ template <clp::IntegerType IntType>
  */
 [[nodiscard]] auto unpack_msgpack(std::span<char const> msgpack_byte_sequence)
         -> outcome_v2::std_result<msgpack::object_handle, std::string>;
+
+/**
+ * Unpacks a msgpack map from the given byte sequence.
+ * @param msgpack_byte_sequence
+ * @return A unpacked msgpack object handle on success.
+ * @return std::optional with the relevant Python exception and error set on the following failures:
+ * - Forward `unpack_msgpack`'s error.
+ * - The unpacked msgpack object is not a map.
+ */
+[[nodiscard]] auto unpack_msgpack_map(std::span<char const> msgpack_byte_sequence)
+        -> std::optional<msgpack::object_handle>;
 
 /*
  * Handles a `clp::TraceableException` by setting a Python exception accordingly.

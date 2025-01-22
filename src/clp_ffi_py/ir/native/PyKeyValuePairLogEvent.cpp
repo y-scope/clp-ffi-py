@@ -66,6 +66,7 @@ public:
     }
 
     [[nodiscard]] static auto handle_schema_tree_node_insertion(
+            [[maybe_unused]] bool is_auto_generated,
             [[maybe_unused]] clp::ffi::SchemaTree::NodeLocator schema_tree_node_locator
     ) -> IRErrorCode {
         return IRErrorCode::IRErrorCode_Success;
@@ -239,13 +240,18 @@ PyDoc_STRVAR(
         " key-value pairs. This class is designed to be instantiated by the IR deserializer."
         " However, direct instantiation using the `__init__` method is also supported for testing"
         " purposes, although this may not be as efficient as emission from the IR deserializer.\n\n"
-        "__init__(self, dictionary)\n\n"
+        "__init__(self, auto_gen_kv_pairs, user_gen_kv_pairs)\n\n"
         "Initializes a :class:`KeyValuePairLogEvent` from the given Python dictionary. Note that"
         " each object should only be initialized once. Double initialization will result in a"
         " memory leak.\n\n"
-        ":param dictionary: A dictionary representing the key-value pair log event, where all keys"
-        " must be strings, including keys inside any sub-dictionaries.\n"
-        ":type dictionary: dict[str, Any]\n"
+        ":param auto_gen_kv_pairs: A dictionary representing the auto-generated key-value pairs of"
+        " the given log event, where all keys must be strings, including keys inside any"
+        " sub-dictionaries.\n"
+        ":type auto_gen_kv_pairs: dict[str, Any]\n"
+        ":param user_gen_kv_pairs: A dictionary representing the user-generated key-value pairs of"
+        " the given log event, where all keys must be strings, including keys inside any"
+        " sub-dictionaries.\n"
+        ":type user_gen_kv_pairs: dict[str, Any]\n"
 );
 CLP_FFI_PY_METHOD auto
 PyKeyValuePairLogEvent_init(PyKeyValuePairLogEvent* self, PyObject* args, PyObject* keywords)
@@ -259,9 +265,11 @@ PyDoc_STRVAR(
         cPyKeyValuePairLogEventToDictDoc,
         "to_dict(self)\n"
         "--\n\n"
-        "Converts the log event into a Python dictionary.\n\n"
-        ":return: The log event as a Python dictionary.\n"
-        ":rtype: dict[str, Any]\n"
+        "Converts the log event into Python dictionaries.\n\n"
+        ":return: A tuple of Python dictionaries:\n\n"
+        "   - A dictionary for auto-generated key-value pairs.\n"
+        "   - A dictionary for user-generated key-value pairs.\n"
+        ":rtype: tuple[dict[str, Any], dict[str, Any]]\n"
 );
 CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_to_dict(PyKeyValuePairLogEvent* self) -> PyObject*;
 
@@ -313,12 +321,15 @@ PyType_Spec PyKeyValuePairLogEvent_type_spec{
  * instance. This approach is inefficient and intended solely for testing purposes, as it allows
  * instance creation without a full IR stream. TODO: Replace this method with a more efficient
  * conversion once a direct utility is available.
- * @param py_dict
+ * @param py_auto_gen_kv_pairs_dict
+ * @param py_user_gen_kv_pairs_dict
  * @return The converted key-value log event of the given dictionary on success.
  * @return std::nullopt on failure with the relevant Python exception and error set.
  */
-[[nodiscard]] auto convert_py_dict_to_key_value_pair_log_event(PyDictObject* py_dict)
-        -> std::optional<clp::ffi::KeyValuePairLogEvent>;
+[[nodiscard]] auto convert_py_dict_to_key_value_pair_log_event(
+        PyDictObject* py_auto_gen_kv_pairs_dict,
+        PyDictObject* py_user_gen_kv_pairs_dict
+) -> std::optional<clp::ffi::KeyValuePairLogEvent>;
 
 /**
  * Serializes the given node id value pairs into a Python dictionary object.
@@ -361,33 +372,46 @@ PyType_Spec PyKeyValuePairLogEvent_type_spec{
 CLP_FFI_PY_METHOD auto
 PyKeyValuePairLogEvent_init(PyKeyValuePairLogEvent* self, PyObject* args, PyObject* keywords)
         -> int {
-    static char keyword_dictionary[]{"dictionary"};
-    static char* keyword_table[]{static_cast<char*>(keyword_dictionary), nullptr};
+    static char keyword_auto_gen_kv_pairs[]{"auto_gen_kv_pairs"};
+    static char keyword_user_gen_kv_pairs[]{"user_gen_kv_pairs"};
+    static char* keyword_table[]{
+            static_cast<char*>(keyword_auto_gen_kv_pairs),
+            static_cast<char*>(keyword_user_gen_kv_pairs),
+            nullptr
+    };
 
     // If the argument parsing fails, `self` will be deallocated. We must reset all pointers to
     // nullptr in advance, otherwise the deallocator might trigger segmentation fault.
     self->default_init();
 
-    PyObject* dictionary{Py_None};
+    PyObject* py_auto_gen_kv_pairs{Py_None};
+    PyObject* py_user_gen_kv_pairs{Py_None};
     if (false
         == static_cast<bool>(PyArg_ParseTupleAndKeywords(
                 args,
                 keywords,
-                "O",
+                "OO",
                 static_cast<char**>(keyword_table),
-                &dictionary
+                &py_auto_gen_kv_pairs,
+                &py_user_gen_kv_pairs
         )))
     {
         return -1;
     }
 
-    if (false == static_cast<bool>(PyDict_Check(dictionary))) {
-        PyErr_SetString(PyExc_TypeError, "`dictionary` must be a Python dictionary object");
+    if (false == static_cast<bool>(PyDict_Check(py_auto_gen_kv_pairs))) {
+        PyErr_SetString(PyExc_TypeError, "`auto_gen_kv_pairs` must be a Python dictionary object");
         return -1;
     }
-    PyDictObject* py_dict{py_reinterpret_cast<PyDictObject>(dictionary)};
+    if (false == static_cast<bool>(PyDict_Check(py_user_gen_kv_pairs))) {
+        PyErr_SetString(PyExc_TypeError, "`user_gen_kv_pairs` must be a Python dictionary object");
+        return -1;
+    }
 
-    auto optional_kv_pair_log_event{convert_py_dict_to_key_value_pair_log_event(py_dict)};
+    auto optional_kv_pair_log_event{convert_py_dict_to_key_value_pair_log_event(
+            py_reinterpret_cast<PyDictObject>(py_auto_gen_kv_pairs),
+            py_reinterpret_cast<PyDictObject>(py_user_gen_kv_pairs)
+    )};
     if (false == optional_kv_pair_log_event.has_value()) {
         return -1;
     }
@@ -396,7 +420,7 @@ PyKeyValuePairLogEvent_init(PyKeyValuePairLogEvent* self, PyObject* args, PyObje
 }
 
 CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_to_dict(PyKeyValuePairLogEvent* self) -> PyObject* {
-    return py_reinterpret_cast<PyObject>(self->to_dict());
+    return self->to_dict();
 }
 
 CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_dealloc(PyKeyValuePairLogEvent* self) -> void {
@@ -404,28 +428,36 @@ CLP_FFI_PY_METHOD auto PyKeyValuePairLogEvent_dealloc(PyKeyValuePairLogEvent* se
     Py_TYPE(self)->tp_free(py_reinterpret_cast<PyObject>(self));
 }
 
-auto convert_py_dict_to_key_value_pair_log_event(PyDictObject* py_dict)
-        -> std::optional<clp::ffi::KeyValuePairLogEvent> {
-    PyObjectPtr<PyBytesObject> const serialized_msgpack_byte_sequence{
-            py_utils_serialize_dict_to_msgpack(py_dict)
+auto convert_py_dict_to_key_value_pair_log_event(
+        PyDictObject* py_auto_gen_kv_pairs_dict,
+        PyDictObject* py_user_gen_kv_pairs_dict
+) -> std::optional<clp::ffi::KeyValuePairLogEvent> {
+    PyObjectPtr<PyBytesObject> const msgpack_serialized_auto_gen_kv_pairs{
+            py_utils_serialize_dict_to_msgpack(py_auto_gen_kv_pairs_dict)
     };
-    if (nullptr == serialized_msgpack_byte_sequence) {
+    if (nullptr == msgpack_serialized_auto_gen_kv_pairs) {
+        return std::nullopt;
+    }
+    PyObjectPtr<PyBytesObject> const msgpack_serialized_user_gen_kv_pairs{
+            py_utils_serialize_dict_to_msgpack(py_user_gen_kv_pairs_dict)
+    };
+    if (nullptr == msgpack_serialized_user_gen_kv_pairs) {
         return std::nullopt;
     }
 
     // Since the type is already checked, we can use the macro to avoid duplicated type checking.
-    std::span<char const> const data_view{
-            PyBytes_AS_STRING(serialized_msgpack_byte_sequence.get()),
-            static_cast<size_t>(PyBytes_GET_SIZE(serialized_msgpack_byte_sequence.get()))
-    };
-    auto const unpack_result{unpack_msgpack(data_view)};
-    if (unpack_result.has_error()) {
-        PyErr_SetString(PyExc_RuntimeError, unpack_result.error().c_str());
+    auto const optional_auto_gen_msgpack_map_handle{unpack_msgpack_map(
+            {PyBytes_AS_STRING(msgpack_serialized_auto_gen_kv_pairs.get()),
+             static_cast<size_t>(PyBytes_GET_SIZE(msgpack_serialized_auto_gen_kv_pairs.get()))}
+    )};
+    if (false == optional_auto_gen_msgpack_map_handle.has_value()) {
         return std::nullopt;
     }
-    auto const& msgpack_obj{unpack_result.value().get()};
-    if (msgpack::type::MAP != msgpack_obj.type) {
-        PyErr_SetString(PyExc_TypeError, "Unpacked msgpack is not a map");
+    auto const optional_user_gen_msgpack_map_handle{unpack_msgpack_map(
+            {PyBytes_AS_STRING(msgpack_serialized_user_gen_kv_pairs.get()),
+             static_cast<size_t>(PyBytes_GET_SIZE(msgpack_serialized_user_gen_kv_pairs.get()))}
+    )};
+    if (false == optional_user_gen_msgpack_map_handle.has_value()) {
         return std::nullopt;
     }
 
@@ -442,8 +474,14 @@ auto convert_py_dict_to_key_value_pair_log_event(PyDictObject* py_dict)
     }
 
     auto& serializer{serializer_result.value()};
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-union-access)
-    if (false == serializer.serialize_msgpack_map(msgpack_obj.via.map)) {
+    // NOLINTBEGIN(cppcoreguidelines-pro-type-union-access)
+    if (false
+        == serializer.serialize_msgpack_map(
+                optional_auto_gen_msgpack_map_handle.value().get().via.map,
+                optional_user_gen_msgpack_map_handle.value().get().via.map
+        ))
+    // NOLINTEND(cppcoreguidelines-pro-type-union-access)
+    {
         PyErr_SetString(
                 PyExc_RuntimeError,
                 get_c_str_from_constexpr_string_view(cSerializerSerializeMsgpackMapError)
@@ -694,24 +732,61 @@ auto PyKeyValuePairLogEvent::init(clp::ffi::KeyValuePairLogEvent kv_pair_log_eve
     return true;
 }
 
-[[nodiscard]] auto PyKeyValuePairLogEvent::to_dict() -> PyDictObject* {
+[[nodiscard]] auto PyKeyValuePairLogEvent::to_dict() -> PyObject* {
     try {
-        auto const& node_id_value_pairs{m_kv_pair_log_event->get_node_id_value_pairs()};
-        auto const& schema_tree{m_kv_pair_log_event->get_schema_tree()};
-        auto const schema_subtree_bitmap_result{m_kv_pair_log_event->get_schema_subtree_bitmap()};
-        if (schema_subtree_bitmap_result.has_error()) {
+        auto const& auto_gen_node_id_value_pairs{
+                m_kv_pair_log_event->get_auto_gen_node_id_value_pairs()
+        };
+        auto const& auto_gen_keys_schema_tree{m_kv_pair_log_event->get_auto_gen_keys_schema_tree()};
+        auto const auto_gen_keys_schema_subtree_bitmap_result{
+                m_kv_pair_log_event->get_auto_gen_keys_schema_subtree_bitmap()
+        };
+        if (auto_gen_keys_schema_subtree_bitmap_result.has_error()) {
             PyErr_Format(
                     PyExc_RuntimeError,
-                    "Failed to get schema subtree bitmap: %s",
-                    schema_subtree_bitmap_result.error().message().c_str()
+                    "Failed to get auto-generated keys schema subtree bitmap: %s",
+                    auto_gen_keys_schema_subtree_bitmap_result.error().message().c_str()
             );
             return nullptr;
         }
-        return serialize_node_id_value_pair_to_py_dict(
-                schema_tree,
-                schema_subtree_bitmap_result.value(),
-                node_id_value_pairs
-        );
+        PyObjectPtr<PyDictObject> const auto_gen_kv_pairs_dict{
+                serialize_node_id_value_pair_to_py_dict(
+                        auto_gen_keys_schema_tree,
+                        auto_gen_keys_schema_subtree_bitmap_result.value(),
+                        auto_gen_node_id_value_pairs
+                )
+        };
+        if (nullptr == auto_gen_kv_pairs_dict) {
+            return nullptr;
+        }
+
+        auto const& user_gen_node_id_value_pairs{
+                m_kv_pair_log_event->get_user_gen_node_id_value_pairs()
+        };
+        auto const& user_gen_keys_schema_tree{m_kv_pair_log_event->get_user_gen_keys_schema_tree()};
+        auto const user_gen_keys_schema_subtree_bitmap_result{
+                m_kv_pair_log_event->get_user_gen_keys_schema_subtree_bitmap()
+        };
+        if (user_gen_keys_schema_subtree_bitmap_result.has_error()) {
+            PyErr_Format(
+                    PyExc_RuntimeError,
+                    "Failed to get user-generated keys schema subtree bitmap: %s",
+                    user_gen_keys_schema_subtree_bitmap_result.error().message().c_str()
+            );
+            return nullptr;
+        }
+        PyObjectPtr<PyDictObject> const user_gen_kv_pairs_dict{
+                serialize_node_id_value_pair_to_py_dict(
+                        user_gen_keys_schema_tree,
+                        user_gen_keys_schema_subtree_bitmap_result.value(),
+                        user_gen_node_id_value_pairs
+                )
+        };
+        if (nullptr == user_gen_kv_pairs_dict) {
+            return nullptr;
+        }
+
+        return PyTuple_Pack(2, auto_gen_kv_pairs_dict.get(), user_gen_kv_pairs_dict.get());
     } catch (clp::TraceableException& ex) {
         handle_traceable_exception(ex);
         return nullptr;

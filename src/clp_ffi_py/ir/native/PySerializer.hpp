@@ -94,13 +94,15 @@ public:
     [[nodiscard]] auto is_closed() const -> bool { return nullptr == m_serializer; }
 
     /**
-     * Serializes the log event from the given msgpack map into IR format.
-     * @param msgpack_byte_sequence
+     * Serializes the log event from the given msgpack maps into IR format.
+     * @param auto_gen_msgpack_map Auto-generated key-value pairs, serialized as a msgpack map.
+     * @param user_gen_msgpack_map User-generated key-value pairs, serialized as a msgpack map.
      * @return the number of bytes serialized on success.
      * @return std::nullptr on failure with the relevant Python exception and error set.
      */
     [[nodiscard]] auto serialize_log_event_from_msgpack_map(
-            std::span<char const> msgpack_byte_sequence
+            std::span<char const> auto_gen_msgpack_map,
+            std::span<char const> user_gen_msgpack_map
     ) -> std::optional<Py_ssize_t>;
 
     [[nodiscard]] auto get_num_bytes_serialized() const -> Py_ssize_t {

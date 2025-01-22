@@ -34,6 +34,7 @@
 #include <pymacro.h>
 #include <pymem.h>
 #include <pyport.h>
+#include <tupleobject.h>
 #include <typeslots.h>
 #include <unicodeobject.h>
 #include <warnings.h>

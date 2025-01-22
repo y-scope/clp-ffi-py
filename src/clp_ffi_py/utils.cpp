@@ -2,9 +2,11 @@
 
 #include "utils.hpp"
 
+#include <optional>
 #include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include <clp/TraceableException.hpp>
 #include <outcome/single-header/outcome.hpp>
@@ -75,6 +77,23 @@ auto unpack_msgpack(std::span<char const> msgpack_byte_sequence)
         return std::string{error.what()};
     }
     return handle;
+}
+
+auto unpack_msgpack_map(std::span<char const> msgpack_byte_sequence)
+        -> std::optional<msgpack::object_handle> {
+    auto unpack_result{unpack_msgpack(msgpack_byte_sequence)};
+    if (unpack_result.has_error()) {
+        PyErr_SetString(PyExc_RuntimeError, unpack_result.error().c_str());
+        return std::nullopt;
+    }
+
+    auto& msgpack_obj_handle{unpack_result.value()};
+    if (msgpack::type::MAP != msgpack_obj_handle.get().type) {
+        PyErr_SetString(PyExc_TypeError, "Unpacked msgpack is not a map");
+        return std::nullopt;
+    }
+
+    return std::move(msgpack_obj_handle);
 }
 
 auto handle_traceable_exception(clp::TraceableException& exception) noexcept -> void {

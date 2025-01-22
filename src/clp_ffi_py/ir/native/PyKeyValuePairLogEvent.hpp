@@ -85,11 +85,14 @@ public:
     }
 
     /**
-     * Converts the underlying key-value pair log event into a Python dictionary.
-     * @return A new reference to the created dictionary on success.
+     * Converts the underlying key-value pair log event into Python dictionaries.
+     * @return A new reference to a Python tuple containing a pair of Python dictionaries on
+     * success:
+     * - A Python dictionary for auto-generated key-value pairs.
+     * - A Python dictionary for user-generated key-value pairs.
      * @return nullptr on failure with the relevant Python exception and error set.
      */
-    [[nodiscard]] auto to_dict() -> PyDictObject*;
+    [[nodiscard]] auto to_dict() -> PyObject*;
 
 private:
     static inline PyObjectStaticPtr<PyTypeObject> m_py_type{nullptr};
