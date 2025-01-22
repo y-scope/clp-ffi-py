@@ -659,7 +659,7 @@ auto serialize_node_id_value_pair_to_py_dict(
             break;
         }
         case SchemaTree::Node::Type::Obj:
-            py_value.reset(Py_None);
+            py_value.reset(get_new_ref_to_py_none());
             break;
         default:
             PyErr_Format(
