@@ -54,7 +54,7 @@ PyDoc_STRVAR(
         cPySerializerSerializeLogEventFromMsgpackMapDoc,
         "serialize_log_event_from_msgpack_map(self, auto_gen_msgpack_map, user_gen_msgpack_map)\n"
         "--\n\n"
-        "Serializes the given log event.\n\n"
+        "Serializes the given log event from the given packed msgpack maps.\n\n"
         ":param auto_gen_msgpack_map: The auto-generated key-value pairs of the log event as a"
         " packed msgpack map where all keys are strings.\n"
         ":type auto_gen_msgpack_map: bytes\n"
