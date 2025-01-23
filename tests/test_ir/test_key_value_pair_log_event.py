@@ -49,7 +49,7 @@ class TestCaseKeyValuePairLogEvent(TestCLPBase):
         """
         encoding_type: str = "cp932"
 
-        # msgpack map: {"key": 0x970x57}, where "0x970x57" is encoded using "cp932"
+        # msgpack map: {"key": 0x970x5c}, where "0x970x5c" is encoded using "cp932"
         msgpack_with_invalid_utf8_str: bytes = b"\x81\xa3\x6b\x65\x79\xa2\x97\x5c"
         expected_dict_with_proper_encoding: Dict[str, str] = {
             "key": str(b"\x97\x5c", encoding=encoding_type)
