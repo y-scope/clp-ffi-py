@@ -113,7 +113,7 @@ PyDoc_STRVAR(
         "--\n\n"
         "Converts the log event into Python dictionaries.\n\n"
         "The `encoding` and `errors` parameters allow customization of Unicode behaviors, similar"
-        " to those in Python's `str` objects, for converting C strings into Python Unicode"
+        " Python's `str` build-in function, for converting C strings into Python Unicode"
         " objects.\n\n"
         ":param encoding: The encoding type used to convert C strings into Python Unicode objects."
         " See `Python Standard Encodings documentation"
