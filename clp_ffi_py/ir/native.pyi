@@ -87,7 +87,9 @@ class FourByteDeserializer:
 
 class KeyValuePairLogEvent:
     def __init__(self, auto_gen_kv_pairs: Dict[Any, Any], user_gen_kv_pairs: Dict[Any, Any]): ...
-    def to_dict(self) -> Tuple[Dict[Any, Any], Dict[Any, Any]]: ...
+    def to_dict(
+        self, encoding: str = "utf-8", errors: str = "strict"
+    ) -> Tuple[Dict[Any, Any], Dict[Any, Any]]: ...
 
 class Serializer:
     def __init__(
