@@ -12,6 +12,7 @@
 #include <utility>
 
 #include <clp/ffi/ir_stream/protocol_constants.hpp>
+#include <json/single_include/nlohmann/json.hpp>
 #include <wrapped_facade_headers/msgpack.hpp>
 
 #include <clp_ffi_py/api_decoration.hpp>
@@ -32,7 +33,7 @@ PyDoc_STRVAR(
         "Serializer for serializing CLP key-value pair IR streams.\n"
         "This class serializes log events into the CLP key-value pair IR format and writes the"
         " serialized data to a specified byte stream object.\n\n"
-        "__init__(self, output_stream, buffer_size_limit=65536)\n\n"
+        "__init__(self, output_stream, buffer_size_limit=65536, user_defined_metadata=None)\n\n"
         "Initializes a :class:`Serializer` instance with the given output stream. Note that each"
         " object should only be initialized once. Double initialization will result in a memory"
         " leak.\n\n"
@@ -42,6 +43,9 @@ PyDoc_STRVAR(
         ":param buffer_size_limit: The maximum amount of serialized data to buffer before flushing"
         " it to `output_stream`. Defaults to 64 KiB.\n"
         ":type buffer_size_limit: int\n"
+        ":param user_defined_metadata: JSON-encoded string containing user-defined stream-level"
+        " metadata. The encoded content must be a valid JSON object.\n"
+        ":type user_defined_metadata: str | None\n"
 );
 CLP_FFI_PY_METHOD auto PySerializer_init(PySerializer* self, PyObject* args, PyObject* keywords)
         -> int;
@@ -218,9 +222,11 @@ CLP_FFI_PY_METHOD auto PySerializer_init(PySerializer* self, PyObject* args, PyO
         -> int {
     static char keyword_output_stream[]{"output_stream"};
     static char keyword_buffer_size_limit[]{"buffer_size_limit"};
+    static char keyword_user_defined_metadata[]{"user_defined_metadata"};
     static char* keyword_table[]{
             static_cast<char*>(keyword_output_stream),
             static_cast<char*>(keyword_buffer_size_limit),
+            static_cast<char*>(keyword_user_defined_metadata),
             nullptr
     };
 
@@ -229,15 +235,17 @@ CLP_FFI_PY_METHOD auto PySerializer_init(PySerializer* self, PyObject* args, PyO
     self->default_init();
 
     PyObject* output_stream{Py_None};
+    PyObject* user_defined_metadata{Py_None};
     Py_ssize_t buffer_size_limit{PySerializer::cDefaultBufferSizeLimit};
     if (false
         == static_cast<bool>(PyArg_ParseTupleAndKeywords(
                 args,
                 keywords,
-                "O|n",
+                "O|nO",
                 static_cast<char**>(keyword_table),
                 &output_stream,
-                &buffer_size_limit
+                &buffer_size_limit,
+                &user_defined_metadata
         )))
     {
         return -1;
@@ -276,7 +284,39 @@ CLP_FFI_PY_METHOD auto PySerializer_init(PySerializer* self, PyObject* args, PyO
         return -1;
     }
 
-    auto serializer_result{PySerializer::ClpIrSerializer::create()};
+    std::optional<nlohmann::json> optional_user_defined_metadata;
+    if (Py_None != user_defined_metadata) {
+        if (false == static_cast<bool>(PyUnicode_CheckExact(user_defined_metadata))) {
+            PyErr_Format(
+                    PyExc_TypeError,
+                    "`%s` must be given as a `str` object.",
+                    static_cast<char const*>(keyword_user_defined_metadata)
+            );
+            return -1;
+        }
+        Py_ssize_t json_str_size{};
+        auto const* json_str_data{PyUnicode_AsUTF8AndSize(user_defined_metadata, &json_str_size)};
+        if (nullptr == json_str_data) {
+            return -1;
+        }
+        auto parsed_user_defined_metadata = nlohmann::json::parse(
+                std::string_view{json_str_data, static_cast<size_t>(json_str_size)},
+                nullptr,
+                false
+        );
+        if (parsed_user_defined_metadata.is_discarded()) {
+            PyErr_Format(
+                    PyExc_RuntimeError,
+                    "Failed to parse `%s`: %s",
+                    static_cast<char const*>(keyword_user_defined_metadata),
+                    json_str_data
+            );
+            return -1;
+        }
+        optional_user_defined_metadata = std::move(parsed_user_defined_metadata);
+    }
+
+    auto serializer_result{PySerializer::ClpIrSerializer::create(optional_user_defined_metadata)};
     if (serializer_result.has_error()) {
         PyErr_Format(
                 PyExc_RuntimeError,
