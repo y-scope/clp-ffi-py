@@ -53,7 +53,7 @@ def serialize_dict_to_json_str(dictionary: Dict[Any, Any]) -> str:
     Serializes the given dictionary into a JSON string.
 
     :param dictionary: The dictionary to serialize.
-    :return: JSON string of serialized dictionary.
+    :return: JSON string of the serialized dictionary.
     :raises: TypeError The given input is not a dictionary.
     """
     if not isinstance(dictionary, dict):
