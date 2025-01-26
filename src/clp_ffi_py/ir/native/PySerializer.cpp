@@ -18,6 +18,7 @@
 #include <clp_ffi_py/api_decoration.hpp>
 #include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ir/native/error_messages.hpp>
+#include <clp_ffi_py/Py_utils.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
 #include <clp_ffi_py/PyObjectUtils.hpp>
 #include <clp_ffi_py/utils.hpp>
@@ -43,9 +44,11 @@ PyDoc_STRVAR(
         ":param buffer_size_limit: The maximum amount of serialized data to buffer before flushing"
         " it to `output_stream`. Defaults to 64 KiB.\n"
         ":type buffer_size_limit: int\n"
-        ":param user_defined_metadata: JSON-encoded string containing user-defined stream-level"
-        " metadata. The encoded content must be a valid JSON object.\n"
-        ":type user_defined_metadata: str | None\n"
+        ":param user_defined_metadata: A dictionary representing user-defined stream-level"
+        " metadata, or None to indicate the absence of such metadata. If a dictionary is provided,"
+        " it must be valid for serialization as a string using the `Python Standard JSON library"
+        " <https://docs.python.org/3/library/json.html>`_\.\n"
+        ":type user_defined_metadata: dict | None\n"
 );
 CLP_FFI_PY_METHOD auto PySerializer_init(PySerializer* self, PyObject* args, PyObject* keywords)
         -> int;
@@ -235,7 +238,7 @@ CLP_FFI_PY_METHOD auto PySerializer_init(PySerializer* self, PyObject* args, PyO
     self->default_init();
 
     PyObject* output_stream{Py_None};
-    PyObject* user_defined_metadata{Py_None};
+    PyObject* py_user_defined_metadata{Py_None};
     Py_ssize_t buffer_size_limit{PySerializer::cDefaultBufferSizeLimit};
     if (false
         == static_cast<bool>(PyArg_ParseTupleAndKeywords(
@@ -245,7 +248,7 @@ CLP_FFI_PY_METHOD auto PySerializer_init(PySerializer* self, PyObject* args, PyO
                 static_cast<char**>(keyword_table),
                 &output_stream,
                 &buffer_size_limit,
-                &user_defined_metadata
+                &py_user_defined_metadata
         )))
     {
         return -1;
@@ -285,17 +288,26 @@ CLP_FFI_PY_METHOD auto PySerializer_init(PySerializer* self, PyObject* args, PyO
     }
 
     std::optional<nlohmann::json> optional_user_defined_metadata;
-    if (Py_None != user_defined_metadata) {
-        if (false == static_cast<bool>(PyUnicode_CheckExact(user_defined_metadata))) {
+    if (Py_None != py_user_defined_metadata) {
+        if (false == static_cast<bool>(PyDict_Check(py_user_defined_metadata))) {
             PyErr_Format(
                     PyExc_TypeError,
-                    "`%s` must be given as a `str` object.",
+                    "`%s` must be a dictionary, if not None.",
                     static_cast<char const*>(keyword_user_defined_metadata)
             );
             return -1;
         }
+        auto* py_serialized_json_str{py_utils_serialize_dict_to_json_str(
+                py_reinterpret_cast<PyDictObject>(py_user_defined_metadata)
+        )};
+        if (nullptr == py_serialized_json_str) {
+            return -1;
+        }
         Py_ssize_t json_str_size{};
-        auto const* json_str_data{PyUnicode_AsUTF8AndSize(user_defined_metadata, &json_str_size)};
+        auto const* json_str_data{PyUnicode_AsUTF8AndSize(
+                py_reinterpret_cast<PyObject>(py_serialized_json_str),
+                &json_str_size
+        )};
         if (nullptr == json_str_data) {
             return -1;
         }

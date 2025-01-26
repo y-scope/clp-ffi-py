@@ -96,7 +96,7 @@ class Serializer:
         self,
         output_stream: IO[bytes],
         buffer_size_limit: int = 65536,
-        user_defined_metadata: Optional[str] = None,
+        user_defined_metadata: Optional[Dict[str, Any]] = None,
     ): ...
     def __enter__(self) -> Serializer: ...
     def __exit__(

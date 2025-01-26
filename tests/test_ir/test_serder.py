@@ -1,4 +1,3 @@
-import json
 from pathlib import Path
 from typing import Any, Dict, IO, List, Optional, Tuple
 
@@ -68,7 +67,7 @@ class TestCaseSerDerBase(TestCLPBase):
         """
         file_stream: IO[bytes] = open(ir_stream_path, "wb")
         serializer: Serializer = Serializer(
-            file_stream, user_defined_metadata=json.dumps(TestCaseSerDerBase.user_defined_metadata)
+            file_stream, user_defined_metadata=TestCaseSerDerBase.user_defined_metadata
         )
         for auto_gen_dict, user_gen_dict in inputs:
             serializer.serialize_log_event_from_msgpack_map(
