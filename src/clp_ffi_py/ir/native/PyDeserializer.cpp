@@ -186,14 +186,6 @@ CLP_FFI_PY_METHOD auto PyDeserializer_get_user_defined_metadata(PyDeserializer* 
         Py_RETURN_NONE;
     }
 
-    if (false == user_defined_metadata->is_object()) {
-        PyErr_SetString(
-                PyExc_TypeError,
-                "User-defined stream-level metadata is not a JSON object."
-        );
-        return nullptr;
-    }
-
     std::string json_str;
     try {
         json_str = user_defined_metadata->dump();
