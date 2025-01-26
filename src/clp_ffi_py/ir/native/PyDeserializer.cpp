@@ -3,6 +3,7 @@
 #include "PyDeserializer.hpp"
 
 #include <new>
+#include <string>
 #include <system_error>
 #include <type_traits>
 #include <utility>
@@ -10,17 +11,21 @@
 #include <clp/ffi/ir_stream/decoding_methods.hpp>
 #include <clp/ffi/ir_stream/Deserializer.hpp>
 #include <clp/ffi/ir_stream/IrUnitType.hpp>
+#include <clp/ffi/ir_stream/protocol_constants.hpp>
 #include <clp/ffi/KeyValuePairLogEvent.hpp>
 #include <clp/ffi/SchemaTree.hpp>
 #include <clp/time_types.hpp>
 #include <clp/TraceableException.hpp>
+#include <json/single_include/nlohmann/json.hpp>
 
 #include <clp_ffi_py/api_decoration.hpp>
 #include <clp_ffi_py/error_messages.hpp>
 #include <clp_ffi_py/ir/native/DeserializerBufferReader.hpp>
 #include <clp_ffi_py/ir/native/error_messages.hpp>
 #include <clp_ffi_py/ir/native/PyKeyValuePairLogEvent.hpp>
+#include <clp_ffi_py/Py_utils.hpp>
 #include <clp_ffi_py/PyObjectCast.hpp>
+#include <clp_ffi_py/PyObjectUtils.hpp>
 #include <clp_ffi_py/utils.hpp>
 
 namespace clp_ffi_py::ir::native {
@@ -68,6 +73,23 @@ PyDoc_STRVAR(
 CLP_FFI_PY_METHOD auto PyDeserializer_deserialize_log_event(PyDeserializer* self) -> PyObject*;
 
 /**
+ * Callback of `PyDeserializer`'s `get_user_defined_metadata`.
+ */
+PyDoc_STRVAR(
+        cPyDeserializerGetUserDefinedMetadataDoc,
+        "get_user_defined_metadata(self)\n"
+        "--\n\n"
+        "Gets the user-defined stream-level metadata.\n\n"
+        ":return:\n"
+        "    - The deserialized user-defined stream-level metadata, loaded as a"
+        " dictionary.\n"
+        "    - None if user-defined stream-level metadata was not given in the deserialized"
+        " IR stream.\n"
+        ":rtype: dict | None\n"
+);
+CLP_FFI_PY_METHOD auto PyDeserializer_get_user_defined_metadata(PyDeserializer* self) -> PyObject*;
+
+/**
  * Callback of `PyDeserializer`'s deallocator.
  */
 CLP_FFI_PY_METHOD auto PyDeserializer_dealloc(PyDeserializer* self) -> void;
@@ -78,6 +100,11 @@ PyMethodDef PyDeserializer_method_table[]{
          py_c_function_cast(PyDeserializer_deserialize_log_event),
          METH_NOARGS,
          static_cast<char const*>(cPyDeserializerDeserializeLogEventDoc)},
+
+        {"get_user_defined_metadata",
+         py_c_function_cast(PyDeserializer_get_user_defined_metadata),
+         METH_NOARGS,
+         static_cast<char const*>(cPyDeserializerGetUserDefinedMetadataDoc)},
 
         {nullptr}
 };
@@ -151,6 +178,40 @@ CLP_FFI_PY_METHOD auto PyDeserializer_init(PyDeserializer* self, PyObject* args,
 
 CLP_FFI_PY_METHOD auto PyDeserializer_deserialize_log_event(PyDeserializer* self) -> PyObject* {
     return self->deserialize_log_event();
+}
+
+CLP_FFI_PY_METHOD auto PyDeserializer_get_user_defined_metadata(PyDeserializer* self) -> PyObject* {
+    auto const* user_defined_metadata{self->get_user_defined_metadata()};
+    if (nullptr == user_defined_metadata) {
+        Py_RETURN_NONE;
+    }
+
+    std::string json_str;
+    try {
+        json_str = user_defined_metadata->dump();
+    } catch (nlohmann::json::exception const& ex) {
+        PyErr_Format(
+                PyExc_RuntimeError,
+                "Failed to serialize the user-defined stream-level metadata into a JSON string."
+                " Error: %s",
+                ex.what()
+        );
+        return nullptr;
+    }
+
+    PyObjectPtr<PyObject> py_metadata_dict{py_utils_parse_json_str(json_str)};
+    if (nullptr == py_metadata_dict) {
+        return nullptr;
+    }
+    if (false == static_cast<bool>(PyDict_Check(py_metadata_dict.get()))) {
+        PyErr_SetString(
+                PyExc_TypeError,
+                "Failed to convert the user-defined stream-level metadata into a dictionary."
+        );
+        return nullptr;
+    }
+
+    return py_metadata_dict.release();
 }
 
 CLP_FFI_PY_METHOD auto PyDeserializer_dealloc(PyDeserializer* self) -> void {
@@ -280,6 +341,17 @@ auto PyDeserializer::deserialize_log_event() -> PyObject* {
     }
 
     Py_RETURN_NONE;
+}
+
+auto PyDeserializer::get_user_defined_metadata() const -> nlohmann::json const* {
+    auto const& metadata{m_deserializer->get_metadata()};
+    std::string const user_defined_metadata_key{
+            clp::ffi::ir_stream::cProtocol::Metadata::UserDefinedMetadataKey
+    };
+    if (false == metadata.contains(user_defined_metadata_key)) {
+        return nullptr;
+    }
+    return &metadata.at(user_defined_metadata_key);
 }
 
 auto PyDeserializer::handle_log_event(clp::ffi::KeyValuePairLogEvent&& log_event) -> IRErrorCode {

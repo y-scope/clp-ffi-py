@@ -46,6 +46,15 @@ py_utils_get_formatted_timestamp(clp::ir::epoch_time_ms_t timestamp, PyObject* t
 [[nodiscard]] auto py_utils_serialize_dict_to_msgpack(PyDictObject* py_dict) -> PyBytesObject*;
 
 /**
+ * CPython wrapper of `clp_ffi_py.utils.serialize_dict_to_json_str`.
+ * @param py_dict
+ * @return a new reference of a Python Unicode object containing JSON string representation of the
+ * dictionary.
+ * @return nullptr on failure with the relevant Python exception and error set.
+ */
+[[nodiscard]] auto py_utils_serialize_dict_to_json_str(PyDictObject* py_dict) -> PyUnicodeObject*;
+
+/**
  * CPython wrapper of `clp_ffi_py.utils.parse_json_str_to_dict`.
  * @param json_str
  * @return a new reference of the parsed JSON object.

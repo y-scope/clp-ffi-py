@@ -133,6 +133,7 @@ CLP_FFI_PY_MARK_AS_PYOBJECT(ir::native::PySerializer);
 CLP_FFI_PY_MARK_AS_PYOBJECT(PyBytesObject);
 CLP_FFI_PY_MARK_AS_PYOBJECT(PyDictObject);
 CLP_FFI_PY_MARK_AS_PYOBJECT(PyTypeObject);
+CLP_FFI_PY_MARK_AS_PYOBJECT(PyUnicodeObject);
 }  // namespace clp_ffi_py
 
 #endif  // CLP_FFI_PY_PY_OBJECT_CAST_HPP

@@ -166,6 +166,13 @@ class TestCaseSerializer(TestCLPBase):
         with self.assertWarns(ResourceWarning) as _:
             serializer = None  # noqa
 
+    def test_invalid_user_defined_metadata(self) -> None:
+        byte_buffer: BytesIO = BytesIO()
+        with self.assertRaises(TypeError):
+            _ = Serializer(byte_buffer, user_defined_metadata="str")  # type: ignore
+        with self.assertRaises(TypeError):
+            _ = Serializer(byte_buffer, user_defined_metadata=[1, "str"])  # type: ignore
+
     def __get_test_files(self) -> List[Path]:
         test_files: List[Path] = []
         for file_path in TestCaseSerializer.test_data_dir.rglob("*"):

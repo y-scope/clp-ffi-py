@@ -12,6 +12,7 @@
 #include <clp/ffi/SchemaTree.hpp>
 #include <clp/time_types.hpp>
 #include <gsl/gsl>
+#include <json/single_include/nlohmann/json.hpp>
 
 #include <clp_ffi_py/ir/native/DeserializerBufferReader.hpp>
 #include <clp_ffi_py/PyObjectUtils.hpp>
@@ -108,6 +109,13 @@ public:
      * @return nullptr on failure with the relevant Python exception and error set.
      */
     [[nodiscard]] auto deserialize_log_event() -> PyObject*;
+
+    /**
+     * @return A pointer to the user-defined stream-level metadata, deserialized from the stream's
+     * preamble, if defined.
+     * @return std::nullptr if the user-defined stream-level metadata is not defined.
+     */
+    [[nodiscard]] auto get_user_defined_metadata() const -> nlohmann::json const*;
 
 private:
     /**

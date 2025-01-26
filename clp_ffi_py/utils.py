@@ -48,6 +48,19 @@ def serialize_dict_to_msgpack(dictionary: Dict[Any, Any]) -> bytes:
     return msgpack.packb(dictionary)
 
 
+def serialize_dict_to_json_str(dictionary: Dict[Any, Any]) -> str:
+    """
+    Serializes the given dictionary into a JSON string.
+
+    :param dictionary: The dictionary to serialize.
+    :return: JSON string of the serialized dictionary.
+    :raises: TypeError The given input is not a dictionary.
+    """
+    if not isinstance(dictionary, dict):
+        raise TypeError("The type of the input object must be a dictionary.")
+    return json.dumps(dictionary)
+
+
 def parse_json_str(json_str: str) -> Any:
     """
     Wrapper of `json.loads`, which parses a JSON string into a Python object.
