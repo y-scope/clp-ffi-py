@@ -73,7 +73,7 @@ To manually build a package for distribution, follow the steps below.
   ```
 
 ## Using Key-Value Pair IR Streams
-The CLP key-value pair IR stream, introduced in version 0.1.0, is a new IR stream format that 
+The CLP key-value pair IR stream, introduced in version 0.0.14, is a new IR stream format that
 enables efficient serialization of key-value pair (kv-pair) log events.
 
 We categorize the kv-pairs of a log event into two categories:
@@ -146,7 +146,7 @@ with open("example.clp", "rb") as ir_stream:
 - `KeyValuePairLogEvent.to_dict` can be used to convert the underlying deserialized results into
   Python dictionaries.
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > The current `Deserializer` does not support reading the previous IR stream format. Backward
 > compatibility will be added in future releases.
 
@@ -416,9 +416,9 @@ in the table below.
 [10]: https://docs.yscope.com/clp-ffi-py/main/api/clp_ffi_py.html
 
 [badge_build_status]: https://github.com/y-scope/clp-ffi-py/workflows/Build/badge.svg
-[badge_monthly_downloads]: https://static.pepy.tech/badge/clp-ffi-py/month 
+[badge_monthly_downloads]: https://static.pepy.tech/badge/clp-ffi-py/month
 [badge_pypi]: https://badge.fury.io/py/clp-ffi-py.svg
 [badge_total_downloads]: https://static.pepy.tech/badge/clp-ffi-py
 [clp_ffi_py_gh_actions]: https://github.com/y-scope/clp-ffi-py/actions
-[msgpack]: https://github.com/msgpack/msgpack/blob/master/spec.md 
+[msgpack]: https://github.com/msgpack/msgpack/blob/master/spec.md
 [pepy/clp_ffi_py]: https://pepy.tech/project/clp-ffi-py
