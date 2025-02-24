@@ -4,6 +4,7 @@
 #include <wrapped_facade_headers/Python.hpp>  // Must be included before any other header files
 
 #include <functional>
+#include <memory>
 #include <utility>
 
 #include <clp/ffi/ir_stream/decoding_methods.hpp>
@@ -172,7 +173,8 @@ private:
 
         [[nodiscard]] auto handle_schema_tree_node_insertion(
                 bool is_auto_generated,
-                clp::ffi::SchemaTree::NodeLocator schema_tree_node_locator
+                clp::ffi::SchemaTree::NodeLocator schema_tree_node_locator,
+                [[maybe_unused]] std::shared_ptr<clp::ffi::SchemaTree const> const& schema_tree
         ) -> clp::ffi::ir_stream::IRErrorCode {
             return m_schema_tree_node_insertion_handle(is_auto_generated, schema_tree_node_locator);
         }
