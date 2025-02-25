@@ -2,6 +2,7 @@
 
 #include "PyDeserializer.hpp"
 
+#include <memory>
 #include <new>
 #include <string>
 #include <system_error>
@@ -253,8 +254,10 @@ auto PyDeserializer::init(
 
         PyDeserializer::IrUnitHandler::SchemaTreeNodeInsertionHandle
                 trivial_schema_tree_node_insertion_handle
-                = []([[maybe_unused]] bool, [[maybe_unused]] clp::ffi::SchemaTree::NodeLocator
-                  ) -> IRErrorCode { return IRErrorCode::IRErrorCode_Success; };
+                = []([[maybe_unused]] bool,
+                     [[maybe_unused]] clp::ffi::SchemaTree::NodeLocator,
+                     [[maybe_unused]] std::shared_ptr<clp::ffi::SchemaTree const> const&)
+                -> IRErrorCode { return IRErrorCode::IRErrorCode_Success; };
 
         PyDeserializer::IrUnitHandler::EndOfStreamHandle end_of_stream_handle
                 = [this]() -> IRErrorCode { return this->handle_end_of_stream(); };

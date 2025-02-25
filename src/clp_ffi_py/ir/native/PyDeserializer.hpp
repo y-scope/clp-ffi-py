@@ -4,6 +4,7 @@
 #include <wrapped_facade_headers/Python.hpp>  // Must be included before any other header files
 
 #include <functional>
+#include <memory>
 #include <utility>
 
 #include <clp/ffi/ir_stream/decoding_methods.hpp>
@@ -129,10 +130,15 @@ private:
                 = std::function<clp::ffi::ir_stream::IRErrorCode(clp::ffi::KeyValuePairLogEvent&&)>;
         using UtcOffsetChangeHandle
                 = std::function<clp::ffi::ir_stream::IRErrorCode(clp::UtcOffset, clp::UtcOffset)>;
+        // clang-format off
+        // NOTE: clang-format 19.1.7 fails to correctly format the following lines within the
+        // 100-char ColumnLimit.
         using SchemaTreeNodeInsertionHandle = std::function<clp::ffi::ir_stream::IRErrorCode(
-                bool is_auto_generated,
-                clp::ffi::SchemaTree::NodeLocator
+                bool,
+                clp::ffi::SchemaTree::NodeLocator,
+                std::shared_ptr<clp::ffi::SchemaTree const> const&
         )>;
+        // clang-format on
         using EndOfStreamHandle = std::function<clp::ffi::ir_stream::IRErrorCode()>;
 
         // Constructor
@@ -172,9 +178,14 @@ private:
 
         [[nodiscard]] auto handle_schema_tree_node_insertion(
                 bool is_auto_generated,
-                clp::ffi::SchemaTree::NodeLocator schema_tree_node_locator
+                clp::ffi::SchemaTree::NodeLocator schema_tree_node_locator,
+                [[maybe_unused]] std::shared_ptr<clp::ffi::SchemaTree const> const& schema_tree
         ) -> clp::ffi::ir_stream::IRErrorCode {
-            return m_schema_tree_node_insertion_handle(is_auto_generated, schema_tree_node_locator);
+            return m_schema_tree_node_insertion_handle(
+                    is_auto_generated,
+                    schema_tree_node_locator,
+                    schema_tree
+            );
         }
 
         [[nodiscard]] auto handle_end_of_stream() -> clp::ffi::ir_stream::IRErrorCode {
