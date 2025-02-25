@@ -130,11 +130,13 @@ private:
                 = std::function<clp::ffi::ir_stream::IRErrorCode(clp::ffi::KeyValuePairLogEvent&&)>;
         using UtcOffsetChangeHandle
                 = std::function<clp::ffi::ir_stream::IRErrorCode(clp::UtcOffset, clp::UtcOffset)>;
+        // clang-format off
         using SchemaTreeNodeInsertionHandle = std::function<clp::ffi::ir_stream::IRErrorCode(
-                (bool,
-                 clp::ffi::SchemaTree::NodeLocator,
-                 std::shared_ptr<clp::ffi::SchemaTree const> const&)
+                bool,
+                clp::ffi::SchemaTree::NodeLocator,
+                std::shared_ptr<clp::ffi::SchemaTree const> const&
         )>;
+        // clang-format on
         using EndOfStreamHandle = std::function<clp::ffi::ir_stream::IRErrorCode()>;
 
         // Constructor
