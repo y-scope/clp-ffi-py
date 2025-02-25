@@ -131,6 +131,8 @@ private:
         using UtcOffsetChangeHandle
                 = std::function<clp::ffi::ir_stream::IRErrorCode(clp::UtcOffset, clp::UtcOffset)>;
         // clang-format off
+        // NOTE: clang-format 19.1.7 fails to correctly format the following lines within the
+        // 100-char ColumnLimit.
         using SchemaTreeNodeInsertionHandle = std::function<clp::ffi::ir_stream::IRErrorCode(
                 bool,
                 clp::ffi::SchemaTree::NodeLocator,
